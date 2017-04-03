@@ -1,0 +1,16 @@
+{% extends "base" %}
+
+<!-- TITLE -->
+{% block title %}
+    OKM/{{ diaarinro }}
+{% endblock %}
+
+<!-- HEADER -->
+{% block header %}
+    {% include fromDefault("header") %}
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+    {% include fromContext("paatos/content_paatos") %}
+{% endblock %}

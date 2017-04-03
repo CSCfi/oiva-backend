@@ -1,0 +1,176 @@
+
+<div class="sector">
+    <div class="sector-left">Viite</div>
+    <div class="sector-right">
+
+    </div>
+</div>
+
+<div class="sector">
+    <div class="sector-left">Asia</div>
+    <div class="sector-right">
+        <h4>Ammatillisen koulutuksen järjestämislupa</h4>
+        <p>
+            Koulutuksen järjestäjälle on myönnetty ammatillisesta koulutuksesta annetun lain (mikä laki ja mitkä pykälät?!)
+            nojalla ammatillisen koulutuksen järjestämislupa <span class="data">{{ lupa.paatospvm | date("dd.MM.yyyy") }}</span> päivätyllä opetus-
+            ja kulttuuriministeriön päätöksellä <span class="data">{{ lupa.diaarinumero }}</span>.
+        </p>
+        <div class="paatoskohtainenTeksti">
+            <span class="data">{{ lupa.meta | field("paatosteksti") | translated }}</span>
+        </div>
+        <p>
+            Tämän päätöksen määräyksiä sovelletaan <span class="data">{{ lupa.alkupvm | date("dd.MM.yyyy") }}</span> alkaen.
+        </p>
+        <p>
+            <b>Säädökset, joihin päätös perustuu:</b><br/>
+            <span class="if">
+                {% if lupa.maaraykset | sallittuKohde("tagi_kokeilu") is notBlank %}
+                    <span class="todo">Mikä laki ja mitkä pykälät?!</span><br/>
+                {% else %}
+                    <span class="todo">Mikä laki ja mitkä pykälät?!</span><br/>
+                {% endif %}
+            </span>
+            <span class="todo">Mikä laki ja mitkä pykälät?!</span><br/>
+            <span class="todo">Mikä laki ja mitkä pykälät?!</span><br/>
+            <span class="if">
+                {% if lupa.maaraykset | sallittuKohde("tagi_kuljettajakoulutus") is notBlank %}
+                    Kuorma- ja linja-auton kuljettajien ammattipätevyydestä <span class="todo">Mikä laki ja mitkä pykälät?!</span>
+                {% endif %}
+            </span>
+        </p>
+        <p>
+            {% include fromDefault("maksu") %}
+        </p>
+        <p>
+            <b>Muutoksenhaku:</b><br/>
+            <span class="todo">TODO: refaktorointi</span>
+            Tähän päätökseen saa hakea muutosta valittamalla
+            <span class="todo">
+            {% if hallintooikeus == "hki" %} Helsingin
+            {% elseif hallintooikeus == "hml" %} Hämeenlinnan
+            {% elseif hallintooikeus == "ita" %} Itä-Suomen
+            {% elseif hallintooikeus == "poh" %} Pohjois-Suomen
+            {% elseif hallintooikeus == "tku" %} Turun
+            {% elseif hallintooikeus == "vsa" %} Vaasan
+            {% else %} korkeimpaan
+            {% endif %}
+            </span>
+            hallinto-oikeuteen.
+            Valitus saadaan tehdä sillä perusteella, että päätös on lain vastainen. Valitusaika on 30 päivää
+            tiedoksisaannista. Liitteenä olevasta valitusosoituksesta ilmenee, miten muutosta haettaessa on
+            meneteltävä.
+        </p>
+
+        <div class="ministeri">
+            <div class="ministeri-left">
+                <span class="data">{{ lupa.meta | fieldvalue("ministeri_nimeke") }}</span>
+            </div>
+            <div class="ministeri-right">
+                <span class="data">{{ lupa.meta | fieldvalue("ministeri_nimi") }}</span>
+            </div>
+        </div>
+        <div class="esittelija">
+            <div class="esittelija-left">
+                <span class="data">{{ lupa.meta | fieldvalue("esittelija_nimeke") }}</span>
+            </div>
+            <div class="esittelija-right">
+                <span class="data">{{ lupa.meta | fieldvalue("esittelija_nimi") }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="sector">
+    <div class="sector-left">Liitteet</div>
+    <div class="sector-right">
+        <ul class="none">
+            {% if lupa.maaraykset | sallittuKohde("tagi_kuljettajakoulutus") is notBlank %}
+                <li>
+                    <span class="if">Lupa toimia kuorma- ja linja-autonkuljettajien ammattipätevyyskoulutusta antavana koulutuskeskuksena</span>
+                </li>
+            {% endif %}
+            {% if lupa.maksu %}
+                <li>
+                    <span class="if">Maksua koskeva oikaisuvaatimusosoitus 15/091/2016</span>
+                </li>
+            {% endif %}
+            <li>
+                <span class="todo">TODO: Valitusosoitus (oikean alueen mukainen)</span>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="sector">
+    <div class="sector-left">Tiedoksi</div>
+    <div class="sector-right">
+        <ul class="none">
+            <li>Opetushallitus</li>
+            <li>Opetushallitus/Koulutustoimialan palvelut</li>
+            <li>Tilastokeskus</li>
+            {% if lupa.maaraykset | sallittuKohde("tagi_kuljettajakoulutus") is notBlank %}
+                <li>
+                    <span class="if">Trafi</span>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<div id="koulutustehtavaPage">
+    <div class="otsikko">Opiskelijavuosien vähimmäismäärä</div>
+    <div class="sisalto">
+        <span class="loop">
+            {% for maarays in lupa.maaraykset | sallittuKohde(["opiskelijamaara", "opiskelijamaara_sisaoppilaitos", "opiskelijamaara_erityisoppilaitos"]) %}
+                <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
+            {% endfor %}
+        </span>
+    </div>
+
+    <div class="otsikko">Opetuskieli</div>
+    <div class="sisalto">
+        <span class="loop">
+            {% for maarays in lupa.maaraykset | sallittuKohde("opetuskieli") %}
+                <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
+            {% endfor %}
+        </span>
+    </div>
+
+    <div class="otsikko">Toiminta-alue</div>
+    <div class="sisalto">
+        <span class="todo">
+            <span class="loop">
+                {% for maarays in lupa.maaraykset | sallittuKohde("jarjestamiskunta") %}
+                    <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
+                {% endfor %}
+            </span>
+        </span>
+    </div>
+
+    <div class="otsikko">Koulutukset</div>
+    <div class="sisalto">
+        <span class="todo">
+            <span class="loop">
+                {% for maarays in lupa.maaraykset | sallittuKohde("tutkinto") %} <!-- TODO: koulutus -->
+                    <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
+                {% endfor %}
+            </span>
+        </span>
+    </div>
+
+    <div class="otsikko">Muut määräykset</div>
+    <div class="sisalto">
+        <span class="todo">
+            <span class="loop">
+                {% for maarays in lupa.maaraykset | sallittuKohde("muu") %} <!-- TODO: muu määräys -->
+                    <div class="muutMaarayksetOtsikko">
+                        <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>
+                    </div>
+                    <div class="muutMaarayksetSelite">
+                        <span class="data">{{ maarays.kohde.meta | field("selite") | translated }}</span>
+                    </div>
+                {% endfor %}
+            </span>
+        </span>
+    </div>
+</div>

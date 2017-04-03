@@ -1,0 +1,91 @@
+# In servers and development these are overidden
+# by external application.yml
+
+oiva:
+    dbhost: override_this_in_local_application_yml
+    dbport: override_this_in_local_application_yml
+    dbname: override_this_in_local_application_yml
+    dbusername: override_this_in_local_application_yml
+    dbpassword: override_this_in_local_application_yml
+    baseUrl: override_this_in_local_application_yml
+
+jooq:
+    sql.dialect: POSTGRES
+
+api:
+    url.prefix: /api
+    public:
+        url.prefix: /public
+
+opintopolku:
+    baseUrl: override_this_in_local_application_yml
+    lokalisaatio:
+        restUrl: /lokalisointi/cxf/rest/v1/localisation
+    koodisto:
+        restUrl: /koodisto-service/rest/json
+    organisaatio:
+        restUrl: /organisaatio-service/rest/organisaatio
+    autentikaatio:
+        restUrl: /authentication-service
+    henkilo:
+        restUrl: ${opintopolku.autentikaatio.restUrl}/resources/henkilo
+    apiCredentials:
+        username: override_this_in_local_application_yml
+        password: override_this_in_local_application_yml
+
+cas:
+    baseUrl: override_this_in_local_application_yml
+    url.prefix: /cas
+    url.login: /login
+    url.logout: /logout
+    service.url: /login/cas
+
+ldap:
+    cache.size: 10000
+    index.cache.size: 10000
+    url: override_this_in_local_application_yml
+    base-prefix: override_this_in_local_application_yml
+    user-search-base: override_this_in_local_application_yml
+    manager:
+        dn: override_this_in_local_application_yml
+        password: override_this_in_local_application_yml
+    cas:
+        user-search-filter: override_this_in_local_application_yml
+        group-search-base: override_this_in_local_application_yml
+        group-search-filter: override_this_in_local_application_yml
+        group-role-attribute: override_this_in_local_application_yml
+
+multipart:
+    maxFileSize: 512MB
+    maxRequestSize: 512MB
+
+server:
+    port: override_this_in_local_application_yml
+
+management:
+    context-path: /manage
+    security.enabled: false
+
+spring:
+    datasource:
+        dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
+        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}
+        username: ${oiva.dbusername}
+        password: ${oiva.dbpassword}
+        platform: postgresql
+        driverClassName: org.postgresql.Driver
+        initialize: false
+
+redis:
+    host: override_this_in_local_application_yml
+    port: override_this_in_local_application_yml
+    kvstore:
+        keyPrefix: kv.
+    userSessionPrefix: spring:session
+
+prince:
+    exec.path: /usr/bin/prince
+
+templates:
+    base.path: /opt/oiva/backend/templates
+

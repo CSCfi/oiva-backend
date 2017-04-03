@@ -1,0 +1,45 @@
+<div id="page-header">
+    <div id="page-header-left">
+        <p>
+            <img src="{{ baseUri }}/images/OKM_leijona_BW_15mm.svg" class="logo">
+        <p>
+        <p>
+            <span class="data">{{ jarjestaja.nimi | translated(language) }}</span><br/>
+            <span class="if">
+                {% if jarjestaja.postiosoite is notBlank %}
+                    <span class="data">{{ jarjestaja.postiosoite.osoite }}</span><br/>
+                    <span class="data">{{ jarjestaja.postiosoite.postiKoodi }} {{ jarjestaja.postiosoite.postitoimipaikka }}</span>
+                {% endif %}
+            </span>
+        </p>
+    </div>
+    <div id="page-header-center">
+        <h4>Päätös</h4>
+        <span class="data">{{ lupa.paatospvm | date("dd.MM.yyyy") }}</span>
+    </div>
+    <div id="page-header-right">
+        OKM/<span class="data">{{ lupa.diaarinumero }}</span>
+    </div>
+</div>
+
+<div id="diaari-placeholder">
+    OKM/{{ lupa.diaarinumero }}
+</div>
+
+<div id="page-footer">
+    <div id="page-footer-left">
+        Opetus- ja kulttuuriministeriö<br />
+        Meritullinkatu 10, Helsinki | PL 29, 00023 Valtioneuvosto<br />
+        Puh. 0295 3 30004 | kirjaamo@minedu.fi
+    </div>
+    <div id="page-footer-center">
+        Undervisnings- och kulturministeriet<br />
+        Sjötullsgatan 10, Helsingfors | PL 29, 00023 Statsrådet<br />
+        Tfn 0295 3 30004 | kirjaamo@minedu.fi
+    </div>
+    <div id="page-footer-right">
+        www.minedu.fi<br />
+        Y-tunnus 0245872-8<br />
+        FO-nummer 0245872-8
+    </div>
+</div>

@@ -1,0 +1,15 @@
+application-dev.yml
+application-template.yml
+application-test.yml
+docker-compose.yml
+
+target/*
+target
+*.iml
+.idea
+
+rebel.xml
+release.properties
+nginx/conf/nginx.conf
+pom.xml.releaseBackup
+oiva-backend.log*
