@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 
@@ -18,6 +18,10 @@ public class KoodistoService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
+    public KoodistoKoodi getKoodi(final String koodisto, final String koodi) {
+        return opintopolkuService.getKoodi(koodisto, koodi);
+    }
+
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
     public List<Maakunta> getMaakuntaKunnat() {
         return opintopolkuService.getMaakuntaKunnat();
@@ -34,23 +38,23 @@ public class KoodistoService {
     }
 
     @Cacheable(value = "KoodistoService:getKunnat", key = "''")
-    public List<Koodisto> getKunnat() {
-        return opintopolkuService.getKunnatKoodisto();
+    public List<KoodistoKoodi> getKunnat() {
+        return opintopolkuService.getKunnatKoodit();
     }
 
     @Cacheable(value = "KoodistoService:getKunta")
-    public Koodisto getKunta(final String koodi) {
-        return opintopolkuService.getKuntaKoodisto(koodi);
+    public KoodistoKoodi getKunta(final String koodi) {
+        return opintopolkuService.getKuntaKoodi(koodi);
     }
 
     @Cacheable(value = "KoodistoService:getKielet", key = "''")
-    public List<Koodisto> getKielet() {
-        return opintopolkuService.getKieletKoodisto();
+    public List<KoodistoKoodi> getKielet() {
+        return opintopolkuService.getKieliKoodit();
     }
 
     @Cacheable(value = {"KoodistoService:getKieli"})
-    public Koodisto getKieli(final String koodi) {
-        final Koodisto kieliKoodisto = opintopolkuService.getKieliKoodisto(koodi);
+    public KoodistoKoodi getKieli(final String koodi) {
+        final KoodistoKoodi kieliKoodisto = opintopolkuService.getKieliKoodi(koodi);
 
         // AM-308 fix usable until koodisto is fixed
         if(StringUtils.equalsIgnoreCase(kieliKoodisto.koodiArvo(), "SE")) {
@@ -66,25 +70,25 @@ public class KoodistoService {
      *  - saame (koodiArvi: 5)
      */
     @Cacheable(value = "KoodistoService:getOpetuskielet", key = "''")
-    public List<Koodisto> getOpetuskielet() {
-        return opintopolkuService.getOppilaitoksenOpetuskieletKoodisto().stream()
+    public List<KoodistoKoodi> getOpetuskielet() {
+        return opintopolkuService.getOppilaitoksenOpetuskieliKoodit().stream()
             .filter(koodistoItem -> Arrays.asList("1", "2", "5").contains(koodistoItem.koodiArvo())).collect(Collectors.toList());
     }
 
     @Cacheable(value = "KoodistoService:getAluehallintovirastoKuntaMap", key = "''")
-    public Map<String, Koodisto> getKuntaAluehallintovirastoMap() {
-        final Map<String, Koodisto> map = new HashMap<>();
-        opintopolkuService.getAlueHallintovirastotKoodisto().stream().forEach(
-            avi -> opintopolkuService.getKunnatForAlueHallintovirastoKoodisto(avi.koodiArvo()).stream().forEach(
+    public Map<String, KoodistoKoodi> getKuntaAluehallintovirastoMap() {
+        final Map<String, KoodistoKoodi> map = new HashMap<>();
+        opintopolkuService.getAlueHallintovirastoKoodit().stream().forEach(
+            avi -> opintopolkuService.getKuntaKooditForAlueHallintovirasto(avi.koodiArvo()).stream().forEach(
             kunta -> map.put(kunta.koodiArvo(), avi)));
         return map;
     }
 
     @Cacheable(value = "KoodistoService:getKuntaMaakuntaMap", key = "''")
-    public Map<String, Koodisto> getKuntaMaakuntaMap() {
-        final Map<String, Koodisto> map = new HashMap<>();
-        opintopolkuService.getMaakunnatKoodisto().stream().forEach(
-            maakunta -> opintopolkuService.getMaakuntaKunnatKoodisto(maakunta.koodiArvo()).stream().forEach(
+    public Map<String, KoodistoKoodi> getKuntaMaakuntaMap() {
+        final Map<String, KoodistoKoodi> map = new HashMap<>();
+        opintopolkuService.getMaakuntaKoodit().stream().forEach(
+            maakunta -> opintopolkuService.getKuntaKooditForMaakunta(maakunta.koodiArvo()).stream().forEach(
             kunta -> map.put(kunta.koodiArvo(), maakunta)));
         return map;
     }

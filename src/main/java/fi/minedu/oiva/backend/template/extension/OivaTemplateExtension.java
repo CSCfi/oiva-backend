@@ -31,6 +31,9 @@ public class OivaTemplateExtension implements Extension {
         filters.put("sortByLanguage", new SortByLanguageFilter());
         filters.put("toDate", new ToDateFilter());
         filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS, VELVOITE));
+        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS));
+        filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE));
+        filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE));
         return filters;
     }
 

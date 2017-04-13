@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.service.KoodistoService;
@@ -27,6 +27,11 @@ public class KoodistoController {
     @Autowired
     private KoodistoService service;
 
+    @RequestMapping(value = "/koodi/{koodisto}/{koodi}", method = GET)
+    public KoodistoKoodi getKieliByKoodi(@PathVariable String koodisto, @PathVariable String koodi) {
+        return service.getKoodi(koodisto, koodi);
+    }
+
     @RequestMapping(value = "/maakuntakunta", method = GET)
     public CompletableFuture<Collection<Maakunta>> getMaakuntaKunnat() {
         return async(service::getMaakuntaKunnat);
@@ -43,27 +48,27 @@ public class KoodistoController {
     }
 
     @RequestMapping(value = "/kunnat", method = GET)
-    public CompletableFuture<Collection<Koodisto>> getKunnat() {
+    public CompletableFuture<Collection<KoodistoKoodi>> getKunnat() {
         return async(service::getKunnat);
     }
 
     @RequestMapping(value = "/kunnat/{koodi}", method = GET)
-    public Koodisto getKuntaByKoodi(@PathVariable String koodi) {
+    public KoodistoKoodi getKuntaByKoodi(@PathVariable String koodi) {
         return service.getKunta(koodi);
     }
 
     @RequestMapping(value = "/kielet", method = GET)
-    public CompletableFuture<Collection<Koodisto>> getKielet() {
+    public CompletableFuture<Collection<KoodistoKoodi>> getKielet() {
         return async(service::getKielet);
     }
 
     @RequestMapping(value = "/kielet/{koodi}", method = GET)
-    public Koodisto getKieliByKoodi(@PathVariable String koodi) {
+    public KoodistoKoodi getKieliByKoodi(@PathVariable String koodi) {
         return service.getKieli(koodi);
     }
 
     @RequestMapping(value = "/opetuskielet", method = GET)
-    public CompletableFuture<Collection<Koodisto>> getOpetuskielet() {
+    public CompletableFuture<Collection<KoodistoKoodi>> getOpetuskielet() {
         return async(service::getOpetuskielet);
     }
 }

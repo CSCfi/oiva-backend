@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.template.extension;
 
 import com.mitchellbosecke.pebble.extension.Filter;
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +25,8 @@ public class SortByLanguageFilter implements Filter {
         }
 
         final String lang = ((String) map.get("language")).toLowerCase();
-        final List<Koodisto> list = Arrays.asList(((Collection<Koodisto>) data).toArray(new Koodisto[]{}));
-        Collections.sort(list, (Koodisto a,Koodisto b) -> a.getTeksti().get(lang).orElse("").compareTo(b.getTeksti().get(lang).orElse("")));
+        final List<KoodistoKoodi> list = Arrays.asList(((Collection<KoodistoKoodi>) data).toArray(new KoodistoKoodi[]{}));
+        Collections.sort(list, (KoodistoKoodi a, KoodistoKoodi b) -> a.getTeksti().get(lang).orElse("").compareTo(b.getTeksti().get(lang).orElse("")));
         return list;
     }
 

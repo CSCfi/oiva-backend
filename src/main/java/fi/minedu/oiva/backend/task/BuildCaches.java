@@ -25,7 +25,7 @@ public class BuildCaches {
     @PostConstruct
     public void onStart() {
         if (!Arrays.asList(env.getActiveProfiles()).contains("test")) {
-            refreshCaches();
+//            refreshCaches(); // TODO: RETURN ME!!
         }
     }
 

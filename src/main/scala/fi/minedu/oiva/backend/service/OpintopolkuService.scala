@@ -5,6 +5,7 @@ import javax.annotation.PostConstruct
 
 import fi.minedu.oiva.backend.cache.CacheAware
 import fi.minedu.oiva.backend.cas.CASClient
+import fi.minedu.oiva.backend.entity.Maarays
 import fi.minedu.oiva.backend.entity.dto.OrganisaatioInfo
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton
 import fi.minedu.oiva.backend.entity.opintopolku._
@@ -34,22 +35,33 @@ class OpintopolkuService extends CacheAware {
 
     @Value("${opintopolku.baseUrl}${opintopolku.koodisto.restUrl}")
     private val koodistoServiceUrl: String = null
-    private lazy val maakunnatKoodistoUrl: String = koodistoServiceUrl + "/maakunta/koodi"
-    private lazy val maakuntaKunnatKoodistoUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-ylakoodit/maakunta_%s"
-    private lazy val kunnatKoodistoUrl: String = koodistoServiceUrl + "/kunta/koodi/"
-    private lazy val kuntaKoodistoUrl: String = koodistoServiceUrl + "/kunta/koodi/kunta_%s"
-    private lazy val kieletKoodistoUrl: String = koodistoServiceUrl + "/kieli/koodi"
-    private lazy val kieliKoodistoUrl: String = koodistoServiceUrl + "/kieli/koodi/kieli_%s"
-    private lazy val oppilaitoksenOpetuskielietKoodistoUrl: String = koodistoServiceUrl + "/oppilaitoksenopetuskieli/koodi"
-    private lazy val eiTutkintoTavottaisetKoodistoUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-ylakoodit/opintoalaoph2002_998"
-    private lazy val alueHallintovirastotKoodistoUrl: String = koodistoServiceUrl + "/aluehallintovirasto/koodi"
-    private lazy val alueHallintovirastonKunnatKoodistoUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-alakoodit/aluehallintovirasto_%s"
-    private lazy val koulutustyypitKoodistoUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-ylakoodit/koulutustyyppi_1"
-    private lazy val koulutusKoodistoUrl: String = koodistoServiceUrl + "/koulutus/koodi/koulutus_%s"
-    private lazy val koulutusAlaKoodistoUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-alakoodit/koulutus_%s"
-    private lazy val koulutusAlaOph2002KoodistoUrl: String = koodistoServiceUrl + "/koulutusalaoph2002/koodi/koulutusalaoph2002_%s"
-    private lazy val koulutusOsaamisalaKoodistoUrl: String = koodistoServiceUrl + "/osaamisala/koodi/osaamisala_%s"
-    private lazy val koulutusItemUrl: String = koodistoServiceUrl + "/codeelement/latest/%s_%s"
+
+    // Koodisto relaatiot
+    private lazy val relaatioAlakoodiUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-alakoodit/"
+    private lazy val relaatioYlakoodiUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-ylakoodit/"
+
+    // Koodisto koodit
+    private lazy val alueHallintovirastoKoodiUrl: String = koodistoServiceUrl + "/aluehallintovirasto/koodi/"
+    private lazy val maakuntaKoodiUrl: String = koodistoServiceUrl + "/maakunta/koodi/"
+    private lazy val kuntaKoodiUrl: String = koodistoServiceUrl + "/kunta/koodi/"
+    private lazy val koulutusAlaOph2002KoodiUrl: String = koodistoServiceUrl + "/koulutusalaoph2002/koodi/"
+    private lazy val koulutusKoodiUrl: String = koodistoServiceUrl + "/koulutus/koodi/"
+    private lazy val koulutusOsaamisalaKoodiUrl: String = koodistoServiceUrl + "/osaamisala/koodi/"
+    private lazy val kieliKoodiUrl: String = koodistoServiceUrl + "/kieli/koodi/"
+    private lazy val oppilaitoksenOpetuskieliKoodiUrl: String = koodistoServiceUrl + "/oppilaitoksenopetuskieli/koodi"
+
+    def koodistoKoodiUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}/koodi/"
+    def koodiUri(koodistoUri: String, koodiArvo: String): String = s"${koodistoUri}_${koodiArvo}"
+
+    // Koodi urit
+    def aluehallintovirastoKoodiUri(koodiArvo: String) = s"aluehallintovirasto_${koodiArvo}"
+    def maakuntaKoodiUri(koodiArvo: String) = s"maakunta_${koodiArvo}"
+    def kuntaKoodiUri(koodiArvo: String) = s"kunta_${koodiArvo}"
+    def koulutusAlaOph2002KoodiUri(koodiArvo: String) = s"koulutusalaoph2002_${koodiArvo}"
+    def koulutustyyppiKoodiUri(koodiArvo: String) = s"koulutustyyppi_${koodiArvo}"
+    def koulutusKoodiUri(koodiArvo: String) = s"koulutus_${koodiArvo}"
+    def osaamisalaKoodiUri(koodiArvo: String) = s"osaamisala_${koodiArvo}"
+    def kieliKoodiUri(koodiArvo: String) = s"kieli_${koodiArvo}"
 
     @Value("${opintopolku.baseUrl}${opintopolku.autentikaatio.restUrl}")
     private val authenticationServiceUrl: String = null
@@ -104,15 +116,9 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    def requestRx[T](url: String, clazz: Class[T]) = {
-        rxClient.target(url).request().rx().get(clazz)
-    }
-
-    def request[T](url: String, klazz: Class[T]) = {
-        rxClient.target(url).request().get(klazz)
-    }
-
-    def toJson[T](str: String, klazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, klazz)
+    def requestRx[T](url: String, clazz: Class[T]) = rxClient.target(url).request().rx().get(clazz)
+    def request[T](url: String, clazz: Class[T]) = rxClient.target(url).request().get(clazz)
+    def toJson[T](str: String, clazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, clazz)
 
     /**
      * Maps raw JSON string to Organisaatio entity
@@ -145,10 +151,7 @@ class OpintopolkuService extends CacheAware {
     def getOrganisaatiohenkilo(oid: String): java.util.List[OrganisaatioInfo] = {
         val strResp = casClient.getTicket(securityCheckUrl, opintopolkuApiUsername, opintopolkuApiPassword)
             .flatMap {
-                ticket => Http(url(organisaatiohenkiloUrl.format(oid))
-                    .GET
-                    .addQueryParameter("ticket", ticket)
-                    OK as.String)
+                ticket => Http(url(organisaatiohenkiloUrl.format(oid)).GET.addQueryParameter("ticket", ticket) OK as.String)
             }.apply()
         ObjectMapperSingleton.mapper.readValue(strResp, new TypeReference[java.util.List[OrganisaatioInfo]](){})
     }
@@ -159,8 +162,8 @@ class OpintopolkuService extends CacheAware {
      * Hakee ja palauttaa maakunnat ja maakuntaan kuuluvat kaikki kunnat
      */
     def getMaakuntaKunnat: java.util.List[Maakunta] =
-        for (maakunta <- request(maakunnatKoodistoUrl, classOf[Array[Maakunta]]).toList) yield {
-            maakunta.setKunta(request(maakuntaKunnatKoodistoUrl.format(maakunta.koodiArvo), classOf[Array[Kunta]]))
+        for (maakunta <- request(maakuntaKoodiUrl, classOf[Array[Maakunta]]).toList) yield {
+            maakunta.setKunta(request(relaatioYlakoodiUrl + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]]))
             maakunta
         }
 
@@ -185,52 +188,43 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    /**
-     * Aluehallintovirastokoodisto
-     */
-    def getAlueHallintovirastotKoodisto = getKoodistoList(alueHallintovirastotKoodistoUrl, false)
-    def getKunnatForAlueHallintovirastoKoodisto(koodi: String) = getKoodistoList(alueHallintovirastonKunnatKoodistoUrl.format(koodi), false)
+    def getKoodi(maarays: Maarays): KoodistoKoodi = getKoodi(maarays.getKoodisto, maarays.getArvo)
+    def getKoodi(koodistoUri: String, koodiArvo: String) = getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo))
 
-    /**
-     * Maakuntakoodisto
-     */
-    def getMaakunnatKoodisto = getKoodistoList(maakunnatKoodistoUrl, false)
-    def getMaakuntaKunnatKoodisto(koodi: String) = getKoodistoList(maakuntaKunnatKoodistoUrl.format(koodi), false)
+    def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiUrl)
 
-    /**
-     * Kuntakoodisto
-     */
-    def getKunnatKoodisto = getKoodistoList(kunnatKoodistoUrl, false)
-    def getKuntaKoodisto(koodi: String) = getKoodisto(kuntaKoodistoUrl, koodi)
+    def getMaakuntaKoodit = getKoodistoKooditList(maakuntaKoodiUrl)
 
-    /**
-     * Kielikoodisto
-     */
-    def getKieletKoodisto = getKoodistoList(kieletKoodistoUrl, false)
-    def getKieliKoodisto(koodi: String) = getKoodisto(kieliKoodistoUrl, koodi.toLowerCase)
-    def getOppilaitoksenOpetuskieletKoodisto = getKoodistoList(oppilaitoksenOpetuskielietKoodistoUrl, false)
+    def getKunnatKoodit = getKoodistoKooditList(kuntaKoodiUrl)
+    def getKuntaKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(kuntaKoodiUrl, kuntaKoodiUri(koodiArvo))
+    def getKuntaKooditForAlueHallintovirasto(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + aluehallintovirastoKoodiUri(koodiArvo))
+    def getKuntaKooditForMaakunta(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiUrl + maakuntaKoodiUri(koodiArvo))
 
-    /**
-     * Koulutuskoodistot
-     */
-    def getKoulutustyypitKoodisto = getKoodistoList(koulutustyypitKoodistoUrl, true)
-    def getKoulutusKoodisto(koodi: String) = getKoodisto(koulutusKoodistoUrl, koodi)
-    def getKoulutusAlaKoodisto(koodi: String) = getKoodistoList(koulutusAlaKoodistoUrl.format(koodi), true)
-    def getKoulutusAlaOph2002Koodisto(koodi: String) = getKoodisto(koulutusAlaOph2002KoodistoUrl, koodi)
-    def getKoulutusOsaamisalaKoodisto(koodi: String) = getKoodisto(koulutusOsaamisalaKoodistoUrl, koodi)
+    def getKieliKoodit = getKoodistoKooditList(kieliKoodiUrl)
+    def getKieliKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(kieliKoodiUrl, kieliKoodiUri(koodiArvo.toLowerCase))
 
-    /**
-     * Muut koodistot
-     */
-    def getEiTutkintoTavotteisetKoodisto = getKoodistoList(eiTutkintoTavottaisetKoodistoUrl, false)
+    def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
 
-    private def getKoodistoList(url: String, showExpired: Boolean): java.util.List[Koodisto] =
-        request(url, classOf[Array[Koodisto]]).toList.filter(koodisto => showExpired || koodisto.isValidDate).distinct.asJava
+//    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)
+//    def getKoulutusKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusKoodiUrl, koulutusKoodiUri(koodiArvo))
+//    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo), true)
+//    def getKoulutusAlaOph2002Koodisto(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusAlaOph2002KoodiUrl, koulutusAlaOph2002KoodiUri(koodiArvo))
+//    def getKoulutusOsaamisalaKoodisto(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusOsaamisalaKoodiUrl, osaamisalaKoodiUri(koodiArvo))
 
-    private def getKoodisto(urlPattern: String, koodi: String): Koodisto =
-        try {
-            request(urlPattern.format(koodi), classOf[Koodisto])
-        } catch {
-            case e: Exception =>  Koodisto.notFound(koodi)
-        }
+    private def getKoodistoKooditList(koodistoKoodiUrl: String, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
+        getKoodistoKooditBlocking(koodistoKoodiUrl).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
+
+    private def getKoodistoKooditBlocking(koodistoKoodiUrl: String): Array[KoodistoKoodi] =
+        try requestKoodistoKoodit(koodistoKoodiUrl).toCompletableFuture.join
+        catch { case e: Exception => Array.empty }
+
+    private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String): KoodistoKoodi =
+        try requestKoodistoKoodi(koodistoUrl, koodiUri).toCompletableFuture.join
+        catch { case e: Exception =>  KoodistoKoodi.notFound(koodiUri) }
+
+    private def requestKoodistoKoodit(koodistoKoodiUrl: String) =
+        cacheRx(koodistoKoodiUrl) { requestRx(koodistoKoodiUrl, classOf[Array[KoodistoKoodi]]) }
+
+    private def requestKoodistoKoodi(koodistoKoodiUrl: String, koodiUri: String) =
+        cacheRx(koodiUri) { requestRx(koodistoKoodiUrl + koodiUri, classOf[KoodistoKoodi]) }
 }

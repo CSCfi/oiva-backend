@@ -2,7 +2,7 @@ package fi.minedu.oiva.backend.entity
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi
 import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -11,12 +11,14 @@ class Maarays(
     var kohde: Kohde,
     var maaraystyyppi: Maaraystyyppi,
     var tekstityyppi: Tekstityyppi,
-    var koodi: Koodisto) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
+    var koodi: KoodistoKoodi) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
     def this() = this(null, null, null, null)
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
     @JsonIgnore override def getTekstityyppiId = super.getTekstityyppiId
+
+    @JsonIgnore def hasKoodistoKoodiInfo = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getArvo)
 
     def getKohde = kohde
     def setKohde(kohde: Kohde): Unit = this.kohde = kohde
@@ -33,5 +35,5 @@ class Maarays(
     def isTekstityyppi = if(null != tekstityyppi) tekstityyppi.getTunniste else null
 
     def getKoodi = koodi
-    def setKoodi(koodi: Koodisto) = this.koodi = koodi
+    def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
 }

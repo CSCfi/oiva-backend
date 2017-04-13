@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fi.minedu.oiva.backend.entity.json.TranslatedStringDeserializer;
 import fi.minedu.oiva.backend.entity.json.TranslatedStringSerializer;
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton;
 import fi.minedu.oiva.backend.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -88,7 +88,7 @@ public class TranslatedString implements Serializable {
         return new TranslatedString(seqOfTuples.collect(CollectionUtils.tuples2Map()));
     }
 
-    public static TranslatedString of(final Koodisto koodisto) {
+    public static TranslatedString of(final KoodistoKoodi koodisto) {
         return of(
             seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), m.nimi()))
         );

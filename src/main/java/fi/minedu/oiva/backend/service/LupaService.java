@@ -9,7 +9,7 @@ import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.entity.Tekstityyppi;
-import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -85,7 +85,7 @@ public class LupaService {
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
         if(hasOption.apply(Maarays.class)) withMaaraykset(lupaOpt);
-        if(hasOption.apply(Koodisto.class)) withKoodisto(lupaOpt);
+        if(hasOption.apply(KoodistoKoodi.class)) withKoodisto(lupaOpt);
         return lupaOpt;
     }
 
@@ -128,8 +128,7 @@ public class LupaService {
     protected Optional<Lupa> withKoodisto(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> {
             if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> {
-                if(maarays.isKohde("jarjestamiskunta")) maarays.setKoodi(opintopolkuService.getKuntaKoodisto(maarays.getArvo()));
-                else if(maarays.isKohde("opetuskieli")) maarays.setKoodi(opintopolkuService.getKieliKoodisto(maarays.getArvo()));
+                if(maarays.hasKoodistoKoodiInfo()) maarays.setKoodi(opintopolkuService.getKoodi(maarays));
             });
         });
         return lupaOpt;

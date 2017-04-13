@@ -13,9 +13,9 @@ import scala.beans.BeanProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-case class Koodisto(
+case class KoodistoKoodi(
     @BeanProperty var koodiArvo: String,
-    @BeanProperty var koodisto: Koodisto.KoodistoTiedot,
+    @BeanProperty var koodisto: KoodistoKoodi.KoodistoTiedot,
     @BeanProperty var metadata: Array[Metadata],
     @BeanProperty var voimassaAlkuPvm: String,
     @BeanProperty var voimassaLoppuPvm: String) {
@@ -30,13 +30,13 @@ case class Koodisto(
         (try { LocalDate.parse(voimassaLoppuPvm).isAfter(LocalDate.now()) } catch { case e: DateTimeParseException => true })
 }
 
-object Koodisto {
+object KoodistoKoodi {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @JsonInclude(Include.NON_NULL)
     case class KoodistoTiedot(@BeanProperty var koodistoUri: String) {
         def this() = this(null)
     }
-    @JsonIgnore def notFound(koodi: String) = Koodisto(koodi, null, Array(
+    @JsonIgnore def notFound(koodi: String) = KoodistoKoodi(koodi, null, Array(
         Metadata("fi", s"Koodia $koodi ei löydy"),
         Metadata("sv", s"Koda $koodi hittades inte")), null, null)
 }
