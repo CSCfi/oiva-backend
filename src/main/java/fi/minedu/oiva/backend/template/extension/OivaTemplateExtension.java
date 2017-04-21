@@ -30,9 +30,10 @@ public class OivaTemplateExtension implements Extension {
         filters.put("semicolon", new SeparatorFilter("; "));
         filters.put("sortByLanguage", new SortByLanguageFilter());
         filters.put("toDate", new ToDateFilter());
-        filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS, VELVOITE));
-        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS));
+        filters.put("kohde", new MaaraysListFilter(byKohdeTunniste));
+        filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS));
         filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE));
+        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS));
         filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE));
         return filters;
     }

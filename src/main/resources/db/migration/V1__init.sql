@@ -99,13 +99,14 @@ DROP TABLE IF EXISTS maarays CASCADE;
 CREATE TABLE maarays
 (
    id bigserial not null primary key
+  ,parent_id bigint
   ,lupa_id bigint not null
   ,kohde_id bigint not null
-  ,koodisto varchar(255) null -- määräykseen liittyvä esim. opintopolun koodisto
-  ,arvo text not null
+  ,koodisto varchar(255) null        -- määräykseen liittyvä esim. opintopolun koodisto
+  ,koodiarvo text not null           -- koodiston koodiarvo
+  ,arvo varchar(255)                 -- määräykseen liittyvä erillinen arvo, esim opiskelijoiden lukumäärä
   ,maaraystyyppi_id bigint not null
-  ,tekstityyppi_id bigint null -- kysymys, perustelu, vastaus, muu
-  ,selite jsonb -- määräykseen liittyvä teksti
+  ,meta jsonb                        -- määräykseen liittyvä UI:sta tuleva teksti
   ,luoja text null
   ,luontipvm timestamp not null default current_timestamp
   ,paivittaja text null
@@ -226,10 +227,6 @@ REFERENCES kohde (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE CASCADE;
 -- määräys viittaus määräystyyppi
 ALTER TABLE maarays ADD CONSTRAINT fk_maaraystyyppi FOREIGN KEY (maaraystyyppi_id)
 REFERENCES maaraystyyppi (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE CASCADE;
-
--- määräys viittaus tekstityyppi
-ALTER TABLE maarays ADD CONSTRAINT fk_tekstityyppi FOREIGN KEY (tekstityyppi_id)
-REFERENCES tekstityyppi (id) MATCH SIMPLE  ON UPDATE CASCADE ON DELETE CASCADE;
 
 -- päätöskierros_kohde_link viittaus kohde
 ALTER TABLE paatoskierros_kohde_link ADD CONSTRAINT fk_kohde FOREIGN KEY (kohde_id)

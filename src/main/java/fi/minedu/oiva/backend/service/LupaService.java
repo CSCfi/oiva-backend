@@ -99,13 +99,11 @@ public class LupaService {
             final Map<Long, Maarays> maaraykset = new HashMap<>();
             final Map<Long, Kohde> kohteet = new HashMap<>();
             final Map<Long, Maaraystyyppi> maaraystyypit = new HashMap<>();
-            final Map<Long, Tekstityyppi> tekstityypit = new HashMap<>();
 
             final Result<Record> result = dsl.select().from(LUPA)
                 .leftOuterJoin(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
                 .leftOuterJoin(KOHDE).on(KOHDE.ID.eq(MAARAYS.KOHDE_ID))
                 .leftOuterJoin(MAARAYSTYYPPI).on(MAARAYSTYYPPI.ID.eq(MAARAYS.MAARAYSTYYPPI_ID))
-                .leftOuterJoin(TEKSTITYYPPI).on(TEKSTITYYPPI.ID.eq(MAARAYS.TEKSTITYYPPI_ID))
                 .where(LUPA.ID.eq(lupa.getId()))
                 .fetch();
 
@@ -113,13 +111,11 @@ public class LupaService {
                 putToMap(maaraykset, record, MAARAYS.fields(), Maarays.class);
                 putToMap(kohteet, record, KOHDE.fields(), Kohde.class);
                 putToMap(maaraystyypit, record, MAARAYSTYYPPI.fields(), Maaraystyyppi.class);
-                putToMap(tekstityypit, record, TEKSTITYYPPI.fields(), Tekstityyppi.class);
             });
             lupa.setMaaraykset(maaraykset.values());
             lupa.maaraykset().forEach(maarays -> {
                 maarays.setKohde(kohteet.getOrDefault(maarays.getKohdeId(), null));
                 maarays.setMaaraystyyppi(maaraystyypit.getOrDefault(maarays.getMaaraystyyppiId(), null));
-                maarays.setTekstityyppi(tekstityypit.getOrDefault(maarays.getTekstityyppiId(), null));
             });
         });
         return lupaOpt;
@@ -128,7 +124,7 @@ public class LupaService {
     protected Optional<Lupa> withKoodisto(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> {
             if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> {
-                if(maarays.hasKoodistoKoodiInfo()) maarays.setKoodi(opintopolkuService.getKoodi(maarays));
+                if(maarays.hasKoodistoKoodiAssociation()) maarays.setKoodi(opintopolkuService.getKoodi(maarays));
             });
         });
         return lupaOpt;

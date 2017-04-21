@@ -96,10 +96,8 @@ class OpintopolkuService extends CacheAware {
      * @param oid oid of org
      * @return Future of raw string
      */
-    def getOrganisaatioAsRawScalaFuture(oid: String) = {
-        cache(oid) {
-            Http(url(organisaatioQueryServiceUrl.format(oid)) OK as.String)
-        }
+    def getOrganisaatioAsRawScalaFuture(oid: String) = cache(oid) {
+        Http(url(organisaatioQueryServiceUrl.format(oid)) OK as.String)
     }
 
     def getOrganisaatio(oid: String) = {
@@ -130,11 +128,10 @@ class OpintopolkuService extends CacheAware {
 
     def getBlockingOrganisaatio(oid: String) = getOrganisaatio(oid).toCompletableFuture.join()
 
-    def getOrganisaatiosAsCSString(oids: Array[String]): CompletionStage[String] = {
+    def getOrganisaatiosAsCSString(oids: Array[String]): CompletionStage[String] =
         Future.sequence(oids.distinct.toList.map(oid => getOrganisaatioAsRawScalaFuture(oid))).collect {
             case x: List[String] => x.mkString("[", ",", "]")
         }
-    }
 
     /**
      * Get by list of oids
@@ -188,7 +185,7 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    def getKoodi(maarays: Maarays): KoodistoKoodi = getKoodi(maarays.getKoodisto, maarays.getArvo)
+    def getKoodi(maarays: Maarays): KoodistoKoodi = getKoodi(maarays.getKoodisto, maarays.getKoodiarvo)
     def getKoodi(koodistoUri: String, koodiArvo: String) = getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo))
 
     def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiUrl)

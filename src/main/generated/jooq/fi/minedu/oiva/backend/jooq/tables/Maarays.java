@@ -4,10 +4,11 @@
 package fi.minedu.oiva.backend.jooq.tables;
 
 
-import fi.minedu.oiva.backend.entity.TranslatedString;
+import com.fasterxml.jackson.databind.JsonNode;
+
 import fi.minedu.oiva.backend.jooq.Keys;
 import fi.minedu.oiva.backend.jooq.Oiva;
-import fi.minedu.oiva.backend.jooq.TranslatedStringBinding;
+import fi.minedu.oiva.backend.jooq.PostgresJSONJacksonBinding;
 import fi.minedu.oiva.backend.jooq.tables.records.MaaraysRecord;
 
 import java.sql.Timestamp;
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays extends TableImpl<MaaraysRecord> {
 
-    private static final long serialVersionUID = 225011325;
+    private static final long serialVersionUID = -1092980392;
 
     /**
      * The reference instance of <code>oiva.maarays</code>
@@ -60,6 +61,11 @@ public class Maarays extends TableImpl<MaaraysRecord> {
     public final TableField<MaaraysRecord, Long> ID = createField("id", org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("nextval('maarays_id_seq'::regclass)", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
+     * The column <code>oiva.maarays.parent_id</code>.
+     */
+    public final TableField<MaaraysRecord, Long> PARENT_ID = createField("parent_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * The column <code>oiva.maarays.lupa_id</code>.
      */
     public final TableField<MaaraysRecord, Long> LUPA_ID = createField("lupa_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
@@ -75,9 +81,14 @@ public class Maarays extends TableImpl<MaaraysRecord> {
     public final TableField<MaaraysRecord, String> KOODISTO = createField("koodisto", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
     /**
+     * The column <code>oiva.maarays.koodiarvo</code>.
+     */
+    public final TableField<MaaraysRecord, String> KOODIARVO = createField("koodiarvo", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+
+    /**
      * The column <code>oiva.maarays.arvo</code>.
      */
-    public final TableField<MaaraysRecord, String> ARVO = createField("arvo", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<MaaraysRecord, String> ARVO = createField("arvo", org.jooq.impl.SQLDataType.VARCHAR.length(255), this, "");
 
     /**
      * The column <code>oiva.maarays.maaraystyyppi_id</code>.
@@ -85,14 +96,9 @@ public class Maarays extends TableImpl<MaaraysRecord> {
     public final TableField<MaaraysRecord, Long> MAARAYSTYYPPI_ID = createField("maaraystyyppi_id", org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>oiva.maarays.tekstityyppi_id</code>.
+     * The column <code>oiva.maarays.meta</code>.
      */
-    public final TableField<MaaraysRecord, Long> TEKSTITYYPPI_ID = createField("tekstityyppi_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
-
-    /**
-     * The column <code>oiva.maarays.selite</code>.
-     */
-    public final TableField<MaaraysRecord, TranslatedString> SELITE = createField("selite", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new TranslatedStringBinding());
+    public final TableField<MaaraysRecord, JsonNode> META = createField("meta", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new PostgresJSONJacksonBinding());
 
     /**
      * The column <code>oiva.maarays.luoja</code>.
@@ -173,7 +179,7 @@ public class Maarays extends TableImpl<MaaraysRecord> {
      */
     @Override
     public List<ForeignKey<MaaraysRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<MaaraysRecord, ?>>asList(Keys.MAARAYS__FK_LUPA, Keys.MAARAYS__FK_KOHDE, Keys.MAARAYS__FK_MAARAYSTYYPPI, Keys.MAARAYS__FK_TEKSTITYYPPI);
+        return Arrays.<ForeignKey<MaaraysRecord, ?>>asList(Keys.MAARAYS__FK_LUPA, Keys.MAARAYS__FK_KOHDE, Keys.MAARAYS__FK_MAARAYSTYYPPI);
     }
 
     /**

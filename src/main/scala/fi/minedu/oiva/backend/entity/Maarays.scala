@@ -10,15 +10,13 @@ import org.apache.commons.lang3.StringUtils
 class Maarays(
     var kohde: Kohde,
     var maaraystyyppi: Maaraystyyppi,
-    var tekstityyppi: Tekstityyppi,
     var koodi: KoodistoKoodi) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
-    def this() = this(null, null, null, null)
+    def this() = this(null, null, null)
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
-    @JsonIgnore override def getTekstityyppiId = super.getTekstityyppiId
 
-    @JsonIgnore def hasKoodistoKoodiInfo = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getArvo)
+    @JsonIgnore def hasKoodistoKoodiAssociation = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
 
     def getKohde = kohde
     def setKohde(kohde: Kohde): Unit = this.kohde = kohde
@@ -29,10 +27,6 @@ class Maarays(
     def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
     def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null
     def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
-
-    def getTekstityyppi = tekstityyppi
-    def setTekstityyppi(tekstityyppi: Tekstityyppi): Unit = this.tekstityyppi = tekstityyppi
-    def isTekstityyppi = if(null != tekstityyppi) tekstityyppi.getTunniste else null
 
     def getKoodi = koodi
     def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi

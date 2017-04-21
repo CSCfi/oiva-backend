@@ -161,6 +161,14 @@ ul.none {
     margin-bottom: 10px;
 }
 
+.maaraystyyppiotsikko {
+    font-weight: bold;
+    margin-top: 15px;
+    margin-left: 20px;
+    margin-bottom: 10px;
+    page-break-after: avoid;
+}
+
 .muutosperusteluosio {
     margin-left: 25px;
 }

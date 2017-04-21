@@ -4,7 +4,7 @@
 package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 
-import fi.minedu.oiva.backend.entity.TranslatedString;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -27,32 +27,34 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays implements Serializable {
 
-    private static final long serialVersionUID = 1320797865;
+    private static final long serialVersionUID = -1640232245;
 
-    private Long             id;
-    private Long             lupaId;
-    private Long             kohdeId;
-    private String           koodisto;
-    private String           arvo;
-    private Long             maaraystyyppiId;
-    private Long             tekstityyppiId;
-    private TranslatedString selite;
-    private String           luoja;
-    private Timestamp        luontipvm;
-    private String           paivittaja;
-    private Timestamp        paivityspvm;
+    private Long      id;
+    private Long      parentId;
+    private Long      lupaId;
+    private Long      kohdeId;
+    private String    koodisto;
+    private String    koodiarvo;
+    private String    arvo;
+    private Long      maaraystyyppiId;
+    private JsonNode  meta;
+    private String    luoja;
+    private Timestamp luontipvm;
+    private String    paivittaja;
+    private Timestamp paivityspvm;
 
     public Maarays() {}
 
     public Maarays(Maarays value) {
         this.id = value.id;
+        this.parentId = value.parentId;
         this.lupaId = value.lupaId;
         this.kohdeId = value.kohdeId;
         this.koodisto = value.koodisto;
+        this.koodiarvo = value.koodiarvo;
         this.arvo = value.arvo;
         this.maaraystyyppiId = value.maaraystyyppiId;
-        this.tekstityyppiId = value.tekstityyppiId;
-        this.selite = value.selite;
+        this.meta = value.meta;
         this.luoja = value.luoja;
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
@@ -60,27 +62,29 @@ public class Maarays implements Serializable {
     }
 
     public Maarays(
-        Long             id,
-        Long             lupaId,
-        Long             kohdeId,
-        String           koodisto,
-        String           arvo,
-        Long             maaraystyyppiId,
-        Long             tekstityyppiId,
-        TranslatedString selite,
-        String           luoja,
-        Timestamp        luontipvm,
-        String           paivittaja,
-        Timestamp        paivityspvm
+        Long      id,
+        Long      parentId,
+        Long      lupaId,
+        Long      kohdeId,
+        String    koodisto,
+        String    koodiarvo,
+        String    arvo,
+        Long      maaraystyyppiId,
+        JsonNode  meta,
+        String    luoja,
+        Timestamp luontipvm,
+        String    paivittaja,
+        Timestamp paivityspvm
     ) {
         this.id = id;
+        this.parentId = parentId;
         this.lupaId = lupaId;
         this.kohdeId = kohdeId;
         this.koodisto = koodisto;
+        this.koodiarvo = koodiarvo;
         this.arvo = arvo;
         this.maaraystyyppiId = maaraystyyppiId;
-        this.tekstityyppiId = tekstityyppiId;
-        this.selite = selite;
+        this.meta = meta;
         this.luoja = luoja;
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
@@ -93,6 +97,14 @@ public class Maarays implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getParentId() {
+        return this.parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
     }
 
     @NotNull
@@ -123,6 +135,15 @@ public class Maarays implements Serializable {
     }
 
     @NotNull
+    public String getKoodiarvo() {
+        return this.koodiarvo;
+    }
+
+    public void setKoodiarvo(String koodiarvo) {
+        this.koodiarvo = koodiarvo;
+    }
+
+    @Size(max = 255)
     public String getArvo() {
         return this.arvo;
     }
@@ -140,20 +161,12 @@ public class Maarays implements Serializable {
         this.maaraystyyppiId = maaraystyyppiId;
     }
 
-    public Long getTekstityyppiId() {
-        return this.tekstityyppiId;
+    public JsonNode getMeta() {
+        return this.meta;
     }
 
-    public void setTekstityyppiId(Long tekstityyppiId) {
-        this.tekstityyppiId = tekstityyppiId;
-    }
-
-    public TranslatedString getSelite() {
-        return this.selite;
-    }
-
-    public void setSelite(TranslatedString selite) {
-        this.selite = selite;
+    public void setMeta(JsonNode meta) {
+        this.meta = meta;
     }
 
     public String getLuoja() {
@@ -193,13 +206,14 @@ public class Maarays implements Serializable {
         StringBuilder sb = new StringBuilder("Maarays (");
 
         sb.append(id);
+        sb.append(", ").append(parentId);
         sb.append(", ").append(lupaId);
         sb.append(", ").append(kohdeId);
         sb.append(", ").append(koodisto);
+        sb.append(", ").append(koodiarvo);
         sb.append(", ").append(arvo);
         sb.append(", ").append(maaraystyyppiId);
-        sb.append(", ").append(tekstityyppiId);
-        sb.append(", ").append(selite);
+        sb.append(", ").append(meta);
         sb.append(", ").append(luoja);
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);

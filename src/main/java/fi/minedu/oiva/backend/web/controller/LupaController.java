@@ -58,6 +58,6 @@ public class LupaController {
     @RequestMapping(method = GET, value = "/**")
     public HttpEntity<Lupa> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
         @RequestParam(value = "with", required = false) String with) {
-        return getOr404(service.get(RequestUtils.getPathVariable(request, fullPath), with));
+        return getOr404(service.get(RequestUtils.getPathVariable(request, fullPath), StringUtils.split(with, ",")));
     }
 }

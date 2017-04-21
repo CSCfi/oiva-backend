@@ -103,7 +103,6 @@ public class Keys {
     public static final ForeignKey<MaaraysRecord, LupaRecord> MAARAYS__FK_LUPA = ForeignKeys0.MAARAYS__FK_LUPA;
     public static final ForeignKey<MaaraysRecord, KohdeRecord> MAARAYS__FK_KOHDE = ForeignKeys0.MAARAYS__FK_KOHDE;
     public static final ForeignKey<MaaraysRecord, MaaraystyyppiRecord> MAARAYS__FK_MAARAYSTYYPPI = ForeignKeys0.MAARAYS__FK_MAARAYSTYYPPI;
-    public static final ForeignKey<MaaraysRecord, TekstityyppiRecord> MAARAYS__FK_TEKSTITYYPPI = ForeignKeys0.MAARAYS__FK_TEKSTITYYPPI;
     public static final ForeignKey<MuutoshistoriaRecord, MaaraysRecord> MUUTOSHISTORIA__FK_MAARAYS = ForeignKeys0.MUUTOSHISTORIA__FK_MAARAYS;
     public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = ForeignKeys0.PAATOSKIERROS__FK_ESITYSMALLI;
     public static final ForeignKey<PaatoskierrosKohdeLinkRecord, KohdeRecord> PAATOSKIERROS_KOHDE_LINK__FK_KOHDE = ForeignKeys0.PAATOSKIERROS_KOHDE_LINK__FK_KOHDE;
@@ -154,7 +153,6 @@ public class Keys {
         public static final ForeignKey<MaaraysRecord, LupaRecord> MAARAYS__FK_LUPA = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.LUPA_PKEY, Maarays.MAARAYS, "maarays__fk_lupa", Maarays.MAARAYS.LUPA_ID);
         public static final ForeignKey<MaaraysRecord, KohdeRecord> MAARAYS__FK_KOHDE = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.KOHDE_PKEY, Maarays.MAARAYS, "maarays__fk_kohde", Maarays.MAARAYS.KOHDE_ID);
         public static final ForeignKey<MaaraysRecord, MaaraystyyppiRecord> MAARAYS__FK_MAARAYSTYYPPI = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MAARAYSTYYPPI_PKEY, Maarays.MAARAYS, "maarays__fk_maaraystyyppi", Maarays.MAARAYS.MAARAYSTYYPPI_ID);
-        public static final ForeignKey<MaaraysRecord, TekstityyppiRecord> MAARAYS__FK_TEKSTITYYPPI = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.TEKSTITYYPPI_PKEY, Maarays.MAARAYS, "maarays__fk_tekstityyppi", Maarays.MAARAYS.TEKSTITYYPPI_ID);
         public static final ForeignKey<MuutoshistoriaRecord, MaaraysRecord> MUUTOSHISTORIA__FK_MAARAYS = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MAARAYS_PKEY, Muutoshistoria.MUUTOSHISTORIA, "muutoshistoria__fk_maarays", Muutoshistoria.MUUTOSHISTORIA.MAARAYS_ID);
         public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.ESITYSMALLI_PKEY, Paatoskierros.PAATOSKIERROS, "paatoskierros__fk_esitysmalli", Paatoskierros.PAATOSKIERROS.ESITYSMALLI_ID);
         public static final ForeignKey<PaatoskierrosKohdeLinkRecord, KohdeRecord> PAATOSKIERROS_KOHDE_LINK__FK_KOHDE = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.KOHDE_PKEY, PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK, "paatoskierros_kohde_link__fk_kohde", PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK.KOHDE_ID);

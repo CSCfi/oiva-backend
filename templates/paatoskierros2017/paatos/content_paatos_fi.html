@@ -136,16 +136,37 @@
         </span>
     </div>
 
-    <div class="otsikko">Toiminta-alue</div>
-    <div class="sisalto">
-        <span class="todo">
-            <span class="loop">
-                {% for maarays in lupa.maaraykset | sallittuKohde("jarjestamiskunta") %}
-                    <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
-                {% endfor %}
+    {% if lupa.maaraykset | kohde("toimintaalue") is notBlank %}
+        <div class="otsikko">Toiminta-alue</div>
+        <div class="sisalto">
+            <span class="todo">
+                {% if lupa.maaraykset | velvoiteKohde("toimintaalue") is notBlank %}
+                    <span class="maaraystyyppiotsikko">Velvoite: </span>
+                    <span class="loop">
+                        {% for maarays in lupa.maaraykset | velvoiteKohde("toimintaalue") %}
+                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+                {% if lupa.maaraykset | oikeusKohde("toimintaalue") is notBlank %}
+                    <span class="maaraystyyppiotsikko">Oikeus:</span>
+                    <span class="loop">
+                        {% for maarays in lupa.maaraykset | oikeusKohde("toimintaalue") %}
+                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
+                        {% endfor %}
+                    </span>
+                {% endif %}
+                {% if lupa.maaraykset | rajoiteKohde("toimintaalue") is notBlank %}
+                    <span class="maaraystyyppiotsikko">Rajoite:</span>
+                    <span class="loop">
+                        {% for maarays in lupa.maaraykset | rajoiteKohde("toimintaalue") %}
+                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
+                        {% endfor %}
+                    </span>
+                {% endif %}
             </span>
-        </span>
-    </div>
+        </div>
+    {% endif %}
 
     <div class="otsikko">Koulutukset</div>
     <div class="sisalto">
