@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.template.extension;
 
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.MaaraystyyppiValue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,10 @@ import static java.util.stream.Collectors.*;
 public class MaaraysListFilter extends OivaFilter {
 
     public enum Method {
-        byKohdeTunniste
+        byKohdeTunniste,
+        byHasKoodiAndArvo,
+        byHasOnlyArvo,
+        byKoodistoUri,
     }
 
     private static final Logger logger = LoggerFactory.getLogger(TranslateFilter.class);
@@ -41,16 +45,34 @@ public class MaaraysListFilter extends OivaFilter {
                 return ((Collection<String>) kohdeObj).stream().anyMatch(kohde -> maarays.isKohde(kohde));
             } else return maarays.isKohde((String) kohdeObj);
         };
+        final BiFunction<Maarays, Object, Boolean> maaraysKoodistoFilter = (maarays, koodistoObj) -> {
+            if(koodistoObj instanceof Collection) {
+                return ((Collection<String>) koodistoObj).stream().anyMatch(kohde -> maarays.isKoodisto(kohde));
+            } else return maarays.isKoodisto((String) koodistoObj);
+        };
         final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
         if(maarayksetOpt.isPresent()) {
-            final Optional kohdeOpt = getKohde(map);
-            if(kohdeOpt.isPresent()) {
-                if (method == Method.byKohdeTunniste) {
-                    return maarayksetOpt.get().stream()
-                        .filter(maarays -> maaraystyyppiFilter.apply(maarays))
-                        .filter(maarays -> maaraysKohdeFilter.apply(maarays, kohdeOpt.get()))
-                        .collect(toList());
-                }
+            final Optional targetOpt = getTarget(map);
+            if(targetOpt.isPresent() && method == Method.byKohdeTunniste) {
+                return maarayksetOpt.get().stream()
+                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> maaraysKohdeFilter.apply(maarays, targetOpt.get()))
+                    .collect(toList());
+            } else if(targetOpt.isPresent() && method == Method.byKoodistoUri) {
+                return maarayksetOpt.get().stream()
+                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> maaraysKoodistoFilter.apply(maarays, targetOpt.get()))
+                    .collect(toList());
+            } else if (method == Method.byHasKoodiAndArvo) {
+                return maarayksetOpt.get().stream()
+                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> maarays.hasKoodistoKoodiAssociation() && StringUtils.isNotBlank(maarays.getArvo()))
+                    .collect(toList());
+            } else if (method == Method.byHasOnlyArvo) {
+                return maarayksetOpt.get().stream()
+                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> !maarays.hasKoodistoKoodiAssociation() && StringUtils.isNotBlank(maarays.getArvo()))
+                    .collect(toList());
             }
         } else logger.warn("Unsupported source");
         return Collections.emptyList();
@@ -68,7 +90,7 @@ public class MaaraysListFilter extends OivaFilter {
         return Arrays.asList(new String[]{argTarget});
     }
 
-    private Optional getKohde(final Map<String, Object> map) {
+    private Optional getTarget(final Map<String, Object> map) {
         if(argExists(map, argTarget)) {
             final Object obj = map.get(argTarget);
             return Optional.of((obj instanceof Collection) ? (Collection) obj : (String) obj);

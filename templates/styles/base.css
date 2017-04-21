@@ -168,6 +168,9 @@ ul.none {
     margin-bottom: 10px;
     page-break-after: avoid;
 }
+.rivi {
+    margin-bottom: 5px;
+}
 
 .muutosperusteluosio {
     margin-left: 25px;

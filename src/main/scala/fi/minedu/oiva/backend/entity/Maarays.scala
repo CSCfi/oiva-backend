@@ -23,6 +23,8 @@ class Maarays(
     def kohdeValue = if(null != kohde) kohde.getTunniste else null
     def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
+    def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
+
     def getMaaraystyyppi = maaraystyyppi
     def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
     def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null

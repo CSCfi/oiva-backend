@@ -118,80 +118,182 @@
 </div>
 
 <div id="koulutustehtavaPage">
-    <div class="otsikko">Opiskelijavuosien vähimmäismäärä</div>
-    <div class="sisalto">
-        <span class="loop">
-            {% for maarays in lupa.maaraykset | sallittuKohde(["opiskelijamaara", "opiskelijamaara_sisaoppilaitos", "opiskelijamaara_erityisoppilaitos"]) %}
-                <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
-            {% endfor %}
-        </span>
-    </div>
+    <h3>KOULUTUKSEN JÄRJESTÄMISLUPA</h3>
 
-    <div class="otsikko">Opetuskieli</div>
-    <div class="sisalto">
-        <span class="loop">
-            {% for maarays in lupa.maaraykset | sallittuKohde("opetuskieli") %}
-                <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
-            {% endfor %}
-        </span>
-    </div>
-
-    {% if lupa.maaraykset | kohde("toimintaalue") is notBlank %}
-        <div class="otsikko">Toiminta-alue</div>
+    <!-- Tutkinnot ja koulutukset -->
+    {% if lupa.maaraykset | kohde("tutkinnotjakoulutukset") is notBlank %}
+        <div class="otsikko">1) Tutkinnot ja koulutukset</div>
         <div class="sisalto">
-            <span class="todo">
-                {% if lupa.maaraykset | velvoiteKohde("toimintaalue") is notBlank %}
-                    <span class="maaraystyyppiotsikko">Velvoite: </span>
-                    <span class="loop">
-                        {% for maarays in lupa.maaraykset | velvoiteKohde("toimintaalue") %}
-                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
+            Koulutuksen järjestäjällä on oikeus myöntää seuraavia tutkintoja ja antaa niihin tutkintokoulutusta sekä järjestää niihin ammatillista osaamista täydentävää ja syventävää koulutusta
+            {% if lupa.maaraykset | velvoiteKohde("tutkinnotjakoulutukset") | koodisto("koulutus") is notBlank %}
+                <div class="maaraystyyppiotsikko">Velvollisuudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | velvoiteKohde("tutkinnotjakoulutukset") | koodisto("koulutus") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | oikeusKohde("tutkinnotjakoulutukset") | koodisto("koulutus") is notBlank %}
+                <div class="maaraystyyppiotsikko">Oikeudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | oikeusKohde("tutkinnotjakoulutukset") | koodisto("koulutus") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | rajoiteKohde("tutkinnotjakoulutukset") | koodisto("koulutus") is notBlank %}
+                <div class="maaraystyyppiotsikko">Rajoitus</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | rajoiteKohde("tutkinnotjakoulutukset") | koodisto("koulutus") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | kohde("tutkinnotjakoulutukset") | koodisto("oivatyovoimakoulutus") is notBlank %}
+                <div class="rivi">Työvoimakoulutus</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | kohde("tutkinnotjakoulutukset") | koodisto("oivatyovoimakoulutus") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Opetus- ja tutkintokieli -->
+    {% if lupa.maaraykset | kohde("opetusjatutkintokieli") is notBlank %}
+        <div class="otsikko">2) Opetus- ja tutkintokieli</div>
+        <div class="sisalto">
+            {% if lupa.maaraykset | velvoiteKohde("opetusjatutkintokieli") is notBlank %}
+                <div class="maaraystyyppiotsikko">Velvollisuudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | velvoiteKohde("opetusjatutkintokieli") %}
+                    <li>
+                        <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | oikeusKohde("opetusjatutkintokieli") is notBlank %}
+                <div class="maaraystyyppiotsikko">Oikeudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | oikeusKohde("opetusjatutkintokieli") %}
+                    <li>
+                        <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | rajoiteKohde("opetusjatutkintokieli") is notBlank %}
+                <div class="maaraystyyppiotsikko">Rajoitukset</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | rajoiteKohde("opetusjatutkintokieli") %}
+                    <li>
+                        <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Toiminta-alue -->
+    {% if lupa.maaraykset | kohde("toimintaalue") is notBlank %}
+        <div class="otsikko">3) Toiminta-alue</div>
+        <div class="sisalto">
+            {% if lupa.maaraykset | velvoiteKohde("toimintaalue") is notBlank %}
+                Koulutuksen järjestäjällä on velvollisuus järjestäjää tutkintoja ja koulutusta ensisijaisesti seuraavien alueiden osaamis- ja koulutustarpeeseen:
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | velvoiteKohde("toimintaalue") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | rajoiteKohde("toimintaalue") is notBlank %}
+                Tutkintoja ja koulutusta saa lisäksi järjestää myös muualla Suomessa lukuun ottamatta seuraavia toiminta-alueita:
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | rajoiteKohde("toimintaalue") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                Tutkintoja ja koulutusta saa lisäksi järjestää myös muualla Suomessa.
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <!-- Opiskelijavuodet -->
+    {% if lupa.maaraykset | kohde("opiskelijavuodet") is notBlank %}
+        <div class="otsikko">4) Opiskelijavuodet</div>
+        <div class="sisalto">
+            <span class="loop">
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | sallittuKohde("opiskelijavuodet") | withOnlyArvo %}
+                        <li>
+                            Opiskelijavuosien vähimmäismäärä: <span class="data">{{ maarays.arvo }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% if lupa.maaraykset | rajoiteKohde("opiskelijavuodet") | withKoodiAndArvo is notBlank %}
+                    <div class="maaraystyyppiotsikko">Rajoitteet</div>
+                    <ul class="loop">
+                        {% for maarays in lupa.maaraykset | rajoiteKohde("opiskelijavuodet") | withKoodiAndArvo %}
+                            <li>
+                                <span class="data">{{ maarays.koodi.teksti | translated }}</span> enintään: <span class="data">{{ maarays.arvo }}</span>
+                            </li>
                         {% endfor %}
-                    </span>
-                {% endif %}
-                {% if lupa.maaraykset | oikeusKohde("toimintaalue") is notBlank %}
-                    <span class="maaraystyyppiotsikko">Oikeus:</span>
-                    <span class="loop">
-                        {% for maarays in lupa.maaraykset | oikeusKohde("toimintaalue") %}
-                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
-                        {% endfor %}
-                    </span>
-                {% endif %}
-                {% if lupa.maaraykset | rajoiteKohde("toimintaalue") is notBlank %}
-                    <span class="maaraystyyppiotsikko">Rajoite:</span>
-                    <span class="loop">
-                        {% for maarays in lupa.maaraykset | rajoiteKohde("toimintaalue") %}
-                            <span class="data">{{ maarays.koodi.teksti | translated | comma }}</span>
-                        {% endfor %}
-                    </span>
+                    </ul>
                 {% endif %}
             </span>
         </div>
     {% endif %}
 
-    <div class="otsikko">Koulutukset</div>
-    <div class="sisalto">
-        <span class="todo">
-            <span class="loop">
-                {% for maarays in lupa.maaraykset | sallittuKohde("tutkinto") %} <!-- TODO: koulutus -->
-                    <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>: <span class="data">{{ maarays.arvo | comma }}</span>
-                {% endfor %}
-            </span>
-        </span>
-    </div>
-
-    <div class="otsikko">Muut määräykset</div>
-    <div class="sisalto">
-        <span class="todo">
-            <span class="loop">
-                {% for maarays in lupa.maaraykset | sallittuKohde("muu") %} <!-- TODO: muu määräys -->
-                    <div class="muutMaarayksetOtsikko">
-                        <span class="data">{{ maarays.kohde.meta | field("otsikko") | translated }}</span>
-                    </div>
-                    <div class="muutMaarayksetSelite">
-                        <span class="data">{{ maarays.kohde.meta | field("selite") | translated }}</span>
-                    </div>
-                {% endfor %}
-            </span>
-        </span>
-    </div>
+    <!-- Muut -->
+    {% if lupa.maaraykset | kohde("muut") is notBlank %}
+        <div class="otsikko">5) Muut oikeudet, velvollisuudet, ehdot ja tehtävät</div>
+        <div class="sisalto">
+            {% if lupa.maaraykset | velvoiteKohde("muut") is notBlank %}
+                <div class="maaraystyyppiotsikko">Velvollisuudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | velvoiteKohde("muut") %}
+                    <li>
+                        <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | oikeusKohde("muut") is notBlank %}
+                <div class="maaraystyyppiotsikko">Oikeudet</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | oikeusKohde("muut") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% if lupa.maaraykset | rajoiteKohde("muut") is notBlank %}
+                <div class="maaraystyyppiotsikko">Rajoitukset</div>
+                <ul class="loop">
+                    {% for maarays in lupa.maaraykset | rajoiteKohde("muut") %}
+                        <li>
+                            <span class="data">{{ maarays.koodi.teksti | translated }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>

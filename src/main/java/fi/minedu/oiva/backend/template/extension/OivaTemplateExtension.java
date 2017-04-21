@@ -31,10 +31,13 @@ public class OivaTemplateExtension implements Extension {
         filters.put("sortByLanguage", new SortByLanguageFilter());
         filters.put("toDate", new ToDateFilter());
         filters.put("kohde", new MaaraysListFilter(byKohdeTunniste));
+        filters.put("koodisto", new MaaraysListFilter(byKoodistoUri));
         filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS));
         filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE));
         filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS));
         filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE));
+        filters.put("withOnlyArvo", new MaaraysListFilter(byHasOnlyArvo));
+        filters.put("withKoodiAndArvo", new MaaraysListFilter(byHasKoodiAndArvo));
         return filters;
     }
 
