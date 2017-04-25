@@ -9,7 +9,8 @@ import scala.beans.BeanProperty
 @JsonInclude(Include.NON_NULL)
 case class Metadata(
     @BeanProperty var kieli: String,
-    @BeanProperty var nimi: String) {
+    @BeanProperty var nimi: String,
+    @BeanProperty var kuvaus: String) {
 
-    def this() = this(null, null)
+    def this() = this(null, null, null)
 }

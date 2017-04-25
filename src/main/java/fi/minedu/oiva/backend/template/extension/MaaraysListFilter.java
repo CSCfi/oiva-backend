@@ -2,10 +2,11 @@ package fi.minedu.oiva.backend.template.extension;
 
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.MaaraystyyppiValue;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,13 +17,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class MaaraysListFilter extends OivaFilter {
 
     public enum Method {
+        combo,
         byKohdeTunniste,
-        byHasKoodiAndArvo,
-        byHasOnlyArvo,
         byKoodistoUri,
     }
 
@@ -39,43 +40,58 @@ public class MaaraysListFilter extends OivaFilter {
 
     @Override
     public Object apply(final Object obj, final Map<String, Object> map) {
-        final Function<Maarays, Boolean> maaraystyyppiFilter = maarays -> this.targetTypes.isEmpty() || targetTypes.stream().anyMatch(tyyppi -> maarays.isMaaraystyyppi(tyyppi));
-        final BiFunction<Maarays, Object, Boolean> maaraysKohdeFilter = (maarays, kohdeObj) -> {
-            if(kohdeObj instanceof Collection) {
-                return ((Collection<String>) kohdeObj).stream().anyMatch(kohde -> maarays.isKohde(kohde));
-            } else return maarays.isKohde((String) kohdeObj);
+        final BiFunction<Object, Function<String, Boolean>, Boolean> filterer = (filterTarget, filter) -> {
+            final Collection<String> filterTargets = filterTarget instanceof Collection ? ((Collection<String>) filterTarget) : Collections.singletonList((String) filterTarget);
+            return filterTargets.stream().anyMatch(filter::apply);
         };
-        final BiFunction<Maarays, Object, Boolean> maaraysKoodistoFilter = (maarays, koodistoObj) -> {
-            if(koodistoObj instanceof Collection) {
-                return ((Collection<String>) koodistoObj).stream().anyMatch(kohde -> maarays.isKoodisto(kohde));
-            } else return maarays.isKoodisto((String) koodistoObj);
+        final BiFunction<Maarays, Object, Boolean> maaraystyyppiFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isMaaraystyyppi(removeStart(value, "~"))));
+        final Function<Maarays, Boolean> targetTypeFilter = maarays -> this.targetTypes.isEmpty() || maaraystyyppiFilter.apply(maarays, getTargetTypeStrings());
+        final BiFunction<Maarays, Object, Boolean> maaraysKohdeFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKohde(removeStart(value, "~"))));
+        final BiFunction<Maarays, Object, Boolean> maaraysKoodistoFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKoodisto(removeStart(value, "~"))));
+        final BiFunction<Maarays, Object, Boolean> maaraysYlaKoodiFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.hasYlaKoodi(removeStart(value, "~"))));
+        final BiFunction<Maarays, Object, Boolean> comboFilter = (maarays, filterSource) -> {
+            final Collection<String> filters = filterSource instanceof Collection ? (Collection<String>) filterSource : Collections.singletonList((String)filterSource);
+            return filters.stream().allMatch(filter -> {
+                final String filterType = trim(substringBefore(filter, ":"));
+                final Collection<String> filterTarget = Arrays.asList(split(trim(substringAfter(filter, ":")), "|"));
+                if(equalsIgnoreCase(filterType, "tyyppi")) return maaraystyyppiFilter.apply(maarays, filterTarget);
+                else if(equalsIgnoreCase(filterType, "kohde")) return maaraysKohdeFilter.apply(maarays, filterTarget);
+                else if(equalsIgnoreCase(filterType, "koodisto")) return maaraysKoodistoFilter.apply(maarays, filterTarget);
+                else if(equalsIgnoreCase(filterType, "ylakoodi")) return maaraysYlaKoodiFilter.apply(maarays, filterTarget);
+                else return false;
+            });
         };
         final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
         if(maarayksetOpt.isPresent()) {
             final Optional targetOpt = getTarget(map);
-            if(targetOpt.isPresent() && method == Method.byKohdeTunniste) {
+            if(targetOpt.isPresent() && method == Method.combo) {
                 return maarayksetOpt.get().stream()
-                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> targetTypeFilter.apply(maarays))
+                    .filter(maarays -> comboFilter.apply(maarays, targetOpt.get()))
+                    .collect(toList());
+            } else if(targetOpt.isPresent() && method == Method.byKohdeTunniste) {
+                return maarayksetOpt.get().stream()
+                    .filter(maarays -> targetTypeFilter.apply(maarays))
                     .filter(maarays -> maaraysKohdeFilter.apply(maarays, targetOpt.get()))
                     .collect(toList());
             } else if(targetOpt.isPresent() && method == Method.byKoodistoUri) {
                 return maarayksetOpt.get().stream()
-                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
+                    .filter(maarays -> targetTypeFilter.apply(maarays))
                     .filter(maarays -> maaraysKoodistoFilter.apply(maarays, targetOpt.get()))
-                    .collect(toList());
-            } else if (method == Method.byHasKoodiAndArvo) {
-                return maarayksetOpt.get().stream()
-                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
-                    .filter(maarays -> maarays.hasKoodistoKoodiAssociation() && StringUtils.isNotBlank(maarays.getArvo()))
-                    .collect(toList());
-            } else if (method == Method.byHasOnlyArvo) {
-                return maarayksetOpt.get().stream()
-                    .filter(maarays -> maaraystyyppiFilter.apply(maarays))
-                    .filter(maarays -> !maarays.hasKoodistoKoodiAssociation() && StringUtils.isNotBlank(maarays.getArvo()))
                     .collect(toList());
             }
         } else logger.warn("Unsupported source");
         return Collections.emptyList();
+    }
+
+    private boolean xor(boolean... booleans) {
+        return BooleanUtils.xor(booleans);
+    }
+
+    private Collection<String> getTargetTypeStrings() {
+        final List<String> targets = new ArrayList<>();
+        this.targetTypes.stream().forEach(maaraystyyppi -> targets.add(maaraystyyppi.name()));
+        return targets;
     }
 
     private Optional<Collection<Maarays>> asMaaraysList(final Object obj) {

@@ -8,7 +8,6 @@ import fi.minedu.oiva.backend.entity.Lupatila;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
-import fi.minedu.oiva.backend.entity.Tekstityyppi;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.jooq.DSLContext;
@@ -124,7 +123,14 @@ public class LupaService {
     protected Optional<Lupa> withKoodisto(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> {
             if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> {
-                if(maarays.hasKoodistoKoodiAssociation()) maarays.setKoodi(opintopolkuService.getKoodi(maarays));
+                if(maarays.hasKoodistoKoodiBind()) {
+                    final KoodistoKoodi koodi = opintopolkuService.getKoodi(maarays);
+                    maarays.setKoodi(koodi);
+                    if(null != koodi && koodi.isKoodisto("koulutus")) {
+                        final KoodistoKoodi koulutustyyppiKoodi = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
+                        if(null != koulutustyyppiKoodi) maarays.addYlaKoodi(koulutustyyppiKoodi);
+                    }
+                }
             });
         });
         return lupaOpt;

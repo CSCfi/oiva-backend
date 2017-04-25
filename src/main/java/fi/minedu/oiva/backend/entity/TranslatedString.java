@@ -88,10 +88,12 @@ public class TranslatedString implements Serializable {
         return new TranslatedString(seqOfTuples.collect(CollectionUtils.tuples2Map()));
     }
 
-    public static TranslatedString of(final KoodistoKoodi koodisto) {
-        return of(
-            seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), m.nimi()))
-        );
+    public static TranslatedString ofNimi(final KoodistoKoodi koodisto) {
+        return of(seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), m.nimi())));
+    }
+
+    public static TranslatedString ofKuvaus(final KoodistoKoodi koodisto) {
+        return of(seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), null != m.kuvaus() ? m.kuvaus() : "")));
     }
 
     public JsonNode toJson() {

@@ -26,7 +26,7 @@ public class SortByLanguageFilter implements Filter {
 
         final String lang = ((String) map.get("language")).toLowerCase();
         final List<KoodistoKoodi> list = Arrays.asList(((Collection<KoodistoKoodi>) data).toArray(new KoodistoKoodi[]{}));
-        Collections.sort(list, (KoodistoKoodi a, KoodistoKoodi b) -> a.getTeksti().get(lang).orElse("").compareTo(b.getTeksti().get(lang).orElse("")));
+        Collections.sort(list, (KoodistoKoodi a, KoodistoKoodi b) -> a.getNimi().get(lang).orElse("").compareTo(b.getNimi().get(lang).orElse("")));
         return list;
     }
 

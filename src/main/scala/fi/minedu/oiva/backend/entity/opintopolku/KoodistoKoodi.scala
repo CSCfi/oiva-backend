@@ -22,7 +22,8 @@ case class KoodistoKoodi(
 
     def this() = this(null, null, null, null, null)
 
-    @JsonIgnore def getTeksti = TranslatedString.of(this)
+    @JsonIgnore def getNimi = TranslatedString.ofNimi(this)
+    @JsonIgnore def getKuvaus = TranslatedString.ofKuvaus(this)
     @JsonIgnore def getMetadataList: java.util.List[Metadata] = if(null == metadata) null else metadata.toList.asJava
     @JsonIgnore def getKoodistoUri = if(null == koodisto) null else koodisto.koodistoUri
     @JsonIgnore def isKoodisto(koodistoType: String) = koodistoType == getKoodistoUri
@@ -37,6 +38,6 @@ object KoodistoKoodi {
         def this() = this(null)
     }
     @JsonIgnore def notFound(koodi: String) = KoodistoKoodi(koodi, null, Array(
-        Metadata("fi", s"Koodia $koodi ei löydy"),
-        Metadata("sv", s"Koda $koodi hittades inte")), null, null)
+        Metadata("fi", s"Koodia $koodi ei löydy", ""),
+        Metadata("sv", s"Koda $koodi hittades inte", "")), null, null)
 }

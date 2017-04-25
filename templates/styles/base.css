@@ -168,8 +168,13 @@ ul.none {
     margin-bottom: 10px;
     page-break-after: avoid;
 }
-.rivi {
-    margin-bottom: 5px;
+.maarays-rivi {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+}
+.sisennys {
+    margin-left: 20px;
 }
 
 .muutosperusteluosio {
@@ -189,7 +194,7 @@ ul.none {
 .ministeri {
     display: table;
     width: 100%;
-    margin-top: 60px;
+    margin-top: 40px;
     margin-bottom: 10px;
     page-break-after: avoid;
 }
@@ -318,19 +323,15 @@ ul.none {
 .debug #footer {
     border: 1px solid gray;
 }
-.debug .data,
-.debug .data * {
+.debug .data {
     background: #e4ffe4;
 }
-.debug .if,
-.debug .if * {
+.debug .if {
     border: 2px solid #e171e1;
 }
-.debug .loop,
-.debug .loop * {
+.debug .loop {
     border: 2px solid #50c1f6;
 }
-.debug .todo,
-.debug .todo * {
+.debug .todo {
     border: 2px solid #d27d7d;
 }

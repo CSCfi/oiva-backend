@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static fi.minedu.oiva.backend.entity.MaaraystyyppiValue.*;
+import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
 import static fi.minedu.oiva.backend.template.extension.MaaraysListFilter.Method.*;
 
 public class OivaTemplateExtension implements Extension {
@@ -28,16 +29,18 @@ public class OivaTemplateExtension implements Extension {
         filters.put("fieldvalue_translated", new JsonFieldFilter(JsonFieldFilter.ReturnType.String, true));
         filters.put("comma", new SeparatorFilter(", "));
         filters.put("semicolon", new SeparatorFilter("; "));
+        filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
         filters.put("sortByLanguage", new SortByLanguageFilter());
         filters.put("toDate", new ToDateFilter());
+        filters.put("maaraysFilter", new MaaraysListFilter(combo));
+
         filters.put("kohde", new MaaraysListFilter(byKohdeTunniste));
         filters.put("koodisto", new MaaraysListFilter(byKoodistoUri));
-        filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS));
-        filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE));
-        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS));
-        filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE));
-        filters.put("withOnlyArvo", new MaaraysListFilter(byHasOnlyArvo));
-        filters.put("withKoodiAndArvo", new MaaraysListFilter(byHasKoodiAndArvo));
+        filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
+        filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE)); // TODO: REPLACE ME WITH maaraysFilter
+        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
+        filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE)); // TODO: REPLACE ME WITH maaraysFilter
+
         return filters;
     }
 

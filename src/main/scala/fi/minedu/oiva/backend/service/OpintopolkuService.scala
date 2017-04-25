@@ -202,6 +202,12 @@ class OpintopolkuService extends CacheAware {
 
     def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
 
+    def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String) = {
+        val koulutustyyppiKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi"))
+        if(!koulutustyyppiKoodit.isEmpty) koulutustyyppiKoodit.head else null
+    }
+    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))
+
 //    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)
 //    def getKoulutusKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusKoodiUrl, koulutusKoodiUri(koodiArvo))
 //    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo), true)
@@ -217,7 +223,7 @@ class OpintopolkuService extends CacheAware {
 
     private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String): KoodistoKoodi =
         try requestKoodistoKoodi(koodistoUrl, koodiUri).toCompletableFuture.join
-        catch { case e: Exception =>  KoodistoKoodi.notFound(koodiUri) }
+        catch { case e: Exception => KoodistoKoodi.notFound(koodiUri) }
 
     private def requestKoodistoKoodit(koodistoKoodiUrl: String) =
         cacheRx(koodistoKoodiUrl) { requestRx(koodistoKoodiUrl, classOf[Array[KoodistoKoodi]]) }

@@ -10,13 +10,14 @@ import org.apache.commons.lang3.StringUtils
 class Maarays(
     var kohde: Kohde,
     var maaraystyyppi: Maaraystyyppi,
-    var koodi: KoodistoKoodi) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
+    var koodi: KoodistoKoodi,
+    var ylaKoodit: Array[KoodistoKoodi]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
-    def this() = this(null, null, null)
+    def this() = this(null, null, null, Array())
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
 
-    @JsonIgnore def hasKoodistoKoodiAssociation = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
+    @JsonIgnore def hasKoodistoKoodiBind = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
 
     def getKohde = kohde
     def setKohde(kohde: Kohde): Unit = this.kohde = kohde
@@ -28,8 +29,18 @@ class Maarays(
     def getMaaraystyyppi = maaraystyyppi
     def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
     def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null
+    def isMaaraystyyppi(tyyppi: String): Boolean = isMaaraystyyppi(MaaraystyyppiValue.valueOf(StringUtils.upperCase(tyyppi)))
     def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
+    def tyyppi = if(null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
 
     def getKoodi = koodi
     def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
+
+    def getYlaKoodit = ylaKoodit
+    def addYlaKoodi(koodi: KoodistoKoodi) { this.ylaKoodit = this.ylaKoodit :+ koodi }
+    def hasYlaKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
+        case Array(koodisto, koodiArvo) => hasYlaKoodi(koodisto, koodiArvo)
+        case _ => false
+    }
+    def hasYlaKoodi(koodisto: String, koodiArvo: String) = ylaKoodit.exists(koodi => koodi.isKoodisto(koodisto) && koodi.koodiArvo == koodiArvo)
 }
