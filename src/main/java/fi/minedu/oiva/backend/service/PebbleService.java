@@ -33,12 +33,6 @@ public class PebbleService {
     @Autowired
     private PebbleConfig pebble;
 
-    @Autowired
-    private MaaraysService maaraysService;
-
-    @Autowired
-    private OpintopolkuService opintopolkuService;
-
     public Optional<ByteArrayResource> getResource(final String path) {
         final String resourcePath = pebble.getTemplateBasePath() + "/" + path;
         try {
@@ -71,7 +65,7 @@ public class PebbleService {
 
             final String templatePath = contextPath + templateName;
             final PebbleTemplate pebbleTemplate = engine.getTemplate(templatePath);
-            final Map<String, Object> context = defaultContext(options, contextPath);
+            final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
             context.put("lupa", nonNullVersion(lupa));
             context.put("jarjestaja", lupa.jarjestaja());
 
@@ -85,11 +79,12 @@ public class PebbleService {
         }
     }
 
-    private Map<String, Object> defaultContext(final RenderOptions options, final String contextPath) {
+    private Map<String, Object> defaultContext(final RenderOptions options, final String contextPath, final String template) {
         final Map<String, Object> context = new HashMap<>();
         context.put("baseUri", options.isType(RenderOutput.web) ? "/api/pebble/resources" : pebble.getTemplateBasePath());
         context.put("contextPath", contextPath);
         context.put("defaultPath", "default");
+        context.put("template", template);
         context.put("output", options.getOutput().name());
         context.put("language", options.getLanguage().name());
         context.put("state", options.getState().name());

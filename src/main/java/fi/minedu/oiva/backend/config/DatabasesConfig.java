@@ -74,6 +74,7 @@ public class DatabasesConfig implements EnvironmentAware {
 
         final Flyway flyway = new Flyway();
         flyway.setDataSource(source);
+        flyway.setBaselineOnMigrate(true);
         flyway.migrate();
 
         log.info("DATABASE MIGRATION DONE");

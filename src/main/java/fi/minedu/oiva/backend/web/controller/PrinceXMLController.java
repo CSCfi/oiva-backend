@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
 import fi.minedu.oiva.backend.service.PrinceXMLService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,9 @@ public class PrinceXMLController {
             options.setDebugMode(null != debugMode);
             final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
             if(htmlOpt.isPresent()) {
+                response.setContentType(APPLICATION_PDF);
+                response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
                 princeXMLService.generatePDF(htmlOpt.get(), response.getOutputStream());
-
             } else {
                 response.setStatus(get500().getStatusCode().value());
             }

@@ -1,34 +1,36 @@
-             ____  _
-            / __ \(_)
-           | |  | |___   ____ _
-           | |  | | \ \ / / _` |
-           | |__| | |\ V / (_| |
-  ____      \____/|_| \_/ \__,_|      _
- |  _ \           | |                | |
- | |_) | __ _  ___| | _____ _ __   __| |
- |  _ < / _` |/ __| |/ / _ \ '_ \ / _` |
- | |_) | (_| | (__|   <  __/ | | | (_| |
- |____/ \__,_|\___|_|\_\___|_| |_|\__,_|
+                ____  _
+               / __ \(_)
+              | |  | |___   ____ _
+              | |  | | \ \ / / _` |
+              | |__| | |\ V / (_| |
+     ____      \____/|_| \_/ \__,_|      _
+    |  _ \           | |                | |
+    | |_) | __ _  ___| | _____ _ __   __| |
+    |  _ < / _` |/ __| |/ / _ \ '_ \ / _` |
+    | |_) | (_| | (__|   <  __/ | | | (_| |
+    |____/ \__,_|\___|_|\_\___|_| |_|\__,_|
 
 # Buildaus ja kehitysympäristön asennus - How-to
 
 ## Oiva 2.0 dependency version updates
-spring-boot-starter-parent      -> 1.5.1.RELEASE
-spring-boot-starter-data-redis  -> 1.4.4.RELEASE
-jooq                            -> 3.9.1
-jool                            -> 0.9.12
-jooq-codegen-maven              -> 3.9.1
-modelmapper-jooq                -> 0.7.7
-javaslang                       -> 1.2.3
-jackson                         -> 2.8.7
-spring-security-test            -> 4.2.1.RELEASE
-spring-data-commons             -> 1.13.0.RELEASE
-spring-ldap-core                -> 2.3.1.RELEASE
-spring-session                  -> 1.3.0.RELEASE
-jersey-rx-client-java8          -> 2.25.1
-pebble                          -> 2.3.0
-springfox-swagger2              -> 2.6.1
-springfox-swagger-ui            -> 2.6.1
+Dependency                      | New version
+------------------------------- | -------------
+spring-boot-starter-parent      | 1.5.1.RELEASE
+spring-boot-starter-data-redis  | 1.4.4.RELEASE
+jooq                            | 3.9.1
+jool                            | 0.9.12
+jooq-codegen-maven              | 3.9.1
+modelmapper-jooq                | 0.7.7
+javaslang                       | 1.2.3
+jackson                         | 2.8.7
+spring-security-test            | 4.2.1.RELEASE
+spring-data-commons             | 1.13.0.RELEASE
+spring-ldap-core                | 2.3.1.RELEASE
+spring-session                  | 1.3.0.RELEASE
+jersey-rx-client-java8          | 2.25.1
+pebble                          | 2.3.0
+springfox-swagger2              | 2.6.1
+springfox-swagger-ui            | 2.6.1
 
 ## Alkuvalmistelut
 
@@ -121,7 +123,7 @@ generate-db -profiiilin ajon yhteydessä.
 
 **Aja Flyway ja JOOQ:**
 
-    $ mvn -Doiva.dbhost=$POSTGRES_IP compile -Pgenerate-db
+    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD compile -Pgenerate-db
 
 
 ### Puhdistus ja populointi Maven SQL pluginilla

@@ -23,6 +23,7 @@ public class PebbleConfig {
                 .loader(oivaLoader)
                 .extension(oivaExtension)
                 .autoEscaping(false)
+                .cacheActive(false)
                 .build();
     }
 
