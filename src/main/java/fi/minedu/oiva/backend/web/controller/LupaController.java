@@ -60,4 +60,16 @@ public class LupaController {
         @RequestParam(value = "with", required = false) String with) {
         return getOr404(service.get(RequestUtils.getPathVariable(request, fullPath), StringUtils.split(with, ",")));
     }
+
+    // TODO: REMOVEME
+    @ApiOperation(notes = "Palauttaa kaikkien lupien PDF-linkit", value = "")
+    @RequestMapping(method = GET, value = "/linkit", produces = { MediaType.TEXT_HTML_VALUE})
+    public String getLinks() {
+        final StringBuilder html = new StringBuilder();
+        service.getAll().stream().forEach(lupa -> {
+            final String link = "/api/pdf/" + lupa.getDiaarinumero();
+            html.append("<a href='" + link  + "'>" + lupa.getDiaarinumero() + "</a><br/>");
+        });
+        return html.toString();
+    }
 }

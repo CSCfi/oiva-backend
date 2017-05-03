@@ -202,10 +202,8 @@ class OpintopolkuService extends CacheAware {
 
     def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
 
-    def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String) = {
-        val koulutustyyppiKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi"))
-        if(!koulutustyyppiKoodit.isEmpty) koulutustyyppiKoodit.head else null
-    }
+    def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): java.util.List[KoodistoKoodi] =
+        getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))
 
 //    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)

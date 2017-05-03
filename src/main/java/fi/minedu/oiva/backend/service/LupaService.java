@@ -127,8 +127,8 @@ public class LupaService {
                     final KoodistoKoodi koodi = opintopolkuService.getKoodi(maarays);
                     maarays.setKoodi(koodi);
                     if(null != koodi && koodi.isKoodisto("koulutus")) {
-                        final KoodistoKoodi koulutustyyppiKoodi = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
-                        if(null != koulutustyyppiKoodi) maarays.addYlaKoodi(koulutustyyppiKoodi);
+                        final List<KoodistoKoodi> koulutustyyppiKoodit = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
+                        if(null != koulutustyyppiKoodit) koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi);
                     }
                 }
             });

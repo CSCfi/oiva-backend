@@ -30,12 +30,14 @@ public class OivaTemplateExtension implements Extension {
         filters.put("comma", new SeparatorFilter(", "));
         filters.put("semicolon", new SeparatorFilter("; "));
         filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
-        filters.put("sortByLanguage", new SortByLanguageFilter());
+        filters.put("sortByLanguage", new SortByLanguageFilter()); // TODO: REMOVE ME
         filters.put("toDate", new ToDateFilter());
         filters.put("maaraysFilter", new MaaraysListFilter(combo));
 
-        filters.put("kohde", new MaaraysListFilter(byKohdeTunniste));
-        filters.put("koodisto", new MaaraysListFilter(byKoodistoUri));
+        // TODO: ADD SORTER FILTERS
+
+        filters.put("kohde", new MaaraysListFilter(byKohdeTunniste)); // TODO: REPLACE ME WITH maaraysFilter
+        filters.put("koodisto", new MaaraysListFilter(byKoodistoUri)); // TODO: REPLACE ME WITH maaraysFilter
         filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
         filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE)); // TODO: REPLACE ME WITH maaraysFilter
         filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
@@ -47,13 +49,14 @@ public class OivaTemplateExtension implements Extension {
     @Override
     public Map<String, Test> getTests() {
         Map<String,Test> testMap = new HashMap<>();
-        testMap.put("hasTranslation", new HasTranslationTest());
+        testMap.put("hasTranslation", new HasTranslationTest()); // TODO: REMOVE ME
         testMap.put("notBlank", new NotEmptyTest());
         testMap.put("dateGT", new DateComparatorTest(">"));
         testMap.put("dateGTE", new DateComparatorTest(">="));
         testMap.put("dateLT", new DateComparatorTest("<"));
         testMap.put("dateLTE", new DateComparatorTest("<="));
         testMap.put("dateEQ", new DateComparatorTest("="));
+        testMap.put("dateBetween", new DateBetweenTest(">=", "<="));
         return testMap;
     }
 

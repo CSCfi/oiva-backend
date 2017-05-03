@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class ToDateFilter extends OivaFilter {
 
-    private static String defaultFormat = "dd.MM.yyyy";
+    private static String defaultFormat = "yyyy-MM-dd";
 
     protected String argFormat = "format";
 
