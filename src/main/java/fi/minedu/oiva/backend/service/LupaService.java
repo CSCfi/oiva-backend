@@ -126,9 +126,26 @@ public class LupaService {
                 if(maarays.hasKoodistoKoodiBind()) {
                     final KoodistoKoodi koodi = opintopolkuService.getKoodi(maarays);
                     maarays.setKoodi(koodi);
-                    if(null != koodi && koodi.isKoodisto("koulutus")) {
+                    if(null != koodi && (koodi.isKoodisto("koulutus"))) {
                         final List<KoodistoKoodi> koulutustyyppiKoodit = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
-                        if(null != koulutustyyppiKoodit) koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi);
+                        if(null != koulutustyyppiKoodit) {
+                            koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi);
+
+                            koulutustyyppiKoodit.stream().forEach(maarays2 -> {
+                                System.out.println("maarays: " + maarays2);
+                            });
+
+                        }
+
+                        final KoodistoKoodi koulutusalaKoodi = opintopolkuService.getKoulutusalaKoodiForKoulutus(koodi.koodiArvo());
+                        if(null != koulutusalaKoodi) {
+
+                            maarays.addYlaKoodi(koulutusalaKoodi);
+
+                            System.out.println("koulutusalaKoodi: " + koulutusalaKoodi);
+                        }
+
+                        //System.out.println("maarays: " + maarays.getYlaKoodit());
                     }
                 }
             });

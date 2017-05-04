@@ -204,7 +204,14 @@ class OpintopolkuService extends CacheAware {
 
     def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): java.util.List[KoodistoKoodi] =
         getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava
+
+    def getKoulutusalaKoodiForKoulutus(koodiArvo: String) = {
+            val koulutusalaKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("isced2011koulutusalataso1"))
+            if(!koulutusalaKoodit.isEmpty) koulutusalaKoodit.head else null
+    }
+
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))
+
 
 //    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)
 //    def getKoulutusKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusKoodiUrl, koulutusKoodiUri(koodiArvo))
