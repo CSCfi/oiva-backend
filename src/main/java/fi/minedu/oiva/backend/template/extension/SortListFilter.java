@@ -62,7 +62,15 @@ public class SortListFilter extends OivaFilter {
         };
 
         final Comparator<Maarays> maaraysSortById = Comparator.comparing(maarays -> maarays.getId());
-        final Function<String, Comparator> toMaaraysComparators = sortBy -> maaraysSortById;
+        final Comparator<Maarays> maaraysSortByKoodiNimi = Comparator.comparing(maarays -> {
+            final KoodistoKoodi koodi = maarays.koodi();
+            return null != koodi ? TranslateFilter.fromTranslatedString(koodi.getNimi(), languageOpt) : "";
+        });
+        final Function<String, Comparator> toMaaraysComparators = sortBy -> {
+            if (equalsIgnoreCase(sortBy, "koodinimi")) return maaraysSortByKoodiNimi;
+            else logger.warn("Unsupported sortMaaraykset option: {}. Using maaraysSortById", sortBy);
+            return maaraysSortById;
+        };
 
         if (sortTarget == SortTarget.Luvat) {
             final Optional<Collection<Lupa>> luvatOpt = asLupaList(obj);
