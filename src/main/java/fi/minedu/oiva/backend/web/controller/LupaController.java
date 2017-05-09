@@ -65,11 +65,6 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa kaikkien lupien PDF-linkit", value = "")
     @RequestMapping(method = GET, value = "/linkit", produces = { MediaType.TEXT_HTML_VALUE})
     public String getLinks() {
-        final StringBuilder html = new StringBuilder();
-        service.getAll().stream().forEach(lupa -> {
-            final String link = "/api/pdf/" + lupa.getDiaarinumero();
-            html.append("<a href='" + link  + "'>" + lupa.getDiaarinumero() + "</a><br/>");
-        });
-        return html.toString();
+        return service.luvatLinksHtml();
     }
 }

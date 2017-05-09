@@ -17,6 +17,7 @@ import java.util.Map;
 import static fi.minedu.oiva.backend.entity.MaaraystyyppiValue.*;
 import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
 import static fi.minedu.oiva.backend.template.extension.MaaraysListFilter.Method.*;
+import static fi.minedu.oiva.backend.template.extension.SortListFilter.SortTarget.*;
 
 public class OivaTemplateExtension implements Extension {
 
@@ -33,6 +34,8 @@ public class OivaTemplateExtension implements Extension {
         filters.put("sortByLanguage", new SortByLanguageFilter()); // TODO: REMOVE ME
         filters.put("toDate", new ToDateFilter());
         filters.put("maaraysFilter", new MaaraysListFilter(combo));
+        filters.put("sortLuvat", new SortListFilter(Luvat));
+        filters.put("sortMaaraykset", new SortListFilter(Maaraykset));
 
         // TODO: ADD SORTER FILTERS
 

@@ -16,12 +16,13 @@ case class Organisaatio(
     @BeanProperty var kotipaikkaUri: String,
     @BeanProperty var nimi: TranslatedString,
     @BeanProperty var postiosoite: Organisaatio.Osoite,
-    @BeanProperty var kayntiosoite: Organisaatio.Osoite) {
+    @BeanProperty var kayntiosoite: Organisaatio.Osoite,
+    @BeanProperty var kuntaKoodi: KoodistoKoodi) {
 
-    def this() = this(null, null, null, null, null, null, null, null)
-    @JsonIgnore def kuntaKoodi = if(null != kotipaikkaUri && kotipaikkaUri.startsWith("kunta_")) kotipaikkaUri.substring(6) else null
+    def this() = this(null, null, null, null, null, null, null, null, null)
+    @JsonIgnore def kuntaKoodiArvo = if(null != kotipaikkaUri && kotipaikkaUri.startsWith("kunta_")) kotipaikkaUri.substring(6) else null
     @JsonIgnore def isKunta(k: Kunta) = isKuntaKoodi(k.koodiArvo)
-    @JsonIgnore def isKuntaKoodi(k: String) = kuntaKoodi == k && null != k
+    @JsonIgnore def isKuntaKoodi(k: String) = kuntaKoodiArvo == k && null != k
 }
 
 object Organisaatio {
@@ -36,7 +37,7 @@ object Organisaatio {
         def this() = this(null, null, null, null)
         @JsonIgnore def postiKoodi = if(null != postinumeroUri && postinumeroUri.startsWith("posti_")) postinumeroUri.substring(6) else null
     }
-    def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null)
+    def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null, null)
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)

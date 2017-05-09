@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,32 +44,39 @@ public class PebbleService {
         }
     }
 
-    public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
-        // TODO
+    // TODO: REMOVEME
+    public Optional<String> toLupaListHTML(final Collection<Lupa> luvat) {
+        final Map<String, Object> context = new HashMap<>();
+        context.put("luvat", luvat);
+        return writeHTML("luvat", context);
+    }
 
-        options.setTemplateName("paatos/base");
+    public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
+        options.setTemplateName("paatos/base"); // TODO
         return generateHtml(lupa, options);
     }
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {
 
-        final String contextPath = "paatoskierros2017";
+        final String contextPath = "paatoskierros2017"; // TODO
         final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
 
         logger.debug("Using base path: {}", pebble.getTemplateBasePath());
         logger.debug("Using context path: {}", contextPath);
         logger.debug("Using template: {}", templateName);
 
-        final PebbleEngine engine = pebble.defaultEngine();
+        final String templatePath = contextPath + templateName;
+        final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
+        context.put("lupa", nonNullVersion(lupa));
+        context.put("jarjestaja", lupa.jarjestaja());
 
+        return writeHTML(templatePath, context);
+    }
+
+    protected Optional<String> writeHTML(final String templatePath, final Map<String, Object> context) {
         try {
-
-            final String templatePath = contextPath + templateName;
+            final PebbleEngine engine = pebble.defaultEngine();
             final PebbleTemplate pebbleTemplate = engine.getTemplate(templatePath);
-            final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
-            context.put("lupa", nonNullVersion(lupa));
-            context.put("jarjestaja", lupa.jarjestaja());
-
             final Writer writer = new StringWriter();
             pebbleTemplate.evaluate(writer, context);
             return Optional.ofNullable(writer.toString());

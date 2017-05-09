@@ -27,7 +27,8 @@ public class MaaraysListFilter extends OivaFilter {
         byKoodistoUri,
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(TranslateFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(MaaraysListFilter.class);
+
     private final Method method;
     private final Collection<MaaraystyyppiValue> targetTypes;
 

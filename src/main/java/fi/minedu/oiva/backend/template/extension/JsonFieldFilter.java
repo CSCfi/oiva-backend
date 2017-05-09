@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class JsonFieldFilter extends OivaFilter {
     private final ReturnType returnType;
     private final boolean localized;
 
-    private final String argFieldName = "fieldName";
+    private static final String argFieldName = "fieldName";
 
     public JsonFieldFilter(final ReturnType type, final boolean localized) {
         this.returnType = type;
@@ -51,6 +52,10 @@ public class JsonFieldFilter extends OivaFilter {
     @Override
     public List<String> getArgumentNames() {
         return Arrays.asList(new String[]{argFieldName});
+    }
+
+    public static String getString(final Object source, final String fieldName) {
+        return (String) new JsonFieldFilter(ReturnType.String, false).apply(source, Collections.singletonMap(argFieldName, fieldName));
     }
 
     private Optional<String> getFieldName(final Map<String, Object> map) {

@@ -9,6 +9,8 @@ import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
+import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,8 +45,19 @@ public class LupaService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
+    @Autowired
+    private PebbleService pebbleService;
+
     public Collection<Lupa> getAll() {
         return dsl.select(LUPA.fields()).from(LUPA).fetchInto(Lupa.class);
+    }
+
+    public String luvatLinksHtml() { // TODO REMOVEME
+        return pebbleService.toLupaListHTML(baseLupaSelect().stream()
+                .map(record -> asLupa(record, Organisaatio.class.getSimpleName(), Kunta.class.getSimpleName()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList())).orElse("");
     }
 
     public Optional<Lupa> get(final Long lupaId, final String... withOptions) {
@@ -78,11 +92,12 @@ public class LupaService {
     }
 
     protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final String... with) {
-        final List withOptions = null == with ? Collections.emptyList() : Arrays.asList(with);
-        final Function<Class<?>, Boolean> hasOption = (targetClass) ->
+        final List withOptions = null == with ? Collections.emptyList() : Arrays.asList(with).stream().map(String::toLowerCase).collect(Collectors.toList());
+        final Function<Class<?>, Boolean> hasOption = targetClass ->
                 withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
+        if(hasOption.apply(Kunta.class)) withKunta(lupaOpt);
         if(hasOption.apply(Maarays.class)) withMaaraykset(lupaOpt);
         if(hasOption.apply(KoodistoKoodi.class)) withKoodisto(lupaOpt);
         return lupaOpt;
@@ -90,6 +105,17 @@ public class LupaService {
 
     protected Optional<Lupa> withOrganization(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> lupa.setJarjestaja(opintopolkuService.getBlockingOrganisaatio(lupa.getJarjestajaOid())));
+        return lupaOpt;
+    }
+
+    protected Optional<Lupa> withKunta(final Optional<Lupa> lupaOpt) {
+        lupaOpt.ifPresent(lupa -> {
+            final Organisaatio jarjestaja = lupa.jarjestaja();
+            if(null != jarjestaja && StringUtils.isNotBlank(jarjestaja.kuntaKoodiArvo())) {
+                final KoodistoKoodi kuntakoodi = opintopolkuService.getKuntaKoodi(jarjestaja.kuntaKoodiArvo());
+                if(null != kuntakoodi) jarjestaja.setKuntaKoodi(kuntakoodi);
+            }
+        });
         return lupaOpt;
     }
 
