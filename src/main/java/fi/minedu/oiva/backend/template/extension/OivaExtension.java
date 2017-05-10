@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.template.extension;
 import com.mitchellbosecke.pebble.template.EvaluationContext;
 import com.mitchellbosecke.pebble.template.ScopeChain;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -29,6 +30,10 @@ public abstract class OivaExtension {
 
     public Date getArgAsDate(final Map<String, Object> map, String key) {
         return argExists(map, key) ? (Date) map.get(key) : null;
+    }
+
+    public Long getArgAsLong(final Map<String, Object> map, String key) {
+        return argExists(map, key) && NumberUtils.isDigits(String.valueOf(map.get(key))) ? NumberUtils.toLong(String.valueOf(map.get(key))) : null;
     }
 
     public String getArgAsString(final Map<String, Object> map, String key) {

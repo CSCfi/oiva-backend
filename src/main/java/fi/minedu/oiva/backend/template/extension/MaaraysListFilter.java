@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.template.extension;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.MaaraystyyppiValue;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,7 @@ import java.util.function.Function;
 
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.lang3.StringUtils.*;
+import static org.apache.commons.lang3.math.NumberUtils.isDigits;
 
 public class MaaraysListFilter extends OivaFilter {
 
@@ -50,6 +52,17 @@ public class MaaraysListFilter extends OivaFilter {
         final BiFunction<Maarays, Object, Boolean> maaraysKohdeFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKohde(removeStart(value, "~"))));
         final BiFunction<Maarays, Object, Boolean> maaraysKoodistoFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKoodisto(removeStart(value, "~"))));
         final BiFunction<Maarays, Object, Boolean> maaraysYlaKoodiFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.hasYlaKoodi(removeStart(value, "~"))));
+        final BiFunction<Maarays, Object, Boolean> maaraysArvoFilter = (maarays, filter) -> filterer.apply(filter, value -> {
+            if (startsWith(value, ">") || startsWith(value, "<")) {
+                final String filterValue = substring(value, 1);
+                if (isDigits(maarays.getArvo()) && isDigits(filterValue)) {
+                    final Integer numberArvo = NumberUtils.toInt(maarays.getArvo());
+                    final Integer numberFilter = NumberUtils.toInt(filterValue);
+                    return equalsIgnoreCase(">", substring(value, 0, 1)) ? numberArvo > numberFilter : numberArvo < numberFilter;
+                } return false;
+            } else return xor(startsWith(value, "~"), equalsIgnoreCase(maarays.getArvo(), removeStart(value, "~")));
+        });
+
         final BiFunction<Maarays, Object, Boolean> comboFilter = (maarays, filterSource) -> {
             final Collection<String> filters = filterSource instanceof Collection ? (Collection<String>) filterSource : Collections.singletonList((String)filterSource);
             return filters.stream().allMatch(filter -> {
@@ -59,6 +72,7 @@ public class MaaraysListFilter extends OivaFilter {
                 else if(equalsIgnoreCase(filterType, "kohde")) return maaraysKohdeFilter.apply(maarays, filterTarget);
                 else if(equalsIgnoreCase(filterType, "koodisto")) return maaraysKoodistoFilter.apply(maarays, filterTarget);
                 else if(equalsIgnoreCase(filterType, "ylakoodi")) return maaraysYlaKoodiFilter.apply(maarays, filterTarget);
+                else if(equalsIgnoreCase(filterType, "arvo")) return maaraysArvoFilter.apply(maarays, filterTarget);
                 else return false;
             });
         };

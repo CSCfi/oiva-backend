@@ -54,11 +54,8 @@ public class OivaTemplateExtension implements Extension {
         Map<String,Test> testMap = new HashMap<>();
         testMap.put("hasTranslation", new HasTranslationTest()); // TODO: REMOVE ME
         testMap.put("notBlank", new NotEmptyTest());
-        testMap.put("dateGT", new DateComparatorTest(">"));
-        testMap.put("dateGTE", new DateComparatorTest(">="));
-        testMap.put("dateLT", new DateComparatorTest("<"));
-        testMap.put("dateLTE", new DateComparatorTest("<="));
-        testMap.put("dateEQ", new DateComparatorTest("="));
+        testMap.put("number", new NumberComparatorTest());
+        testMap.put("date", new DateTest());
         testMap.put("dateBetween", new DateBetweenTest(">=", "<="));
         return testMap;
     }
