@@ -29,14 +29,14 @@ public class OivaFormatterFilter extends OivaFilter {
         final Optional<Locale> localeOpt = getContextScopeLocale(map);
 
         if(!NotEmptyTest.check(source)) {
-            return null;
+            return "";
         } else if(type == Type.number && NumberUtils.isDigits(String.valueOf(source))) {
             final Long value = NumberUtils.toLong(String.valueOf(source));
             if(localeOpt.isPresent()) {
                 return NumberFormat.getNumberInstance(localeOpt.get()).format(value);
             }
         }
-        return null;
+        return source;
     }
 
     @Override
