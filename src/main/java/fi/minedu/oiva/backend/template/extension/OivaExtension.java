@@ -8,6 +8,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,6 +73,19 @@ public abstract class OivaExtension {
             final ScopeChain scope = scopeOpt.get();
             return Optional.of(scope.containsKey(languageArg) ? String.valueOf(scope.get(languageArg)) : "");
         } else return Optional.empty();
+    }
+
+    public Optional<Locale> getContextScopeLocale(final Map<String, Object> map) {
+        final Optional<String> languageOpt = getContextScopeLanguage(map);
+        if(languageOpt.isPresent()) {
+            if(StringUtils.equalsIgnoreCase(languageOpt.get(), "fi")) {
+                return Optional.of(new Locale("fi", "FI"));
+            } else if(StringUtils.equalsIgnoreCase(languageOpt.get(), "en")) {
+                return Optional.of(Locale.UK);
+            } else if(StringUtils.equalsIgnoreCase(languageOpt.get(), "sv")) {
+                return Optional.of(new Locale("sv", "SE"));
+            }
+        } return Optional.empty();
     }
 
     public String getScopeArgumentAsString(final ScopeChain scope, final String argName) {

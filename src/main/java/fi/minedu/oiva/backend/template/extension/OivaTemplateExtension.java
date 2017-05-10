@@ -17,6 +17,7 @@ import java.util.Map;
 import static fi.minedu.oiva.backend.entity.MaaraystyyppiValue.*;
 import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
 import static fi.minedu.oiva.backend.template.extension.MaaraysListFilter.Method.*;
+import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.number;
 import static fi.minedu.oiva.backend.template.extension.SortListFilter.SortTarget.*;
 
 public class OivaTemplateExtension implements Extension {
@@ -31,13 +32,13 @@ public class OivaTemplateExtension implements Extension {
         filters.put("comma", new SeparatorFilter(", "));
         filters.put("semicolon", new SeparatorFilter("; "));
         filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
-        filters.put("sortByLanguage", new SortByLanguageFilter()); // TODO: REMOVE ME
         filters.put("toDate", new ToDateFilter());
+        filters.put("number", new OivaFormatterFilter(number));
+
         filters.put("maaraysFilter", new MaaraysListFilter(combo));
+
         filters.put("sortLuvat", new SortListFilter(Luvat));
         filters.put("sortMaaraykset", new SortListFilter(Maaraykset));
-
-        // TODO: ADD SORTER FILTERS
 
         filters.put("kohde", new MaaraysListFilter(byKohdeTunniste)); // TODO: REPLACE ME WITH maaraysFilter
         filters.put("koodisto", new MaaraysListFilter(byKoodistoUri)); // TODO: REPLACE ME WITH maaraysFilter
@@ -52,7 +53,6 @@ public class OivaTemplateExtension implements Extension {
     @Override
     public Map<String, Test> getTests() {
         Map<String,Test> testMap = new HashMap<>();
-        testMap.put("hasTranslation", new HasTranslationTest()); // TODO: REMOVE ME
         testMap.put("notBlank", new NotEmptyTest());
         testMap.put("number", new NumberComparatorTest());
         testMap.put("date", new DateTest());
