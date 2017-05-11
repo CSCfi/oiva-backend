@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.service
 
+import java.util.Optional
 import java.util.concurrent.CompletionStage
 import javax.annotation.PostConstruct
 
@@ -185,7 +186,7 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    def getKoodi(maarays: Maarays): KoodistoKoodi = getKoodi(maarays.getKoodisto, maarays.getKoodiarvo)
+    def getKoodi(maarays: Maarays): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodi(maarays.getKoodisto, maarays.getKoodiarvo))
     def getKoodi(koodistoUri: String, koodiArvo: String) = getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo))
 
     def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiUrl)
@@ -202,12 +203,12 @@ class OpintopolkuService extends CacheAware {
 
     def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
 
-    def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): java.util.List[KoodistoKoodi] =
-        getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava
+    def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): Optional[java.util.List[KoodistoKoodi]] =
+        Optional.ofNullable(getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava)
 
-    def getKoulutusalaKoodiForKoulutus(koodiArvo: String) = {
-            val koulutusalaKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("isced2011koulutusalataso1"))
-            if(!koulutusalaKoodit.isEmpty) koulutusalaKoodit.head else null
+    def getKoulutusalaKoodiForKoulutus(koodiArvo: String): Optional[KoodistoKoodi] = {
+        val koulutusalaKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("isced2011koulutusalataso1"))
+        if(!koulutusalaKoodit.isEmpty) Optional.ofNullable(koulutusalaKoodit.head) else Optional.empty()
     }
 
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))

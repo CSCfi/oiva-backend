@@ -15,9 +15,15 @@ class Lupa(
     var maaraykset: Collection[Maarays]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Lupa {
 
     def this() = this(null, null, null, null, null)
+
+    // exclude from json
     @JsonIgnore override def getPaatoskierrosId = super.getPaatoskierrosId
     @JsonIgnore override def getAsiatyyppiId = super.getAsiatyyppiId
     @JsonIgnore override def getLupatilaId = super.getLupatilaId
+    @JsonIgnore override def getLuoja = super.getLuoja
+    @JsonIgnore override def getLuontipvm = super.getLuontipvm
+    @JsonIgnore override def getPaivittaja = super.getPaivittaja
+    @JsonIgnore override def getPaivityspvm = super.getPaivityspvm
 
     def getPaatoskierros = paatoskierros
     def setPaatoskierros(paatoskierros: Paatoskierros): Unit = this.paatoskierros = paatoskierros
