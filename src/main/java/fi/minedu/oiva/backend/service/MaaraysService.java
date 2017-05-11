@@ -75,7 +75,7 @@ public class MaaraysService implements RecordMapping<Maarays> {
                 }
             });
         }
-        if(maarays.hasAliMaarays()) maarays.aliMaaraysList().stream().forEach(this::withKoodisto);
+        if(maarays.hasAliMaarays()) maarays.getAliMaaraykset().stream().forEach(this::withKoodisto);
         return maarays;
     }
 }

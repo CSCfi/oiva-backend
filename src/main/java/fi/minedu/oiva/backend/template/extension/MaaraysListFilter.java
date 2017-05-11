@@ -110,7 +110,7 @@ public class MaaraysListFilter extends OivaFilter {
     }
 
     private Optional<Collection<Maarays>> asMaaraysList(final Object obj) {
-        if(obj instanceof Collection) {
+        if(null != obj && obj instanceof Collection) {
             final Collection<Maarays> list = (Collection<Maarays>) obj;
             return Optional.ofNullable(list);
         } return Optional.empty();

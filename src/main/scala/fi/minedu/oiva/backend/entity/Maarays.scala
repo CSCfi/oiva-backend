@@ -1,11 +1,12 @@
 package fi.minedu.oiva.backend.entity
 
+import java.util.Collection
+import java.util.ArrayList
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.opintopolku.{KoodistoKoodi}
 import org.apache.commons.lang3.StringUtils
-
-import scala.collection.JavaConverters._
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -14,7 +15,7 @@ class Maarays(
     var maaraystyyppi: Maaraystyyppi,
     var koodi: KoodistoKoodi,
     var ylaKoodit: Array[KoodistoKoodi],
-    var aliMaaraykset: Array[Maarays]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
+    var aliMaaraykset: Collection[Maarays]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
     def this() = this(null, null, null, null, null)
 
@@ -59,10 +60,9 @@ class Maarays(
 
     def getAliMaaraykset = aliMaaraykset
     @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if(null != maarays && getId != maarays.getId) {
-        if (null == this.aliMaaraykset) this.aliMaaraykset = Array(maarays)
-        else this.aliMaaraykset = this.aliMaaraykset :+ maarays
+        if (null == this.aliMaaraykset) this.aliMaaraykset = new ArrayList()
+        this.aliMaaraykset.add(maarays)
     }
-    @JsonIgnore def aliMaaraysList: java.util.List[Maarays] = if(hasAliMaarays) aliMaaraykset.toList.asJava else null
     @JsonIgnore def hasAliMaarays = null != aliMaaraykset && !aliMaaraykset.isEmpty
     @JsonIgnore def isYlinMaarays = getParentId == null
     @JsonIgnore def isParentOf(maarays: Maarays) = if(null != maarays) getId == maarays.getParentId else false
