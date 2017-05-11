@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
@@ -52,31 +53,27 @@ public class MaaraysService implements RecordMapping<Maarays> {
             putToMap(kohteet, record, KOHDE.fields(), Kohde.class);
             putToMap(maaraystyypit, record, MAARAYSTYYPPI.fields(), Maaraystyyppi.class);
         });
-
-        final Collection<Maarays> maaraysList = maaraykset.values().stream().filter(Maarays::isYlinMaarays).collect(Collectors.toList());
-        maaraysList.forEach(maarays -> {
-            maaraykset.values().stream().filter(maarays::isParentOf).forEach(maarays::addAliMaarays);
+        maaraykset.values().stream().forEach(maarays -> {
             maarays.setKohde(kohteet.getOrDefault(maarays.getKohdeId(), null));
             maarays.setMaaraystyyppi(maaraystyypit.getOrDefault(maarays.getMaaraystyyppiId(), null));
         });
+
+        final Collection<Maarays> maaraysList = maaraykset.values().stream().filter(Maarays::isYlinMaarays).collect(Collectors.toList());
+        maaraysList.forEach(maarays -> maaraykset.values().stream().filter(maarays::isParentOf).forEach(maarays::addAliMaarays));
 
         return maaraysList;
     }
 
     protected Maarays withKoodisto(final Maarays maarays) {
-        if (maarays.hasKoodistoKoodiBind()) {
-            final KoodistoKoodi koodi = opintopolkuService.getKoodi(maarays);
-            maarays.setKoodi(koodi);
-            if (null != koodi && (koodi.isKoodisto("koulutus"))) {
-                final List<KoodistoKoodi> koulutustyyppiKoodit = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
-                if (null != koulutustyyppiKoodit) {
-                    koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi);
+        if (maarays.hasKoodistoAndKoodiArvo()) {
+            opintopolkuService.getKoodi(maarays).ifPresent(koodi -> {
+                maarays.setKoodi(koodi);
+                if (koodi.isKoodisto("koulutus")) {
+                    final String koodiArvo = koodi.koodiArvo();
+                    opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo).ifPresent(koulutustyyppiKoodit -> koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi));
+                    opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(maarays::addYlaKoodi);
                 }
-                final KoodistoKoodi koulutusalaKoodi = opintopolkuService.getKoulutusalaKoodiForKoulutus(koodi.koodiArvo());
-                if (null != koulutusalaKoodi) {
-                    maarays.addYlaKoodi(koulutusalaKoodi);
-                }
-            }
+            });
         }
         if(maarays.hasAliMaarays()) maarays.aliMaaraysList().stream().forEach(this::withKoodisto);
         return maarays;

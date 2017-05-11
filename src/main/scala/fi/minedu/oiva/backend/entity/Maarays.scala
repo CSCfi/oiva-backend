@@ -17,33 +17,39 @@ class Maarays(
     var aliMaaraykset: Array[Maarays]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
     def this() = this(null, null, null, null, null)
+
+    // exclude from json
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
+    @JsonIgnore override def getParentId = super.getParentId
+    @JsonIgnore override def getLuoja = super.getLuoja
+    @JsonIgnore override def getLuontipvm = super.getLuontipvm
+    @JsonIgnore override def getPaivittaja = super.getPaivittaja
+    @JsonIgnore override def getPaivityspvm = super.getPaivityspvm
 
-    @JsonIgnore def hasKoodistoKoodiBind = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
+    @JsonIgnore def hasKoodistoAndKoodiArvo = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
 
     def getKohde = kohde
-    @JsonIgnore def setKohde(kohde: Kohde): Unit = this.kohde = kohde
+    def setKohde(kohde: Kohde): Unit = this.kohde = kohde
     @JsonIgnore def kohdeValue = if(null != kohde) kohde.getTunniste else null
     @JsonIgnore def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
     @JsonIgnore def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
 
     def getMaaraystyyppi = maaraystyyppi
-    @JsonIgnore def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
+    def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
     @JsonIgnore def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null
     @JsonIgnore def isMaaraystyyppi(tyyppi: String): Boolean = isMaaraystyyppi(MaaraystyyppiValue.valueOf(StringUtils.upperCase(tyyppi)))
     @JsonIgnore def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
     @JsonIgnore def tyyppi = if(null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
 
     def getKoodi = koodi
-    @JsonIgnore def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
+    def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
 
     def getYlaKoodit = ylaKoodit
-    @JsonIgnore def addYlaKoodi(koodi: KoodistoKoodi) {
+    @JsonIgnore def addYlaKoodi(koodi: KoodistoKoodi): Unit =
         if(null == this.ylaKoodit) this.ylaKoodit = Array(koodi) 
-        else this.ylaKoodit = this.ylaKoodit :+ koodi 
-    }
+        else this.ylaKoodit = this.ylaKoodit :+ koodi
     @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
         case Array(koodisto, koodiArvo) => hasYlaKoodi(koodisto, koodiArvo)
         case _ => false
