@@ -20,6 +20,10 @@ import org.jooq.SelectOnConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -156,22 +160,12 @@ public class LupaService {
                         final List<KoodistoKoodi> koulutustyyppiKoodit = opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodi.koodiArvo());
                         if(null != koulutustyyppiKoodit) {
                             koulutustyyppiKoodit.stream().forEach(maarays::addYlaKoodi);
-
-                            koulutustyyppiKoodit.stream().forEach(maarays2 -> {
-                                System.out.println("maarays: " + maarays2);
-                            });
-
                         }
 
                         final KoodistoKoodi koulutusalaKoodi = opintopolkuService.getKoulutusalaKoodiForKoulutus(koodi.koodiArvo());
                         if(null != koulutusalaKoodi) {
-
                             maarays.addYlaKoodi(koulutusalaKoodi);
-
-                            System.out.println("koulutusalaKoodi: " + koulutusalaKoodi);
                         }
-
-                        //System.out.println("maarays: " + maarays.getYlaKoodit());
                     }
                 }
             });
