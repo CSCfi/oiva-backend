@@ -57,8 +57,7 @@ public class MaaraysListFilter extends OivaFilter {
         final Optional targetOpt = getTarget(map);
         if(maarayksetOpt.isPresent() && targetOpt.isPresent()) {
             return maarayksetOpt.get().stream().filter(maarays -> chainFilter.apply(maarays, targetOpt.get())).collect(toList());
-        } else logger.warn("Unsupported source");
-        return Collections.emptyList();
+        } return Collections.emptyList();
     }
 
     private boolean applyFilters(final Maarays maarays, final String filter) {
