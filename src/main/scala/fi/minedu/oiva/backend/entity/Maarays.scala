@@ -2,8 +2,10 @@ package fi.minedu.oiva.backend.entity
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
-import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi
+import fi.minedu.oiva.backend.entity.opintopolku.{KoodistoKoodi}
 import org.apache.commons.lang3.StringUtils
+
+import scala.collection.JavaConverters._
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -11,36 +13,51 @@ class Maarays(
     var kohde: Kohde,
     var maaraystyyppi: Maaraystyyppi,
     var koodi: KoodistoKoodi,
-    var ylaKoodit: Array[KoodistoKoodi]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
+    var ylaKoodit: Array[KoodistoKoodi],
+    var aliMaaraykset: Array[Maarays]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Maarays  {
 
-    def this() = this(null, null, null, Array())
+    def this() = this(null, null, null, null, null)
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
 
     @JsonIgnore def hasKoodistoKoodiBind = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
 
     def getKohde = kohde
-    def setKohde(kohde: Kohde): Unit = this.kohde = kohde
-    def kohdeValue = if(null != kohde) kohde.getTunniste else null
-    def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
+    @JsonIgnore def setKohde(kohde: Kohde): Unit = this.kohde = kohde
+    @JsonIgnore def kohdeValue = if(null != kohde) kohde.getTunniste else null
+    @JsonIgnore def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
-    def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
+    @JsonIgnore def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
 
     def getMaaraystyyppi = maaraystyyppi
-    def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
-    def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null
-    def isMaaraystyyppi(tyyppi: String): Boolean = isMaaraystyyppi(MaaraystyyppiValue.valueOf(StringUtils.upperCase(tyyppi)))
-    def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
-    def tyyppi = if(null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
+    @JsonIgnore def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
+    @JsonIgnore def maaraystyyppiValue = if(null != maaraystyyppi) maaraystyyppi.getTunniste else null
+    @JsonIgnore def isMaaraystyyppi(tyyppi: String): Boolean = isMaaraystyyppi(MaaraystyyppiValue.valueOf(StringUtils.upperCase(tyyppi)))
+    @JsonIgnore def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
+    @JsonIgnore def tyyppi = if(null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
 
     def getKoodi = koodi
-    def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
+    @JsonIgnore def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
 
     def getYlaKoodit = ylaKoodit
-    def addYlaKoodi(koodi: KoodistoKoodi) { this.ylaKoodit = this.ylaKoodit :+ koodi }
-    def hasYlaKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
+    @JsonIgnore def addYlaKoodi(koodi: KoodistoKoodi) {
+        if(null == this.ylaKoodit) this.ylaKoodit = Array(koodi) 
+        else this.ylaKoodit = this.ylaKoodit :+ koodi 
+    }
+    @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
         case Array(koodisto, koodiArvo) => hasYlaKoodi(koodisto, koodiArvo)
         case _ => false
     }
-    def hasYlaKoodi(koodisto: String, koodiArvo: String) = ylaKoodit.exists(koodi => koodi.isKoodisto(koodisto) && koodi.koodiArvo == koodiArvo)
+    @JsonIgnore def hasYlaKoodi(koodisto: String, koodiArvo: String) =
+        null != ylaKoodit && ylaKoodit.exists(koodi => koodi.isKoodisto(koodisto) && koodi.koodiArvo == koodiArvo)
+
+    def getAliMaaraykset = aliMaaraykset
+    @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if(null != maarays && getId != maarays.getId) {
+        if (null == this.aliMaaraykset) this.aliMaaraykset = Array(maarays)
+        else this.aliMaaraykset = this.aliMaaraykset :+ maarays
+    }
+    @JsonIgnore def aliMaaraysList: java.util.List[Maarays] = if(hasAliMaarays) aliMaaraykset.toList.asJava else null
+    @JsonIgnore def hasAliMaarays = null != aliMaaraykset && !aliMaaraykset.isEmpty
+    @JsonIgnore def isYlinMaarays = getParentId == null
+    @JsonIgnore def isParentOf(maarays: Maarays) = if(null != maarays) getId == maarays.getParentId else false
 }
