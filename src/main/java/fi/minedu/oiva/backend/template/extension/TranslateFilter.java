@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.template.extension;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fi.minedu.oiva.backend.entity.TranslatedString;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,8 @@ public class TranslateFilter extends OivaFilter {
 
     @Override
     public Object apply(final Object translationSource, final Map<String, Object> map) {
-        final Optional<String> languageOpt = getContextScopeLanguage(map);
+        final String languageArg = getLanguage(map);
+        final Optional<String> languageOpt = StringUtils.isNotBlank(languageArg) ? Optional.ofNullable(languageArg) : getContextScopeLanguage(map);
         if(languageOpt.isPresent()) {
             if(!NotEmptyTest.check(translationSource)) {
                 return null;

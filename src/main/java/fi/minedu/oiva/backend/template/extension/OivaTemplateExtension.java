@@ -16,7 +16,7 @@ import java.util.Map;
 
 import static fi.minedu.oiva.backend.entity.MaaraystyyppiValue.*;
 import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
-import static fi.minedu.oiva.backend.template.extension.MaaraysListFilter.Method.*;
+import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.capitalize;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.number;
 import static fi.minedu.oiva.backend.template.extension.SortListFilter.SortTarget.*;
 
@@ -34,19 +34,10 @@ public class OivaTemplateExtension implements Extension {
         filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
         filters.put("toDate", new ToDateFilter());
         filters.put("number", new OivaFormatterFilter(number));
-
-        filters.put("maaraysFilter", new MaaraysListFilter(combo));
-
+        filters.put("capitalize", new OivaFormatterFilter(capitalize));
+        filters.put("maaraysFilter", new MaaraysListFilter());
         filters.put("sortLuvat", new SortListFilter(Luvat));
         filters.put("sortMaaraykset", new SortListFilter(Maaraykset));
-
-        filters.put("kohde", new MaaraysListFilter(byKohdeTunniste)); // TODO: REPLACE ME WITH maaraysFilter
-        filters.put("koodisto", new MaaraysListFilter(byKoodistoUri)); // TODO: REPLACE ME WITH maaraysFilter
-        filters.put("sallittuKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
-        filters.put("velvoiteKohde", new MaaraysListFilter(byKohdeTunniste, VELVOITE)); // TODO: REPLACE ME WITH maaraysFilter
-        filters.put("oikeusKohde", new MaaraysListFilter(byKohdeTunniste, OIKEUS)); // TODO: REPLACE ME WITH maaraysFilter
-        filters.put("rajoiteKohde", new MaaraysListFilter(byKohdeTunniste, RAJOITE)); // TODO: REPLACE ME WITH maaraysFilter
-
         return filters;
     }
 

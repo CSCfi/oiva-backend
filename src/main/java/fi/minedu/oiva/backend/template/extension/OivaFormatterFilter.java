@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.template.extension;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,8 @@ public class OivaFormatterFilter extends OivaFilter {
     private static final Logger logger = LoggerFactory.getLogger(OivaFormatterFilter.class);
 
     public enum Type {
-        number
+        number,
+        capitalize
     }
 
     private final Type type;
@@ -35,6 +37,8 @@ public class OivaFormatterFilter extends OivaFilter {
             if(localeOpt.isPresent()) {
                 return NumberFormat.getNumberInstance(localeOpt.get()).format(value);
             }
+        } else if(type == Type.capitalize) {
+            return StringUtils.capitalize(String.valueOf(source));
         }
         return source;
     }

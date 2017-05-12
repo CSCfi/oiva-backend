@@ -36,6 +36,7 @@ class Maarays(
     @JsonIgnore def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
     @JsonIgnore def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
+    @JsonIgnore def isKoodiArvo(koodiArvo: String) = null != getKoodiarvo && StringUtils.equalsIgnoreCase(getKoodiarvo, koodiArvo)
 
     def getMaaraystyyppi = maaraystyyppi
     def setMaaraystyyppi(maaraystyyppi: Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
