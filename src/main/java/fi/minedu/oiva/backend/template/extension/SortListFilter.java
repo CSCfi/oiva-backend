@@ -116,15 +116,15 @@ public class SortListFilter extends OivaFilter {
         } return Optional.empty();
     }
 
-    @Override
-    public List<String> getArgumentNames() {
-        return Arrays.asList(new String[]{argTarget});
-    }
-
     private Optional<Collection> getTargets(final Map<String, Object> map) {
         if(argExists(map, argTarget)) {
             final Object obj = map.get(argTarget);
             return Optional.of((obj instanceof Collection) ? (Collection) obj : Collections.singletonList(obj));
         } else return Optional.empty();
+    }
+
+    @Override
+    public List<String> getArgumentNames() {
+        return Arrays.asList(new String[]{argTarget});
     }
 }
