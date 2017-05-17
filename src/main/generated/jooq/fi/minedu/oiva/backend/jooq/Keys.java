@@ -16,6 +16,7 @@ import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutoshistoria;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink;
+import fi.minedu.oiva.backend.jooq.tables.SchemaVersion;
 import fi.minedu.oiva.backend.jooq.tables.Tekstityyppi;
 import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 import fi.minedu.oiva.backend.jooq.tables.records.AsiatyyppiRecord;
@@ -30,6 +31,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MaaraystyyppiRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutoshistoriaRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.PaatoskierrosKohdeLinkRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.PaatoskierrosRecord;
+import fi.minedu.oiva.backend.jooq.tables.records.SchemaVersionRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.TekstityyppiRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.TiedoteRecord;
 
@@ -89,6 +91,7 @@ public class Keys {
     public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = UniqueKeys0.MAARAYSTYYPPI_PKEY;
     public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_PKEY = UniqueKeys0.MUUTOSHISTORIA_PKEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = UniqueKeys0.PAATOSKIERROS_PKEY;
+    public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = UniqueKeys0.SCHEMA_VERSION_PK;
     public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_PKEY = UniqueKeys0.TEKSTITYYPPI_PKEY;
     public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = UniqueKeys0.TIEDOTE_PKEY;
 
@@ -141,6 +144,7 @@ public class Keys {
         public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = createUniqueKey(Maaraystyyppi.MAARAYSTYYPPI, "maaraystyyppi_pkey", Maaraystyyppi.MAARAYSTYYPPI.ID);
         public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_PKEY = createUniqueKey(Muutoshistoria.MUUTOSHISTORIA, "muutoshistoria_pkey", Muutoshistoria.MUUTOSHISTORIA.ID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_pkey", Paatoskierros.PAATOSKIERROS.ID);
+        public static final UniqueKey<SchemaVersionRecord> SCHEMA_VERSION_PK = createUniqueKey(SchemaVersion.SCHEMA_VERSION, "schema_version_pk", SchemaVersion.SCHEMA_VERSION.VERSION);
         public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_PKEY = createUniqueKey(Tekstityyppi.TEKSTITYYPPI, "tekstityyppi_pkey", Tekstityyppi.TEKSTITYYPPI.ID);
         public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_pkey", Tiedote.TIEDOTE.ID);
     }

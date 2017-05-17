@@ -16,6 +16,7 @@ import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutoshistoria;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink;
+import fi.minedu.oiva.backend.jooq.tables.SchemaVersion;
 import fi.minedu.oiva.backend.jooq.tables.Tekstityyppi;
 import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 
@@ -44,7 +45,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = -2060867298;
+    private static final long serialVersionUID = -1833614558;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -110,6 +111,11 @@ public class Oiva extends SchemaImpl {
      * The table <code>oiva.paatoskierros_kohde_link</code>.
      */
     public final PaatoskierrosKohdeLink PAATOSKIERROS_KOHDE_LINK = fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK;
+
+    /**
+     * The table <code>oiva.schema_version</code>.
+     */
+    public final SchemaVersion SCHEMA_VERSION = fi.minedu.oiva.backend.jooq.tables.SchemaVersion.SCHEMA_VERSION;
 
     /**
      * The table <code>oiva.tekstityyppi</code>.
@@ -183,6 +189,7 @@ public class Oiva extends SchemaImpl {
             Muutoshistoria.MUUTOSHISTORIA,
             Paatoskierros.PAATOSKIERROS,
             PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK,
+            SchemaVersion.SCHEMA_VERSION,
             Tekstityyppi.TEKSTITYYPPI,
             Tiedote.TIEDOTE);
     }
