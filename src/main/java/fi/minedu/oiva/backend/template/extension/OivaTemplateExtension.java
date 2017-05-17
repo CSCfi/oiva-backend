@@ -34,6 +34,7 @@ public class OivaTemplateExtension implements Extension {
         filters.put("semicolon", new SeparatorFilter("; "));
         filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
         filters.put("toDate", new ToDateFilter());
+        filters.put("toToimialueKoodi", new ToToimialaKoodiFilter());
         filters.put("number", new OivaFormatterFilter(number));
         filters.put("capitalize", new OivaFormatterFilter(capitalize));
         filters.put("wording", new OivaFormatterFilter(wording));

@@ -74,16 +74,24 @@ public class OivaFormatterFilter extends OivaFilter {
     }
 
     private String pick(final Object source, final String picker) {
-        final String[] options = StringUtils.split(String.valueOf(source), "|");
+        final String[] options = getPickOptions(source);
         if(null == options) return String.valueOf(source);
         else {
             final Map<String, String> map = new HashMap<>();
             for(final String option : options) {
                 final String[] parts = StringUtils.split(option, "::");
-                if(null != parts && parts.length > 1) map.put(parts[0], parts[1]);
+                if(null != parts && parts.length > 1) map.put(StringUtils.trim(parts[0]), StringUtils.trim(parts[1]));
             }
             return map.get(picker);
         }
+    }
+
+    private String[] getPickOptions(final Object source) {
+        if(source instanceof String) return StringUtils.split(String.valueOf(source), "|");
+        else if(source instanceof Collection) {
+            final Collection list = (Collection) source;
+            return (String[]) list.toArray(new String[list.size()]);
+        } else return new String[] {};
     }
 
     private Optional<Object> getFirstArgument(final Map<String, Object> map) {

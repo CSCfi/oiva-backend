@@ -5,7 +5,8 @@ import org.jooq.impl.EnumConverter;
 public enum MaaraystyyppiValue {
     OIKEUS,
     RAJOITE,
-    VELVOITE;
+    VELVOITE,
+    POIKKEUS;
 
     public static class Converter extends EnumConverter<String, MaaraystyyppiValue> {
         public Converter() {
