@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
+import static fi.minedu.oiva.backend.template.extension.MaaraysTransformerFilter.Type.toimintaAlueArvo;
+import static fi.minedu.oiva.backend.template.extension.MatchComparatorTest.Type.any;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.capitalize;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.number;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.wording;
@@ -34,14 +36,14 @@ public class OivaTemplateExtension implements Extension {
         filters.put("semicolon", new SeparatorFilter("; "));
         filters.put("withColonPrefix", new AppendFilter(prefix, ": "));
         filters.put("toDate", new ToDateFilter());
-        filters.put("toToimialueKoodi", new ToToimialaKoodiFilter());
         filters.put("number", new OivaFormatterFilter(number));
         filters.put("capitalize", new OivaFormatterFilter(capitalize));
         filters.put("wording", new OivaFormatterFilter(wording));
         filters.put("pick", new OivaFormatterFilter(pick));
-        filters.put("maaraysFilter", new MaaraysListFilter());
-        filters.put("sortLuvat", new SortListFilter(Luvat));
-        filters.put("sortMaaraykset", new SortListFilter(Maaraykset));
+        filters.put("filterMaarays", new MaaraysListFilter());
+        filters.put("toimintaAlueArvo", new MaaraysTransformerFilter(toimintaAlueArvo));
+        filters.put("sortLupa", new SortListFilter(luvat));
+        filters.put("sortMaarays", new SortListFilter(maaraykset));
         return filters;
     }
 
@@ -52,6 +54,7 @@ public class OivaTemplateExtension implements Extension {
         testMap.put("number", new NumberComparatorTest());
         testMap.put("date", new DateTest());
         testMap.put("dateBetween", new DateBetweenTest(">=", "<="));
+        testMap.put("any", new MatchComparatorTest(any));
         return testMap;
     }
 

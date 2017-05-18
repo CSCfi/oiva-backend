@@ -22,8 +22,8 @@ import static org.apache.commons.lang3.StringUtils.equalsIgnoreCase;
 public class SortListFilter extends OivaFilter {
 
     public enum SortTarget {
-        Luvat,
-        Maaraykset
+        luvat,
+        maaraykset
     }
 
     private static final Logger logger = LoggerFactory.getLogger(SortListFilter.class);
@@ -57,7 +57,7 @@ public class SortListFilter extends OivaFilter {
             if (equalsIgnoreCase(sortBy, "esittelija")) return lupaSortByEsittelijaNimi;
             else if (equalsIgnoreCase(sortBy, "kunta")) return lupaSortByJarjestajaKunta;
             else if (equalsIgnoreCase(sortBy, "diaarinumero")) return lupaSortByDiaarinumero;
-            else logger.warn("Unsupported sortLuvat option: {}. Using lupaSortByDiaarinumero", sortBy);
+            else logger.warn("Unsupported sortLupa option: {}. Using lupaSortByDiaarinumero", sortBy);
             return lupaSortByDiaarinumero;
         };
 
@@ -72,11 +72,11 @@ public class SortListFilter extends OivaFilter {
             if (equalsIgnoreCase(sortBy, "koodisto")) return maaraysSortByKoodisto;
             else if (equalsIgnoreCase(sortBy, "koodiarvo")) return maaraysSortByKoodiarvo;
             else if (equalsIgnoreCase(sortBy, "koodinimi")) return maaraysSortByKoodiNimi;
-            else logger.warn("Unsupported sortMaaraykset option: {}. Using maaraysSortById", sortBy);
+            else logger.warn("Unsupported sortMaarays option: {}. Using maaraysSortById", sortBy);
             return maaraysSortById;
         };
 
-        if (sortTarget == SortTarget.Luvat) {
+        if (sortTarget == SortTarget.luvat) {
             final Optional<Collection<Lupa>> luvatOpt = asLupaList(obj);
             if (luvatOpt.isPresent()) {
                 final List<Comparator> lupaComparators = sortBys.stream().map(toLupaComparators::apply).collect(Collectors.toList());
@@ -87,7 +87,7 @@ public class SortListFilter extends OivaFilter {
                 } else logger.warn("No sort options provided");
                 return luvatOpt.get();
             }
-        } else if (sortTarget == SortTarget.Maaraykset) {
+        } else if (sortTarget == SortTarget.maaraykset) {
             final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
             if (maarayksetOpt.isPresent()) {
                 final List<Comparator> maaraysComparators = sortBys.stream().map(toMaaraysComparators::apply).collect(Collectors.toList());

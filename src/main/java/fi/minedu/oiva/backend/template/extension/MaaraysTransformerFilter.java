@@ -1,0 +1,91 @@
+package fi.minedu.oiva.backend.template.extension;
+
+import fi.minedu.oiva.backend.entity.Maarays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+public class MaaraysTransformerFilter extends OivaFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(MaaraysTransformerFilter.class);
+
+    public static final String toimintaAlueValtakunnallinen = "33";
+    public static final String toimintaAlueEiArvoa = "00";
+
+    private final Type type;
+
+    public enum Type {
+        toimintaAlueArvo
+    }
+
+    public MaaraysTransformerFilter(final Type type) {
+        this.type = type;
+    }
+
+    @Override
+    public Object apply(final Object obj, final Map<String, Object> map) {
+        final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
+        if(type == Type.toimintaAlueArvo) {
+            return toToimintaAlueArvo(maarayksetOpt);
+        } else return "";
+    }
+
+    /**
+     * Return toiminta-alue arvo which can be one of the following:
+     *  - 00: has no toiminta-alue määräyksiä
+     *  - 01: has one town
+     *  - 02: has more than one town
+     *  - 10: has one region
+     *  - 11: has one region and one town
+     *  - 12: has one region and more than one town
+     *  - 20: has more than one region
+     *  - 21: has more than one region and one town
+     *  - 22: has more than one region and town
+     *  - 33: whole Finland
+     *
+     * @param maarayksetOpt list of Maarays
+     * @return toiminta-alue arvo
+     */
+    public String toToimintaAlueArvo(final Optional<Collection<Maarays>> maarayksetOpt) {
+        if(maarayksetOpt.isPresent()) {
+            if(maarayksetOpt.get().stream().anyMatch(this::isValtakunnallinen)) return toimintaAlueValtakunnallinen;
+            else if(maarayksetOpt.get().stream().anyMatch(this::isAlueellinen)) {
+                final long maakuntaCount = Math.min(maarayksetOpt.get().stream().filter(this::isMaakunta).count(), 2);
+                final long kuntaCount = Math.min(maarayksetOpt.get().stream().filter(this::isKunta).count(), 2);
+                return String.valueOf(maakuntaCount + "" + kuntaCount);
+            }
+        } return toimintaAlueEiArvoa;
+    }
+
+    private boolean isValtakunnallinen(final Maarays maarays) {
+        return null != maarays && maarays.isKoodi("nuts1", "FI1");
+    }
+
+    private boolean isAlueellinen(final Maarays maarays) {
+        return isMaakunta(maarays) || isKunta(maarays);
+    }
+
+    private boolean isMaakunta(final Maarays maarays) {
+        return null != maarays && maarays.isKoodisto("maakunta");
+    }
+
+    private boolean isKunta(final Maarays maarays) {
+        return null != maarays && maarays.isKoodisto("kunta");
+    }
+
+    private Optional<Collection<Maarays>> asMaaraysList(final Object obj) {
+        if(null != obj && obj instanceof Collection) {
+            final Collection<Maarays> list = (Collection<Maarays>) obj;
+            return Optional.ofNullable(list);
+        } return Optional.empty();
+    }
+
+    @Override
+    public List<String> getArgumentNames() {
+        return defaultArgumentNames();
+    }
+}
