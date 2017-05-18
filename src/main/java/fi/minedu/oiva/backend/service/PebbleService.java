@@ -48,6 +48,7 @@ public class PebbleService {
     public Optional<String> toLupaListHTML(final Collection<Lupa> luvat) {
         final Map<String, Object> context = new HashMap<>();
         context.put("luvat", luvat);
+        context.put("language", "fi");
         return writeHTML("luvat", context);
     }
 

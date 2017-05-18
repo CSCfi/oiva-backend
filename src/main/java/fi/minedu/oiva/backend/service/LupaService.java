@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
+import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -48,7 +49,7 @@ public class LupaService implements RecordMapping<Lupa> {
 
     public String luvatLinksHtml() { // TODO REMOVEME
         return pebbleService.toLupaListHTML(baseLupaSelect().stream()
-                .map(record -> entity(record, Organisaatio.class.getSimpleName(), Kunta.class.getSimpleName()))
+                .map(record -> entity(record, Organisaatio.class.getSimpleName(), Kunta.class.getSimpleName(), Maakunta.class.getSimpleName()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList())).orElse("");
@@ -92,6 +93,7 @@ public class LupaService implements RecordMapping<Lupa> {
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
         if(hasOption.apply(Kunta.class)) withKunta(lupaOpt);
+        if(hasOption.apply(Maakunta.class)) withMaakunta(lupaOpt);
         if(hasOption.apply(Maarays.class)) withMaaraykset(lupaOpt);
         if(hasOption.apply(KoodistoKoodi.class)) withKoodisto(lupaOpt);
         return lupaOpt;
@@ -106,8 +108,17 @@ public class LupaService implements RecordMapping<Lupa> {
         lupaOpt.ifPresent(lupa -> {
             final Organisaatio jarjestaja = lupa.jarjestaja();
             if(null != jarjestaja && StringUtils.isNotBlank(jarjestaja.kuntaKoodiArvo())) {
-                final KoodistoKoodi kuntakoodi = opintopolkuService.getKuntaKoodi(jarjestaja.kuntaKoodiArvo());
-                if(null != kuntakoodi) jarjestaja.setKuntaKoodi(kuntakoodi);
+                opintopolkuService.getKuntaKoodi(jarjestaja.kuntaKoodiArvo()).ifPresent(jarjestaja::setKuntaKoodi);
+            }
+        });
+        return lupaOpt;
+    }
+
+    protected Optional<Lupa> withMaakunta(final Optional<Lupa> lupaOpt) {
+        lupaOpt.ifPresent(lupa -> {
+            final Organisaatio jarjestaja = lupa.jarjestaja();
+            if(null != jarjestaja && null != jarjestaja.kuntaKoodi()) {
+                opintopolkuService.getMaakuntaKoodiForKunta(jarjestaja.kuntaKoodiArvo()).ifPresent(jarjestaja::setMaakuntaKoodi);
             }
         });
         return lupaOpt;

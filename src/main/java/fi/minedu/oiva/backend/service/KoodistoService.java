@@ -44,7 +44,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKunta")
     public KoodistoKoodi getKunta(final String koodi) {
-        return opintopolkuService.getKuntaKoodi(koodi);
+        return opintopolkuService.getKuntaKoodi(koodi).orElseGet(null);
     }
 
     @Cacheable(value = "KoodistoService:getKielet", key = "''")

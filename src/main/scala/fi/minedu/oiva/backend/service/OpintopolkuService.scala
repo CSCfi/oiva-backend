@@ -194,7 +194,7 @@ class OpintopolkuService extends CacheAware {
     def getMaakuntaKoodit = getKoodistoKooditList(maakuntaKoodiUrl)
 
     def getKunnatKoodit = getKoodistoKooditList(kuntaKoodiUrl)
-    def getKuntaKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(kuntaKoodiUrl, kuntaKoodiUri(koodiArvo))
+    def getKuntaKoodi(koodiArvo: String): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodistoKoodiBlocking(kuntaKoodiUrl, kuntaKoodiUri(koodiArvo)))
     def getKuntaKooditForAlueHallintovirasto(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + aluehallintovirastoKoodiUri(koodiArvo))
     def getKuntaKooditForMaakunta(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiUrl + maakuntaKoodiUri(koodiArvo))
 
@@ -203,6 +203,15 @@ class OpintopolkuService extends CacheAware {
 
     def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
 
+    // maakunta ja kunta
+    def getMaakuntaKoodiForKunta(koodiArvo: String): Optional[KoodistoKoodi] = {
+        val maakuntaKoodit = getKuntaAlaKoodit(koodiArvo).filter(_.isKoodisto("maakunta"))
+        if(!maakuntaKoodit.isEmpty) Optional.ofNullable(maakuntaKoodit.head) else Optional.empty()
+    }
+
+    def getKuntaAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + kuntaKoodiUri(koodiArvo))
+
+    // koulutus
     def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): Optional[java.util.List[KoodistoKoodi]] =
         Optional.ofNullable(getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava)
 
@@ -212,7 +221,6 @@ class OpintopolkuService extends CacheAware {
     }
 
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))
-
 
 //    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)
 //    def getKoulutusKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusKoodiUrl, koulutusKoodiUri(koodiArvo))

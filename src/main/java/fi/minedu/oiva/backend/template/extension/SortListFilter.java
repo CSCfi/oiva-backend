@@ -43,18 +43,18 @@ public class SortListFilter extends OivaFilter {
 
         final Comparator<Lupa> lupaSortByDiaarinumero = Comparator.comparing(lupa -> lupa.getDiaarinumero());
         final Comparator<Lupa> lupaSortByEsittelijaNimi = Comparator.comparing(lupa -> JsonFieldFilter.getString(lupa.getMeta(), "esittelija_nimi"));
+        final Function<KoodistoKoodi, String> koodistoKoodiNimi = koodi -> null != koodi ? TranslateFilter.fromTranslatedString(koodi.getNimi(), languageOpt) : "";
+        final Comparator<Lupa> lupaSortByJarjestajaMaakunta = Comparator.comparing(lupa -> {
+            final Organisaatio jarjestaja = lupa.jarjestaja();
+            return null != jarjestaja ? koodistoKoodiNimi.apply(jarjestaja.getMaakuntaKoodi()) : "";
+        });
         final Comparator<Lupa> lupaSortByJarjestajaKunta = Comparator.comparing(lupa -> {
             final Organisaatio jarjestaja = lupa.jarjestaja();
-            if(null != jarjestaja) {
-                final KoodistoKoodi kuntaKoodi = jarjestaja.getKuntaKoodi();
-                if(null != kuntaKoodi) {
-                    return TranslateFilter.fromTranslatedString(kuntaKoodi.getNimi(), languageOpt);
-                }
-            }
-            return "";
+            return null != jarjestaja ? koodistoKoodiNimi.apply(jarjestaja.getKuntaKoodi()) : "";
         });
         final Function<String, Comparator> toLupaComparators = sortBy -> {
             if (equalsIgnoreCase(sortBy, "esittelija")) return lupaSortByEsittelijaNimi;
+            else if (equalsIgnoreCase(sortBy, "maakunta")) return lupaSortByJarjestajaMaakunta;
             else if (equalsIgnoreCase(sortBy, "kunta")) return lupaSortByJarjestajaKunta;
             else if (equalsIgnoreCase(sortBy, "diaarinumero")) return lupaSortByDiaarinumero;
             else logger.warn("Unsupported sortLupa option: {}. Using lupaSortByDiaarinumero", sortBy);
