@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static fi.minedu.oiva.backend.template.extension.AppendFilter.Type.prefix;
+import static fi.minedu.oiva.backend.template.extension.MaaraysTransformerFilter.Type.htmlClass;
 import static fi.minedu.oiva.backend.template.extension.MaaraysTransformerFilter.Type.toimintaAlueArvo;
 import static fi.minedu.oiva.backend.template.extension.MatchComparatorTest.Type.any;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.capitalize;
@@ -42,6 +43,7 @@ public class OivaTemplateExtension implements Extension {
         filters.put("pick", new OivaFormatterFilter(pick));
         filters.put("filterMaarays", new MaaraysListFilter());
         filters.put("toimintaAlueArvo", new MaaraysTransformerFilter(toimintaAlueArvo));
+        filters.put("htmlClass", new MaaraysTransformerFilter(htmlClass));
         filters.put("sortLupa", new SortListFilter(luvat));
         filters.put("sortMaarays", new SortListFilter(maaraykset));
         return filters;

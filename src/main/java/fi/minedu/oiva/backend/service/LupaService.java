@@ -47,12 +47,17 @@ public class LupaService implements RecordMapping<Lupa> {
         return dsl.select(LUPA.fields()).from(LUPA).fetchInto(Lupa.class);
     }
 
+    private String[] withOptions(final Class<?>... classes) {
+        if(null == classes) return new String[] {};
+        else return Arrays.asList(classes).stream().map(Class::getSimpleName).toArray(size -> new String[size]);
+    }
+
     public String luvatLinksHtml() { // TODO REMOVEME
         return pebbleService.toLupaListHTML(baseLupaSelect().stream()
-                .map(record -> entity(record, Organisaatio.class.getSimpleName(), Kunta.class.getSimpleName(), Maakunta.class.getSimpleName()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .collect(Collectors.toList())).orElse("");
+            .map(record -> entity(record, withOptions(Organisaatio.class, Kunta.class, Maakunta.class)))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList())).orElse("");
     }
 
     public Optional<Lupa> get(final Long lupaId, final String... withOptions) {
@@ -89,7 +94,7 @@ public class LupaService implements RecordMapping<Lupa> {
     protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final String... with) {
         final List withOptions = null == with ? Collections.emptyList() : Arrays.asList(with).stream().map(String::toLowerCase).collect(Collectors.toList());
         final Function<Class<?>, Boolean> hasOption = targetClass ->
-                withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
+            withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
         if(hasOption.apply(Kunta.class)) withKunta(lupaOpt);

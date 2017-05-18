@@ -1,13 +1,17 @@
 package fi.minedu.oiva.backend.template.extension;
 
 import fi.minedu.oiva.backend.entity.Maarays;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 public class MaaraysTransformerFilter extends OivaFilter {
 
@@ -19,7 +23,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
     private final Type type;
 
     public enum Type {
-        toimintaAlueArvo
+        toimintaAlueArvo,
+        htmlClass
     }
 
     public MaaraysTransformerFilter(final Type type) {
@@ -31,6 +36,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
         final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
         if(type == Type.toimintaAlueArvo) {
             return toToimintaAlueArvo(maarayksetOpt);
+        } else if(type == Type.htmlClass) {
+            return toHtmlClasses(maarayksetOpt);
         } else return "";
     }
 
@@ -77,10 +84,18 @@ public class MaaraysTransformerFilter extends OivaFilter {
         return null != maarays && maarays.isKoodisto("kunta");
     }
 
-    private Optional<Collection<Maarays>> asMaaraysList(final Object obj) {
-        if(null != obj && obj instanceof Collection) {
-            final Collection<Maarays> list = (Collection<Maarays>) obj;
+    public String toHtmlClasses(final Optional<Collection<Maarays>> maarayksetOpt) {
+        if(maarayksetOpt.isPresent()) {
+            return maarayksetOpt.get().stream().map(maarays -> StringUtils.joinWith(" ", maarays.tyyppi(), maarays.koodiUri())).collect(Collectors.joining(" "));
+        } return "";
+    }
+
+    private Optional<Collection<Maarays>> asMaaraysList(final Object source) {
+        if(null != source && source instanceof Collection) {
+            final Collection<Maarays> list = (Collection<Maarays>) source;
             return Optional.ofNullable(list);
+        } else if(null != source && source instanceof Maarays) {
+            return Optional.ofNullable(Collections.singletonList((Maarays)source));
         } return Optional.empty();
     }
 
