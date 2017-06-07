@@ -10,7 +10,7 @@ public class OivaTemplates {
     }
 
     public enum RenderLanguage {
-        fi, sv, en
+        fi, sv, en, se
     }
 
     public enum RenderOutput {

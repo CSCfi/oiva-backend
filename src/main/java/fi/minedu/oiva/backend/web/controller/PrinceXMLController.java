@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.entity.OivaTemplates.RenderLanguage;
 import static fi.minedu.oiva.backend.service.LupaService.*;
 import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
@@ -55,7 +54,7 @@ public class PrinceXMLController {
         final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
         try {
             final Lupa lupa = lupaService.get(diaarinumero, withAll).get();
-            final RenderOptions options = RenderOptions.pdfOptions(RenderLanguage.fi);
+            final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
             options.setDebugMode(null != debugMode);
             final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
             if(htmlOpt.isPresent()) {

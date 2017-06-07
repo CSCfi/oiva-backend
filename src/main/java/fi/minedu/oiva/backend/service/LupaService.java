@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.entity.Esitysmalli;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.Lupatila;
 import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.OivaTemplates;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
@@ -22,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -145,5 +147,17 @@ public class LupaService implements RecordMapping<Lupa> {
     public boolean hasTutkintoNimenMuutos(final Lupa lupa) {
         return !MaaraysListFilter.apply(lupa.getMaaraykset(), "kohde:tutkinnotjakoulutukset", "koodisto:koulutus",
             "koodiarvo:384201|487203|331101|351407|351703|458103|361201|374115|477103|384501|384202|371113|477102|354102|364902|467905|374111|477101|384112|487102|487103").isEmpty();
+    }
+
+    public OivaTemplates.RenderLanguage renderLanguageFor(final Lupa lupa) {
+        final BiFunction<Collection<Maarays>, String, Boolean> isOpetuskieliKoodiArvo = (maaraykset, koodiarvo) -> maaraykset.stream().anyMatch(maarays -> maarays.isKoodiArvo(koodiarvo));
+        final Collection<Maarays> maaraykset = MaaraysListFilter.apply(lupa.getMaaraykset(), "kohde:opetusjatutkintokieli", "koodisto:oppilaitoksenopetuskieli");
+        if(isOpetuskieliKoodiArvo.apply(maaraykset, "1") ||
+           isOpetuskieliKoodiArvo.apply(maaraykset, "3") ||
+           isOpetuskieliKoodiArvo.apply(maaraykset, "9")) return OivaTemplates.RenderLanguage.fi;
+        else if(isOpetuskieliKoodiArvo.apply(maaraykset, "2")) return OivaTemplates.RenderLanguage.sv;
+//        else if(isOpetuskieliKoodiArvo.apply(maaraykset, "4")) return OivaTemplates.RenderLanguage.en; // TODO: After english support is added
+//        else if(isOpetuskieliKoodiArvo.apply(maaraykset, "5")) return OivaTemplates.RenderLanguage.se; // TODO: After saame support is added
+        else return OivaTemplates.RenderLanguage.fi;
     }
 }
