@@ -10,6 +10,7 @@ import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.template.extension.MaaraysListFilter;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectOnConditionStep;
@@ -139,5 +140,10 @@ public class LupaService implements RecordMapping<Lupa> {
             if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> maaraysService.withKoodisto(maarays));
         });
         return lupaOpt;
+    }
+
+    public boolean hasTutkintoNimenMuutos(final Lupa lupa) {
+        return !MaaraysListFilter.apply(lupa.getMaaraykset(), "kohde:tutkinnotjakoulutukset", "koodisto:koulutus",
+            "koodiarvo:384201|487203|331101|351407|351703|458103|361201|374115|477103|384501|384202|371113|477102|354102|364902|467905|374111|477101|384112|487102|487103").isEmpty();
     }
 }

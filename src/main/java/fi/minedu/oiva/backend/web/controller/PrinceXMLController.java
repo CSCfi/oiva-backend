@@ -59,15 +59,16 @@ public class PrinceXMLController {
             options.setDebugMode(null != debugMode);
             final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
             if(htmlOpt.isPresent()) {
+                if(lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
                 response.setContentType(APPLICATION_PDF);
                 response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
-                princeXMLService.generatePDF(htmlOpt.get(), response.getOutputStream());
-            } else {
-                response.setStatus(get500().getStatusCode().value());
+                if(princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
+                    return;
+                }
             }
-
+            response.setStatus(get500().getStatusCode().value());
         } catch (Exception e) {
-            logger.error("Error while trying to toHTML public Paatos with diaarinro {}", diaarinumero, e);
+            logger.error("Error while trying to toPDF public Paatos with diaarinro {}", diaarinumero, e);
             response.setStatus(notFound().getStatusCode().value());
         }
     }

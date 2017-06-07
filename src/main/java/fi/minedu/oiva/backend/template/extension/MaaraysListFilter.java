@@ -6,9 +6,11 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +25,7 @@ public class MaaraysListFilter extends OivaFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(MaaraysListFilter.class);
 
-    private final String argTarget = "targetName";
+    private static final String argTarget = "targetName";
 
     private final BiFunction<Object, Function<String, Boolean>, Boolean> filterer = (filterTarget, filter) -> {
         final Collection<String> filterTargets = filterTarget instanceof Collection ? ((Collection<String>) filterTarget) : Collections.singletonList((String) filterTarget);
@@ -94,5 +96,17 @@ public class MaaraysListFilter extends OivaFilter {
             final Object obj = map.get(argTarget);
             return Optional.of((obj instanceof Collection) ? (Collection) obj : (String) obj);
         } else return Optional.empty();
+    }
+
+    public static Collection apply(final Collection<Maarays> maaraykset, final String... filtersArg) {
+        final Map<String, Object> map = new HashMap();
+        if(null != filtersArg) {
+            final Collection<String> filters = new ArrayList();
+            for(final String filter : filtersArg) {
+                filters.add(filter);
+            }
+            map.put(argTarget, filters);
+        }
+        return (Collection) new MaaraysListFilter().apply(maaraykset, map);
     }
 }

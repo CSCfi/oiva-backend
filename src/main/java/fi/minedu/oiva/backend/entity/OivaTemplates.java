@@ -1,5 +1,8 @@
 package fi.minedu.oiva.backend.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class OivaTemplates {
 
     public enum RenderState {
@@ -14,11 +17,16 @@ public class OivaTemplates {
         web, pdf
     }
 
+    public enum Attachment {
+        tutkintoNimenMuutos
+    }
+
     public static class RenderOptions {
         private RenderOutput output;
         private RenderState state;
         private RenderLanguage language;
         private String templateName;
+        private Collection<Attachment> attachments;
         private boolean debugMode;
 
         public static RenderOptions webOptions(final RenderLanguage language) {
@@ -33,6 +41,7 @@ public class OivaTemplates {
             this.output = output;
             this.state = state;
             this.language = language;
+            this.attachments = new ArrayList();
             this.debugMode = false;
         }
 
@@ -68,6 +77,15 @@ public class OivaTemplates {
 
         public void setTemplateName(String templateName) {
             this.templateName = templateName;
+        }
+
+        public RenderOptions addAttachment(final Attachment attachment) {
+            this.attachments.add(attachment);
+            return this;
+        }
+
+        public boolean hasAttachment(final Attachment targetAttachment) {
+            return this.attachments.stream().anyMatch(attachment -> attachment == targetAttachment);
         }
 
         public RenderOptions setDebugMode(final boolean debug) {
