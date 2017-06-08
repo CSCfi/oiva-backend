@@ -1,10 +1,12 @@
 package fi.minedu.oiva.backend.template.extension;
 
 import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(MaaraysTransformerFilter.class);
 
+    private final String argOne = "argument1";
+
     public static final String toimintaAlueValtakunnallinen = "33";
     public static final String toimintaAlueEiArvoa = "00";
 
@@ -24,7 +28,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
 
     public enum Type {
         toimintaAlueArvo,
-        htmlClass
+        htmlClass,
+        ylakoodi
     }
 
     public MaaraysTransformerFilter(final Type type) {
@@ -38,6 +43,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
             return toToimintaAlueArvo(maarayksetOpt);
         } else if(type == Type.htmlClass) {
             return toHtmlClasses(maarayksetOpt);
+        } else if(type == Type.ylakoodi) {
+            return toYlakoodi(maarayksetOpt, map);
         } else return "";
     }
 
@@ -90,6 +97,16 @@ public class MaaraysTransformerFilter extends OivaFilter {
         } return "";
     }
 
+    public KoodistoKoodi toYlakoodi(final Optional<Collection<Maarays>> maarayksetOpt, final Map<String, Object> map) {
+        final Optional argOpt = getFirstArgument(map);
+        if(maarayksetOpt.isPresent() && argOpt.isPresent()) {
+            final String ylaKoodiUri = (String) argOpt.get();
+            return maarayksetOpt.get().stream().filter(maarays -> maarays.hasYlaKoodi(ylaKoodiUri)).map(maarays ->
+                Arrays.stream(maarays.ylaKoodit()).filter(koodi -> koodi.isKoodi(ylaKoodiUri)).findFirst()
+            ).findAny().orElse(Optional.empty()).orElse(null);
+        } return null;
+    }
+
     private Optional<Collection<Maarays>> asMaaraysList(final Object source) {
         if(null != source && source instanceof Collection) {
             final Collection<Maarays> list = (Collection<Maarays>) source;
@@ -99,8 +116,12 @@ public class MaaraysTransformerFilter extends OivaFilter {
         } return Optional.empty();
     }
 
+    private Optional<Object> getFirstArgument(final Map<String, Object> map) {
+        return argExists(map, argOne) ? Optional.of(map.get(argOne)) : Optional.empty();
+    }
+
     @Override
     public List<String> getArgumentNames() {
-        return defaultArgumentNames();
+        return Arrays.asList(new String[]{argOne});
     }
 }

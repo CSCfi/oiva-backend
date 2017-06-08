@@ -26,7 +26,13 @@ case class KoodistoKoodi(
     @JsonIgnore def getKuvaus = TranslatedString.ofKuvaus(this)
     @JsonIgnore def getMetadataList: java.util.List[Metadata] = if(null == metadata) null else metadata.toList.asJava
     @JsonIgnore def getKoodistoUri = if(null == koodisto) null else koodisto.koodistoUri
-    @JsonIgnore def isKoodisto(koodistoType: String) = koodistoType == getKoodistoUri
+    @JsonIgnore def isKoodisto(koodistoValue: String) = koodistoValue == getKoodistoUri
+    @JsonIgnore def isKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
+        case Array(koodistoUri, koodiArvo) => isKoodi(koodistoUri, koodiArvo)
+        case _ => false
+    }
+    @JsonIgnore def isKoodi(koodistoValue: String, koodiValue: String): Boolean = koodistoValue == getKoodistoUri && koodiValue == getKoodiArvo
+
     @JsonIgnore def isValidDate = voimassaLoppuPvm == null ||
         (try { LocalDate.parse(voimassaLoppuPvm).isAfter(LocalDate.now()) } catch { case e: DateTimeParseException => true })
 }

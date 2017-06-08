@@ -54,12 +54,7 @@ class Maarays(
     @JsonIgnore def addYlaKoodi(koodi: KoodistoKoodi): Unit =
         if(null == this.ylaKoodit) this.ylaKoodit = Array(koodi) 
         else this.ylaKoodit = this.ylaKoodit :+ koodi
-    @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = koodiUri.split("_") match {
-        case Array(koodisto, koodiArvo) => hasYlaKoodi(koodisto, koodiArvo)
-        case _ => false
-    }
-    @JsonIgnore def hasYlaKoodi(koodisto: String, koodiArvo: String) =
-        null != ylaKoodit && ylaKoodit.exists(koodi => koodi.isKoodisto(koodisto) && koodi.koodiArvo == koodiArvo)
+    @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = null != ylaKoodit && ylaKoodit.exists(ylakoodi => ylakoodi.isKoodi(koodiUri))
 
     def getAliMaaraykset = aliMaaraykset
     @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if(null != maarays && getId != maarays.getId) {
