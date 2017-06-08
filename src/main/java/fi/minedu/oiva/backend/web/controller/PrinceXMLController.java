@@ -53,22 +53,28 @@ public class PrinceXMLController {
         @RequestParam(value = "debug", required = false) final String debugMode) {
         final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
         try {
-            final Lupa lupa = lupaService.get(diaarinumero, withAll).get();
-            final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
-            options.setDebugMode(null != debugMode);
-            final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
-            if(htmlOpt.isPresent()) {
-                if(lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
-                response.setContentType(APPLICATION_PDF);
-                response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
-                if(princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
-                    return;
+            final Optional<Lupa> lupaOpt = lupaService.get(diaarinumero, withAll);
+            if(lupaOpt.isPresent()) {
+                final Lupa lupa = lupaOpt.get();
+                final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
+                options.setDebugMode(null != debugMode);
+                final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
+                if (htmlOpt.isPresent()) {
+                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
+                    response.setContentType(APPLICATION_PDF);
+                    response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
+                    if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
+                        response.setStatus(get500().getStatusCode().value());
+                        response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaarinumero);
+                    }
                 }
+            } else {
+                response.setStatus(notFound().getStatusCode().value());
+                response.getWriter().write("No such Lupa with diaarinumero " + diaarinumero);
             }
-            response.setStatus(get500().getStatusCode().value());
         } catch (Exception e) {
-            logger.error("Error while trying to toPDF public Paatos with diaarinro {}", diaarinumero, e);
-            response.setStatus(notFound().getStatusCode().value());
+            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaarinumero, e);
+            response.setStatus(get500().getStatusCode().value());
         }
     }
 }
