@@ -60,7 +60,13 @@ public class PrinceXMLController {
                 options.setDebugMode(null != debugMode);
                 final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
                 if (htmlOpt.isPresent()) {
-                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
+                    if(options.getLanguage().name().equals("sv")) {
+                        if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos_sv);
+                    }
+                    else {
+                        if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
+                    }
+
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {

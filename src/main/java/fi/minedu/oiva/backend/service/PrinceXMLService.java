@@ -44,6 +44,9 @@ public class PrinceXMLService {
             if(options.hasAttachment(Attachment.tutkintoNimenMuutos)) {
                 merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset.pdf");
             }
+            if(options.hasAttachment(Attachment.tutkintoNimenMuutos_sv)) {
+                merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset_sv.pdf");
+            }
 
             merger.setDestinationStream(output);
             merger.mergeDocuments();

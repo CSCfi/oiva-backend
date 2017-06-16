@@ -18,7 +18,8 @@ public class OivaTemplates {
     }
 
     public enum Attachment {
-        tutkintoNimenMuutos
+        tutkintoNimenMuutos,
+        tutkintoNimenMuutos_sv,
     }
 
     public static class RenderOptions {
