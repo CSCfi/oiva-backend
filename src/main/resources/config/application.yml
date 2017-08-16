@@ -89,3 +89,7 @@ prince:
 templates:
     base.path: /opt/oiva/backend/templates
 
+logging:
+    file: logs/oiva-backend.log
+    level:
+        root: ERROR

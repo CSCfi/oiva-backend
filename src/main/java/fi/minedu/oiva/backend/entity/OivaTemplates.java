@@ -18,8 +18,7 @@ public class OivaTemplates {
     }
 
     public enum Attachment {
-        tutkintoNimenMuutos,
-        tutkintoNimenMuutos_sv,
+        tutkintoNimenMuutos
     }
 
     public static class RenderOptions {
@@ -58,6 +57,10 @@ public class OivaTemplates {
         public RenderOptions setLanguage(final RenderLanguage language) {
             this.language = language;
             return this;
+        }
+
+        public boolean isLanguage(final RenderLanguage language) {
+            return this.language == language;
         }
 
         public RenderOutput getOutput() {

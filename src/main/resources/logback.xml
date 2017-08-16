@@ -2,5 +2,6 @@
 <configuration scan="true">
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="fi.minedu.oiva" level="${logback.loglevel}"/>
+    <logger name="org.jasig.cas.client.validation" level="${logback.loglevel}"/>
     <logger name="org.springframework.security" level="${logback.loglevel}"/>
 </configuration>
