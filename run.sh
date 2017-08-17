@@ -2,7 +2,12 @@
 
 oivaOptionsArg=$@
 
-OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Xms4096m -Xmx4096m"
+OIVA_MEMORY="4096m"
+
+OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Doiva-backend -server"
+OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Xms${OIVA_MEMORY} -Xmx${OIVA_MEMORY}"
+OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70"
+
 
 if [[ $oivaOptionsArg == *"r"* ]]; then
     echo -e "Using jmxremote arguments\n"

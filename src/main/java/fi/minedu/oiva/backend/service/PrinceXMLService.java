@@ -42,10 +42,11 @@ public class PrinceXMLService {
             merger.addSource(base);
 
             if(options.hasAttachment(Attachment.tutkintoNimenMuutos)) {
-                merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset.pdf");
-            }
-            if(options.hasAttachment(Attachment.tutkintoNimenMuutos_sv)) {
-                merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset_sv.pdf");
+                if(options.isLanguage(RenderLanguage.sv)) {
+                    merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset_sv.pdf");
+                } else {
+                    merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset.pdf");
+                }
             }
 
             merger.setDestinationStream(output);
