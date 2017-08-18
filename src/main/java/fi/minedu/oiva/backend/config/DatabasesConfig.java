@@ -70,14 +70,12 @@ public class DatabasesConfig implements EnvironmentAware {
         config.addDataSourceProperty("password", dataSourcePropertyResolver.getProperty("password"));
         DataSource source = new HikariDataSource(config);
 
-        log.info(" RUNNING DATABASE MIGRATION NOW");
+        log.info("Applying database migration");
 
         final Flyway flyway = new Flyway();
         flyway.setDataSource(source);
         flyway.setBaselineOnMigrate(true);
         flyway.migrate();
-
-        log.info("DATABASE MIGRATION DONE");
 
         return source;
     }

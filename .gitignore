@@ -12,4 +12,6 @@ rebel.xml
 release.properties
 nginx/conf/nginx.conf
 pom.xml.releaseBackup
+
+logs
 oiva-backend.log*

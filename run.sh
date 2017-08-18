@@ -16,4 +16,4 @@ if [[ $oivaOptionsArg == *"r"* ]]; then
     OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Dcom.sun.management.jmxremote.ssl=false"
 fi
 
-sudo -u oiva java $OIVA_JAVA_OPTS -jar oiva-backend.jar
+sudo -u oiva java $OIVA_JAVA_OPTS -jar oiva-backend.jar &

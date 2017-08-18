@@ -92,4 +92,7 @@ templates:
 logging:
     file: logs/oiva-backend.log
     level:
-        root: ERROR
+        root: WARN
+        fi.minedu.oiva: INFO
+        org.springframework.security: WARN
+        org.jasig.cas.client.validation: WARN
