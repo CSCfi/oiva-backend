@@ -29,9 +29,6 @@ public class HenkiloController {
     @Autowired
     private HenkiloService service;
 
-    @Autowired
-    public OpintopolkuService opService;
-
     @ApiOperation(notes = "Palauttaa henkilön oidin perusteella.", value = "")
     @RequestMapping(method = GET, value = "/{oid:.+}")
     public CompletableFuture<HttpEntity<Henkilo>> get(@PathVariable String oid) {

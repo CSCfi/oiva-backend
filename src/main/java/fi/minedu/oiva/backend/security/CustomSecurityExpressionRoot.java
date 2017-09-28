@@ -15,8 +15,8 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
 
     private Logger log = LoggerFactory.getLogger(CustomSecurityExpressionRoot.class);
 
-    CustomSecurityExpressionRoot(Authentication a) {
-        super(a);
+    CustomSecurityExpressionRoot(final Authentication auth) {
+        super(auth);
     }
 
     public void setFilterObject(Object filterObject) {

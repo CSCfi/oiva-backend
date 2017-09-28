@@ -40,15 +40,14 @@ public class AuthController {
         final CustomUserDetailsMapper.UserDetailsWrapper principal = (CustomUserDetailsMapper.UserDetailsWrapper) auth.getPrincipal();
         final List<String> roles = auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
         return mapOf(
-                tuple("oid", principal.getUsername()),
-                tuple("roles", roles)
+            tuple("oid", principal.getUsername()),
+            tuple("roles", roles)
         );
     }
 
     @ApiOperation(notes = "CAS redirect", value = "/auth/login")
     @RequestMapping("/auth/login")
-    public void login(HttpServletRequest request, HttpServletResponse response,
-        @RequestParam(required = true) String redirect) throws IOException {
+    public void login(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);
     }

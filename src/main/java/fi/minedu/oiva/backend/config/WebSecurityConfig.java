@@ -41,23 +41,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String casUrlLogout;
 
     @Autowired
-    Http401UnauthorizedEntryPoint http401UnauthorizedEntryPoint;
+    private Http401UnauthorizedEntryPoint http401UnauthorizedEntryPoint;
 
     @Autowired
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable();
+    protected void configure(final HttpSecurity http) throws Exception {
+        http.csrf().disable();
         http.exceptionHandling()
             .authenticationEntryPoint(http401UnauthorizedEntryPoint)
             .and()
             .addFilter(casAuthenticationFilter())
             .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter.class);
 
-        http
-            .headers()
-            .frameOptions().disable();
+        http.headers().frameOptions().disable();
 
         http.logout()
             .logoutUrl("/api/logout")
@@ -65,15 +62,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .deleteCookies("JSESSIONID", "SESSION")
             .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
 
-        // As there's a lot of async processing (CompletableFutures), we need to copy SecurityContext to
-        // launched async threads
+        // As there's a lot of async processing (CompletableFutures), we need to copy SecurityContext to launched async threads
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-            .antMatchers("/swagger/**");
+    public void configure(final WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/swagger/**");
     }
 
     @Bean

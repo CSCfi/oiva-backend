@@ -12,15 +12,12 @@ public class CustomSecurityExpressionHandler extends DefaultMethodSecurityExpres
     private AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
     @Override
-    protected MethodSecurityExpressionOperations createSecurityExpressionRoot(final Authentication authentication,
-                                                                              final MethodInvocation invocation) {
-        CustomSecurityExpressionRoot root = new CustomSecurityExpressionRoot(authentication);
-
+    protected MethodSecurityExpressionOperations createSecurityExpressionRoot(final Authentication authentication, final MethodInvocation invocation) {
+        final CustomSecurityExpressionRoot root = new CustomSecurityExpressionRoot(authentication);
         root.setThis(invocation.getThis());
         root.setPermissionEvaluator(getPermissionEvaluator());
         root.setTrustResolver(trustResolver);
         root.setRoleHierarchy(getRoleHierarchy());
-
         return root;
     }
 

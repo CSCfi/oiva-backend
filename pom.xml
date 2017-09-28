@@ -702,6 +702,7 @@
                                 <location>filesystem:src/main/resources/db/migration</location>
                             </locations>
                             <validateOnMigrate>false</validateOnMigrate>
+                            <baselineOnMigrate>true</baselineOnMigrate>
                         </configuration>
                     </plugin>
                     <plugin>

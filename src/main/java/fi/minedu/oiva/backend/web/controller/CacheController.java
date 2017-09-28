@@ -33,14 +33,14 @@ public class CacheController {
     }
 
     @RequestMapping(value = "/refresh", method = PUT)
-    //TODO: USE AFTER CAS-INTEGRATION WORKS @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
+    @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
     public ResponseEntity refresh() {
         async(() -> cacheService.refreshCache(true));
         return ok();
     }
 
     @RequestMapping(value="/flushall", method = PUT)
-    //TODO: USE AFTER CAS-INTEGRATION WORKS @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
+    @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
     public ResponseEntity flush() {
         async(() -> cacheService.flushCache(false));
         return ok();

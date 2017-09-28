@@ -90,7 +90,7 @@ templates:
     base.path: /opt/oiva/backend/templates
 
 logging:
-    file: logs/oiva-backend.log
+    file: /var/log/oiva/oiva-backend.log
     level:
         root: WARN
         fi.minedu.oiva: INFO

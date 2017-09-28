@@ -76,18 +76,15 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
      */
     @SuppressWarnings("unchecked")
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) { // TODO: NOT USED -- DO WE NEED THIS?
         return Matching
             .whenIsType((String s) -> SecurityUtil.roleOIDs(authentication, s))
             .whenAllMatch(instanceOf(List.class), hasItem(instanceOf(String.class))).thenApply(ignr -> (List<String>) permission)
             .match(permission).map(oids -> Matching
-                    .whenIsValue("Hakemus")
-                        .thenApply(ignr -> checkOidsOnCheckable("hakemusService", targetId, oids))
-                    .whenIsValue("Paatos")
-                        .thenApply(ignr -> checkOidsOnCheckable("paatosService", targetId, oids))
-                    .whenIsValue("Koulutustehtava")
-                        .thenApply(ignr -> checkOidsOnCheckable("koulutustehtavaService", targetId, oids))
-                    .match(targetType).orElse(false)
+                .whenIsValue("Hakemus").thenApply(ignr -> checkOidsOnCheckable("hakemusService", targetId, oids))
+                .whenIsValue("Paatos").thenApply(ignr -> checkOidsOnCheckable("paatosService", targetId, oids))
+                .whenIsValue("Koulutustehtava").thenApply(ignr -> checkOidsOnCheckable("koulutustehtavaService", targetId, oids))
+                .match(targetType).orElse(false)
             ).orElse(false);
     }
 
