@@ -477,7 +477,7 @@
                         <configuration>
                             <autocommit>true</autocommit>
                             <srcFiles>
-                                <srcFile>src/main/resources/data.sql</srcFile>
+                                <srcFile>../oiva-deployment/database/oiva-data.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>

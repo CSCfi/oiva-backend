@@ -12,6 +12,7 @@ INSERT INTO oiva.lupatila(tunniste, selite) VALUES ('HYLATTY','{"fi":"Lupa on hy
 INSERT INTO oiva.maaraystyyppi(tunniste, selite) VALUES ('OIKEUS','{"fi":"Oikeus"}');
 INSERT INTO oiva.maaraystyyppi(tunniste, selite) VALUES ('RAJOITE','{"fi":"Rajoite"}');
 INSERT INTO oiva.maaraystyyppi(tunniste, selite) VALUES ('VELVOITE','{"fi":"Velvoite"}');
+INSERT INTO oiva.maaraystyyppi(tunniste, selite) VALUES ('POIKKEUS','{"fi":"Poikkeus"}');
 
 INSERT INTO oiva.tekstityyppi(tunniste, selite) VALUES ('PERUSTELU','{"fi":"Perustelu"}');
 INSERT INTO oiva.tekstityyppi(tunniste, selite) VALUES ('MUU','{"fi":"Muu määräys"}');
@@ -43,6 +44,7 @@ INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-01-01','2017-01-02','oiva','2017-03-24 10:06:35.1458','{"fi": "Tyhjä rivi amkoute-kannassa"}',1);
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2016-12-19','2017-01-15','oiva','2016-12-19 15:06:28.53536','{"fi": "Tekniset tutkintorakennemuutokset 1.8.2017"}',8);
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-02-09','2017-02-28','oiva','2017-02-09 13:14:24.255977','{"fi": "1.1.2017 voimaan tulevat päätökset takautuvasti"}',4);
+INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-08-01','2017-12-31','oiva','2017-02-09 13:14:24.255977','{"fi": "1.1.2018 voimaan tulevat päätökset"}',4);
 
 -- kohteet
 INSERT INTO oiva.kohde(tunniste, meta, luoja, luontipvm) VALUES ('tutkinnotjakoulutukset','{"otsikko":{"fi":"Tutkinnot ja koulutukset","sv":"på svenska"}}','oiva','2017-03-19 07:46:22.066839');

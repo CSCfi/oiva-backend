@@ -40,8 +40,7 @@ Koneelle täytyy asentaa:
 * Maven (3.3.1 tai uudempi)
  
 Asenna myös Docker ja Docker Compose jos ympäristön pystytykseen halutaan käyttää Docker Composea. Ilman Dockeria 
-tietokannat (PostgreSQL ja Redis) täytyy asentaa käsin. Jos Dockeria käyttää Macillä tai Windowsilla, 
-Docker Toolbox (https://www.docker.com/toolbox) tuo Dockerin näille ympäristöille.
+tietokannat (PostgreSQL ja Redis) täytyy asentaa käsin. 
 
 ### PrinceXML
 
@@ -76,20 +75,10 @@ Aja joko lokaalisti tai dockerilla (suositeltu)
 
 Docker-compose:
 
-    $ docker-compose up postgres redis
+    $ docker-compose up
 
 
 **HUOM!!! Paremetrien syöttö ei enää toimi Spring Boot-plugarin kanssa, kun pluginissa forkataan oma prosessi.**
-
-Natiivi-Dockeria ajettaessa (Linux hosteissa) voi tehdä näin:
-
-    $ ./run.sh
-
-Skripti ottaa postgres ja redis host-tiedot, luo niiden pohjalta tuunatun application-dev.yml konffin ja käynnistää 
-sovelluksen.
-
-Boot2dockeria käytettäessä docker-composeen vaaditaan porttimäppäykset, jotta containereihin saadaan hostilta yhteys. 
-Nämä ovat ports-kohdat (esim ``ports:\n - "5432:5432"``) docker-compose.yml:ssä.
 
 Sovellusta ajettaessa PITÄÄ konfiguraatiot olla halutun profiilin mukaisessa `application.yml` tai `application-dev.yml 
 tiedostossa, tai muuten konfiguraatiot luetaan projektin sisältä!
@@ -126,33 +115,26 @@ generate-db -profiiilin ajon yhteydessä.
     $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD compile -Pgenerate-db
 
 
-### Puhdistus ja populointi Maven SQL pluginilla
+## Tietokannan puhdistus ja populointi Maven SQL pluginilla
 
-**HUOM!** execute id:n kutsuminen suoraan seuraavissa komennoissa vaatii vähintään Maven-version 3.3.1
-
-#### Pudota flyway-migraatiokanta ja applikaatiospesifiset skeemat (e.g. tabula rasa)
+#### Pudota flyway-migraatiokanta ja sovelluksen skeemat
 
     $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD initialize sql:execute@clean-db
-
-#### Populoi tietokanta alustavalla datasetillä
-
-Setti sisältää alkuvaiheen realistista päätösarkistodataa.
-
-Huom: muistathan ajaa ``mvn ... compile -Pgenerate-db`` ensin, fikstuuri vaatii valmiiksi luodun kantaskeeman.
-    
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD initialize sql:execute@populate-db
-        
-## Entityjen luominen uusiksi 
+   
+#### Entityjen luominen 
 
     $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD compile -Pgenerate-db
 
-HUOM! Käyttää nyt `application.yml` -tiedoston konfiguraatioita, joten jos postgres-portti tms. asetus on 
-eroavainen ko. tiedoston asetuksista, pitää sinne tehdä muutoksia.
+#### Populoi tietokanta alustavalla datasetillä
+
+Tietojoukko sisältää alkuvaiheen realistista lupadataa. Huom! pohjadata on yksityisessä oiva-deployment repository:ssa johon plugin viittaa.
+    
+    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD initialize sql:execute@populate-db
 
 
 ## Aja kehitysversiota lokaali-Mavenilla
 
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -redis.host=$REDIS_IP spring-boot:run # Runs with defined dev settings
+    $ mvn -Doiva.dbhost=$POSTGRES_IP -redis.host=$REDIS_IP spring-boot:run
 
 Mikäli parametria ei syötetä, käyttää softa defaulttia joka on postgres. Tällöin koneen /etc/hosts:ssa pitää olla käsin 
 tehtynä postgres nimi, joka osoittaa oikeaan hostiin.
