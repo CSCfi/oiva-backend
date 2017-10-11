@@ -1,0 +1,39 @@
+version: '3'
+services:
+    backend:
+        build: .
+        ports:
+            - "8099:8099"
+        expose:
+            - "8099"
+        volumes:
+            - ../oiva-template:/opt/oiva/template
+        depends_on:
+            - "postgres"
+            - "redis"
+        networks:
+            - oivanw
+    postgres:
+        image: postgres:9.6
+        ports:
+            - "5432:5432"
+        expose:
+            - "5432"
+        environment:
+            POSTGRES_USER: oiva
+            POSTGRES_PASSWORD: oiva
+            POSTGRES_DB: oiva
+        networks:
+            - oivanw
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - oivanw
+networks:
+    oivanw:
+        ipam:
+            driver: default
+            config:
+                - subnet: 10.20.20.10/24

@@ -1,7 +1,6 @@
 application-dev.yml
 application-template.yml
 application-test.yml
-docker-compose.yml
 
 target/*
 target

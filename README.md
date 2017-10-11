@@ -17,12 +17,14 @@ Dependency                      | New version
 ------------------------------- | -------------
 spring-boot-starter-parent      | 1.5.1.RELEASE
 spring-boot-starter-data-redis  | 1.4.4.RELEASE
+postgresql                      | 42.1.4
 jooq                            | 3.9.1
 jool                            | 0.9.12
 jooq-codegen-maven              | 3.9.1
 modelmapper-jooq                | 0.7.7
 javaslang                       | 1.2.3
 jackson                         | 2.8.7
+flyway-core                     | 4.2.0
 spring-security-test            | 4.2.1.RELEASE
 spring-data-commons             | 1.13.0.RELEASE
 spring-ldap-core                | 2.3.1.RELEASE
