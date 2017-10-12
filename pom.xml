@@ -425,6 +425,7 @@
             <plugin>
                 <groupId>com.comphenix.maven</groupId>
                 <artifactId>yaml-properties-plugin</artifactId>
+                <version>0.1.0</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -433,7 +434,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <app>src/main/resources/config/application.yml</app>
+                                <app>${basedir}/src/main/resources/config/application.yml</app>
                             </files>
                         </configuration>
                     </execution>
