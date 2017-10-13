@@ -25,6 +25,7 @@ INSERT INTO oiva.esitysmalli(templatepath,luoja,luontipvm) VALUES ('kokonaiskier
 INSERT INTO oiva.esitysmalli(templatepath,luoja,luontipvm) VALUES ('kokonaiskierros2016uusi','oiva','2017-03-24 10:01:28.53536');
 INSERT INTO oiva.esitysmalli(templatepath,luoja,luontipvm) VALUES ('kokonaiskierros2016hakemus','oiva','2017-03-24 10:01:28.53536');
 INSERT INTO oiva.esitysmalli(templatepath,luoja,luontipvm) VALUES ('tutkintorakenne2017','oiva','2016-12-19 15:06:28.53536');
+INSERT INTO oiva.esitysmalli(templatepath,luoja,luontipvm) VALUES ('paatoskierros2017','oiva','2016-12-19 15:06:28.53536');
 
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2015-05-18','2015-12-31','oiva','2015-05-18 12:22:38.414556','{"fi": "Tuntematon"}',1);
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2014-12-04','2015-01-30','oiva','2015-05-19 11:37:21.044803','{"fi": "Kevään 2015 VALMA-päätökset"}',1);
@@ -44,7 +45,7 @@ INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-01-01','2017-01-02','oiva','2017-03-24 10:06:35.1458','{"fi": "Tyhjä rivi amkoute-kannassa"}',1);
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2016-12-19','2017-01-15','oiva','2016-12-19 15:06:28.53536','{"fi": "Tekniset tutkintorakennemuutokset 1.8.2017"}',8);
 INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-02-09','2017-02-28','oiva','2017-02-09 13:14:24.255977','{"fi": "1.1.2017 voimaan tulevat päätökset takautuvasti"}',4);
-INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-08-01','2017-12-31','oiva','2017-02-09 13:14:24.255977','{"fi": "1.1.2018 voimaan tulevat päätökset"}',4);
+INSERT INTO oiva.paatoskierros(alkupvm,loppupvm,luoja,luontipvm,meta,esitysmalli_id) VALUES ('2017-08-01','2017-12-31','oiva','2017-02-09 13:14:24.255977','{"fi": "1.1.2018 voimaan tulevat päätökset"}',9);
 
 -- kohteet
 INSERT INTO oiva.kohde(tunniste, meta, luoja, luontipvm) VALUES ('tutkinnotjakoulutukset','{"otsikko":{"fi":"Tutkinnot ja koulutukset","sv":"på svenska"}}','oiva','2017-03-19 07:46:22.066839');
