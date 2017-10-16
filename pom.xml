@@ -47,7 +47,7 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/CSC-IT-Center-for-Science/oiva-backend</developerConnection>
+        <developerConnection>scm:git:git@github.com:arcuaki/oiva-backend.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
