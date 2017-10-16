@@ -35,6 +35,7 @@ springfox-swagger2              | 2.6.1
 springfox-swagger-ui            | 2.6.1
 
 UUSI VERSIO
+SITTEN VIELÄ UUDEMPI VERSIO
 
 ## Alkuvalmistelut
 
