@@ -34,6 +34,8 @@ pebble                          | 2.3.0
 springfox-swagger2              | 2.6.1
 springfox-swagger-ui            | 2.6.1
 
+UUSI VERSIO
+
 ## Alkuvalmistelut
 
 Koneelle täytyy asentaa: 
