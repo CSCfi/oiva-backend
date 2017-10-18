@@ -137,7 +137,7 @@ public class LupaService implements RecordMapping<Lupa> {
 
     protected Optional<Lupa> withKoodisto(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> {
-            if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> maaraysService.withKoodisto(maarays));
+            if(null != lupa.maaraykset()) lupa.maaraykset().forEach(maarays -> maaraysService.withKoodisto(Optional.ofNullable(maarays)));
         });
         return lupaOpt;
     }
