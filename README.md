@@ -302,4 +302,4 @@ Jos haluaa elää vaarallisesti, niin testien skippaaminen onnistuu lisäämalla
 * REST-kutsujen cachetus (nginx?)
 * Staattisten assettien forever cache
 
-Testaus
+Testaus - puuttuva osa!
