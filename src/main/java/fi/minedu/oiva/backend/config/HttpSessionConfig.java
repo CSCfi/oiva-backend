@@ -5,4 +5,4 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 
 @Profile({"!test"})
 @EnableRedisHttpSession
-public class HttpSessionConfig { }
+public class HttpSessionConfig {}

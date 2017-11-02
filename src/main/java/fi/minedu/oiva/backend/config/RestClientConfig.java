@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class RestClientConfig {
+
     @Bean
     public RestTemplate getRestTemplate() {
         return new RestTemplate();
@@ -17,7 +18,7 @@ public class RestClientConfig {
 
     @Bean
     public RxClient<RxCompletionStageInvoker> getJerseyRxClient() {
-        RxClient<RxCompletionStageInvoker> client = RxCompletionStage.newClient();
+        final RxClient<RxCompletionStageInvoker> client = RxCompletionStage.newClient();
         client.register(JacksonFeature.class);
         return client;
     }

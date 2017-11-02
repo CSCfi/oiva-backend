@@ -16,19 +16,14 @@ import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.DefaultRecordListenerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
-import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -47,11 +42,12 @@ public class DatabasesConfig implements EnvironmentAware {
     private RelaxedPropertyResolver dataSourcePropertyResolver;
 
     @Override
-    public void setEnvironment(Environment env) {
-        this.env = env;
-        this.dataSourcePropertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
+    public void setEnvironment(final Environment environment) {
+        this.env = environment;
+        this.dataSourcePropertyResolver = new RelaxedPropertyResolver(environment, "spring.datasource.");
     }
 
+    @Primary
     @Profile("!test")
     @Bean(destroyMethod = "shutdown")
     public DataSource dataSource() {
@@ -68,7 +64,8 @@ public class DatabasesConfig implements EnvironmentAware {
         config.addDataSourceProperty("url", dataSourcePropertyResolver.getProperty("url"));
         config.addDataSourceProperty("user", dataSourcePropertyResolver.getProperty("username"));
         config.addDataSourceProperty("password", dataSourcePropertyResolver.getProperty("password"));
-        DataSource source = new HikariDataSource(config);
+
+        final DataSource source = new HikariDataSource(config);
 
         log.info("Applying database migration");
 
@@ -102,45 +99,13 @@ public class DatabasesConfig implements EnvironmentAware {
     }
 
     @Bean
-    public org.jooq.Configuration jooqConfig(ConnectionProvider connectionProvider,
-                                             TransactionProvider transactionProvider) {
+    @Primary
+    public org.jooq.Configuration jooqConfig(ConnectionProvider connectionProvider, TransactionProvider transactionProvider) {
         return new DefaultConfiguration()
             .derive(connectionProvider)
             .derive(transactionProvider)
             .derive(SQLDialect.POSTGRES)
             .derive(new DefaultRecordListenerProvider(new AuditFieldsRecordListener()))
             .derive(new Settings().withExecuteWithOptimisticLocking(true));
-    }
-
-    @Configuration
-    public static class RedisConfig {
-
-        private @Value("${redis.host}") String redisHost;
-        private @Value("${redis.port}") int redisPort;
-
-        @Bean
-        public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-            return new PropertySourcesPlaceholderConfigurer();
-        }
-
-        @Bean
-        JedisConnectionFactory jedisConnectionFactory() {
-            JedisConnectionFactory factory = new JedisConnectionFactory();
-            factory.setHostName(redisHost);
-            factory.setPort(redisPort);
-            factory.setUsePool(true);
-            return factory;
-        }
-
-        @Bean
-        RedisTemplate<Object, Object> redisTemplate() {
-            final RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
-            redisTemplate.setConnectionFactory(jedisConnectionFactory());
-            final RedisSerializer<Object> keySerializer =
-                new Jackson2JsonRedisSerializer<>(Object.class);
-            redisTemplate.setKeySerializer(keySerializer);
-            redisTemplate.setHashKeySerializer(keySerializer);
-            return redisTemplate;
-        }
     }
 }

@@ -6,6 +6,7 @@ import com.mitchellbosecke.pebble.error.PebbleException;
 import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import fi.minedu.oiva.backend.config.PebbleConfig;
 import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.LupatilaValue;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,18 +58,18 @@ public class PebbleService {
         // Tulostetaan lupatilan mukainen esitysmalli
         // HUOM! Toistaiseksi käytössä vain yksi malli, joka on paatos tilasta riippumatta
 
-        final String lupatila = lupa.lupatila().getTunniste().toString();
-        if(lupatila.equals("LUONNOS")) options.setTemplateName("paatos/base");
-        if(lupatila.equals("VALMIS")) options.setTemplateName("paatos/base");
-        if(lupatila.equals("PASSIVOITU")) options.setTemplateName("paatos/base");
-        if(lupatila.equals("HYLATTY")) options.setTemplateName("paatos/base");
+        final LupatilaValue lupaTila = lupa.lupatila().getTunniste();
+        if(lupaTila == LupatilaValue.LUONNOS) options.setTemplateName("paatos/base");
+        if(lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
+        if(lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
+        if(lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
 
         return generateHtml(lupa, options);
     }
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {
 
-        final String contextPath = lupa.paatoskierros().esitysmalli().getTemplatepath();
+        final String contextPath = "paatoskierros2017"; // TODDO = lupa.paatoskierros().esitysmalli().getTemplatepath();
         final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
 
         logger.debug("Using base path: {}", pebble.getTemplateBasePath());
