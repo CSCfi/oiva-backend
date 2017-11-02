@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.entity.Liite;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
@@ -60,7 +61,17 @@ public class PrinceXMLController {
                 options.setDebugMode(null != debugMode);
                 final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
                 if (htmlOpt.isPresent()) {
-                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
+
+                    lupaService.getAttachments(lupa).stream().forEach(attachment -> {
+                        if(AttachmentType.convert(attachment.getTyyppi()) != null) {
+                            options.addAttachment(AttachmentType.convert(attachment.getTyyppi()), attachment.getPolku());
+                        }
+
+                    });
+
+                    // TODO: lisää pdf kantaan tarvittaville luville
+                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
+
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {

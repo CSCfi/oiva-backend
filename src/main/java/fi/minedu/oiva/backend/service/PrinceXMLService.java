@@ -39,9 +39,14 @@ public class PrinceXMLService {
 
         try {
             final PDFMergerUtility merger = new PDFMergerUtility();
+
+            if(options.hasAttachment(AttachmentType.paatosKirje)) {
+                merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.paatosKirje).getPath());
+            }
+
             merger.addSource(base);
 
-            if(options.hasAttachment(Attachment.tutkintoNimenMuutos)) {
+            if(options.hasAttachment(AttachmentType.tutkintoNimenMuutos)) {
                 if(options.isLanguage(RenderLanguage.sv)) {
                     merger.addSource(templateBasePath + "/liitteet/LIITE-tutkintojen_nimien_muutokset_sv.pdf");
                 } else {
