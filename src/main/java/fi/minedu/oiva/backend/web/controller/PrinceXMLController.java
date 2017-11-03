@@ -62,7 +62,7 @@ public class PrinceXMLController {
                 final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
                 if (htmlOpt.isPresent()) {
 
-                    lupaService.getAttachments(lupa).stream().forEach(attachment -> {
+                    lupaService.getAttachments(lupa.getId()).stream().forEach(attachment -> {
                         if(AttachmentType.convert(attachment.getTyyppi()) != null) {
                             options.addAttachment(AttachmentType.convert(attachment.getTyyppi()), attachment.getPolku());
                         }

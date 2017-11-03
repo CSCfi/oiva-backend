@@ -160,9 +160,9 @@ public class LupaService implements RecordMapping<Lupa> {
         else return OivaTemplates.RenderLanguage.fi;
     }
 
-    public Collection<Liite> getAttachments(final Lupa lupa) {
+    public Collection<Liite> getAttachments(final long id) {
        return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI).from(LIITE, LUPA_LIITE)
-               .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(lupa.getId()))).fetchInto(Liite.class);
+               .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(id))).fetchInto(Liite.class);
     }
 
 }
