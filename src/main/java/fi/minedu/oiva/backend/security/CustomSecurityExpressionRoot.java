@@ -63,7 +63,7 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
     }
 
     /**
-     * just convenience method to see if user is really authenticated (= signed in)
+     * Convenience method to see if user is signed in
      */
     public boolean isSignedIn() {
         if (log.isDebugEnabled()) log.debug("check if signed in: " + !this.isAnonymous());

@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Kohde;
+import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
 import static fi.minedu.oiva.backend.jooq.Tables.LUPA;
+import static fi.minedu.oiva.backend.jooq.Tables.LUPATILA;
 import static fi.minedu.oiva.backend.jooq.Tables.MAARAYS;
 import static fi.minedu.oiva.backend.jooq.Tables.MAARAYSTYYPPI;
 
@@ -36,12 +38,18 @@ public class MaaraysService implements RecordMapping<Maarays> {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
+    @Autowired
+    private AuthService authService;
+
     private SelectConditionStep<Record> baseLupaMaaraysSelect(final Long lupaId) {
-        return dsl.select().from(LUPA)
+        final SelectConditionStep<Record> query = dsl.select().from(LUPA)
             .leftOuterJoin(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
             .leftOuterJoin(KOHDE).on(KOHDE.ID.eq(MAARAYS.KOHDE_ID))
             .leftOuterJoin(MAARAYSTYYPPI).on(MAARAYSTYYPPI.ID.eq(MAARAYS.MAARAYSTYYPPI_ID))
+            .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID))
             .where(LUPA.ID.eq(lupaId));
+        if(authService.onlyPublic()) query.and(LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS));
+        return query;
     }
 
     public Collection<Maarays> getByLupa(final Long lupaId, final String... with) {

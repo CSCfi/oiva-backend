@@ -31,9 +31,9 @@ public class LocalizationService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public Optional<JsonNode> getTranslations(final String localeStr) {
+    public Optional<JsonNode> getTranslations(final String lang) {
         final ObjectMapper mapper = new ObjectMapper();
-        final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + localeStr + ".json");
+        final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + lang + ".json");
         try {
             return Optional.ofNullable(mapper.readTree(is));
 
@@ -43,11 +43,11 @@ public class LocalizationService {
         }
     }
 
-    @Cacheable(value = "LocalizationService:get", key = "#localeStr")
-    public Map<String, String> getTranslationsWS(final String localeStr) {
+    @Cacheable(value = "LocalizationService:get", key = "#lang")
+    public Map<String, String> getTranslationsWS(final String lang) {
         final Map<String, String> translations = new HashMap<>();
         try {
-            final JsonNode json = ObjectMapperSingleton.mapper.readTree(restTemplate.getForObject(String.format(localizationUrl + urlSuffix, localeStr), String.class));
+            final JsonNode json = ObjectMapperSingleton.mapper.readTree(restTemplate.getForObject(String.format(localizationUrl + urlSuffix, lang), String.class));
             if (json.isArray()) {
                 for (final JsonNode translation : json) {
                     translations.put(translation.get("key").asText(), translation.get("value").asText());

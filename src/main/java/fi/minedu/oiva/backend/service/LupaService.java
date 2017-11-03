@@ -15,7 +15,6 @@ import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.template.extension.MaaraysListFilter;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.jooq.Result;
 import org.jooq.SelectOnConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 

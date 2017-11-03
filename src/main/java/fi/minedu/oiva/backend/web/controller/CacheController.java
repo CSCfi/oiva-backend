@@ -1,6 +1,5 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.OivaAuthorization;
 import fi.minedu.oiva.backend.service.CacheService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RequestMapping(
     value = "${api.url.prefix}" + CacheController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
-public class CacheController implements OivaAuthorization {
+public class CacheController {
 
     public static final String path = "/cache";
 
@@ -31,14 +30,12 @@ public class CacheController implements OivaAuthorization {
 
     @RequestMapping(method = GET)
     @ApiOperation(notes = "Palauttaa välimuistissa olevat avaimet", value = "/")
-    @PreAuthorize(ACCESS_ADMIN)
     public CompletableFuture<Collection<String>> getCacheNames() {
         return cacheService.getCacheNames();
     }
 
     @RequestMapping(value = "/refresh", method = PUT)
     @ApiOperation(notes = "Tyhjentää ja alustaa välimuistin", value = "/refresh")
-    @PreAuthorize(ACCESS_ADMIN)
     public ResponseEntity refresh() {
         async(() -> cacheService.refreshCache(true));
         return ok();
@@ -46,7 +43,6 @@ public class CacheController implements OivaAuthorization {
 
     @RequestMapping(value="/flushall", method = PUT)
     @ApiOperation(notes = "Tyhjentää välimuistin", value = "/flushall")
-    @PreAuthorize(ACCESS_ADMIN)
     public ResponseEntity flush() {
         async(() -> cacheService.flushCache(false));
         return ok();

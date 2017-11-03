@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Kohde;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,8 +17,9 @@ public class KohdeService {
     @Autowired
     private DSLContext dsl;
 
+    @OivaAccess_Application
     @Cacheable(value = {"KohdeService:getAll"}, key = "''")
-    public Collection<Kohde> getAll() {
+    public Collection<Kohde> getAll() { // TODO: IS THIS NEEDED?
         return dsl.select(KOHDE.fields()).from(KOHDE).fetchInto(Kohde.class);
     }
 }
