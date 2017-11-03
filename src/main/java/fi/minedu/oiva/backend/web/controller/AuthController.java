@@ -24,8 +24,10 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping(value = "${api.url.prefix}")
+@RequestMapping(value = "${api.url.prefix}" + AuthController.path)
 public class AuthController implements OivaAuthorization {
+
+    public static final String path = "/auth";
 
     @Value("${cas.baseUrl}${cas.url.prefix}${cas.url.login}")
     private String casLoginUrl;
@@ -33,7 +35,7 @@ public class AuthController implements OivaAuthorization {
     @Value("${oiva.baseUrl}${cas.service.url}")
     private String casServiceUrl;
 
-    @RequestMapping(value = "/auth/me", method = GET)
+    @RequestMapping(value = "/me", method = GET)
     @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "/auth/me")
     @PreAuthorize(ACCESS_AUTHENTICATED)
     public Map<String, Object> getMe() {
@@ -46,8 +48,8 @@ public class AuthController implements OivaAuthorization {
         );
     }
 
-    @RequestMapping("/auth/login")
     @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = "/auth/login")
+    @RequestMapping("/login")
     public void login(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);

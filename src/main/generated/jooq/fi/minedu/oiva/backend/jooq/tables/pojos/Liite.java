@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite implements Serializable {
 
-    private static final long serialVersionUID = -1571738171;
+    private static final long serialVersionUID = 1237829722;
 
     private Long      id;
     private String    nimi;
@@ -39,6 +39,8 @@ public class Liite implements Serializable {
     private Timestamp paivityspvm;
     private Long      koko;
     private JsonNode  meta;
+    private String    tyyppi;
+    private String    kieli;
 
     public Liite() {}
 
@@ -53,6 +55,8 @@ public class Liite implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.koko = value.koko;
         this.meta = value.meta;
+        this.tyyppi = value.tyyppi;
+        this.kieli = value.kieli;
     }
 
     public Liite(
@@ -65,7 +69,9 @@ public class Liite implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         Long      koko,
-        JsonNode  meta
+        JsonNode  meta,
+        String    tyyppi,
+        String    kieli
     ) {
         this.id = id;
         this.nimi = nimi;
@@ -77,6 +83,8 @@ public class Liite implements Serializable {
         this.paivityspvm = paivityspvm;
         this.koko = koko;
         this.meta = meta;
+        this.tyyppi = tyyppi;
+        this.kieli = kieli;
     }
 
     public Long getId() {
@@ -164,6 +172,26 @@ public class Liite implements Serializable {
         this.meta = meta;
     }
 
+    @NotNull
+    @Size(max = 255)
+    public String getTyyppi() {
+        return this.tyyppi;
+    }
+
+    public void setTyyppi(String tyyppi) {
+        this.tyyppi = tyyppi;
+    }
+
+    @NotNull
+    @Size(max = 2)
+    public String getKieli() {
+        return this.kieli;
+    }
+
+    public void setKieli(String kieli) {
+        this.kieli = kieli;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Liite (");
@@ -178,6 +206,8 @@ public class Liite implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(koko);
         sb.append(", ").append(meta);
+        sb.append(", ").append(tyyppi);
+        sb.append(", ").append(kieli);
 
         sb.append(")");
         return sb.toString();

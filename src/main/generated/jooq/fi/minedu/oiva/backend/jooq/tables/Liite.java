@@ -39,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite extends TableImpl<LiiteRecord> {
 
-    private static final long serialVersionUID = 776341359;
+    private static final long serialVersionUID = 732337312;
 
     /**
      * The reference instance of <code>oiva.liite</code>
@@ -103,6 +103,16 @@ public class Liite extends TableImpl<LiiteRecord> {
      * The column <code>oiva.liite.meta</code>.
      */
     public final TableField<LiiteRecord, JsonNode> META = createField("meta", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new PostgresJSONJacksonBinding());
+
+    /**
+     * The column <code>oiva.liite.tyyppi</code>.
+     */
+    public final TableField<LiiteRecord, String> TYYPPI = createField("tyyppi", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
+
+    /**
+     * The column <code>oiva.liite.kieli</code>.
+     */
+    public final TableField<LiiteRecord, String> KIELI = createField("kieli", org.jooq.impl.SQLDataType.VARCHAR.length(2).nullable(false), this, "");
 
     /**
      * Create a <code>oiva.liite</code> table reference

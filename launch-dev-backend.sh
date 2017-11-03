@@ -21,9 +21,9 @@ elif [[ $userArg == "samu" ]]; then
     OIVA_JREBEL_AGENT=''
 else
     echo "Usage: ./launch-dev-backend.sh [DEVNAME] [OPTIONS]"
+    echo "Options:\n\tc\tUse docker-compose databases\n\td\tUse Java remote debug\n\tr\tUse JRebel\n\to\tUse maven offline mode\n\tl\tUse Ldap ssh-tunnel\n"
     exit 1
 fi
-
 
 OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -Pdev -Dspring.profiles.active=dev"
 
@@ -42,9 +42,10 @@ echo "\nLaunching oiva-backend as $userArg using options:"
 
 optionsArg=$@
 
-if [[ $optionsArg == *"o"* ]]; then
-    echo "maven offline mode"
-    OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -o"
+
+if [[ $optionsArg == *"c"* ]]; then
+    echo "docker-compose setup"
+    OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Doiva.dbhost=0.0.0.0 -Doiva.dbport=6432 -Dredis.host=0.0.0.0 -Dredis.port=7379"
 fi
 
 if [[ $optionsArg == *"d"* ]]; then
@@ -55,6 +56,16 @@ fi
 if [[ $optionsArg == *"r"* ]]; then
     echo "jrebel"
     OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -agentpath:${OIVA_JREBEL_AGENT}"
+fi
+
+if [[ $optionsArg == *"o"* ]]; then
+    echo "maven offline mode"
+    OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -o"
+fi
+
+if [[ $optionsArg == *"l"* ]]; then
+    echo "ldap ssh-tunnel"
+    OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Dldap.url=ldaps://127.0.0.1:20636"
 fi
 
 echo "\nMaven options:${OIVA_MVN_OPTS}\nJava options:${OIVA_JAVA_OPTS}\n"

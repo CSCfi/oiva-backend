@@ -17,8 +17,30 @@ public class OivaTemplates {
         web, pdf
     }
 
-    public enum Attachment {
-        tutkintoNimenMuutos
+    public enum AttachmentType {
+        tutkintoNimenMuutos,
+        paatosKirje;
+
+        public static AttachmentType convert(String str) {
+            for (AttachmentType attachmentType : AttachmentType.values()) {
+                if (attachmentType.toString().equals(str)) {
+                    return attachmentType;
+                }
+            }
+            return null;
+        }
+    }
+
+    public static class Attachment {
+        private AttachmentType type;
+        private String path;
+        private String language;
+
+        public String getPath() { return this.path; }
+        public void setPath(String path) { this.path = path; }
+
+        public AttachmentType getType() { return this.type; }
+        public void setType(AttachmentType type) { this.type = type; }
     }
 
     public static class RenderOptions {
@@ -83,13 +105,20 @@ public class OivaTemplates {
             this.templateName = templateName;
         }
 
-        public RenderOptions addAttachment(final Attachment attachment) {
+        public RenderOptions addAttachment(final AttachmentType attachmentType, final String path) {
+            final Attachment attachment = new Attachment();
+            attachment.setPath(path);
+            attachment.setType(attachmentType);
             this.attachments.add(attachment);
             return this;
         }
 
-        public boolean hasAttachment(final Attachment targetAttachment) {
-            return this.attachments.stream().anyMatch(attachment -> attachment == targetAttachment);
+        public Attachment getAttachment(final AttachmentType attachmentType) {
+            return this.attachments.stream().filter(p -> p.type.equals(attachmentType)).findFirst().get();
+        }
+
+        public boolean hasAttachment(final AttachmentType targetAttachment) {
+            return this.attachments.stream().anyMatch(attachment -> attachment.type == targetAttachment);
         }
 
         public RenderOptions setDebugMode(final boolean debug) {

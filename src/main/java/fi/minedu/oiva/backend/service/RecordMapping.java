@@ -29,8 +29,7 @@ public interface RecordMapping<T> {
 
     default boolean withOption(final Class<?> clazz, final String... with) {
         final List withOptions = null == with ? Collections.emptyList() : Arrays.asList(with).stream().map(String::toLowerCase).collect(Collectors.toList());
-        final Function<Class<?>, Boolean> hasOption = targetClass ->
-                withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
+        final Function<Class<?>, Boolean> hasOption = targetClass -> withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
         return hasOption.apply(clazz);
     }
 }

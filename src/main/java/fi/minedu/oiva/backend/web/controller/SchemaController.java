@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import fi.minedu.oiva.backend.service.JsonSchemaService;
+import fi.minedu.oiva.backend.service.SchemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
@@ -14,17 +14,22 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping(
-    value = "${api.url.prefix}" + JsonSchemaController.path,
+    value = "${api.url.prefix}" + SchemaController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
-public class JsonSchemaController {
-    public static final String path = "/jsonschema";
+public class SchemaController {
+
+    public static final String path = "/schema";
 
     @Autowired
-    private JsonSchemaService service;
+    private SchemaService service;
 
-    @RequestMapping(value="/{entityClass:.*}",method = GET)
-    public HttpEntity<JsonSchema> get(@PathVariable String entityClass) {
-        return getOr404(service.getSchema(entityClass));
+    @RequestMapping(value="/oiva/{entityClass:.*}",method = GET)
+    public HttpEntity<JsonSchema> getOivaSchema(@PathVariable final String entityClass) {
+        return getOr404(service.getOivaSchema(entityClass));
     }
 
+    @RequestMapping(value="/opintopolku/{entityClass:.*}",method = GET)
+    public HttpEntity<JsonSchema> getOpintopolkuSchema(@PathVariable final String entityClass) {
+        return getOr404(service.getOpintopolkuSchema(entityClass));
+    }
 }
