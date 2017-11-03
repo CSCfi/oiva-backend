@@ -11,5 +11,4 @@ public class TikaConfig {
     public AutoDetectParser getTikaAutoDetect() {
         return new AutoDetectParser();
     }
-
 }

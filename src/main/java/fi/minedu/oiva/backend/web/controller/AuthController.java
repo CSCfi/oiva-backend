@@ -23,8 +23,10 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
-@RequestMapping(value = "${api.url.prefix}")
+@RequestMapping(value = "${api.url.prefix}" + AuthController.path)
 public class AuthController {
+
+    public static final String path = "/auth";
 
     @Value("${cas.baseUrl}${cas.url.prefix}${cas.url.login}")
     private String casLoginUrl;
@@ -32,8 +34,8 @@ public class AuthController {
     @Value("${oiva.baseUrl}${cas.service.url}")
     private String casServiceUrl;
 
-    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "/auth/me")
-    @RequestMapping(value = "/auth/me", method = GET)
+    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "")
+    @RequestMapping(value = "/me", method = GET)
     @PreAuthorize("isSignedIn()")
     public Map<String, Object> getMe() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -45,8 +47,8 @@ public class AuthController {
         );
     }
 
-    @ApiOperation(notes = "CAS redirect", value = "/auth/login")
-    @RequestMapping("/auth/login")
+    @ApiOperation(notes = "CAS redirect", value = "")
+    @RequestMapping("/login")
     public void login(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);

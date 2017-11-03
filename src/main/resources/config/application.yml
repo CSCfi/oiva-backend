@@ -79,8 +79,6 @@ spring:
 redis:
     host: override_this_in_local_application_yml
     port: override_this_in_local_application_yml
-    kvstore:
-        keyPrefix: kv.
     userSessionPrefix: spring:session
 
 prince:

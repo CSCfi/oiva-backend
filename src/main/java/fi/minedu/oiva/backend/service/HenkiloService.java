@@ -15,11 +15,12 @@ import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 
 @Service
 public class HenkiloService {
-    @Autowired
-    LdapHenkiloRepository henkiloRepository;
 
     @Autowired
-    OpintopolkuService opintopolkuService;
+    private LdapHenkiloRepository henkiloRepository;
+
+    @Autowired
+    private OpintopolkuService opintopolkuService;
 
     @PreAuthorize("isSignedIn()")
     public Henkilo getHenkiloByOid(String oid) {

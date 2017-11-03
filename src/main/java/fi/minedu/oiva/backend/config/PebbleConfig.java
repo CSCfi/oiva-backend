@@ -20,11 +20,11 @@ public class PebbleConfig {
         final OivaTemplateExtension oivaExtension = new OivaTemplateExtension();
 
         return new PebbleEngine.Builder()
-                .loader(oivaLoader)
-                .extension(oivaExtension)
-                .autoEscaping(false)
-                .cacheActive(false)
-                .build();
+            .loader(oivaLoader)
+            .extension(oivaExtension)
+            .autoEscaping(false)
+            .cacheActive(false)
+            .build();
     }
 
     public String getTemplateBasePath() {

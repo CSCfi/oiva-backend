@@ -40,6 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${cas.url.logout}")
     private String casUrlLogout;
 
+    @Value("${api.url.prefix}")
+    private String oivaApiPath;
+
     @Autowired
     private Http401UnauthorizedEntryPoint http401UnauthorizedEntryPoint;
 
@@ -57,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().disable();
 
         http.logout()
-            .logoutUrl("/api/logout")
+            .logoutUrl(oivaApiPath + "/auth/logout")
             .invalidateHttpSession(true)
             .deleteCookies("JSESSIONID", "SESSION")
             .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
@@ -122,5 +125,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(casAuthenticationProvider());
     }
-
 }
