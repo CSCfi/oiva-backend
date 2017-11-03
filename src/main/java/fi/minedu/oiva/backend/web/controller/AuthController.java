@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.security.CustomUserDetailsMapper;
+import fi.minedu.oiva.backend.security.OivaAuthorization;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping(value = "${api.url.prefix}")
-public class AuthController {
+public class AuthController implements OivaAuthorization {
 
     @Value("${cas.baseUrl}${cas.url.prefix}${cas.url.login}")
     private String casLoginUrl;
@@ -32,9 +33,9 @@ public class AuthController {
     @Value("${oiva.baseUrl}${cas.service.url}")
     private String casServiceUrl;
 
-    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "/auth/me")
     @RequestMapping(value = "/auth/me", method = GET)
-    @PreAuthorize("isSignedIn()")
+    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "/auth/me")
+    @PreAuthorize(ACCESS_AUTHENTICATED)
     public Map<String, Object> getMe() {
         final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         final CustomUserDetailsMapper.UserDetailsWrapper principal = (CustomUserDetailsMapper.UserDetailsWrapper) auth.getPrincipal();
@@ -45,8 +46,8 @@ public class AuthController {
         );
     }
 
-    @ApiOperation(notes = "CAS redirect", value = "/auth/login")
     @RequestMapping("/auth/login")
+    @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = "/auth/login")
     public void login(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);
