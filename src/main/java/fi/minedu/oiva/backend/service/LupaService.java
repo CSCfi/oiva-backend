@@ -7,6 +7,7 @@ import fi.minedu.oiva.backend.entity.Lupatila;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.OivaTemplates;
 import fi.minedu.oiva.backend.entity.Paatoskierros;
+import fi.minedu.oiva.backend.entity.Liite;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
@@ -157,6 +158,11 @@ public class LupaService implements RecordMapping<Lupa> {
 //        else if(isOpetuskieliKoodiArvo.apply(maaraykset, "4")) return OivaTemplates.RenderLanguage.en; // TODO: After english support is added
 //        else if(isOpetuskieliKoodiArvo.apply(maaraykset, "5")) return OivaTemplates.RenderLanguage.se; // TODO: After saame support is added
         else return OivaTemplates.RenderLanguage.fi;
+    }
+
+    public Collection<Liite> getAttachments(final long id) {
+       return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI).from(LIITE, LUPA_LIITE)
+               .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(id))).fetchInto(Liite.class);
     }
 
 }
