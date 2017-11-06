@@ -65,7 +65,7 @@ public class LupaService implements RecordMapping<Lupa> {
     protected Optional<Condition> baseLupaFilter() {
         final OivaPermission accessPermission = authService.lupaAccessPermission();
         final Condition valmisLupaCondition = LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS);
-        if(accessPermission.is(OivaAccess.Type.Public)) {
+        if(accessPermission.is(OivaAccess.Type.OnlyPublic)) {
             return Optional.of(valmisLupaCondition);
         } else if(accessPermission.is(OivaAccess.Type.OrganizationAndPublic)) {
             if(accessPermission.oids.isEmpty()) {

@@ -5,7 +5,7 @@ public interface OivaAccess {
     enum Type {
         All,
         OrganizationAndPublic,
-        Public
+        OnlyPublic
     }
 
     String Role_Application = "APP_KOUTE";

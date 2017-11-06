@@ -36,7 +36,7 @@ public class AuthService {
             return access;
 
         } else {
-            return new OivaPermission(Type.Public);
+            return new OivaPermission(Type.OnlyPublic);
         }
     }
 
