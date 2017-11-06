@@ -1,7 +1,5 @@
 package fi.minedu.oiva.backend.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.expression.SecurityExpressionRoot;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionOperations;
 import org.springframework.security.core.Authentication;
@@ -9,11 +7,10 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 
 public class CustomSecurityExpressionRoot extends SecurityExpressionRoot implements MethodSecurityExpressionOperations {
+
     private Object filterObject;
     private Object returnObject;
     private Object target;
-
-    private Logger log = LoggerFactory.getLogger(CustomSecurityExpressionRoot.class);
 
     CustomSecurityExpressionRoot(final Authentication auth) {
         super(auth);
@@ -44,29 +41,22 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
     }
 
     /**
-     * Returns every OID and possible administration privilege of given role prefix.
+     * Returns oids related to the given role
      *
-     * @param partialRole Role prefix
-     * @return list of OIDs for role prefix
+     * @param role target role
+     * @return list of role related oids
      */
-    public List<String> oidsFor(String partialRole) {
-        return SecurityUtil.roleOIDs(partialRole);
+    public List<String> oidsFor(final String role) {
+        return SecurityUtil.roleOids(role);
     }
 
     /**
-     * Multi role prefix version of oidsFor
-     * @param partialRoles Role prefixes
+     * Returns oids related to the given role
+     *
+     * @param roles Role prefixes
      * @return list of OIDs for role prefix
      */
-    public List<String> oidsFor(List<String> partialRoles) {
-        return SecurityUtil.roleOIDs(partialRoles);
-    }
-
-    /**
-     * Convenience method to see if user is signed in
-     */
-    public boolean isSignedIn() {
-        if (log.isDebugEnabled()) log.debug("check if signed in: " + !this.isAnonymous());
-        return !this.isAnonymous();
+    public List<String> oidsFor(final List<String> roles) {
+        return SecurityUtil.roleOids(roles);
     }
 }

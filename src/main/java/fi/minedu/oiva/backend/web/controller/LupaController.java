@@ -60,11 +60,4 @@ public class LupaController {
         @RequestParam(value = "with", required = false) String with) {
         return getOr404(service.get(RequestUtils.getPathVariable(request, fullPath), StringUtils.split(with, ",")));
     }
-
-    // TODO: REMOVEME
-    @ApiOperation(notes = "Palauttaa kaikkien lupien PDF-linkit", value = "")
-    @RequestMapping(method = GET, value = "/linkit", produces = { MediaType.TEXT_HTML_VALUE})
-    public String getLinks() {
-        return service.luvatLinksHtml();
-    }
 }

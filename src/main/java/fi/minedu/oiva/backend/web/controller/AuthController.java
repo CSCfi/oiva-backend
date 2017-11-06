@@ -1,11 +1,10 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.service.AuthService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +35,7 @@ public class AuthController {
 
     @RequestMapping(value = "/me", method = GET)
     @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = AuthController.path + "/me")
-    @PreAuthorize(OivaAccess.Application)
+    @OivaAccess_Application
     public CompletableFuture<Map<String, Object>> getMe() {
         return async(() -> service.getMe());
     }

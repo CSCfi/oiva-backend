@@ -37,19 +37,19 @@ import static org.hamcrest.Matchers.instanceOf;
 @Component
 public class OivaPermissionChecker implements PermissionEvaluator, ApplicationContextAware {
 
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     /**
      * Autowiring of services breaks evaluator for some reasons too busy to find out,
      * so this is for the win and fix. Ugly, yes. Then getBean() is used to resolve services
      * from context.
      *
-     * @param applicationContext
+     * @param context
      * @throws BeansException
      */
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
+    public void setApplicationContext(final ApplicationContext context) throws BeansException {
+        this.applicationContext = context;
     }
 
     @Override
@@ -76,10 +76,9 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
      */
     @SuppressWarnings("unchecked")
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) { // TODO: NOT USED -- DO WE NEED THIS?
-        return Matching
-            .whenIsType((String s) -> SecurityUtil.roleOIDs(authentication, s))
-            .whenAllMatch(instanceOf(List.class), hasItem(instanceOf(String.class))).thenApply(ignr -> (List<String>) permission)
+    public boolean hasPermission(final Authentication authentication, final Serializable targetId, final String targetType, final Object permission) { // TODO: NOT USED -- DO WE NEED THIS?
+        return Matching.whenIsType((String s) -> SecurityUtil.roleOids(authentication, s))
+            .whenAllMatch(instanceOf(List.class), hasItem(instanceOf(String.class))).thenApply(ignore -> (List<String>) permission)
             .match(permission).map(oids -> Matching
                 .whenIsValue("Hakemus").thenApply(ignr -> checkOidsOnCheckable("hakemusService", targetId, oids))
                 .whenIsValue("Paatos").thenApply(ignr -> checkOidsOnCheckable("paatosService", targetId, oids))

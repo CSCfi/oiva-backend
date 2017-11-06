@@ -3,6 +3,8 @@ package fi.minedu.oiva.backend.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ public class LocalizationService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @OivaAccess_Public
     public Optional<JsonNode> getTranslations(final String lang) {
         final ObjectMapper mapper = new ObjectMapper();
         final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + lang + ".json");
@@ -43,6 +46,7 @@ public class LocalizationService {
         }
     }
 
+    @OivaAccess_Public
     @Cacheable(value = "LocalizationService:get", key = "#lang")
     public Map<String, String> getTranslationsWS(final String lang) {
         final Map<String, String> translations = new HashMap<>();
@@ -59,6 +63,7 @@ public class LocalizationService {
         return translations;
     }
 
+    @OivaAccess_Public
     @CacheEvict(value = "LocalizationService", allEntries = true)
     public void refreshTranslations() {}
 }

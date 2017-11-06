@@ -1,17 +1,15 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.security.CustomUserDetailsMapper;
+import fi.minedu.oiva.backend.security.OivaPermission;
+import fi.minedu.oiva.backend.security.SecurityUtil;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess.Type;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 
 import static fi.minedu.oiva.backend.util.CollectionUtils.mapOf;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -22,36 +20,28 @@ public class AuthService {
     @OivaAccess_Application
     public Map<String, Object> getMe() {
         return mapOf(
-            tuple("oid", userName()),
-            tuple("roles", userRoles())
+            tuple("oid", SecurityUtil.userName()),
+            tuple("roles", SecurityUtil.userRoles())
         );
     }
 
-    protected Optional<Authentication> userAuthentication() {
-        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
+    @OivaAccess_Public
+    public OivaPermission lupaAccessPermission() {
+        if(hasAnyRole(OivaAccess.Role_Esittelija)) {
+            return new OivaPermission(Type.All);
+
+        } else if(hasAnyRole(OivaAccess.Role_Kayttaja)) {
+            final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
+            SecurityUtil.roleOids(OivaAccess.Role_Kayttaja).stream().forEach(access.oids::add);
+            return access;
+
+        } else {
+            return new OivaPermission(Type.Public);
+        }
     }
 
-    protected Optional<CustomUserDetailsMapper.UserDetailsWrapper> userPrincipal() {
-        final Optional<Authentication> authOpt = userAuthentication();
-        return Optional.ofNullable(authOpt.isPresent() ? (CustomUserDetailsMapper.UserDetailsWrapper) authOpt.get().getPrincipal() : null);
-    }
-
-    protected boolean isOivaUser() {
-        return userRoles().contains(OivaAccess.Role_Application);
-    }
-
-    protected boolean onlyPublic() {
-        return !isOivaUser();
-    }
-
-    protected Optional<String> userName() {
-        final Optional<CustomUserDetailsMapper.UserDetailsWrapper> principalOpt = userPrincipal();
-        return Optional.ofNullable(principalOpt.isPresent() ? principalOpt.get().getUsername() : null);
-    }
-
-    protected List<String> userRoles() {
-        final List<String> userRoles = new ArrayList<>();
-        userAuthentication().ifPresent(auth -> auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).forEach(userRoles::add));
-        return userRoles;
+    @OivaAccess_Public
+    public boolean hasAnyRole(final String ...roles) {
+        return SecurityUtil.userRoles().stream().anyMatch(s -> Arrays.asList(roles).contains(s));
     }
 }

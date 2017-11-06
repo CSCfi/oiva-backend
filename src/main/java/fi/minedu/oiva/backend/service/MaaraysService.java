@@ -5,6 +5,9 @@ import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.security.OivaPermission;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess.Type;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -39,7 +42,7 @@ public class MaaraysService implements RecordMapping<Maarays> {
     private OpintopolkuService opintopolkuService;
 
     @Autowired
-    private AuthService authService;
+    private LupaService lupaService;
 
     private SelectConditionStep<Record> baseLupaMaaraysSelect(final Long lupaId) {
         final SelectConditionStep<Record> query = dsl.select().from(LUPA)
@@ -48,16 +51,19 @@ public class MaaraysService implements RecordMapping<Maarays> {
             .leftOuterJoin(MAARAYSTYYPPI).on(MAARAYSTYYPPI.ID.eq(MAARAYS.MAARAYSTYYPPI_ID))
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID))
             .where(LUPA.ID.eq(lupaId));
-        if(authService.onlyPublic()) query.and(LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS));
+
+        lupaService.baseLupaFilter().ifPresent(query::and);
         return query;
     }
 
+    @OivaAccess_Public
     public Collection<Maarays> getByLupa(final Long lupaId, final String... with) {
         final Result<Record> results = baseLupaMaaraysSelect(lupaId).fetch();
         final Collection<Maarays> maaraykset = toMaaraysList(results, with);
         return maaraykset;
     }
 
+    @OivaAccess_Public
     public Collection<Maarays> getByLupaAndKohde(final Long lupaId, final String kohdeTunniste, final String... with) {
         final Result<Record> results = baseLupaMaaraysSelect(lupaId).and(KOHDE.TUNNISTE.eq(kohdeTunniste)).fetch();
         final Collection<Maarays> maaraykset = toMaaraysList(results, with);

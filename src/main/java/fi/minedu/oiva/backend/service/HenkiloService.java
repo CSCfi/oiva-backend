@@ -4,7 +4,6 @@ import fi.minedu.oiva.backend.entity.dto.Henkilo;
 import fi.minedu.oiva.backend.repo.LdapHenkiloRepository;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -18,14 +17,14 @@ import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 public class HenkiloService {
 
     @Autowired
-    private LdapHenkiloRepository henkiloRepository;
+    private LdapHenkiloRepository ldapAccess;
 
     @Autowired
     private OpintopolkuService opintopolkuService;
 
     @OivaAccess_Application
     public Henkilo getHenkiloByOid(String oid) {
-        return henkiloRepository.getHenkiloByOid(oid);
+        return ldapAccess.getHenkiloByOid(oid);
     }
 
     @OivaAccess_Application
@@ -39,7 +38,7 @@ public class HenkiloService {
     }
 
     private List<Henkilo> getHenkilosByOids(final String[] oids) {
-        return henkiloRepository.getHenkilosByOids(oids);
+        return ldapAccess.getHenkilosByOids(oids);
     }
 
     private Optional<Henkilo> getByOidWithOrganization(final String oid) {
