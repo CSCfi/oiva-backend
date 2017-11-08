@@ -7,6 +7,7 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import fi.minedu.oiva.backend.config.PebbleConfig;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class PebbleService {
     @Autowired
     private PebbleConfig pebble;
 
+    @OivaAccess_Public
     public Optional<ByteArrayResource> getResource(final String path) {
         final String resourcePath = pebble.getTemplateBasePath() + "/" + path;
         try {
@@ -45,14 +47,7 @@ public class PebbleService {
         }
     }
 
-    // TODO: REMOVEME
-    public Optional<String> toLupaListHTML(final Collection<Lupa> luvat) {
-        final Map<String, Object> context = new HashMap<>();
-        context.put("luvat", luvat);
-        context.put("language", "fi");
-        return writeHTML("luvat", context);
-    }
-
+    @OivaAccess_Public
     public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
 
         // Tulostetaan lupatilan mukainen esitysmalli

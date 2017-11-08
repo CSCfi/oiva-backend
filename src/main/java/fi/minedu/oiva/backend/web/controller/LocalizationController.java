@@ -31,7 +31,7 @@ public class LocalizationController {
         @RequestParam(defaultValue = "fi") String lang,
         @RequestParam(defaultValue = "false") Boolean refresh) {
         return async(() -> {
-            if (refresh) service.refreshTranslations();
+            if(refresh) service.refreshTranslations();
             return service.getTranslationsWS(lang);
         });
     }

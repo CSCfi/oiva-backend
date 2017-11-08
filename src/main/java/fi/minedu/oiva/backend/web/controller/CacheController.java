@@ -1,10 +1,10 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.service.CacheService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,19 +28,20 @@ public class CacheController {
     private CacheService cacheService;
 
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa välimuistissa olevat avaimet", value = "/")
     public CompletableFuture<Collection<String>> getCacheNames() {
         return cacheService.getCacheNames();
     }
 
     @RequestMapping(value = "/refresh", method = PUT)
-    @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
+    @ApiOperation(notes = "Tyhjentää ja alustaa välimuistin", value = "/refresh")
     public ResponseEntity refresh() {
         async(() -> cacheService.refreshCache(true));
         return ok();
     }
 
     @RequestMapping(value="/flushall", method = PUT)
-    @PreAuthorize("hasAuthority('APP_KOUTE_YLLAPITAJA')")
+    @ApiOperation(notes = "Tyhjentää välimuistin", value = "/flushall")
     public ResponseEntity flush() {
         async(() -> cacheService.flushCache(false));
         return ok();

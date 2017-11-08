@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.customProperties.HyperSchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,11 +21,13 @@ public class SchemaService {
     private static final String CLASS_PREFIX = "fi.minedu.oiva.backend.entity.";
     private static final String OPINTOPOLKU_CLASS_PREFIX = CLASS_PREFIX + "opintopolku.";
 
+    @OivaAccess_Public
     @Cacheable(value = {"SchemaService:getOivaSchema"})
     public Optional<JsonSchema> getOivaSchema(final String entityClass) {
         return getSchema(CLASS_PREFIX + entityClass);
     }
 
+    @OivaAccess_Public
     @Cacheable(value = {"SchemaService:getOpintopolkuSchema"})
     public Optional<JsonSchema> getOpintopolkuSchema(final String entityClass) {
         return getSchema(OPINTOPOLKU_CLASS_PREFIX + entityClass);
