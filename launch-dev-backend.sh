@@ -36,9 +36,11 @@ OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:Para
 echo "\nLaunching oiva-backend as $userArg using options:"
 
 # Options:
-#  o    mvn offline mode
+#  c    docker-compose mode
 #  d    debug mode
 #  r    jrebel mode
+#  o    mvn offline mode
+#  l    ldap-tunnel mode
 
 optionsArg=$@
 

@@ -1,7 +1,9 @@
 version: "3"
 services:
     backend:
-        build: .
+        build:
+            context: .
+            dockerfile: ./Dockerfile-backend
         ports:
             - "9099:8099"
         volumes:
@@ -25,6 +27,20 @@ services:
         image: redis
         ports:
             - "7379:6379"
+        networks:
+            - oivanw
+    nginx:
+        hostname: localhost
+        image: ficusio/openresty:latest
+        ports:
+            - "443:443"
+            - "80:80"
+        volumes:
+            - ./nginx/nginx.conf:/opt/openresty/nginx/conf/nginx.conf
+            - ./nginx/ssl/nginx.crt:/opt/openresty/nginx/conf/ssl/nginx.crt
+            - ./nginx/ssl/nginx.key:/opt/openresty/nginx/conf/ssl/nginx.key
+        extra_hosts:
+            hostmachine: HOSTIP
         networks:
             - oivanw
 networks:
