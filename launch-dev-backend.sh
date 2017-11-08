@@ -7,7 +7,8 @@ shift
 PATH_TO_BACKEND="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 OIVA_MEMORY=512m
-OIVA_JAVA_JREBEL=''
+OIVA_JAVA_JREBEL=""
+OIVA_DOCKER_HOST="0.0.0.0"
 
 # Developer specific setup
 
@@ -47,7 +48,7 @@ optionsArg=$@
 
 if [[ $optionsArg == *"c"* ]]; then
     echo "docker-compose setup"
-    OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Doiva.dbhost=0.0.0.0 -Doiva.dbport=6432 -Dredis.host=0.0.0.0 -Dredis.port=7379"
+    OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Doiva.dbhost=$OIVA_DOCKER_HOST -Doiva.dbport=6432 -Dredis.host=$OIVA_DOCKER_HOST -Dredis.port=7379"
 fi
 
 if [[ $optionsArg == *"d"* ]]; then
