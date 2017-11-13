@@ -51,7 +51,7 @@ public class LupaService implements RecordMapping<Lupa> {
     private AuthService authService;
 
     protected SelectOnConditionStep<Record> baseLupaSelect() {
-        return dsl.select().from(LUPA)
+        return dsl.select(LUPA.fields()).from(LUPA)
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
     }
 
