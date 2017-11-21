@@ -1,9 +1,11 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +46,12 @@ public class PebbleController {
     @Autowired
     private LupaService lupaService;
 
+    @OivaAccess_Public
     @RequestMapping(value = "/**", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
+    @ApiOperation(notes = "Tuottaa luvan HTML-muodossa", value = "")
     public HttpEntity<String> renderHTML(final HttpServletRequest request,
-        @RequestParam(value = "debug", required = false) final String debugMode) {
+        final @RequestParam(value = "debug", required = false) String debugMode) {
+
         final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
         try {
             final Lupa lupa = lupaService.get(diaarinumero, withAll).get();
@@ -60,7 +65,9 @@ public class PebbleController {
         }
     }
 
+    @OivaAccess_Public
     @RequestMapping(value = "/resources/**", method = GET)
+    @ApiOperation(notes = "Palauttaa pebble-resurssin", value = "")
     public ResponseEntity<Resource> resource(final HttpServletRequest request) {
         final String resourcePath =  RequestUtils.getPathVariable(request, path + "/resources/");
         final Optional<ByteArrayResource> resourceOpt = service.getResource(resourcePath);

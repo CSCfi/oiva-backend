@@ -4,13 +4,15 @@ import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,48 +21,41 @@ public class KoodistoService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
-    @OivaAccess_Public
+    @Cacheable(value = "KoodistoService:getKoodi", key="{#koodisto, #koodi}")
     public KoodistoKoodi getKoodi(final String koodisto, final String koodi) {
         return opintopolkuService.getKoodi(koodisto, koodi);
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
     public List<Maakunta> getMaakuntaKunnat() {
         return opintopolkuService.getMaakuntaKunnat();
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getKoulutustoimijat", key = "''")
     public List<Organisaatio> getKoulutustoimijat() {
         return opintopolkuService.getKoulutustoimijat();
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getMaakuntaJarjestajat", key = "''")
     public List<Maakunta> getMaakuntaJarjestajat() {
         return opintopolkuService.getMaakuntaJarjestajat();
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getKunnat", key = "''")
     public List<KoodistoKoodi> getKunnat() {
         return opintopolkuService.getKunnatKoodit();
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getKunta")
     public KoodistoKoodi getKunta(final String koodi) {
         return opintopolkuService.getKuntaKoodi(koodi).orElseGet(null);
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getKielet", key = "''")
     public List<KoodistoKoodi> getKielet() {
         return opintopolkuService.getKieliKoodit();
     }
 
-    @OivaAccess_Public
     @Cacheable(value = {"KoodistoService:getKieli"})
     public KoodistoKoodi getKieli(final String koodi) {
         final KoodistoKoodi kieliKoodisto = opintopolkuService.getKieliKoodi(koodi);
@@ -78,14 +73,12 @@ public class KoodistoService {
      *  - ruotsi (koodiArvo: 2)
      *  - saame (koodiArvi: 5)
      */
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getOpetuskielet", key = "''")
     public List<KoodistoKoodi> getOpetuskielet() {
         return opintopolkuService.getOppilaitoksenOpetuskieliKoodit().stream()
             .filter(koodistoItem -> Arrays.asList("1", "2", "5").contains(koodistoItem.koodiArvo())).collect(Collectors.toList());
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getAluehallintovirastoKuntaMap", key = "''")
     public Map<String, KoodistoKoodi> getKuntaAluehallintovirastoMap() {
         final Map<String, KoodistoKoodi> map = new HashMap<>();
@@ -95,7 +88,6 @@ public class KoodistoService {
         return map;
     }
 
-    @OivaAccess_Public
     @Cacheable(value = "KoodistoService:getKuntaMaakuntaMap", key = "''")
     public Map<String, KoodistoKoodi> getKuntaMaakuntaMap() {
         final Map<String, KoodistoKoodi> map = new HashMap<>();

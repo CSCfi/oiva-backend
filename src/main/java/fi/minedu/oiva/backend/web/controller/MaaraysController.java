@@ -1,9 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.MaaraysService;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.util.ControllerUtil.options;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
@@ -28,11 +29,12 @@ public class MaaraysController {
     @Autowired
     private MaaraysService service;
 
-    @ApiOperation(notes = "Palauttaa kaikki luvan määräykset joilla on tietty kohde", value = "")
+    @OivaAccess_Public
     @RequestMapping(value = "/lupa/{lupaId:[0-9]+}/{kohdeTunniste}", method = GET)
+    @ApiOperation(notes = "Palauttaa kaikki luvan määräykset joilla on tietty kohde", value = "")
     public CompletableFuture<Collection<Maarays>> getAllByLupaAndKohde(
-        @PathVariable final Long lupaId, @PathVariable final String kohdeTunniste,
-        @RequestParam(value = "with", required = false) String with) {
-        return async(() -> service.getByLupaAndKohde(lupaId, kohdeTunniste, StringUtils.split(with, ",")));
+        final @PathVariable Long lupaId, final @PathVariable String kohdeTunniste,
+        final @RequestParam(value = "with", required = false) String with) {
+        return async(() -> service.getByLupaAndKohde(lupaId, kohdeTunniste, options(with)));
     }
 }

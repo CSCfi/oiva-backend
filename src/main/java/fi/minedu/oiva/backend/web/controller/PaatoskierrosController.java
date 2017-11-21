@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Paatoskierros;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.service.PaatoskierrosService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,10 @@ public class PaatoskierrosController {
     @Autowired
     private PaatoskierrosService service;
 
-    @ApiOperation(notes = "Palauttaa kaikki päätöskierrokset", value = "")
+    @OivaAccess_Application
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa kaikki päätöskierrokset", value = "")
     public CompletableFuture<Collection<Paatoskierros>> getAll() {
-        return async(() -> service.getAll());
+        return async(service::getAll);
     }
 }

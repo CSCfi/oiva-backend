@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.util;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -105,4 +106,7 @@ public final class ControllerUtil {
         return URI.create(Arrays.asList(fragments).stream().collect(Collectors.joining("/")));
     }
 
+    public static String[] options(final String with) {
+        return StringUtils.split(with, ",");
+    }
 }

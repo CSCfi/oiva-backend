@@ -15,7 +15,6 @@ import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.OivaPermission;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.template.extension.MaaraysListFilter;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -78,21 +77,18 @@ public class LupaService implements RecordMapping<Lupa> {
         }
     }
 
-    @OivaAccess_Public
     public Collection<Lupa> getAll() { // TODO: Implement filter
         final SelectJoinStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
         return query.fetchInto(Lupa.class);
     }
 
-    @OivaAccess_Public
     public Optional<Lupa> get(final Long lupaId, final String... withOptions) {
         final SelectConditionStep<Record> query = lupaSelect().where(LUPA.ID.eq(lupaId));
         baseLupaFilter().ifPresent(query::and);
         return entity(query.fetchOne(), withOptions);
     }
 
-    @OivaAccess_Public
     public Optional<Lupa> get(final String diaarinumero, final String... withOptions) {
         final SelectConditionStep<Record> query = lupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero));
         baseLupaFilter().ifPresent(query::and);
@@ -169,13 +165,11 @@ public class LupaService implements RecordMapping<Lupa> {
         return lupaOpt;
     }
 
-    @OivaAccess_Public
     public boolean hasTutkintoNimenMuutos(final Lupa lupa) {
         return !MaaraysListFilter.apply(lupa.getMaaraykset(), "kohde:tutkinnotjakoulutukset", "koodisto:koulutus",
             "koodiarvo:384201|487203|331101|351407|351703|458103|361201|374115|477103|384501|384202|371113|477102|354102|364902|467905|374111|477101|384112|487102|487103|487202").isEmpty();
     }
 
-    @OivaAccess_Public
     public OivaTemplates.RenderLanguage renderLanguageFor(final Lupa lupa) {
         final BiFunction<Collection<Maarays>, String, Boolean> isOpetuskieliKoodiArvo = (maaraykset, koodiarvo) -> maaraykset.stream().anyMatch(maarays -> maarays.isKoodiArvo(koodiarvo));
         final Collection<Maarays> maaraykset = MaaraysListFilter.apply(lupa.getMaaraykset(), "kohde:opetusjatutkintokieli", "koodisto:oppilaitoksenopetuskieli");
@@ -188,7 +182,6 @@ public class LupaService implements RecordMapping<Lupa> {
         else return OivaTemplates.RenderLanguage.fi;
     }
 
-    @OivaAccess_Public
     public Collection<Liite> getAttachments(final long lupaId) { // TODO: Add baseLupaFilter here
        return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI).from(LIITE, LUPA_LIITE)
         .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(lupaId))).fetchInto(Liite.class);

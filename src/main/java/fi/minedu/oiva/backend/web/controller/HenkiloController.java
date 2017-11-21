@@ -1,8 +1,8 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.dto.Henkilo;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.service.HenkiloService;
-import fi.minedu.oiva.backend.service.OpintopolkuService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -29,14 +30,17 @@ public class HenkiloController {
     @Autowired
     private HenkiloService service;
 
-    @ApiOperation(notes = "Palauttaa henkilön oidin perusteella.", value = "")
+    @OivaAccess_Application
     @RequestMapping(method = GET, value = "/{oid:.+}")
-    public CompletableFuture<HttpEntity<Henkilo>> get(@PathVariable String oid) {
-        return getOr404(service.getByOidWithOrganizationAsync(oid));
+    @ApiOperation(notes = "Palauttaa henkilön oidin perusteella.", value = "")
+    public CompletableFuture<HttpEntity<Henkilo>> get(final @PathVariable String oid) {
+        return getOr404(async(() -> service.getByOidWithOrganization(oid)));
     }
 
+    @OivaAccess_Application
     @RequestMapping(method = GET)
-    public CompletableFuture<Collection<Henkilo>> getMany(@RequestParam String[] oids) {
-        return service.getHenkilosByOidsAsync(oids);
+    @ApiOperation(notes = "Palauttaa henkilöt oidien perusteella.", value = "")
+    public CompletableFuture<Collection<Henkilo>> getMany(final @RequestParam String[] oids) {
+        return async(() -> service.getHenkilosByOids(oids));
     }
 }

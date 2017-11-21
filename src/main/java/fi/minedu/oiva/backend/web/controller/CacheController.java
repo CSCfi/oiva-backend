@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
 import fi.minedu.oiva.backend.service.CacheService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,14 @@ public class CacheController {
     @Autowired
     private CacheService cacheService;
 
+    @OivaAccess_Yllapitaja
     @RequestMapping(method = GET)
     @ApiOperation(notes = "Palauttaa välimuistissa olevat avaimet", value = "/")
     public CompletableFuture<Collection<String>> getCacheNames() {
-        return cacheService.getCacheNames();
+        return async(cacheService::getCacheNames);
     }
 
+    @OivaAccess_Yllapitaja
     @RequestMapping(value = "/refresh", method = PUT)
     @ApiOperation(notes = "Tyhjentää ja alustaa välimuistin", value = "/refresh")
     public ResponseEntity refresh() {
@@ -40,6 +43,7 @@ public class CacheController {
         return ok();
     }
 
+    @OivaAccess_Yllapitaja
     @RequestMapping(value="/flushall", method = PUT)
     @ApiOperation(notes = "Tyhjentää välimuistin", value = "/flushall")
     public ResponseEntity flush() {

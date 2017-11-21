@@ -41,7 +41,9 @@ public class DummyAuthenticationFilter extends
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response)
+            throws AuthenticationException, IOException, ServletException {
+
         final Authentication result = new UsernamePasswordAuthenticationToken("testeruser", "testcredentials", AUTHORITIES);
         logger.info("Doing dummy authnetication ");
         return result;

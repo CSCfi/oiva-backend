@@ -1,13 +1,9 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Kohde;
-import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
-import fi.minedu.oiva.backend.security.OivaPermission;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess.Type;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Result;
@@ -56,14 +52,12 @@ public class MaaraysService implements RecordMapping<Maarays> {
         return query;
     }
 
-    @OivaAccess_Public
     public Collection<Maarays> getByLupa(final Long lupaId, final String... with) {
         final Result<Record> results = baseLupaMaaraysSelect(lupaId).fetch();
         final Collection<Maarays> maaraykset = toMaaraysList(results, with);
         return maaraykset;
     }
 
-    @OivaAccess_Public
     public Collection<Maarays> getByLupaAndKohde(final Long lupaId, final String kohdeTunniste, final String... with) {
         final Result<Record> results = baseLupaMaaraysSelect(lupaId).and(KOHDE.TUNNISTE.eq(kohdeTunniste)).fetch();
         final Collection<Maarays> maaraykset = toMaaraysList(results, with);

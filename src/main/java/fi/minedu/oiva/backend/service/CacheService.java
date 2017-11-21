@@ -1,6 +1,5 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +13,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 
 @Service
 public class CacheService {
@@ -35,9 +31,13 @@ public class CacheService {
     @Value("${redis.userSessionPrefix}")
     private String userSessionPrefix;
 
-    @OivaAccess_Yllapitaja
-    public CompletableFuture<Collection<String>> getCacheNames() {
-        return async(() -> cacheManager.getCacheNames());
+    /**
+     * Return all existing cache keys
+     *
+     * @return cache keys
+     */
+    public Collection<String> getCacheNames() {
+        return cacheManager.getCacheNames();
     }
 
     /**
@@ -46,7 +46,6 @@ public class CacheService {
      *
      * @return duration in millseconds
      */
-    @OivaAccess_Yllapitaja
     public long flushCache(final boolean retainSessions) {
         final long startTime = System.currentTimeMillis();
         final RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
@@ -67,7 +66,6 @@ public class CacheService {
      *
      * @return duration in millseconds
      */
-    @OivaAccess_Yllapitaja
     public long refreshCache(final boolean retainSessions) {
         flushCache(retainSessions);
 

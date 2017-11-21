@@ -19,7 +19,7 @@ public interface RecordMapping<T> {
         return r.into(fields).into(clazz);
     }
 
-    default <T, V> void putToMap(Map<V, T> map, Record r, Field<?>[] fields, Class<T> clazz) {
+    default <T, V> void putToMap(final Map<V, T> map, final Record r, Field<?>[] fields, final Class<T> clazz) {
         final Record intermediateRecord = r.into(fields);
         final V id = (V) intermediateRecord.getValue("id");
         if (id != null && !map.containsKey(id)) {

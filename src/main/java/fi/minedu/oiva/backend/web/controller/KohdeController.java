@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Kohde;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.service.KohdeService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,10 @@ public class KohdeController {
     @Autowired
     private KohdeService service;
 
-    @ApiOperation(notes = "Palauttaa kaikki määräyksen kohteet", value = "")
+    @OivaAccess_Application
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa kaikki määräyksen kohteet", value = "")
     public CompletableFuture<Collection<Kohde>> getAll() {
-        return async(() -> service.getAll());
+        return async(service::getAll);
     }
 }
