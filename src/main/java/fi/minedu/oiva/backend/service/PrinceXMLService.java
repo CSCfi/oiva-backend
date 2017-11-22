@@ -1,7 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
 import com.princexml.Prince;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.apache.pdfbox.util.PDFMergerUtility;
 import org.apache.tika.io.IOUtils;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class PrinceXMLService {
     @Value("${prince.exec.path}")
     private String princeExecPath;
 
-    @OivaAccess_Public
     public boolean toPDF(final String html, final OutputStream output, final RenderOptions options)  {
         final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
         if(generatePDF(html, basePDFStream)) {

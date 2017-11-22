@@ -7,7 +7,6 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import fi.minedu.oiva.backend.config.PebbleConfig;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +19,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +34,6 @@ public class PebbleService {
     @Autowired
     private PebbleConfig pebble;
 
-    @OivaAccess_Public
     public Optional<ByteArrayResource> getResource(final String path) {
         final String resourcePath = pebble.getTemplateBasePath() + "/" + path;
         try {
@@ -47,7 +44,6 @@ public class PebbleService {
         }
     }
 
-    @OivaAccess_Public
     public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
 
         // Tulostetaan lupatilan mukainen esitysmalli
@@ -64,7 +60,7 @@ public class PebbleService {
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {
 
-        final String contextPath = "paatoskierros2017"; // TODDO = lupa.paatoskierros().esitysmalli().getTemplatepath();
+        final String contextPath = "paatoskierros2017"; // TODO = lupa.paatoskierros().esitysmalli().getTemplatepath();
         final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
 
         logger.debug("Using base path: {}", pebble.getTemplateBasePath());

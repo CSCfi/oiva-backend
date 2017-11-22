@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.AuthService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,17 @@ public class AuthController {
     @Value("${oiva.baseUrl}${cas.service.url}")
     private String casServiceUrl;
 
+    @OivaAccess_Application
     @RequestMapping(value = "/me", method = GET)
     @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = AuthController.path + "/me")
-    @OivaAccess_Application
     public CompletableFuture<Map<String, Object>> getMe() {
-        return async(() -> service.getMe());
+        return async(service::getMe);
     }
 
+    @OivaAccess_Public
     @RequestMapping(value = "/login", method = GET)
     @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = AuthController.path + "/login")
-    public void login(final HttpServletRequest request, final HttpServletResponse response, @RequestParam final String redirect) throws IOException {
+    public void login(final HttpServletRequest request, final HttpServletResponse response, final @RequestParam String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);
     }

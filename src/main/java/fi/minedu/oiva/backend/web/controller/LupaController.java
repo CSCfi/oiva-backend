@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.util.ControllerUtil.options;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
@@ -30,8 +32,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
     value = "${api.url.prefix}" + LupaController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
 public class LupaController {
-
-    private static final Logger logger = LoggerFactory.getLogger(LupaController.class);
 
     public static final String path = "/luvat";
 
@@ -41,23 +41,25 @@ public class LupaController {
     @Autowired
     private LupaService service;
 
-    @ApiOperation(notes = "Palauttaa kaikki luvat", value = "")
+    @OivaAccess_Public
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa kaikki luvat", value = "")
     public CompletableFuture<Collection<Lupa>> getAll() {
-        return async(() -> service.getAll());
+        return async(service::getAll);
     }
 
-    @ApiOperation(notes = "Palauttaa luvan tietokantatunnuksen perusteella", value = "")
+    @OivaAccess_Public
     @RequestMapping(method = GET, value = "/{lupaId:[0-9]+}")
-    public HttpEntity<Lupa> getById(@PathVariable long lupaId,
-        @RequestParam(value = "with", required = false) String with) {
-        return getOr404(service.get(lupaId, StringUtils.split(with, ",")));
+    @ApiOperation(notes = "Palauttaa luvan tietokantatunnuksen perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getById(final @PathVariable long lupaId, final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.get(lupaId, options(with))));
     }
 
-    @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
+    @OivaAccess_Public
     @RequestMapping(method = GET, value = "/**")
-    public HttpEntity<Lupa> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
-        @RequestParam(value = "with", required = false) String with) {
-        return getOr404(service.get(RequestUtils.getPathVariable(request, fullPath), StringUtils.split(with, ",")));
+    @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
+        final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, fullPath), options(with))));
     }
 }
