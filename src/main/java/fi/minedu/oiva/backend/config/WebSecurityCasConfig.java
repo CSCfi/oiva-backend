@@ -23,7 +23,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityCasConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${cas.baseUrl}${cas.url.prefix}")
     private String casUrlPrefix;
@@ -65,7 +65,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .deleteCookies("JSESSIONID", "SESSION")
             .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
 
-        // As there's a lot of async processing (CompletableFutures), we need to copy SecurityContext to launched async threads
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 

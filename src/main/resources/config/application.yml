@@ -14,8 +14,6 @@ jooq:
 
 api:
     url.prefix: /api
-    public:
-        url.prefix: /public
 
 opintopolku:
     baseUrl: override_this_in_local_application_yml

@@ -1,6 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
+import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
+import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
@@ -46,6 +49,13 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa kaikki luvat", value = "")
     public CompletableFuture<Collection<Lupa>> getAll() {
         return async(service::getAll);
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/jarjestajilla")
+    @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla", value = "")
+    public CompletableFuture<Collection<Lupa>> getAllWithJarjestaja() {
+        return async(() -> service.getAll(options(Organisaatio.class, Kunta.class, Maakunta.class)));
     }
 
     @OivaAccess_Public
