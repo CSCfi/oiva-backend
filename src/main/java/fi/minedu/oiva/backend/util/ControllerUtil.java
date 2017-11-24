@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -108,5 +109,9 @@ public final class ControllerUtil {
 
     public static String[] options(final String with) {
         return StringUtils.split(with, ",");
+    }
+
+    public static String[] options(final Class<?>... with) {
+        return null == with ? new String[0] : options(Arrays.asList(with).stream().map(Class::getSimpleName).collect(Collectors.joining(",")));
     }
 }

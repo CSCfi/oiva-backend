@@ -77,10 +77,13 @@ public class LupaService implements RecordMapping<Lupa> {
         }
     }
 
-    public Collection<Lupa> getAll() { // TODO: Implement filter
+    public Collection<Lupa> getAll(final String... withOptions) { // TODO: Implement filter
         final SelectJoinStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
-        return query.fetchInto(Lupa.class);
+        return query.fetchInto(Lupa.class).stream()
+            .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
+            .filter(Optional::isPresent).map(Optional::get)
+            .collect(Collectors.toList());
     }
 
     public Optional<Lupa> get(final Long lupaId, final String... withOptions) {
@@ -108,11 +111,6 @@ public class LupaService implements RecordMapping<Lupa> {
             return with(Optional.of(lupa), withOptions);
         }
         return Optional.empty();
-    }
-
-    protected String[] withOptions(final Class<?>... classes) {
-        if(null == classes) return new String[] {};
-        else return Arrays.asList(classes).stream().map(Class::getSimpleName).toArray(size -> new String[size]);
     }
 
     protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final String... with) {

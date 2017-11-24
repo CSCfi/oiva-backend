@@ -41,4 +41,11 @@ public class SchemaController {
     public CompletableFuture<HttpEntity<JsonSchema>> getOpintopolkuSchema(final @PathVariable String entityClass) {
         return getOr404(async(() -> service.getOpintopolkuSchema(entityClass)));
     }
+
+    @OivaAccess_Public
+    @RequestMapping(value="/export/{entityClass:.*}",method = GET)
+    @ApiOperation(notes = "Palauttaa export-skeeman json-kuvauksen luokkanimen perusteella", value = "")
+    public CompletableFuture<HttpEntity<JsonSchema>> getExportSchema(final @PathVariable String entityClass) {
+        return getOr404(async(() -> service.getExportSchema(entityClass)));
+    }
 }

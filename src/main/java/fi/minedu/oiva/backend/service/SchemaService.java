@@ -19,15 +19,18 @@ public class SchemaService {
 
     private static final String CLASS_PREFIX = "fi.minedu.oiva.backend.entity.";
     private static final String OPINTOPOLKU_CLASS_PREFIX = CLASS_PREFIX + "opintopolku.";
+    private static final String EXPORT_CLASS_PREFIX = CLASS_PREFIX + "export.";
 
-    @Cacheable(value = {"SchemaService:getOivaSchema"})
     public Optional<JsonSchema> getOivaSchema(final String entityClass) {
         return getSchema(CLASS_PREFIX + entityClass);
     }
 
-    @Cacheable(value = {"SchemaService:getOpintopolkuSchema"})
     public Optional<JsonSchema> getOpintopolkuSchema(final String entityClass) {
         return getSchema(OPINTOPOLKU_CLASS_PREFIX + entityClass);
+    }
+
+    public Optional<JsonSchema> getExportSchema(final String entityClass) {
+        return getSchema(EXPORT_CLASS_PREFIX + entityClass);
     }
 
     protected Optional<JsonSchema> getSchema(final String entityClass) {
