@@ -54,6 +54,7 @@ public class PebbleService {
         if(lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
         if(lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
         if(lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
+        options.setTemplateName("paatos/base");
 
         return generateHtml(lupa, options);
     }
