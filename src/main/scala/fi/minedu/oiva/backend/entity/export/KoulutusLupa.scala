@@ -29,5 +29,5 @@ class KoulutusLupa(
     @JsonIgnore override def getPaivityspvm = super.getPaivityspvm
 
     def getKoulutukset = koulutukset
-    def setKoulutukset(koulutukset: Collection[String]): Unit = this.koulutukset = if(koulutukset.isEmpty) null else koulutukset
+    def setKoulutukset(koulutukset: Collection[String]): Unit = this.koulutukset = koulutukset
 }
