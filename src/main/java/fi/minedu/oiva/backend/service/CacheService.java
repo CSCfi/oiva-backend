@@ -13,9 +13,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 
 @Service
 public class CacheService {
@@ -34,8 +31,13 @@ public class CacheService {
     @Value("${redis.userSessionPrefix}")
     private String userSessionPrefix;
 
-    public CompletableFuture<Collection<String>> getCacheNames() {
-        return async(() -> cacheManager.getCacheNames());
+    /**
+     * Return all existing cache keys
+     *
+     * @return cache keys
+     */
+    public Collection<String> getCacheNames() {
+        return cacheManager.getCacheNames();
     }
 
     /**

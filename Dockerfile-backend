@@ -1,7 +1,7 @@
 FROM openjdk:8-jre
 MAINTAINER Oiva dev <aki.heikkinen@arcusys.fi>
 
-EXPOSE 8099
+EXPOSE 9099
 
 COPY target/oiva-backend.jar /opt/oiva/backend/oiva-backend.jar
 COPY application-dev.yml /opt/oiva/backend/application.yml

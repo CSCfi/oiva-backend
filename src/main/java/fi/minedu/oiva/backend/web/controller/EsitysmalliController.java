@@ -1,6 +1,8 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Esitysmalli;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
 import fi.minedu.oiva.backend.service.EsitysmalliService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,10 @@ public class EsitysmalliController {
     @Autowired
     private EsitysmalliService service;
 
-    @ApiOperation(notes = "Palauttaa kaikki esitysmallit", value = "")
+    @OivaAccess_Application
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa kaikki esitysmallit", value = "")
     public CompletableFuture<Collection<Esitysmalli>> getAll() {
-        return async(() -> service.getAll());
+        return async(service::getAll);
     }
 }

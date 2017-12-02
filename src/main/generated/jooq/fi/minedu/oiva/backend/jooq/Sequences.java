@@ -59,6 +59,11 @@ public class Sequences {
     public static final Sequence<Long> LUPA_ID_SEQ = new SequenceImpl<Long>("lupa_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
+     * The sequence <code>oiva.lupa_liite_id_seq</code>
+     */
+    public static final Sequence<Long> LUPA_LIITE_ID_SEQ = new SequenceImpl<Long>("lupa_liite_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
      * The sequence <code>oiva.lupatila_id_seq</code>
      */
     public static final Sequence<Long> LUPATILA_ID_SEQ = new SequenceImpl<Long>("lupatila_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

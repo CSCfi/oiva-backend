@@ -15,8 +15,7 @@ public class KohdeService {
     @Autowired
     private DSLContext dsl;
 
-    //@Cacheable(value = {"KohdeService:getAll"}, key = "''")
-    public Collection<Kohde> getAll() {
+    public Collection<Kohde> getAll() { // TODO: IS THIS NEEDED?
         return dsl.select(KOHDE.fields()).from(KOHDE).fetchInto(Kohde.class);
     }
 }

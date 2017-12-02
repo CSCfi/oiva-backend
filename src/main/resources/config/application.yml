@@ -14,8 +14,6 @@ jooq:
 
 api:
     url.prefix: /api
-    public:
-        url.prefix: /public
 
 opintopolku:
     baseUrl: override_this_in_local_application_yml
@@ -79,8 +77,6 @@ spring:
 redis:
     host: override_this_in_local_application_yml
     port: override_this_in_local_application_yml
-    kvstore:
-        keyPrefix: kv.
     userSessionPrefix: spring:session
 
 prince:

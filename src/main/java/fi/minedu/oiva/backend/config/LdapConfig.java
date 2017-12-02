@@ -16,6 +16,7 @@ import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 @Configuration
 public class LdapConfig {
+
     @Value("${ldap.url}")
     private String ldapUrl;
 
@@ -44,16 +45,12 @@ public class LdapConfig {
     private String ldapGroupRoleAttribute;
 
     @Bean
-    //@ConfigurationProperties(prefix="ldap.contextSource")
     public LdapContextSource contextSource() {
-        LdapContextSource contextSource = new LdapContextSource();
-
-        // TODO: replace with @ConfigurationProperties (?)
+        final LdapContextSource contextSource = new LdapContextSource();
         contextSource.setUrl(ldapUrl);
         contextSource.setBase(ldapBasePrefix);
         contextSource.setUserDn(ldapManagerDN);
         contextSource.setPassword(ldapManagerPassword);
-
         return contextSource;
     }
 
@@ -64,13 +61,10 @@ public class LdapConfig {
 
     @Bean
     public LdapAuthoritiesPopulator ldapAuthoritiesPopulator(LdapContextSource contextSource) {
-        DefaultLdapAuthoritiesPopulator populator;
-        populator = new DefaultLdapAuthoritiesPopulator(contextSource, ldapGroupSearchBase);
-
+        final DefaultLdapAuthoritiesPopulator populator = new DefaultLdapAuthoritiesPopulator(contextSource, ldapGroupSearchBase);
         populator.setGroupSearchFilter(ldapGroupSearchFilter);
         populator.setGroupRoleAttribute(ldapGroupRoleAttribute);
         populator.setRolePrefix("");
-
         return populator;
     }
 
@@ -80,11 +74,8 @@ public class LdapConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(LdapUserSearch userSearch,
-                                                 LdapAuthoritiesPopulator ldapAuthoritiesPopulator,
-                                                 UserDetailsContextMapper contextMapper) {
-
-        LdapUserDetailsService service = new LdapUserDetailsService(userSearch, ldapAuthoritiesPopulator);
+    public UserDetailsService userDetailsService(LdapUserSearch userSearch, LdapAuthoritiesPopulator ldapAuthoritiesPopulator, UserDetailsContextMapper contextMapper) {
+        final LdapUserDetailsService service = new LdapUserDetailsService(userSearch, ldapAuthoritiesPopulator);
         service.setUserDetailsMapper(contextMapper);
         return service;
     }

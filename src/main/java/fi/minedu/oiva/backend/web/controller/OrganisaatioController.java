@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.OpintopolkuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,23 +25,27 @@ public class OrganisaatioController {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
+    @OivaAccess_Public
     @RequestMapping("/{oid:.+}/raw")
-    public CompletionStage<String> get(@PathVariable String oid) {
+    public CompletionStage<String> get(final @PathVariable String oid) {
         return opintopolkuService.getOrganisaatioAsRaw(oid);
     }
 
+    @OivaAccess_Public
     @RequestMapping("/{oid:.+}")
-    public CompletionStage<Organisaatio> getAsEntity(@PathVariable String oid) {
+    public CompletionStage<Organisaatio> getAsEntity(final @PathVariable String oid) {
         return opintopolkuService.getOrganisaatio(oid);
     }
 
+    @OivaAccess_Public
     @RequestMapping("/block/{oid:.+}")
-    public Organisaatio getAsEntityBlocking(@PathVariable String oid) {
+    public Organisaatio getAsEntityBlocking(final @PathVariable String oid) {
         return opintopolkuService.getBlockingOrganisaatio(oid);
     }
 
+    @OivaAccess_Public
     @RequestMapping(method = GET)
-    public CompletionStage<String> getMany(@RequestParam String[] oids) {
+    public CompletionStage<String> getMany(final @RequestParam String[] oids) {
         return opintopolkuService.getOrganisaatiosAsCSString(oids);
     }
 }

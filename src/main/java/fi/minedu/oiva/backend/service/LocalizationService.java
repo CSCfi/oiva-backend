@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-
 @Service
 public class LocalizationService {
 
@@ -32,39 +31,34 @@ public class LocalizationService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public Optional<JsonNode> getTranslations(String localeStr) {
+    public Optional<JsonNode> getTranslations(final String lang) {
         final ObjectMapper mapper = new ObjectMapper();
-        final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + localeStr + ".json");
+        final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + lang + ".json");
         try {
             return Optional.ofNullable(mapper.readTree(is));
 
-        } catch (IOException e) {
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace();
-            }
+        } catch (IOException ioe) {
+            logger.error("Failed to get translation", ioe);
             return Optional.empty();
         }
     }
 
-    @Cacheable(value = "translationsCache", key = "#localeStr")
-    public Map<String, String> getTranslationsREST(String localeStr) {
-        Map<String, String> transMap = new HashMap<>();
+    @Cacheable(value = "LocalizationService:get", key = "#lang")
+    public Map<String, String> getTranslationsWS(final String lang) {
+        final Map<String, String> translations = new HashMap<>();
         try {
-            JsonNode json = ObjectMapperSingleton.mapper.readTree(restTemplate.getForObject(String.format(localizationUrl + urlSuffix, localeStr), String.class));
+            final JsonNode json = ObjectMapperSingleton.mapper.readTree(restTemplate.getForObject(String.format(localizationUrl + urlSuffix, lang), String.class));
             if (json.isArray()) {
                 for (final JsonNode translation : json) {
-                    transMap.put(translation.get("key").asText(), translation.get("value").asText());
+                    translations.put(translation.get("key").asText(), translation.get("value").asText());
                 }
             }
-
-        } catch (IOException e) {
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace();
-            }
+        } catch (IOException ioe) {
+            logger.error("Failed to get translation", ioe);
         }
-        return transMap;
+        return translations;
     }
 
-    @CacheEvict(value = "translationsCache", allEntries = true)
+    @CacheEvict(value = "LocalizationService", allEntries = true)
     public void refreshTranslations() {}
 }

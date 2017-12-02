@@ -7,7 +7,7 @@ import org.springframework.security.core.AuthenticationException;
 public class DummyAuthManager implements AuthenticationManager {
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
         return authentication;
     }
 }

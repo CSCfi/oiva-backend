@@ -15,8 +15,7 @@ public class PaatoskierrosService {
     @Autowired
     private DSLContext dsl;
 
-    //@Cacheable(value = {"PaatoskierrosService:getAll"}, key = "''")
-    public Collection<Paatoskierros> getAll() {
+    public Collection<Paatoskierros> getAll() { // TODO: IS THIS NEEDED?
         return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS).fetchInto(Paatoskierros.class);
     }
 }

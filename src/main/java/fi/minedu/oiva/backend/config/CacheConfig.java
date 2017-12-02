@@ -13,13 +13,14 @@ import org.springframework.data.redis.core.RedisTemplate;
 @EnableCaching
 @Profile({"!test"})
 public class CacheConfig {
+
     @Autowired
-    RedisTemplate redisTemplate;
+    private RedisTemplate redisTemplate;
 
     @Bean
-    CacheManager cacheManager() {
-        RedisCacheManager cm = new RedisCacheManager(redisTemplate);
-        cm.setUsePrefix(true);
-        return cm;
+    public CacheManager cacheManager() {
+        final RedisCacheManager manager = new RedisCacheManager(redisTemplate);
+        manager.setUsePrefix(true);
+        return manager;
     }
 }

@@ -20,8 +20,7 @@ public class OIDArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
-        throws Exception {
-        return SecurityUtil.roleOIDs(Arrays.asList(parameter.getParameterAnnotation(OIDs.class).value()));
+        final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) throws Exception {
+        return SecurityUtil.roleOids(Arrays.asList(parameter.getParameterAnnotation(OIDs.class).value()));
     }
 }

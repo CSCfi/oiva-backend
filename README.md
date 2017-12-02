@@ -274,30 +274,20 @@ Tällöin asetukset ovat hardkoodattuina paketin sisällä, eikä ulkoista konfi
 
 ## Julkaisut
 
-Käytössä Maven release plugin. Plugin kysyy ajettaessa tehtävää julkaisuversiota (esim 1.1.2), ja tämän jälkeistä 
-snapshot-versiota (esim 1.2.0-SNAPHOT). Plugin hoitaa tagien tekemisen ja puskemisen gittiin automaattisesti, joten
-oma git-tunnus ja -salasana on annettava ajon yhteydessä.
+Julkaisun tekemistä varten on luotu release.sh skripti joka tekee tarvittavat git-komennot sekä käyttää Maven release pluginia.
+Ilman parametreja skripti suorittaa dry-run tyyppisen ajon (testaamista varten). Mikäli virallinen julkaisu halutaan tehdä niin
+skriptille tulee syöttää argumentti: publish
 
 ### Komennot
 
-**HUOM!** Release-plugin suorittaa oletuksena kaikki testit, joten varmista että kohdan `Testit` vaatimat määritykset on tehty ennenkuin ajat release-komentoja
+Kokeile julkaisua (suorittaa dry-run ajon)
 
-Kokeile julkaisua:
-
-    $ mvn release:prepare -DdryRun=true -Dusername=<your username> -P dev
+    $ ./release.sh
   
 Poista release pluginin tekemät tiedostot kokeilun jälkeen:
 
-    $ mvn release:clean
+    $ ./release.sh clean
     
 Tee oikea julkaisu:
 
-    $ mvn release:prepare -Dusername=<your username> -P dev
-
-Jos haluaa elää vaarallisesti, niin testien skippaaminen onnistuu lisäämalla argumentti
-    -Darguments="-DskipTests"
-
-## TODO
-
-* REST-kutsujen cachetus (nginx?)
-* Staattisten assettien forever cache
+    $ ./release.sh publish

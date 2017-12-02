@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LocalizationService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +26,15 @@ public class LocalizationController {
     @Autowired
     private LocalizationService service;
 
-    @ApiOperation(notes = "Proxyttää lokalisaation Opintopolun lokalisaatiopalvelusta.", value = "")
+    @OivaAccess_Public
     @RequestMapping(method = GET)
+    @ApiOperation(notes = "Palauttaa kielikäännöksen opintopolun lokalisaatiopalvelusta", value = "")
     public CompletableFuture<Map<String, String>> getTranslations(
-        @RequestParam(defaultValue = "fi") String lang,
-        @RequestParam(defaultValue = "false") Boolean refresh) {
+        final @RequestParam(defaultValue = "fi") String lang,
+        final @RequestParam(defaultValue = "false") Boolean refresh) {
         return async(() -> {
-            if (refresh) {
-                service.refreshTranslations();
-            }
-            return service.getTranslationsREST(lang);
+            if(refresh) service.refreshTranslations();
+            return service.getTranslationsWS(lang);
         });
     }
 }

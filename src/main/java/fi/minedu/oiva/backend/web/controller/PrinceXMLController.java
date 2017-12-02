@@ -1,10 +1,13 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.entity.Liite;
 import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
 import fi.minedu.oiva.backend.service.PrinceXMLService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,7 @@ import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
 public class PrinceXMLController {
 
     private static final Logger logger = LoggerFactory.getLogger(PrinceXMLController.class);
+
     public static final String APPLICATION_PDF = "application/pdf";
 
     public static final String path = "/pdf";
@@ -47,10 +51,13 @@ public class PrinceXMLController {
     @Autowired
     private LupaService lupaService;
 
-    @ResponseBody
+    @OivaAccess_Public
     @RequestMapping(value = "/**")
+    @ResponseBody
+    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
     public void renderPDF(final HttpServletResponse response, final HttpServletRequest request,
-        @RequestParam(value = "debug", required = false) final String debugMode) {
+        final @RequestParam(value = "debug", required = false) String debugMode) {
+
         final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
         try {
             final Optional<Lupa> lupaOpt = lupaService.get(diaarinumero, withAll);
@@ -60,7 +67,17 @@ public class PrinceXMLController {
                 options.setDebugMode(null != debugMode);
                 final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
                 if (htmlOpt.isPresent()) {
-                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(Attachment.tutkintoNimenMuutos);
+
+                    lupaService.getAttachments(lupa.getId()).stream().forEach(attachment -> {
+                        if(AttachmentType.convert(attachment.getTyyppi()) != null) {
+                            options.addAttachment(AttachmentType.convert(attachment.getTyyppi()), attachment.getPolku());
+                        }
+
+                    });
+
+                    // TODO: lisää pdf kantaan tarvittaville luville
+                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
+
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
