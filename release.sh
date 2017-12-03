@@ -13,6 +13,8 @@ if [[ $1 == "publish" ]]; then
 		git merge --no-ff -m "Merge latest development version" develop
 		mvn release:prepare -Dusername=git -P dev
 		git checkout develop
+		git merge --no-ff -m "Update next development version number" master
+		git push
 	else
 		echo "Release preparation cancelled"
 	fi
