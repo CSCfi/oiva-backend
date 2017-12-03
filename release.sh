@@ -11,7 +11,7 @@ if [[ $1 == "publish" ]]; then
 		    mvn release:clean
 		fi
 		git merge --no-ff -m "Merge latest development version" develop
-		mvn release:prepare -DupdateWorkingCopyVersions=false -Dusername=git -P dev
+		mvn release:prepare -Dusername=git -P dev
 		git checkout develop
 	else
 		echo "Release preparation cancelled"
@@ -27,5 +27,5 @@ else
 	if [ -f ./pom.xml.tag ]; then
 	    mvn release:clean
 	fi
-	mvn release:prepare -DupdateWorkingCopyVersions=false -DdryRun=true -Dusername=git -P dev
+	mvn release:prepare -DdryRun=true -Dusername=git -P dev
 fi
