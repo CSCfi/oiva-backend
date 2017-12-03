@@ -12,6 +12,7 @@ if [[ $1 == "publish" ]]; then
 		fi
 		git merge --no-ff -m "Merge latest development version" develop
 		mvn release:prepare -DupdateWorkingCopyVersions=false -Dusername=git -P dev
+		git checkout develop
 	else
 		echo "Release preparation cancelled"
 	fi
