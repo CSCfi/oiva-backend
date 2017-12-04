@@ -176,9 +176,6 @@ Juuripolku tulee määrittää sovelluksen konfiguraatioissa (ks. alla) ja versi
 Määritä sovelluksen application.yml tiedoston ``templates.base.path`` osoittamaan juurikansioon josta templatet löytyvät (tämä on templaten **juuripolku**). Esimerkiksi jos templatet löytyvät
 polusta /opt/oiva/backend/template niin ko. asetuksen tulee olla ``templates.base.path: /opt/oiva/backend/``
 
-**Huom!** pebble-templatet sisältävät seuraavanlaisia viittauksia ``{% extends "template/default/basetemplate.html" %}`` jonka johdosta ``templates.base.path`` asetus
-tulee määrittää siten että se täydentää (absoluuttisen)polun alkuosan (huomio / merkki)
-
 Joissain tilanteissa ``oiva.hakukierros`` tietokantatauluun on voitu määritetty omat templatepolut ``templatepath`` sarakeeseen (tämä on templaten **versiopolku**). Tämä ei ole pakollista, sillä mikäli
 ko. kenttä on tyhjä niin sovellus käyttää oletustemplateja (template/default/). 
 
