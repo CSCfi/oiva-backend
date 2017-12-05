@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -87,10 +86,5 @@ public class CacheService {
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Cache pre-population finished in {}ms", duration);
         return duration;
-    }
-
-    private Cache cache(final String cacheName) {
-        logger.info("Pre-populating cache: {}", cacheName);
-        return cacheManager.getCache(cacheName);
     }
 }
