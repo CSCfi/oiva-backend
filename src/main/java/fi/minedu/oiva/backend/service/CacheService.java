@@ -23,6 +23,9 @@ public class CacheService {
     private RedisTemplate redisTemplate;
 
     @Autowired
+    private LupaService lupaService;
+
+    @Autowired
     private KoodistoService koodistoService;
 
     @Autowired
@@ -71,14 +74,15 @@ public class CacheService {
 
         final long startTime = System.currentTimeMillis();
 
-        cache("KoodistoService:getMaakuntaKunnat").put("", koodistoService.getMaakuntaKunnat());
-        cache("KoodistoService:getKoulutustoimijat").put("", koodistoService.getKoulutustoimijat());
-        cache("KoodistoService:getMaakuntaJarjestajat").put("", koodistoService.getMaakuntaJarjestajat());
-        cache("KoodistoService:getKunnat").put("", koodistoService.getKunnat());
-        cache("KoodistoService:getKielet").put("", koodistoService.getKielet());
-        cache("KoodistoService:getOpetuskielet").put("", koodistoService.getOpetuskielet());
-        cache("KoodistoService:getAluehallintovirastoKuntaMap").put("", koodistoService.getKuntaAluehallintovirastoMap());
-        cache("KoodistoService:getKuntaMaakuntaMap").put("", koodistoService.getKuntaMaakuntaMap());
+        koodistoService.getMaakuntaKunnat();
+        koodistoService.getKoulutustoimijat();
+        koodistoService.getMaakuntaJarjestajat();
+        koodistoService.getKunnat();
+        koodistoService.getKielet();
+        koodistoService.getOpetuskielet();
+        koodistoService.getKuntaAluehallintovirastoMap();
+        koodistoService.getKuntaMaakuntaMap();
+        lupaService.getAll(RecordMapping.withAll);
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Cache pre-population finished in {}ms", duration);

@@ -32,6 +32,7 @@ case class KoodistoKoodi(
         case _ => false
     }
     @JsonIgnore def isKoodi(koodistoValue: String, koodiValue: String): Boolean = koodistoValue == getKoodistoUri && koodiValue == getKoodiArvo
+    @JsonIgnore def koodiUri = if(null != getKoodistoUri && null != koodiArvo) getKoodistoUri + "_" + koodiArvo else null
 
     @JsonIgnore def isValidDate = voimassaLoppuPvm == null ||
         (try { LocalDate.parse(voimassaLoppuPvm).isAfter(LocalDate.now()) } catch { case e: DateTimeParseException => true })
