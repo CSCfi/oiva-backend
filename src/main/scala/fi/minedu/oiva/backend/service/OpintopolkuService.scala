@@ -38,18 +38,15 @@ class OpintopolkuService extends CacheAware {
     private val koodistoServiceUrl: String = null
 
     // Koodisto relaatiot
-    private lazy val relaatioAlakoodiUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-alakoodit/"
-    private lazy val relaatioYlakoodiUrl: String = koodistoServiceUrl + "/relaatio/sisaltyy-ylakoodit/"
+    private lazy val relaatioAlakoodiPath: String = "/relaatio/sisaltyy-alakoodit/"
+    private lazy val relaatioYlakoodiPath: String = "/relaatio/sisaltyy-ylakoodit/"
 
     // Koodisto koodit
-    private lazy val alueHallintovirastoKoodiUrl: String = koodistoServiceUrl + "/aluehallintovirasto/koodi/"
-    private lazy val maakuntaKoodiUrl: String = koodistoServiceUrl + "/maakunta/koodi/"
-    private lazy val kuntaKoodiUrl: String = koodistoServiceUrl + "/kunta/koodi/"
-    private lazy val koulutusAlaOph2002KoodiUrl: String = koodistoServiceUrl + "/koulutusalaoph2002/koodi/"
-    private lazy val koulutusKoodiUrl: String = koodistoServiceUrl + "/koulutus/koodi/"
-    private lazy val koulutusOsaamisalaKoodiUrl: String = koodistoServiceUrl + "/osaamisala/koodi/"
-    private lazy val kieliKoodiUrl: String = koodistoServiceUrl + "/kieli/koodi/"
-    private lazy val oppilaitoksenOpetuskieliKoodiUrl: String = koodistoServiceUrl + "/oppilaitoksenopetuskieli/koodi"
+    private lazy val alueHallintovirastoKoodiPath: String = "/aluehallintovirasto/koodi/"
+    private lazy val maakuntaKoodiPath: String = "/maakunta/koodi/"
+    private lazy val kuntaKoodiPath: String = "/kunta/koodi/"
+    private lazy val kieliKoodiPath: String = "/kieli/koodi/"
+    private lazy val oppilaitoksenOpetuskieliKoodiPath: String = "/oppilaitoksenopetuskieli/koodi"
 
     def koodistoKoodiUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}/koodi/"
     def koodiUri(koodistoUri: String, koodiArvo: String): String = s"${koodistoUri}_${koodiArvo}"
@@ -160,8 +157,8 @@ class OpintopolkuService extends CacheAware {
      * Hakee ja palauttaa maakunnat ja maakuntaan kuuluvat kaikki kunnat
      */
     def getMaakuntaKunnat: java.util.List[Maakunta] =
-        for (maakunta <- request(maakuntaKoodiUrl, classOf[Array[Maakunta]]).toList) yield {
-            maakunta.setKunta(request(relaatioYlakoodiUrl + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]]))
+        for (maakunta <- request(koodistoServiceUrl + maakuntaKoodiPath, classOf[Array[Maakunta]]).toList) yield {
+            maakunta.setKunta(request(koodistoServiceUrl + relaatioYlakoodiPath + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]]))
             maakunta
         }
 
@@ -189,19 +186,19 @@ class OpintopolkuService extends CacheAware {
     def getKoodi(maarays: Maarays): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodi(maarays.getKoodisto, maarays.getKoodiarvo))
     def getKoodi(koodistoUri: String, koodiArvo: String) = getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo))
 
-    def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiUrl)
+    def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiPath)
 
-    def getMaakuntaKoodit = getKoodistoKooditList(maakuntaKoodiUrl)
+    def getMaakuntaKoodit = getKoodistoKooditList(maakuntaKoodiPath)
 
-    def getKunnatKoodit = getKoodistoKooditList(kuntaKoodiUrl)
-    def getKuntaKoodi(koodiArvo: String): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodistoKoodiBlocking(kuntaKoodiUrl, kuntaKoodiUri(koodiArvo)))
-    def getKuntaKooditForAlueHallintovirasto(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + aluehallintovirastoKoodiUri(koodiArvo))
-    def getKuntaKooditForMaakunta(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiUrl + maakuntaKoodiUri(koodiArvo))
+    def getKunnatKoodit = getKoodistoKooditList(kuntaKoodiPath)
+    def getKuntaKoodi(koodiArvo: String): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodistoKoodiBlocking(koodistoServiceUrl + kuntaKoodiPath, kuntaKoodiUri(koodiArvo)))
+    def getKuntaKooditForAlueHallintovirasto(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + aluehallintovirastoKoodiUri(koodiArvo))
+    def getKuntaKooditForMaakunta(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + maakuntaKoodiUri(koodiArvo))
 
-    def getKieliKoodit = getKoodistoKooditList(kieliKoodiUrl)
-    def getKieliKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(kieliKoodiUrl, kieliKoodiUri(koodiArvo.toLowerCase))
+    def getKieliKoodit = getKoodistoKooditList(kieliKoodiPath)
+    def getKieliKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koodistoServiceUrl + kieliKoodiPath, kieliKoodiUri(koodiArvo.toLowerCase))
 
-    def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiUrl)
+    def getOppilaitoksenOpetuskieliKoodit = getKoodistoKooditList(oppilaitoksenOpetuskieliKoodiPath)
 
     // maakunta ja kunta
     def getMaakuntaKoodiForKunta(koodiArvo: String): Optional[KoodistoKoodi] = {
@@ -209,7 +206,7 @@ class OpintopolkuService extends CacheAware {
         if(!maakuntaKoodit.isEmpty) Optional.ofNullable(maakuntaKoodit.head) else Optional.empty()
     }
 
-    def getKuntaAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + kuntaKoodiUri(koodiArvo))
+    def getKuntaAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + kuntaKoodiUri(koodiArvo))
 
     // koulutus
     def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): Optional[java.util.List[KoodistoKoodi]] =
@@ -220,27 +217,21 @@ class OpintopolkuService extends CacheAware {
         if(!koulutusalaKoodit.isEmpty) Optional.ofNullable(koulutusalaKoodit.head) else Optional.empty()
     }
 
-    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo))
+    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + koulutusKoodiUri(koodiArvo))
 
-//    def getKoulutusKooditForKoulutustyyppi = getKoodistoKooditList(relaatioYlakoodiUrl + koulutustyyppiKoodiUri("1"), true)
-//    def getKoulutusKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusKoodiUrl, koulutusKoodiUri(koodiArvo))
-//    def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiUrl + koulutusKoodiUri(koodiArvo), true)
-//    def getKoulutusAlaOph2002Koodisto(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusAlaOph2002KoodiUrl, koulutusAlaOph2002KoodiUri(koodiArvo))
-//    def getKoulutusOsaamisalaKoodisto(koodiArvo: String) = getKoodistoKoodiBlocking(koulutusOsaamisalaKoodiUrl, osaamisalaKoodiUri(koodiArvo))
+    private def getKoodistoKooditList(koodistoKoodiPath: String, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
+        getKoodistoKooditBlocking(koodistoKoodiPath).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
 
-    private def getKoodistoKooditList(koodistoKoodiUrl: String, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
-        getKoodistoKooditBlocking(koodistoKoodiUrl).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
-
-    private def getKoodistoKooditBlocking(koodistoKoodiUrl: String): Array[KoodistoKoodi] =
-        try requestKoodistoKoodit(koodistoKoodiUrl).toCompletableFuture.join
+    private def getKoodistoKooditBlocking(koodistoKoodiPath: String): Array[KoodistoKoodi] =
+        try requestKoodistoKoodit(koodistoKoodiPath).toCompletableFuture.join
         catch { case e: Exception => Array.empty }
 
     private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String): KoodistoKoodi =
         try requestKoodistoKoodi(koodistoUrl, koodiUri).toCompletableFuture.join
         catch { case e: Exception => KoodistoKoodi.notFound(koodiUri) }
 
-    private def requestKoodistoKoodit(koodistoKoodiUrl: String) =
-        cacheRx(koodistoKoodiUrl) { requestRx(koodistoKoodiUrl, classOf[Array[KoodistoKoodi]]) }
+    private def requestKoodistoKoodit(koodistoKoodiPath: String) =
+        cacheRx(koodistoKoodiPath) { requestRx(koodistoServiceUrl + koodistoKoodiPath, classOf[Array[KoodistoKoodi]]) }
 
     private def requestKoodistoKoodi(koodistoKoodiUrl: String, koodiUri: String) =
         cacheRx(koodiUri) { requestRx(koodistoKoodiUrl + koodiUri, classOf[KoodistoKoodi]) }
