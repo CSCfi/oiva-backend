@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +20,9 @@ public class CacheService {
 
     @Autowired
     private RedisTemplate redisTemplate;
+
+    @Autowired
+    private LupaService lupaService;
 
     @Autowired
     private KoodistoService koodistoService;
@@ -71,22 +73,18 @@ public class CacheService {
 
         final long startTime = System.currentTimeMillis();
 
-        cache("KoodistoService:getMaakuntaKunnat").put("", koodistoService.getMaakuntaKunnat());
-        cache("KoodistoService:getKoulutustoimijat").put("", koodistoService.getKoulutustoimijat());
-        cache("KoodistoService:getMaakuntaJarjestajat").put("", koodistoService.getMaakuntaJarjestajat());
-        cache("KoodistoService:getKunnat").put("", koodistoService.getKunnat());
-        cache("KoodistoService:getKielet").put("", koodistoService.getKielet());
-        cache("KoodistoService:getOpetuskielet").put("", koodistoService.getOpetuskielet());
-        cache("KoodistoService:getAluehallintovirastoKuntaMap").put("", koodistoService.getKuntaAluehallintovirastoMap());
-        cache("KoodistoService:getKuntaMaakuntaMap").put("", koodistoService.getKuntaMaakuntaMap());
+        koodistoService.getMaakuntaKunnat();
+        koodistoService.getKoulutustoimijat();
+        koodistoService.getMaakuntaJarjestajat();
+        koodistoService.getKunnat();
+        koodistoService.getKielet();
+        koodistoService.getOpetuskielet();
+        koodistoService.getKuntaAluehallintovirastoMap();
+        koodistoService.getKuntaMaakuntaMap();
+        lupaService.getAll(RecordMapping.withAll);
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Cache pre-population finished in {}ms", duration);
         return duration;
-    }
-
-    private Cache cache(final String cacheName) {
-        logger.info("Pre-populating cache: {}", cacheName);
-        return cacheManager.getCache(cacheName);
     }
 }
