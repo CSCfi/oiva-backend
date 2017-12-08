@@ -22,18 +22,65 @@ public class KoodistoService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
-    public Koodisto getKoodisto(final String koodisto, final Integer koodistoVersio) {
-        return opintopolkuService.getKoodisto(koodisto, koodistoVersio);
+    /**
+     * Hae koodisto koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @param koodistoUri koodisto uri
+     * @param koodistoVersio koodisto versio
+     * @return koodisto
+     */
+    public Koodisto getKoodisto(final String koodistoUri, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodisto(koodistoUri, koodistoVersio);
     }
 
-    @Cacheable(value = "KoodistoService:getKoodit", key="{#koodisto, #koodistoVersio}")
-    public List<KoodistoKoodi> getKoodit(final String koodisto, final Integer koodistoVersio) {
-        return opintopolkuService.getKoodit(koodisto, koodistoVersio);
+    /**
+     * Hae kaikki koodiston koodit koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @param koodistoUri koodisto uri
+     * @param koodistoVersio koodisto versio
+     * @return Koodiston koodit
+     */
+    public List<KoodistoKoodi> getKoodit(final String koodistoUri, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodit(koodistoUri, koodistoVersio);
     }
 
-    @Cacheable(value = "KoodistoService:getKoodi", key="{#koodisto, #koodi, #koodistoVersio}")
-    public KoodistoKoodi getKoodi(final String koodisto, final String koodi, final Integer koodistoVersio) {
-        return opintopolkuService.getKoodi(koodisto, koodi, koodistoVersio);
+    /**
+     * Hae koodi koodistoUrin, koodin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @param koodistoUri koodisto uri
+     * @param koodiArvo koodiarvo
+     * @param koodistoVersio koodisto versio
+     * @return Koodi
+     */
+    public KoodistoKoodi getKoodi(final String koodistoUri, final String koodiArvo, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodi(koodistoUri, koodiArvo, koodistoVersio);
+    }
+
+    /**
+     * Hae maakunta koodit. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @return maakunta koodit
+     */
+    public List<KoodistoKoodi> getMaakunnat() {
+        return opintopolkuService.getMaakuntaKoodit();
+    }
+
+    /**
+     * Hae kunta koodit. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @return kunta koodit
+     */
+    public List<KoodistoKoodi> getKunnat() {
+        return opintopolkuService.getKuntaKoodit();
+    }
+
+    /**
+     * Hae kieli koodit. Välimuistitetaan OpintopolkuService -palvelussa
+     *
+     * @return kieli koodit
+     */
+    public List<KoodistoKoodi> getKielet() {
+        return opintopolkuService.getKieliKoodit();
     }
 
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
@@ -51,24 +98,9 @@ public class KoodistoService {
         return opintopolkuService.getMaakuntaJarjestajat();
     }
 
-    @Cacheable(value = "KoodistoService:getMaakunnat", key = "''")
-    public List<KoodistoKoodi> getMaakunnat() {
-        return opintopolkuService.getMaakuntaKoodit();
-    }
-
-    @Cacheable(value = "KoodistoService:getKunnat", key = "''")
-    public List<KoodistoKoodi> getKunnat() {
-        return opintopolkuService.getKunnatKoodit();
-    }
-
     @Cacheable(value = "KoodistoService:getKunta")
     public KoodistoKoodi getKunta(final String koodi) {
         return opintopolkuService.getKuntaKoodi(koodi).orElseGet(null);
-    }
-
-    @Cacheable(value = "KoodistoService:getKielet", key = "''")
-    public List<KoodistoKoodi> getKielet() {
-        return opintopolkuService.getKieliKoodit();
     }
 
     @Cacheable(value = {"KoodistoService:getKieli"})
@@ -95,7 +127,7 @@ public class KoodistoService {
     }
 
     @Cacheable(value = "KoodistoService:getAluehallintovirastoKuntaMap", key = "''")
-    public Map<String, KoodistoKoodi> getKuntaAluehallintovirastoMap() {
+    public Map<String, KoodistoKoodi> getKuntaAluehallintovirastoMap() { // TODO: NOT USED, REMOVE?
         final Map<String, KoodistoKoodi> map = new HashMap<>();
         opintopolkuService.getAlueHallintovirastoKoodit().stream().forEach(
             avi -> opintopolkuService.getKuntaKooditForAlueHallintovirasto(avi.koodiArvo()).stream().forEach(
@@ -104,7 +136,7 @@ public class KoodistoService {
     }
 
     @Cacheable(value = "KoodistoService:getKuntaMaakuntaMap", key = "''")
-    public Map<String, KoodistoKoodi> getKuntaMaakuntaMap() {
+    public Map<String, KoodistoKoodi> getKuntaMaakuntaMap() { // TODO: NOT USED, REMOVE?
         final Map<String, KoodistoKoodi> map = new HashMap<>();
         opintopolkuService.getMaakuntaKoodit().stream().forEach(
             maakunta -> opintopolkuService.getKuntaKooditForMaakunta(maakunta.koodiArvo()).stream().forEach(
