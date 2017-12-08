@@ -48,7 +48,9 @@ class OpintopolkuService extends CacheAware {
     private lazy val kieliKoodiPath: String = "/kieli/koodi/"
     private lazy val oppilaitoksenOpetuskieliKoodiPath: String = "/oppilaitoksenopetuskieli/koodi"
 
-    def koodistoKoodiUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}/koodi/"
+    def koodistoKooditPath(koodistoUri: String) = s"/${koodistoUri}/koodi"
+    def koodistoUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}"
+    def koodistoKoodiUrl(koodistoUri: String) = koodistoServiceUrl + koodistoKooditPath(koodistoUri) + "/"
     def koodiUri(koodistoUri: String, koodiArvo: String): String = s"${koodistoUri}_${koodiArvo}"
 
     // Koodi urit
@@ -185,6 +187,19 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
+    /**
+      * Get Koodisto information without caching it
+      *
+      * @param koodistoUri path to koodisto
+      * @param koodistoVersio version, if not present get latest
+      * @return Koodisto information
+      */
+    def getKoodisto(koodistoUri: String, koodistoVersio: Integer = null): Koodisto =
+        getKoodistoBlocking(koodistoUri, koodistoVersio)
+
+    def getKoodit(koodistoUri: String, koodistoVersio: Integer) =
+        getKoodistoKooditList(koodistoKooditPath(koodistoUri), koodistoVersio)
+
     def getKoodi(maarays: Maarays): Optional[KoodistoKoodi] =
         Optional.ofNullable(getKoodi(maarays.getKoodisto, maarays.getKoodiarvo, maarays.getKoodistoversio))
 
@@ -224,6 +239,19 @@ class OpintopolkuService extends CacheAware {
 
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + koulutusKoodiUri(koodiArvo))
 
+    /**
+      * Get Koodisto. Use cache only if koodistoVersion is explicitely provided
+      *
+      * @param koodistoUri Koodisto uri
+      * @param koodistoVersio Koodisto version
+      * @return Koodisto
+      */
+    private def getKoodistoBlocking(koodistoUri: String, koodistoVersio: Integer = null): Koodisto =
+        try {
+            if(null != koodistoVersio) cacheRx(koodistoUri, koodistoVersio) { requestKoodisto(koodistoUri, koodistoVersio) }.toCompletableFuture.join()
+            else requestKoodisto(koodistoUri, koodistoVersio).toCompletableFuture.join()
+        } catch { case e: Exception => Koodisto.notFound(koodistoUri, koodistoVersio) }
+
     private def getKoodistoKooditList(koodistoKoodiPath: String, koodistoVersio: Integer = null, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
         getKoodistoKooditBlocking(koodistoKoodiPath, koodistoVersio).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
 
@@ -231,9 +259,12 @@ class OpintopolkuService extends CacheAware {
         try requestKoodistoKoodit(koodistoKoodiPath, koodistoVersio).toCompletableFuture.join
         catch { case e: Exception => Array.empty }
 
-    private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String, koodistoVersio: Integer = null): KoodistoKoodi = // TODO: REMOVE OPTIONAL PARAMETER?
+    private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String, koodistoVersio: Integer = null): KoodistoKoodi =
         try requestKoodistoKoodi(koodistoUrl, koodiUri, koodistoVersio).toCompletableFuture.join
         catch { case e: Exception => KoodistoKoodi.notFound(koodiUri) }
+
+    private def requestKoodisto(koodistoUri: String, koodistoVersio: Integer) =
+        requestRx(withKoodistoVersio(koodistoUrl(koodistoUri), koodistoVersio), classOf[Koodisto])
 
     private def requestKoodistoKoodit(koodistoKoodiPath: String, koodistoVersio: Integer) =
         cacheRx(koodistoKoodiPath, koodistoVersio) {

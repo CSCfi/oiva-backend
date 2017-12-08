@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
+import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
@@ -21,8 +22,13 @@ public class KoodistoService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
-    public KoodistoKoodi getKoodi(final String koodisto, final String koodi) {
-        return getKoodi(koodisto, koodi, null);
+    public Koodisto getKoodisto(final String koodisto, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodisto(koodisto, koodistoVersio);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoodit", key="{#koodisto, #koodistoVersio}")
+    public List<KoodistoKoodi> getKoodit(final String koodisto, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodit(koodisto, koodistoVersio);
     }
 
     @Cacheable(value = "KoodistoService:getKoodi", key="{#koodisto, #koodi, #koodistoVersio}")

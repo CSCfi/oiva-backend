@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
@@ -30,10 +32,38 @@ public class KoodistoController {
     private KoodistoService service;
 
     @OivaAccess_Public
+    @RequestMapping(value = "/koodisto/{koodistoUri}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun uusimman koodiston koodistoUrin perusteella", value = "")
+    public CompletableFuture<Koodisto> getKoodisto(final @PathVariable String koodistoUri) {
+        return async(() -> service.getKoodisto(koodistoUri, null));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koodisto/{koodistoUri}/{koodistoVersio:[0-9]+}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koodiston koodistoUrin ja koodistoVersion perusteella", value = "")
+    public CompletableFuture<Koodisto> getKoodisto(final @PathVariable String koodistoUri, final @PathVariable Integer koodistoVersio) {
+        return async(() -> service.getKoodisto(koodistoUri, koodistoVersio));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koodit/{koodistoUri}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun uusimmat koodiston koodit koodistoUrin perusteella", value = "")
+    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri) {
+        return async(() -> service.getKoodit(koodistoUri, null));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koodit/{koodistoUri}/{koodistoVersio:[0-9]+}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koodiston koodit koodistoUrin ja koodistoVersion perusteella", value = "")
+    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri, final @PathVariable Integer koodistoVersio) {
+        return async(() -> service.getKoodit(koodistoUri, koodistoVersio));
+    }
+
+    @OivaAccess_Public
     @RequestMapping(value = "/koodi/{koodisto}/{koodi}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun uusimman koodistoversion koodin koodiston ja kooriarvon perusteella", value = "")
     public CompletableFuture<KoodistoKoodi> getKoodi(final @PathVariable String koodisto, final @PathVariable String koodi) {
-        return async(() -> service.getKoodi(koodisto, koodi));
+        return async(() -> service.getKoodi(koodisto, koodi, null));
     }
 
     @OivaAccess_Public
