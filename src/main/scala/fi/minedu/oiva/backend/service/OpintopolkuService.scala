@@ -61,6 +61,8 @@ class OpintopolkuService extends CacheAware {
     def osaamisalaKoodiUri(koodiArvo: String) = s"osaamisala_${koodiArvo}"
     def kieliKoodiUri(koodiArvo: String) = s"kieli_${koodiArvo}"
 
+    def koodistoVersio(versio: Integer) = if(null != versio) s"koodistoVersio=${versio}" else ""
+
     @Value("${opintopolku.baseUrl}${opintopolku.autentikaatio.restUrl}")
     private val authenticationServiceUrl: String = null
     private lazy val securityCheckUrl: String = authenticationServiceUrl + "/j_spring_cas_security_check"
@@ -183,8 +185,11 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    def getKoodi(maarays: Maarays): Optional[KoodistoKoodi] = Optional.ofNullable(getKoodi(maarays.getKoodisto, maarays.getKoodiarvo))
-    def getKoodi(koodistoUri: String, koodiArvo: String) = getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo))
+    def getKoodi(maarays: Maarays): Optional[KoodistoKoodi] =
+        Optional.ofNullable(getKoodi(maarays.getKoodisto, maarays.getKoodiarvo, maarays.getKoodistoversio))
+
+    def getKoodi(koodistoUri: String, koodiArvo: String, koodistoVersio: Integer) =
+        getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo), koodistoVersio)
 
     def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiPath)
 
@@ -219,20 +224,29 @@ class OpintopolkuService extends CacheAware {
 
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + koulutusKoodiUri(koodiArvo))
 
-    private def getKoodistoKooditList(koodistoKoodiPath: String, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
-        getKoodistoKooditBlocking(koodistoKoodiPath).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
+    private def getKoodistoKooditList(koodistoKoodiPath: String, koodistoVersio: Integer = null, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
+        getKoodistoKooditBlocking(koodistoKoodiPath, koodistoVersio).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
 
-    private def getKoodistoKooditBlocking(koodistoKoodiPath: String): Array[KoodistoKoodi] =
-        try requestKoodistoKoodit(koodistoKoodiPath).toCompletableFuture.join
+    private def getKoodistoKooditBlocking(koodistoKoodiPath: String, koodistoVersio: Integer): Array[KoodistoKoodi] =
+        try requestKoodistoKoodit(koodistoKoodiPath, koodistoVersio).toCompletableFuture.join
         catch { case e: Exception => Array.empty }
 
-    private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String): KoodistoKoodi =
-        try requestKoodistoKoodi(koodistoUrl, koodiUri).toCompletableFuture.join
+    private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String, koodistoVersio: Integer = null): KoodistoKoodi = // TODO: REMOVE OPTIONAL PARAMETER?
+        try requestKoodistoKoodi(koodistoUrl, koodiUri, koodistoVersio).toCompletableFuture.join
         catch { case e: Exception => KoodistoKoodi.notFound(koodiUri) }
 
-    private def requestKoodistoKoodit(koodistoKoodiPath: String) =
-        cacheRx(koodistoKoodiPath) { requestRx(koodistoServiceUrl + koodistoKoodiPath, classOf[Array[KoodistoKoodi]]) }
+    private def requestKoodistoKoodit(koodistoKoodiPath: String, koodistoVersio: Integer) =
+        cacheRx(koodistoKoodiPath, koodistoVersio) {
+            requestRx(withKoodistoVersio(koodistoServiceUrl + koodistoKoodiPath, koodistoVersio), classOf[Array[KoodistoKoodi]])
+        }
 
-    private def requestKoodistoKoodi(koodistoKoodiUrl: String, koodiUri: String) =
-        cacheRx(koodiUri) { requestRx(koodistoKoodiUrl + koodiUri, classOf[KoodistoKoodi]) }
+    private def requestKoodistoKoodi(koodistoKoodiUrl: String, koodiUri: String, koodistoVersio: Integer) =
+        cacheRx(koodiUri, koodistoVersio) {
+            requestRx(withKoodistoVersio(koodistoKoodiUrl + koodiUri, koodistoVersio), classOf[KoodistoKoodi])
+        }
+
+    private def withKoodistoVersio(koodistoUrl: String, versio: Integer) = koodistoVersio(versio) match {
+        case v if(null == v || v.trim.isEmpty) => koodistoUrl
+        case v: String => koodistoUrl + "?" + v
+    }
 }

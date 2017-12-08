@@ -34,6 +34,11 @@ trait CacheAware {
         }
     }
 
+    def cacheRx[V](key: String, versio: Integer)(genValue: => CompletionStage[V]): CompletionStage[V] = {
+        val versionKey = if(null != versio) s":${versio}" else ""
+        cacheRx(key + versionKey)(genValue)
+    }
+
     def cacheRx[V](key: String)(genValue: => CompletionStage[V]): CompletionStage[V] = {
         require(cache != null, "Cache must be set")
 

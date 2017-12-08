@@ -21,9 +21,13 @@ public class KoodistoService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
-    @Cacheable(value = "KoodistoService:getKoodi", key="{#koodisto, #koodi}")
     public KoodistoKoodi getKoodi(final String koodisto, final String koodi) {
-        return opintopolkuService.getKoodi(koodisto, koodi);
+        return getKoodi(koodisto, koodi, null);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoodi", key="{#koodisto, #koodi, #koodistoVersio}")
+    public KoodistoKoodi getKoodi(final String koodisto, final String koodi, final Integer koodistoVersio) {
+        return opintopolkuService.getKoodi(koodisto, koodi, koodistoVersio);
     }
 
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
@@ -39,6 +43,11 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getMaakuntaJarjestajat", key = "''")
     public List<Maakunta> getMaakuntaJarjestajat() {
         return opintopolkuService.getMaakuntaJarjestajat();
+    }
+
+    @Cacheable(value = "KoodistoService:getMaakunnat", key = "''")
+    public List<KoodistoKoodi> getMaakunnat() {
+        return opintopolkuService.getMaakuntaKoodit();
     }
 
     @Cacheable(value = "KoodistoService:getKunnat", key = "''")

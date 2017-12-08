@@ -31,9 +31,17 @@ public class KoodistoController {
 
     @OivaAccess_Public
     @RequestMapping(value = "/koodi/{koodisto}/{koodi}", method = GET)
-    @ApiOperation(notes = "Palauttaa opintopolun koodin koodiston ja kooriarvon perusteella", value = "")
+    @ApiOperation(notes = "Palauttaa opintopolun uusimman koodistoversion koodin koodiston ja kooriarvon perusteella", value = "")
     public CompletableFuture<KoodistoKoodi> getKoodi(final @PathVariable String koodisto, final @PathVariable String koodi) {
         return async(() -> service.getKoodi(koodisto, koodi));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koodi/{koodisto}/{koodi}/{koodistoVersio:[0-9]+}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koodin koodiston, kooriarvon ja version perusteella", value = "")
+    public CompletableFuture<KoodistoKoodi> getKoodi(
+        final @PathVariable String koodisto, final @PathVariable String koodi, final @PathVariable Integer koodistoVersio) {
+        return async(() -> service.getKoodi(koodisto, koodi, koodistoVersio));
     }
 
     @OivaAccess_Public
@@ -55,6 +63,13 @@ public class KoodistoController {
     @ApiOperation(notes = "Palauttaa opintopolun maakunnat koulutuksenjärjestäjillä", value = "")
     public CompletableFuture<Collection<Maakunta>> getMaakuntaJarjestajat() {
         return async(service::getMaakuntaJarjestajat);
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/maakunnat", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun maakunnat", value = "")
+    public CompletableFuture<Collection<KoodistoKoodi>> getMaakunnat() {
+        return async(service::getMaakunnat);
     }
 
     @OivaAccess_Public
