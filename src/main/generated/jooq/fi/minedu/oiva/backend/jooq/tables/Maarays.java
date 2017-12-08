@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays extends TableImpl<MaaraysRecord> {
 
-    private static final long serialVersionUID = -1064705948;
+    private static final long serialVersionUID = -397748773;
 
     /**
      * The reference instance of <code>oiva.maarays</code>
@@ -123,7 +123,7 @@ public class Maarays extends TableImpl<MaaraysRecord> {
     /**
      * The column <code>oiva.maarays.koodistoversio</code>.
      */
-    public final TableField<MaaraysRecord, Integer> KOODISTOVERSIO = createField("koodistoversio", org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("7", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+    public final TableField<MaaraysRecord, Integer> KOODISTOVERSIO = createField("koodistoversio", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
      * Create a <code>oiva.maarays</code> table reference
