@@ -16,11 +16,12 @@ import scala.beans.BeanProperty
 case class KoodistoKoodi(
     @BeanProperty var koodiArvo: String,
     @BeanProperty var koodisto: KoodistoKoodi.KoodistoTiedot,
+    @BeanProperty var versio: Integer,
     @BeanProperty var metadata: Array[Metadata],
     @BeanProperty var voimassaAlkuPvm: String,
     @BeanProperty var voimassaLoppuPvm: String) {
 
-    def this() = this(null, null, null, null, null)
+    def this() = this(null, null, null, null, null, null)
 
     @JsonIgnore def getNimi = TranslatedString.ofNimi(this)
     @JsonIgnore def getKuvaus = TranslatedString.ofKuvaus(this)
@@ -44,7 +45,7 @@ object KoodistoKoodi {
     case class KoodistoTiedot(@BeanProperty var koodistoUri: String) {
         def this() = this(null)
     }
-    @JsonIgnore def notFound(koodi: String) = KoodistoKoodi(koodi, null, Array(
+    @JsonIgnore def notFound(koodi: String) = KoodistoKoodi(koodi, null, null, Array(
         Metadata("fi", s"Koodia $koodi ei löydy", ""),
         Metadata("sv", s"Koda $koodi hittades inte", "")), null, null)
 }
