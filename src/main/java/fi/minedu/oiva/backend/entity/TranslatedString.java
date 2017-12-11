@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import fi.minedu.oiva.backend.entity.json.TranslatedStringDeserializer;
 import fi.minedu.oiva.backend.entity.json.TranslatedStringSerializer;
+import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton;
+import fi.minedu.oiva.backend.entity.opintopolku.Metadata;
 import fi.minedu.oiva.backend.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.lambda.Seq;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -88,12 +91,28 @@ public class TranslatedString implements Serializable {
         return new TranslatedString(seqOfTuples.collect(CollectionUtils.tuples2Map()));
     }
 
-    public static TranslatedString ofNimi(final KoodistoKoodi koodisto) {
-        return of(seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), m.nimi())));
+    public static TranslatedString ofNimi(final Koodisto koodisto) {
+        return ofNimi(koodisto.getMetadataList());
     }
 
-    public static TranslatedString ofKuvaus(final KoodistoKoodi koodisto) {
-        return of(seq(koodisto.getMetadataList()).map(m -> tuple(m.kieli().toLowerCase(), null != m.kuvaus() ? m.kuvaus() : "")));
+    public static TranslatedString ofKuvaus(final Koodisto koodisto) {
+        return ofKuvaus(koodisto.getMetadataList());
+    }
+
+    public static TranslatedString ofNimi(final KoodistoKoodi koodi) {
+        return ofNimi(koodi.getMetadataList());
+    }
+
+    public static TranslatedString ofKuvaus(final KoodistoKoodi koodi) {
+        return ofKuvaus(koodi.getMetadataList());
+    }
+
+    protected static TranslatedString ofNimi(final List<Metadata> metadata) {
+        return of(seq(metadata).map(m -> tuple(m.kieli().toLowerCase(), m.nimi())));
+    }
+
+    protected static TranslatedString ofKuvaus(final List<Metadata> metadata) {
+        return of(seq(metadata).map(m -> tuple(m.kieli().toLowerCase(), null != m.kuvaus() ? m.kuvaus() : "")));
     }
 
     public JsonNode toJson() {

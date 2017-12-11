@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays implements Serializable {
 
-    private static final long serialVersionUID = -1640232245;
+    private static final long serialVersionUID = -980161541;
 
     private Long      id;
     private Long      parentId;
@@ -42,6 +42,7 @@ public class Maarays implements Serializable {
     private Timestamp luontipvm;
     private String    paivittaja;
     private Timestamp paivityspvm;
+    private Integer   koodistoversio;
 
     public Maarays() {}
 
@@ -59,6 +60,7 @@ public class Maarays implements Serializable {
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
+        this.koodistoversio = value.koodistoversio;
     }
 
     public Maarays(
@@ -74,7 +76,8 @@ public class Maarays implements Serializable {
         String    luoja,
         Timestamp luontipvm,
         String    paivittaja,
-        Timestamp paivityspvm
+        Timestamp paivityspvm,
+        Integer   koodistoversio
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -89,6 +92,7 @@ public class Maarays implements Serializable {
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
+        this.koodistoversio = koodistoversio;
     }
 
     public Long getId() {
@@ -201,6 +205,14 @@ public class Maarays implements Serializable {
         this.paivityspvm = paivityspvm;
     }
 
+    public Integer getKoodistoversio() {
+        return this.koodistoversio;
+    }
+
+    public void setKoodistoversio(Integer koodistoversio) {
+        this.koodistoversio = koodistoversio;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Maarays (");
@@ -218,6 +230,7 @@ public class Maarays implements Serializable {
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
+        sb.append(", ").append(koodistoversio);
 
         sb.append(")");
         return sb.toString();
