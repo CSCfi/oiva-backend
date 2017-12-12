@@ -40,6 +40,10 @@ public class PrinceXMLService {
         try {
             final PDFMergerUtility merger = new PDFMergerUtility();
 
+            if(options.hasAttachment(AttachmentType.hallintolakiKorjaus2017)) {
+                merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017).getPath());
+            }
+
             if(options.hasAttachment(AttachmentType.paatosKirje)) {
                 merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.paatosKirje).getPath());
             }

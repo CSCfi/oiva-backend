@@ -19,7 +19,8 @@ public class OivaTemplates {
 
     public enum AttachmentType {
         tutkintoNimenMuutos,
-        paatosKirje;
+        paatosKirje,
+        hallintolakiKorjaus2017;
 
         public static AttachmentType convert(String str) {
             for (AttachmentType attachmentType : AttachmentType.values()) {
