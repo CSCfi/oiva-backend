@@ -2,6 +2,8 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.ExportService;
 import io.swagger.annotations.ApiOperation;
@@ -28,16 +30,14 @@ public class ExportController {
     @Autowired
     private ExportService service;
 
-    // TODO: BASIC AUTH
-    @OivaAccess_Public
+    @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/jarjestysluvat")
     @ApiOperation(notes = "Palauttaa kaikki uusimmat jarjestysluvat", value = "")
     public CompletableFuture<Collection<Lupa>> getJarjestysluvat() {
         return async(service::getJarjestysluvat);
     }
 
-    // TODO: BASIC AUTH
-    @OivaAccess_Public
+    @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/koulutusluvat")
     @ApiOperation(notes = "Palauttaa kaikkien lupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "")
     public CompletableFuture<Collection<KoulutusLupa>> getKoulutusLuvat() {
