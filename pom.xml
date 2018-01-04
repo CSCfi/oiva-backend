@@ -9,7 +9,7 @@
     <name>Oiva Backend</name>
     <artifactId>backend</artifactId>
     <groupId>fi.minedu.oiva</groupId>
-    <version>1.7.4</version>
+    <version>1.7.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -48,7 +48,7 @@
 
     <scm>
         <developerConnection>scm:git:git@github.com:CSCfi/oiva-backend.git</developerConnection>
-        <tag>1.7.4</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <repositories>
