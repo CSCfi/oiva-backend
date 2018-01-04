@@ -14,6 +14,9 @@ jooq:
 
 api:
     url.prefix: /api
+    basicauth:
+        username: override_this_in_local_application_yml
+        password: override_this_in_local_application_yml
 
 opintopolku:
     baseUrl: override_this_in_local_application_yml
