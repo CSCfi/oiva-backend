@@ -38,7 +38,7 @@ public class ExportService implements RecordMapping<Lupa> {
             .and(MAARAYS.KOODISTO.eq("koulutus"))
             .fetchInto(String.class);
 
-        return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM, LUPA.LOPPUPVM).from(LUPA)
+        return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.JARJESTAJA_OID, LUPA.DIAARINUMERO, LUPA.ALKUPVM, LUPA.LOPPUPVM).from(LUPA)
             .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM).fetchInto(KoulutusLupa.class).stream().map(koulutusLupa -> {
                 koulutusLupa.setKoulutukset(koulutusKoodiArvot.apply(koulutusLupa.getId()));
                 return koulutusLupa;

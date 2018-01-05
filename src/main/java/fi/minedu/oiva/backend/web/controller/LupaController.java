@@ -8,9 +8,6 @@ import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -38,9 +35,6 @@ public class LupaController {
 
     public static final String path = "/luvat";
 
-    @Value("${api.url.prefix}" + LupaController.path + "/")
-    private String fullPath;
-
     @Autowired
     private LupaService service;
 
@@ -66,10 +60,11 @@ public class LupaController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/**")
+    @RequestMapping(method = GET, value = "/{diaarinumero}/**")
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
+    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero,
+        final HttpServletResponse response, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, fullPath), options(with))));
+        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
 }

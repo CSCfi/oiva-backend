@@ -18,8 +18,6 @@ class KoulutusLupa(
     @JsonIgnore override def getPaatoskierrosId = super.getPaatoskierrosId
     @JsonIgnore override def getLupatilaId = super.getLupatilaId
     @JsonIgnore override def getAsiatyyppiId = super.getAsiatyyppiId
-    @JsonIgnore override def getDiaarinumero = super.getDiaarinumero
-    @JsonIgnore override def getJarjestajaOid = super.getJarjestajaOid
     @JsonIgnore override def getPaatospvm = super.getPaatospvm
     @JsonIgnore override def getMeta = super.getMeta
     @JsonIgnore override def getMaksu = super.getMaksu

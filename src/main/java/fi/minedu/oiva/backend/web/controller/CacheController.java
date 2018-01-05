@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -21,6 +22,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RequestMapping(
     value = "${api.url.prefix}" + CacheController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@ApiIgnore
 public class CacheController {
 
     public static final String path = "/cache";

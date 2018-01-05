@@ -62,6 +62,9 @@ multipart:
 
 server:
     port: override_this_in_local_application_yml
+    tomcat:
+        remote_ip_header: x-forwarded-for
+        protocol_header: x-forwarded-proto
 
 management:
     context-path: /manage
