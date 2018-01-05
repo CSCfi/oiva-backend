@@ -7,6 +7,7 @@ import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.ExportService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,14 +33,14 @@ public class ExportController {
 
     @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/jarjestysluvat")
-    @ApiOperation(notes = "Palauttaa kaikki uusimmat jarjestysluvat", value = "")
+    @ApiOperation(notes = "Palauttaa kaikki uusimmat jarjestysluvat", value = "", authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<Collection<Lupa>> getJarjestysluvat() {
         return async(service::getJarjestysluvat);
     }
 
     @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/koulutusluvat")
-    @ApiOperation(notes = "Palauttaa kaikkien lupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "")
+    @ApiOperation(notes = "Palauttaa kaikkien lupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<Collection<KoulutusLupa>> getKoulutusLuvat() {
         return async(service::getKoulutusLuvat);
     }
