@@ -40,6 +40,12 @@ public class PrinceXMLService {
         try {
             final PDFMergerUtility merger = new PDFMergerUtility();
 
+            // 21.12.2017 tulleet hallintolakiin liittyvät korjaukset
+            if(options.hasAttachment(AttachmentType.hallintolakiKorjaus2017v2)) {
+                merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017v2).getPath());
+            }
+
+            // 1z2.12.2017 tulleet hallintolakiin liittyvät korjaukset
             if(options.hasAttachment(AttachmentType.hallintolakiKorjaus2017)) {
                 merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017).getPath());
             }
