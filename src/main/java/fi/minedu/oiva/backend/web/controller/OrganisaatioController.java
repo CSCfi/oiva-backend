@@ -26,26 +26,8 @@ public class OrganisaatioController {
     private OpintopolkuService opintopolkuService;
 
     @OivaAccess_Public
-    @RequestMapping("/{oid:.+}/raw")
-    public CompletionStage<String> get(final @PathVariable String oid) {
-        return opintopolkuService.getOrganisaatioAsRaw(oid);
-    }
-
-    @OivaAccess_Public
-    @RequestMapping("/{oid:.+}")
-    public CompletionStage<Organisaatio> getAsEntity(final @PathVariable String oid) {
+    @RequestMapping(value = "/{oid:.+}", method = GET)
+    public CompletionStage<Organisaatio> get(final @PathVariable String oid) {
         return opintopolkuService.getOrganisaatio(oid);
-    }
-
-    @OivaAccess_Public
-    @RequestMapping("/block/{oid:.+}")
-    public Organisaatio getAsEntityBlocking(final @PathVariable String oid) {
-        return opintopolkuService.getBlockingOrganisaatio(oid);
-    }
-
-    @OivaAccess_Public
-    @RequestMapping(method = GET)
-    public CompletionStage<String> getMany(final @RequestParam String[] oids) {
-        return opintopolkuService.getOrganisaatiosAsCSString(oids);
     }
 }

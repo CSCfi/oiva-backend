@@ -16,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,9 +38,6 @@ public class PebbleController {
 
     public static final String path = "/pebble";
 
-    @Value("${api.url.prefix}" + PebbleController.path + "/")
-    private String fullPath;
-
     @Autowired
     private PebbleService service;
 
@@ -47,29 +45,27 @@ public class PebbleController {
     private LupaService lupaService;
 
     @OivaAccess_Public
-    @RequestMapping(value = "/**", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
+    @RequestMapping(value = "/{diaarinumero}/**", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
     @ApiOperation(notes = "Tuottaa luvan HTML-muodossa", value = "")
-    public HttpEntity<String> renderHTML(final HttpServletRequest request,
-        final @RequestParam(value = "debug", required = false) String debugMode) {
+    public HttpEntity<String> renderHTML(final @PathVariable String diaarinumero, final HttpServletRequest request) {
 
-        final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
+        final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Lupa lupa = lupaService.get(diaarinumero, withAll).get();
+            final Lupa lupa = lupaService.get(diaariNumero, withAll).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
-            options.setDebugMode(null != debugMode);
             return getOr404(service.toHTML(lupa, options));
 
         } catch (Exception e) {
-            logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaarinumero, e);
+            logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaariNumero, e);
             return get500();
         }
     }
 
     @OivaAccess_Public
-    @RequestMapping(value = "/resources/**", method = GET)
+    @RequestMapping(value = "/resources/{filename}/**", method = GET)
     @ApiOperation(notes = "Palauttaa pebble-resurssin", value = "")
-    public ResponseEntity<Resource> resource(final HttpServletRequest request) {
-        final String resourcePath =  RequestUtils.getPathVariable(request, path + "/resources/");
+    public ResponseEntity<Resource> resource(final @PathVariable String filename, final HttpServletRequest request) {
+        final String resourcePath = RequestUtils.getPathVariable(request, filename);
         final Optional<ByteArrayResource> resourceOpt = service.getResource(resourcePath);
         if(resourceOpt.isPresent()) {
             final ByteArrayResource bar = resourceOpt.get();

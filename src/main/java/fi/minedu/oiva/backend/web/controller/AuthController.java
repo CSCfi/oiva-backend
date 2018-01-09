@@ -36,14 +36,14 @@ public class AuthController {
 
     @OivaAccess_Application
     @RequestMapping(value = "/me", method = GET)
-    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = AuthController.path + "/me")
+    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "")
     public CompletableFuture<Map<String, Object>> getMe() {
         return async(service::getMe);
     }
 
     @OivaAccess_Public
     @RequestMapping(value = "/login", method = GET)
-    @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = AuthController.path + "/login")
+    @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = "")
     public void login(final HttpServletRequest request, final HttpServletResponse response, final @RequestParam String redirect) throws IOException {
         request.getSession().setAttribute("redirect", redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);
