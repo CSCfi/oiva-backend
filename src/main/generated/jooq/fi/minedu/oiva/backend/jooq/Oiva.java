@@ -11,6 +11,7 @@ import fi.minedu.oiva.backend.jooq.tables.Kohde;
 import fi.minedu.oiva.backend.jooq.tables.Liite;
 import fi.minedu.oiva.backend.jooq.tables.Lupa;
 import fi.minedu.oiva.backend.jooq.tables.LupaLiite;
+import fi.minedu.oiva.backend.jooq.tables.Lupahistoria;
 import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
@@ -45,7 +46,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = -2041927538;
+    private static final long serialVersionUID = -1971627221;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -86,6 +87,11 @@ public class Oiva extends SchemaImpl {
      * The table <code>oiva.lupa_liite</code>.
      */
     public final LupaLiite LUPA_LIITE = fi.minedu.oiva.backend.jooq.tables.LupaLiite.LUPA_LIITE;
+
+    /**
+     * The table <code>oiva.lupahistoria</code>.
+     */
+    public final Lupahistoria LUPAHISTORIA = fi.minedu.oiva.backend.jooq.tables.Lupahistoria.LUPAHISTORIA;
 
     /**
      * The table <code>oiva.lupatila</code>.
@@ -158,6 +164,7 @@ public class Oiva extends SchemaImpl {
             Sequences.FUUSIO_ID_SEQ,
             Sequences.KOHDE_ID_SEQ,
             Sequences.LIITE_ID_SEQ,
+            Sequences.LUPAHISTORIA_ID_SEQ,
             Sequences.LUPA_ID_SEQ,
             Sequences.LUPA_LIITE_ID_SEQ,
             Sequences.LUPATILA_ID_SEQ,
@@ -185,6 +192,7 @@ public class Oiva extends SchemaImpl {
             Liite.LIITE,
             Lupa.LUPA,
             LupaLiite.LUPA_LIITE,
+            Lupahistoria.LUPAHISTORIA,
             Lupatila.LUPATILA,
             Maarays.MAARAYS,
             Maaraystyyppi.MAARAYSTYYPPI,

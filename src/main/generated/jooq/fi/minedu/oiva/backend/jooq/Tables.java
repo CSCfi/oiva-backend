@@ -11,6 +11,7 @@ import fi.minedu.oiva.backend.jooq.tables.Kohde;
 import fi.minedu.oiva.backend.jooq.tables.Liite;
 import fi.minedu.oiva.backend.jooq.tables.Lupa;
 import fi.minedu.oiva.backend.jooq.tables.LupaLiite;
+import fi.minedu.oiva.backend.jooq.tables.Lupahistoria;
 import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
@@ -70,6 +71,11 @@ public class Tables {
      * The table <code>oiva.lupa_liite</code>.
      */
     public static final LupaLiite LUPA_LIITE = fi.minedu.oiva.backend.jooq.tables.LupaLiite.LUPA_LIITE;
+
+    /**
+     * The table <code>oiva.lupahistoria</code>.
+     */
+    public static final Lupahistoria LUPAHISTORIA = fi.minedu.oiva.backend.jooq.tables.Lupahistoria.LUPAHISTORIA;
 
     /**
      * The table <code>oiva.lupatila</code>.
