@@ -90,18 +90,6 @@ class OpintopolkuService extends CacheAware {
         setCache("OpintopolkuService")
     }
 
-    /**
-     * Fetches organization raw string data from Opintopolku
-     *
-     * NOTE! OID can also be Y-tunnus!
-     *
-     * @param oid oid of org
-     * @return Future of raw string
-     */
-    def getOrganisaatioAsRawScalaFuture(oid: String) = cache(oid) {
-        Http(url(organisaatioQueryServiceUrl.format(oid)) OK as.String)
-    }
-
     def getOrganisaatio(oid: String) = {
         val url = organisaatioQueryServiceUrl.format(oid)
         cacheRx(oid) {
@@ -109,37 +97,11 @@ class OpintopolkuService extends CacheAware {
         }
     }
 
-    def getOrganisaatioAsRaw(oid: String) = {
-        val url = organisaatioQueryServiceUrl.format(oid)
-        cacheRx(url) {
-            requestRx(url, classOf[String])
-        }
-    }
-
     def requestRx[T](url: String, clazz: Class[T]) = rxClient.target(url).request().rx().get(clazz)
     def request[T](url: String, clazz: Class[T]) = rxClient.target(url).request().get(clazz)
     def toJson[T](str: String, clazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, clazz)
 
-    /**
-     * Maps raw JSON string to Organisaatio entity
-     * @param oid oid of org
-     * @return entity
-     */
-    def getOrganisaatioAsScalaFuture(oid: String) =
-        for (orgStr <- getOrganisaatioAsRawScalaFuture(oid)) yield toJson(orgStr, classOf[Organisaatio])
-
     def getBlockingOrganisaatio(oid: String) = getOrganisaatio(oid).toCompletableFuture.join()
-
-    def getOrganisaatiosAsCSString(oids: Array[String]): CompletionStage[String] =
-        Future.sequence(oids.distinct.toList.map(oid => getOrganisaatioAsRawScalaFuture(oid))).collect {
-            case x: List[String] => x.mkString("[", ",", "]")
-        }
-
-    /**
-     * Get by list of oids
-     */
-    def getOrganisaatiosAsScalaFuture(oids: Array[String]): Future[List[Organisaatio]] =
-        Future.sequence(oids.distinct.toList.map(getOrganisaatioAsScalaFuture))
 
     /**
      * Fetches person's organizational data from Opintopolku

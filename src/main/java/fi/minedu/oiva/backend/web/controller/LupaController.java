@@ -44,9 +44,6 @@ public class LupaController {
 
     public static final String path = "/luvat";
 
-    @Value("${api.url.prefix}" + LupaController.path + "/")
-    private String fullPath;
-
     @Autowired
     private LupaService service;
 
@@ -76,11 +73,12 @@ public class LupaController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/**")
+    @RequestMapping(method = GET, value = "/{diaarinumero}/**")
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
+    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero,
+        final HttpServletResponse response, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, fullPath), options(with))));
+        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
 
     @OivaAccess_Public
