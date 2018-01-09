@@ -1,6 +1,5 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Liite;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
@@ -14,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -26,6 +26,7 @@ import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
 import static fi.minedu.oiva.backend.service.LupaService.*;
 import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 @RequestMapping(
@@ -39,9 +40,6 @@ public class PrinceXMLController {
 
     public static final String path = "/pdf";
 
-    @Value("${api.url.prefix}" + PrinceXMLController.path + "/")
-    private String fullPath;
-
     @Autowired
     private PebbleService pebbleService;
 
@@ -52,19 +50,18 @@ public class PrinceXMLController {
     private LupaService lupaService;
 
     @OivaAccess_Public
-    @RequestMapping(value = "/**")
+    @RequestMapping(value = "/{diaarinumero}/**", method = GET)
     @ResponseBody
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
-    public void renderPDF(final HttpServletResponse response, final HttpServletRequest request,
-        final @RequestParam(value = "debug", required = false) String debugMode) {
+    public void renderPDF(final @PathVariable String diaarinumero,
+        final HttpServletResponse response, final HttpServletRequest request) {
 
-        final String diaarinumero =  RequestUtils.getPathVariable(request, fullPath);
+        final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Optional<Lupa> lupaOpt = lupaService.get(diaarinumero, withAll);
+            final Optional<Lupa> lupaOpt = lupaService.get(diaariNumero, withAll);
             if(lupaOpt.isPresent()) {
                 final Lupa lupa = lupaOpt.get();
                 final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
-                options.setDebugMode(null != debugMode);
                 final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
                 if (htmlOpt.isPresent()) {
 
@@ -79,18 +76,18 @@ public class PrinceXMLController {
                     if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
 
                     response.setContentType(APPLICATION_PDF);
-                    response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaarinumero, "/", "-") + ".pdf");
+                    response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaariNumero, "/", "-") + ".pdf");
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
                         response.setStatus(get500().getStatusCode().value());
-                        response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaarinumero);
+                        response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
                     }
                 }
             } else {
                 response.setStatus(notFound().getStatusCode().value());
-                response.getWriter().write("No such Lupa with diaarinumero " + diaarinumero);
+                response.getWriter().write("No such Lupa with diaarinumero " + diaariNumero);
             }
         } catch (Exception e) {
-            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaarinumero, e);
+            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaariNumero, e);
             response.setStatus(get500().getStatusCode().value());
         }
     }

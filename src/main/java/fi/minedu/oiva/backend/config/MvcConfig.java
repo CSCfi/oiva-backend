@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.config;
 
 import com.fasterxml.classmate.TypeResolver;
+import com.google.common.base.Predicates;
 import fi.minedu.oiva.backend.spring.handler.CompletionStageReturnValueHandler;
 import fi.minedu.oiva.backend.spring.resolver.OIDArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +12,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.AlternateTypeRule;
 import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
@@ -36,6 +41,15 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     private TypeResolver typeResolver;
 
     @Override
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+        super.addResourceHandlers(registry);
+        registry.addResourceHandler("**/swagger-ui.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("**/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    @Override
     public void addViewControllers(final ViewControllerRegistry registry) {}
 
     @Bean
@@ -44,6 +58,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
             .groupName("oiva")
             .apiInfo(apiInfo())
             .select()
+            .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+            .paths(PathSelectors.any())
             .build()
             .directModelSubstitute(Timestamp.class, Long.class)
             .alternateTypeRules(buildTypeRules());
@@ -78,7 +94,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
             "Opetushallinnon ohjaus- ja säätelypalvelun API",
             "2.0",
             "",
-            "",
+                new Contact("", "", ""),
             "",
             ""
         );

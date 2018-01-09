@@ -11,6 +11,7 @@ import fi.minedu.oiva.backend.jooq.tables.Kohde;
 import fi.minedu.oiva.backend.jooq.tables.Liite;
 import fi.minedu.oiva.backend.jooq.tables.Lupa;
 import fi.minedu.oiva.backend.jooq.tables.LupaLiite;
+import fi.minedu.oiva.backend.jooq.tables.Lupahistoria;
 import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
@@ -26,6 +27,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.KohdeRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.LiiteRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.LupaLiiteRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.LupaRecord;
+import fi.minedu.oiva.backend.jooq.tables.records.LupahistoriaRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.LupatilaRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MaaraysRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MaaraystyyppiRecord;
@@ -68,6 +70,7 @@ public class Keys {
     public static final Identity<LiiteRecord, Long> IDENTITY_LIITE = Identities0.IDENTITY_LIITE;
     public static final Identity<LupaRecord, Long> IDENTITY_LUPA = Identities0.IDENTITY_LUPA;
     public static final Identity<LupaLiiteRecord, Long> IDENTITY_LUPA_LIITE = Identities0.IDENTITY_LUPA_LIITE;
+    public static final Identity<LupahistoriaRecord, Long> IDENTITY_LUPAHISTORIA = Identities0.IDENTITY_LUPAHISTORIA;
     public static final Identity<LupatilaRecord, Long> IDENTITY_LUPATILA = Identities0.IDENTITY_LUPATILA;
     public static final Identity<MaaraysRecord, Long> IDENTITY_MAARAYS = Identities0.IDENTITY_MAARAYS;
     public static final Identity<MaaraystyyppiRecord, Long> IDENTITY_MAARAYSTYYPPI = Identities0.IDENTITY_MAARAYSTYYPPI;
@@ -88,6 +91,7 @@ public class Keys {
     public static final UniqueKey<LupaRecord> LUPA_PKEY = UniqueKeys0.LUPA_PKEY;
     public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = UniqueKeys0.LUPA_DIAARINUMERO_KEY;
     public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = UniqueKeys0.LUPA_LIITE_PKEY;
+    public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = UniqueKeys0.LUPAHISTORIA_PKEY;
     public static final UniqueKey<LupatilaRecord> LUPATILA_PKEY = UniqueKeys0.LUPATILA_PKEY;
     public static final UniqueKey<MaaraysRecord> MAARAYS_PKEY = UniqueKeys0.MAARAYS_PKEY;
     public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = UniqueKeys0.MAARAYSTYYPPI_PKEY;
@@ -126,6 +130,7 @@ public class Keys {
         public static Identity<LiiteRecord, Long> IDENTITY_LIITE = createIdentity(Liite.LIITE, Liite.LIITE.ID);
         public static Identity<LupaRecord, Long> IDENTITY_LUPA = createIdentity(Lupa.LUPA, Lupa.LUPA.ID);
         public static Identity<LupaLiiteRecord, Long> IDENTITY_LUPA_LIITE = createIdentity(LupaLiite.LUPA_LIITE, LupaLiite.LUPA_LIITE.ID);
+        public static Identity<LupahistoriaRecord, Long> IDENTITY_LUPAHISTORIA = createIdentity(Lupahistoria.LUPAHISTORIA, Lupahistoria.LUPAHISTORIA.ID);
         public static Identity<LupatilaRecord, Long> IDENTITY_LUPATILA = createIdentity(Lupatila.LUPATILA, Lupatila.LUPATILA.ID);
         public static Identity<MaaraysRecord, Long> IDENTITY_MAARAYS = createIdentity(Maarays.MAARAYS, Maarays.MAARAYS.ID);
         public static Identity<MaaraystyyppiRecord, Long> IDENTITY_MAARAYSTYYPPI = createIdentity(Maaraystyyppi.MAARAYSTYYPPI, Maaraystyyppi.MAARAYSTYYPPI.ID);
@@ -144,6 +149,7 @@ public class Keys {
         public static final UniqueKey<LupaRecord> LUPA_PKEY = createUniqueKey(Lupa.LUPA, "lupa_pkey", Lupa.LUPA.ID);
         public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = createUniqueKey(Lupa.LUPA, "lupa_diaarinumero_key", Lupa.LUPA.DIAARINUMERO);
         public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = createUniqueKey(LupaLiite.LUPA_LIITE, "lupa_liite_pkey", LupaLiite.LUPA_LIITE.ID);
+        public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = createUniqueKey(Lupahistoria.LUPAHISTORIA, "lupahistoria_pkey", Lupahistoria.LUPAHISTORIA.ID);
         public static final UniqueKey<LupatilaRecord> LUPATILA_PKEY = createUniqueKey(Lupatila.LUPATILA, "lupatila_pkey", Lupatila.LUPATILA.ID);
         public static final UniqueKey<MaaraysRecord> MAARAYS_PKEY = createUniqueKey(Maarays.MAARAYS, "maarays_pkey", Maarays.MAARAYS.ID);
         public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = createUniqueKey(Maaraystyyppi.MAARAYSTYYPPI, "maaraystyyppi_pkey", Maaraystyyppi.MAARAYSTYYPPI.ID);

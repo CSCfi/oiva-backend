@@ -4,11 +4,13 @@ import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.entity.Lupahistoria;
+
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
+import fi.minedu.oiva.backend.service.LupahistoriaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +38,18 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
     produces = { MediaType.APPLICATION_JSON_VALUE })
 public class LupaController {
 
-    public static final String path = "/luvat";
+    @Value("${templates.base.path}")
+    private String templateBasePath;
 
-    @Value("${api.url.prefix}" + LupaController.path + "/")
-    private String fullPath;
+
+    public static final String path = "/luvat";
 
     @Autowired
     private LupaService service;
+
+    @Autowired
+    private LupahistoriaService lhservice;
+
 
     @OivaAccess_Public
     @RequestMapping(method = GET)
@@ -66,10 +73,26 @@ public class LupaController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/**")
+    @RequestMapping(method = GET, value = "/{diaarinumero}/**")
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final HttpServletResponse response, final HttpServletRequest request,
+    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero,
+        final HttpServletResponse response, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, fullPath), options(with))));
+        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/historia")
+    @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän oid:n perusteella", value = "")
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @RequestParam(value = "oid", required = false) String oid) {
+        return async(() -> lhservice.getHistoriaByOid(oid));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/historiaytunnus")
+    @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän ytunnuksen perusteella", value = "")
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @RequestParam(value = "ytunnus", required = false) String ytunnus) {
+        return async(() -> lhservice.getHistoriaByYtunnus(ytunnus));
+    }
+
 }
