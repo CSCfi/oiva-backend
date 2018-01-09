@@ -44,7 +44,7 @@ public class LupaService implements RecordMapping<Lupa> {
     private MaaraysService maaraysService;
 
     @Autowired
-    private OpintopolkuService opintopolkuService;
+    private OrganisaatioService organisaatioService;
 
     @Autowired
     private AuthService authService;
@@ -119,48 +119,23 @@ public class LupaService implements RecordMapping<Lupa> {
             withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
-        if(hasOption.apply(Kunta.class)) withKunta(lupaOpt);
-        if(hasOption.apply(Maakunta.class)) withMaakunta(lupaOpt);
         if(hasOption.apply(Maarays.class)) withMaaraykset(lupaOpt);
         if(hasOption.apply(KoodistoKoodi.class)) withKoodisto(lupaOpt);
         return lupaOpt;
     }
 
-    protected Optional<Lupa> withOrganization(final Optional<Lupa> lupaOpt) {
-        lupaOpt.ifPresent(lupa -> lupa.setJarjestaja(opintopolkuService.getBlockingOrganisaatio(lupa.getJarjestajaOid())));
-        return lupaOpt;
+    protected void withOrganization(final Optional<Lupa> lupaOpt) {
+        lupaOpt.ifPresent(lupa -> organisaatioService.getWithLocation(lupa.getJarjestajaOid()).ifPresent(lupa::setJarjestaja));
     }
 
-    protected Optional<Lupa> withKunta(final Optional<Lupa> lupaOpt) {
-        lupaOpt.ifPresent(lupa -> {
-            final Organisaatio jarjestaja = lupa.jarjestaja();
-            if(null != jarjestaja && StringUtils.isNotBlank(jarjestaja.kuntaKoodiArvo())) {
-                opintopolkuService.getKuntaKoodi(jarjestaja.kuntaKoodiArvo()).ifPresent(jarjestaja::setKuntaKoodi);
-            }
-        });
-        return lupaOpt;
-    }
-
-    protected Optional<Lupa> withMaakunta(final Optional<Lupa> lupaOpt) {
-        lupaOpt.ifPresent(lupa -> {
-            final Organisaatio jarjestaja = lupa.jarjestaja();
-            if(null != jarjestaja && null != jarjestaja.kuntaKoodi()) {
-                opintopolkuService.getMaakuntaKoodiForKunta(jarjestaja.kuntaKoodiArvo()).ifPresent(jarjestaja::setMaakuntaKoodi);
-            }
-        });
-        return lupaOpt;
-    }
-
-    protected Optional<Lupa> withMaaraykset(final Optional<Lupa> lupaOpt) {
+    protected void withMaaraykset(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> lupa.setMaaraykset(maaraysService.getByLupa(lupa.getId())));
-        return lupaOpt;
     }
 
-    protected Optional<Lupa> withKoodisto(final Optional<Lupa> lupaOpt) {
+    protected void withKoodisto(final Optional<Lupa> lupaOpt) {
         lupaOpt.ifPresent(lupa -> {
             if(null != lupa.maaraykset()) lupa.maaraykset().stream().map(Optional::ofNullable).forEach(maaraysService::withKoodisto);
         });
-        return lupaOpt;
     }
 
     public boolean hasTutkintoNimenMuutos(final Lupa lupa) {

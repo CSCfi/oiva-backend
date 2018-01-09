@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.entity
 
-import java.util.Collection
+import java.util.{Collection, Optional}
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio
@@ -36,6 +37,7 @@ class Lupa(
 
     def getJarjestaja = jarjestaja
     def setJarjestaja(jarjestaja: Organisaatio): Unit = this.jarjestaja = jarjestaja
+    @JsonIgnore def getJarjestajaOpt: java.util.Optional[Organisaatio] = Optional.ofNullable(jarjestaja)
 
     def getMaaraykset = maaraykset
     def setMaaraykset(maaraykset: Collection[Maarays]): Unit = this.maaraykset = maaraykset
