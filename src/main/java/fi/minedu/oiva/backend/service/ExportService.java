@@ -47,9 +47,6 @@ public class ExportService implements RecordMapping<Lupa> {
     @Autowired
     private KoodistoService koodistoService;
 
-    @Autowired
-    private OpintopolkuService opintopolkuService;
-
     /**
      * Tarjoaa kaikki lupatiedot
      * Käyttäjä: Vipunen
@@ -132,7 +129,7 @@ public class ExportService implements RecordMapping<Lupa> {
             };
 
             final Collection<String> oppilaitoksenkielet = oppilaitoksenopetuskielet.apply(lupaId);
-            final Map<String, String> koulutusToKoulutusalaMap = koodistoService.getKoulutusToKoulutusalaMap();
+            final Map<String, String> koulutusToKoulutusalaMap = koodistoService.getKoulutusToKoulutusalaRelation();
 
             // määräykset
             maaraykset.apply(lupaId).stream().forEach(maarays -> {

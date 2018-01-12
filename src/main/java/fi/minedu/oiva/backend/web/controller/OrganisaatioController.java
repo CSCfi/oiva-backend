@@ -29,12 +29,6 @@ public class OrganisaatioController {
 
     @OivaAccess_Public
     @RequestMapping(value = "/{oid:.+}", method = GET)
-    public CompletableFuture<Organisaatio> get(final @PathVariable String oid) {
-        return async(() -> service.get(oid));
-    }
-
-    @OivaAccess_Public
-    @RequestMapping(value = "/{oid:.+}/sijainnilla", method = GET)
     public CompletableFuture<HttpEntity<Organisaatio>> getWithLocation(final @PathVariable String oid) {
         return getOr404(async(() -> service.getWithLocation(oid)));
     }

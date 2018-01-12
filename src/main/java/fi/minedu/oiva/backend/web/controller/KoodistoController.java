@@ -114,7 +114,7 @@ public class KoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/kunnat/{koodiArvo}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun kunnan koodiarvon perusteela", value = "")
-    public CompletableFuture<KoodistoKoodi> getKuntaByKoodi(final @PathVariable String koodiArvo) {
+    public CompletableFuture<KoodistoKoodi> getKunta(final @PathVariable String koodiArvo) {
         return async(() -> service.getKunta(koodiArvo));
     }
 
@@ -128,7 +128,7 @@ public class KoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/kielet/{koodiArvo}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun kielen koodiarvon perusteela", value = "")
-    public CompletableFuture<KoodistoKoodi> getKieliByKoodi(final @PathVariable String koodiArvo) {
+    public CompletableFuture<KoodistoKoodi> getKieli(final @PathVariable String koodiArvo) {
         return async(() -> service.getKieli(koodiArvo));
     }
 
@@ -149,7 +149,7 @@ public class KoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/koulutusalat/{koodiArvo}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun koulutusalan koodiarvon perusteela", value = "")
-    public CompletableFuture<KoodistoKoodi> getKoulutusalaKoodi(final @PathVariable String koodiArvo) {
+    public CompletableFuture<KoodistoKoodi> getKoulutusala(final @PathVariable String koodiArvo) {
         return async(() -> service.getKoulutusala(koodiArvo));
     }
 
@@ -163,7 +163,7 @@ public class KoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/koulutus-koulutusala-relaatio", method = GET)
     @ApiOperation(notes = "Palauttaa koulutusten koulutusala relaatiot", value = "")
-    public CompletableFuture<Map<String, String>> getKoulutusToKoulutusalaMap() {
-        return async(service::getKoulutusToKoulutusalaMap);
+    public CompletableFuture<Map<String, String>> getKoulutusToKoulutusalaRelation() {
+        return async(service::getKoulutusToKoulutusalaRelation);
     }
 }

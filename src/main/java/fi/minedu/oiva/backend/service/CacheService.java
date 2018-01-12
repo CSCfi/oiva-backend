@@ -94,6 +94,7 @@ public class CacheService {
 
         final long startTime = System.currentTimeMillis();
 
+        logger.info("Cache refresh requested");
         koodistoService.getMaakuntaKunnat();
         koodistoService.getKoulutustoimijat();
         koodistoService.getMaakuntaJarjestajat();
@@ -102,8 +103,9 @@ public class CacheService {
         koodistoService.getOpetuskielet();
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
-        refreshKoulutus();
-        lupaService.getAll(RecordMapping.withAll);
+        lupaService.getAll(RecordMapping.withAll).stream().forEach(lupa ->
+            lupaService.get(lupa.getDiaarinumero(), RecordMapping.withAll));
+        refreshKoulutus(false);
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Cache refresh finished in {}ms", duration);
@@ -176,24 +178,25 @@ public class CacheService {
      *
      * @return Duration
      */
-    public long refreshKoulutus() {
+    public long refreshKoulutus(boolean deleteExisting) {
         final long startTime = System.currentTimeMillis();
+        if(deleteExisting) {
+            final List<String> cacheKeys = new ArrayList<>();
+            final BiConsumer<String, String> cacheKey = (cacheName, key) -> cacheKeys.add(cacheName + ":\"" + key + "\"");
 
-        final List<String> cacheKeys = new ArrayList<>();
-        final BiConsumer<String, String> cacheKey = (cacheName, key) -> cacheKeys.add(cacheName + ":\"" + key + "\"");
+            cacheKey.accept("KoodistoService:getKoulutusalat", "");
+            cacheKey.accept("KoodistoService:getKoulutusToKoulutusalaRelation", "");
+            koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
+                cacheKey.accept("KoodistoService:getKoulutusala", koulutusala.koodiArvo());
+                cacheKey.accept("KoodistoService:getKoulutusalaKoulutukset", koulutusala.koodiArvo());
+            });
 
-        cacheKey.accept("KoodistoService:getKoulutusalat", "");
-        cacheKey.accept("KoodistoService:getKoulutusToKoulutusalaMap", "");
-        koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
-            cacheKey.accept("KoodistoService:getKoulutusala", koulutusala.koodiArvo());
-            cacheKey.accept("KoodistoService:getKoulutusalaKoulutukset", koulutusala.koodiArvo());
-        });
-
-        // delete cache keys
-        flushCacheKeys(cacheKeys);
+            // delete cache keys
+            flushCacheKeys(cacheKeys);
+        }
 
         // refresh
-        koodistoService.getKoulutusToKoulutusalaMap();
+        koodistoService.getKoulutusToKoulutusalaRelation();
         koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
             koodistoService.getKoulutusala(koulutusala.koodiArvo());
             koodistoService.getKoulutusalaKoulutukset(koulutusala.koodiArvo());

@@ -160,8 +160,8 @@ public class KoodistoService {
         return opintopolkuService.getKoulutusKooditForKoulutusala(koodi);
     }
 
-    @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaMap", key = "''")
-    public Map<String, String> getKoulutusToKoulutusalaMap() {
+    @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
+    public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
         getKoulutusalat().stream().forEach(koulutusalaKoodi -> {
             getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->

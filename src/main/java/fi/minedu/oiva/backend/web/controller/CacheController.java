@@ -60,7 +60,7 @@ public class CacheController {
     @RequestMapping(value="/refresh/koulutus", method = PUT)
     @ApiOperation(notes = "Uudistaa koulutuskoodistoon liittyvän välimuistin", value = "", authorizations = @Authorization(value = "CAS"))
     public ResponseEntity refreshKoulutus() {
-        async(cacheService::refreshKoulutus);
+        async(() -> cacheService.refreshKoulutus(true));
         return ok();
     }
 }

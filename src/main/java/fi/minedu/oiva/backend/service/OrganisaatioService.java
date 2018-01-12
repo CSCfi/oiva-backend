@@ -14,10 +14,6 @@ public class OrganisaatioService {
     @Autowired
     private OpintopolkuService opintopolkuService;
 
-    public Organisaatio get(final String oid) {
-        return opintopolkuService.getBlockingOrganisaatio(oid);
-    }
-
     @Cacheable(value = {"OrganisaatioService:getWithLocation"}, key = "#oid")
     public Optional<Organisaatio> getWithLocation(final String oid) {
         final Optional<Organisaatio> organisaatioOpt = Optional.ofNullable(opintopolkuService.getBlockingOrganisaatio(oid));
