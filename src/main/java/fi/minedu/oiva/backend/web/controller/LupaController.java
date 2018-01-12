@@ -41,7 +41,6 @@ public class LupaController {
     @Value("${templates.base.path}")
     private String templateBasePath;
 
-
     public static final String path = "/luvat";
 
     @Autowired
@@ -49,7 +48,6 @@ public class LupaController {
 
     @Autowired
     private LupahistoriaService lhservice;
-
 
     @OivaAccess_Public
     @RequestMapping(method = GET)
@@ -66,17 +64,9 @@ public class LupaController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/{lupaId:[0-9]+}")
-    @ApiOperation(notes = "Palauttaa luvan tietokantatunnuksen perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getById(final @PathVariable long lupaId, final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(lupaId, options(with))));
-    }
-
-    @OivaAccess_Public
     @RequestMapping(method = GET, value = "/{diaarinumero}/**")
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero,
-        final HttpServletResponse response, final HttpServletRequest request,
+    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
@@ -94,5 +84,4 @@ public class LupaController {
     public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @RequestParam(value = "ytunnus", required = false) String ytunnus) {
         return async(() -> lhservice.getHistoriaByYtunnus(ytunnus));
     }
-
 }

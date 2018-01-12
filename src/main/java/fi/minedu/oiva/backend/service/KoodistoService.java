@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
+import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
@@ -141,6 +142,31 @@ public class KoodistoService {
         opintopolkuService.getMaakuntaKoodit().stream().forEach(
             maakunta -> opintopolkuService.getKuntaKooditForMaakunta(maakunta.koodiArvo()).stream().forEach(
             kunta -> map.put(kunta.koodiArvo(), maakunta)));
+        return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusalat", key = "''")
+    public List<KoodistoKoodi> getKoulutusalat() {
+        return opintopolkuService.getKoulutusalaKoodit();
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusala", key = "#koodi")
+    public KoodistoKoodi getKoulutusala(final String koodi) {
+        return opintopolkuService.getKoulutusalaKoodi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusalaKoulutukset", key = "#koodi")
+    public List<KoodistoKoodi> getKoulutusalaKoulutukset(final String koodi) {
+        return opintopolkuService.getKoulutusKooditForKoulutusala(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaMap", key = "''")
+    public Map<String, String> getKoulutusToKoulutusalaMap() {
+        final Map<String, String> map = new HashMap<>();
+        getKoulutusalat().stream().forEach(koulutusalaKoodi -> {
+            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
+                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()));
+        });
         return map;
     }
 }

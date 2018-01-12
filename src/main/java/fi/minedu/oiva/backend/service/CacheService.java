@@ -1,5 +1,8 @@
 package fi.minedu.oiva.backend.service;
 
+import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +14,17 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Service
 public class CacheService {
@@ -48,7 +61,7 @@ public class CacheService {
      *
      * @return duration in millseconds
      */
-    public long flushCache(final boolean retainSessions) {
+    protected long flushCache(final boolean retainSessions) {
         final long startTime = System.currentTimeMillis();
         final RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
         redisTemplate.execute((RedisCallback) connection -> {
@@ -60,6 +73,14 @@ public class CacheService {
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Cache flushed in {}ms", duration);
         return duration;
+    }
+
+    protected void flushCacheKeys(final Collection<String> cacheKeys) {
+        final RedisSerializer<String> serializer = redisTemplate.getStringSerializer();
+        redisTemplate.execute((RedisCallback) connection -> {
+            cacheKeys.stream().forEach(key -> connection.del(serializer.serialize(key)));
+            return null;
+        });
     }
 
     /**
@@ -81,10 +102,105 @@ public class CacheService {
         koodistoService.getOpetuskielet();
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
+        refreshKoulutus();
         lupaService.getAll(RecordMapping.withAll);
 
         final long duration = System.currentTimeMillis() - startTime;
-        logger.info("Cache pre-population finished in {}ms", duration);
+        logger.info("Cache refresh finished in {}ms", duration);
+        return duration;
+    }
+
+    /**
+     * Clear and pre-populate specific lupa related cache
+     *
+     * @param diaarinumero Lupa's diaarinumero
+     * @return Duration
+     */
+    public long refreshLupa(final String diaarinumero) {
+        final long startTime = System.currentTimeMillis();
+
+        final Set<String> cacheKeys = new HashSet<>();
+        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.get(byDiaarinumero, RecordMapping.withAll);
+
+        final BiFunction<Class<?>, String, String> cacheNameBuilder = (cacheBase, cacheSuffix) ->
+            cacheBase.getSimpleName() + (StringUtils.isNotBlank(cacheSuffix) ? ":" + cacheSuffix : "");
+
+        final BiConsumer<String, String> addKey = (cacheNameSuffix, key) -> cacheKeys.add(cacheNameSuffix + ":\"" + key + "\"");
+
+        final BiConsumer<String, String> addOpintopolkuKey = (cacheNameSuffix, cacheKey) ->
+            addKey.accept(cacheNameBuilder.apply(OpintopolkuService.class, cacheNameSuffix), cacheKey);
+
+        final BiConsumer<String, String> addOrganisaatioKey = (cacheNameSuffix, cacheKey) ->
+            addKey.accept(cacheNameBuilder.apply(OrganisaatioService.class, cacheNameSuffix), cacheKey);
+
+        final Consumer<Optional<Organisaatio>> organisaatioKeys = organisaatioOpt -> organisaatioOpt.ifPresent(organisaatio -> {
+            addOpintopolkuKey.accept("", organisaatio.oid());
+            organisaatio.getKuntaKoodiOpt().ifPresent(kuntaKoodi -> {
+                addOpintopolkuKey.accept("", kuntaKoodi.koodiUri());
+                addOpintopolkuKey.accept("", "/relaatio/sisaltyy-alakoodit/" + kuntaKoodi.koodiUri());
+            });
+            organisaatio.getMaakuntaKoodiOpt().ifPresent(maakuntaKoodi -> addOpintopolkuKey.accept("", maakuntaKoodi.koodiUri()));
+            addOrganisaatioKey.accept("getWithLocation", organisaatio.oid());
+        });
+        final Consumer<Maarays> maaraysKeys = maarays -> {
+            addOpintopolkuKey.accept("", maarays.koodiUri());
+            addOpintopolkuKey.accept("", "/relaatio/sisaltyy-alakoodit/" + maarays.koodiUri());
+            Optional.ofNullable(maarays.getKoodistoversio()).ifPresent(versio -> addOpintopolkuKey.accept("", maarays.koodiUri() + ":" + versio));
+        };
+        final Consumer<Collection<Maarays>> maarayksetKeys = maaraykset -> {
+            if(null != maaraykset) maaraykset.stream().forEach(maarays -> {
+                maaraysKeys.accept(maarays);
+                Optional.ofNullable(maarays.getAliMaaraykset()).ifPresent(alimaaraykset -> alimaaraykset.stream().forEach(maaraysKeys::accept));
+            });
+        };
+
+        // collect cache keys
+        getLupa.apply(diaarinumero).ifPresent(lupa -> {
+            organisaatioKeys.accept(lupa.getJarjestajaOpt());
+            maarayksetKeys.accept(lupa.getMaaraykset());
+        });
+
+        // delete cache keys
+        flushCacheKeys(cacheKeys);
+
+        // refresh lupa
+        getLupa.apply(diaarinumero);
+
+        final long duration = System.currentTimeMillis() - startTime;
+        logger.info("Lupa {} cache refreshed in {}ms", diaarinumero, duration);
+        return duration;
+    }
+
+    /**
+     * Clear and pre-populate koulutus koodisto related cache
+     *
+     * @return Duration
+     */
+    public long refreshKoulutus() {
+        final long startTime = System.currentTimeMillis();
+
+        final List<String> cacheKeys = new ArrayList<>();
+        final BiConsumer<String, String> cacheKey = (cacheName, key) -> cacheKeys.add(cacheName + ":\"" + key + "\"");
+
+        cacheKey.accept("KoodistoService:getKoulutusalat", "");
+        cacheKey.accept("KoodistoService:getKoulutusToKoulutusalaMap", "");
+        koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
+            cacheKey.accept("KoodistoService:getKoulutusala", koulutusala.koodiArvo());
+            cacheKey.accept("KoodistoService:getKoulutusalaKoulutukset", koulutusala.koodiArvo());
+        });
+
+        // delete cache keys
+        flushCacheKeys(cacheKeys);
+
+        // refresh
+        koodistoService.getKoulutusToKoulutusalaMap();
+        koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
+            koodistoService.getKoulutusala(koulutusala.koodiArvo());
+            koodistoService.getKoulutusalaKoulutukset(koulutusala.koodiArvo());
+        });
+
+        final long duration = System.currentTimeMillis() - startTime;
+        logger.info("Koulutus cache refreshed in {}ms", duration);
         return duration;
     }
 }

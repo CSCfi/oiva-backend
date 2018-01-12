@@ -86,12 +86,6 @@ public class LupaService implements RecordMapping<Lupa> {
             .collect(Collectors.toList());
     }
 
-    public Optional<Lupa> get(final Long lupaId, final String... withOptions) {
-        final SelectConditionStep<Record> query = lupaSelect().where(LUPA.ID.eq(lupaId));
-        baseLupaFilter().ifPresent(query::and);
-        return entity(query.fetchOne(), withOptions);
-    }
-
     public Optional<Lupa> get(final String diaarinumero, final String... withOptions) {
         final SelectConditionStep<Record> query = lupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero));
         baseLupaFilter().ifPresent(query::and);
