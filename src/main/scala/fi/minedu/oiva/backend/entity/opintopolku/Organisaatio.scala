@@ -1,7 +1,9 @@
 package fi.minedu.oiva.backend.entity.opintopolku
 
+import java.util.Optional
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.annotation.{JsonInclude, JsonIgnore, JsonIgnoreProperties}
+import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.TranslatedString
 
 import scala.beans.BeanProperty
@@ -24,6 +26,8 @@ case class Organisaatio(
     @JsonIgnore def kuntaKoodiArvo = if(null != kotipaikkaUri && kotipaikkaUri.startsWith("kunta_")) kotipaikkaUri.substring(6) else null
     @JsonIgnore def isKunta(k: Kunta) = isKuntaKoodi(k.koodiArvo)
     @JsonIgnore def isKuntaKoodi(k: String) = kuntaKoodiArvo == k && null != k
+    @JsonIgnore def getKuntaKoodiOpt: java.util.Optional[KoodistoKoodi] = Optional.ofNullable(kuntaKoodi)
+    @JsonIgnore def getMaakuntaKoodiOpt: java.util.Optional[KoodistoKoodi] = Optional.ofNullable(maakuntaKoodi)
 }
 
 object Organisaatio {

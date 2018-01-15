@@ -15,7 +15,7 @@ public class KohdeService {
     @Autowired
     private DSLContext dsl;
 
-    public Collection<Kohde> getAll() { // TODO: IS THIS NEEDED?
+    public Collection<Kohde> getAll() {
         return dsl.select(KOHDE.fields()).from(KOHDE).fetchInto(Kohde.class);
     }
 }

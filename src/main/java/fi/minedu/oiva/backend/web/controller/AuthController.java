@@ -4,6 +4,7 @@ import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.AuthService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +37,7 @@ public class AuthController {
 
     @OivaAccess_Application
     @RequestMapping(value = "/me", method = GET)
-    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "")
+    @ApiOperation(notes = "Palauttaa aktiivisen käyttäjän tiedot ja roolit", value = "", authorizations = @Authorization(value = "CAS"))
     public CompletableFuture<Map<String, Object>> getMe() {
         return async(service::getMe);
     }

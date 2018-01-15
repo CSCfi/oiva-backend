@@ -12,6 +12,7 @@ public class RequestUtils {
         final String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         final String bestMatchingPattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         final String arguments = new AntPathMatcher().extractPathWithinPattern(bestMatchingPattern, path);
-        return basePath + (StringUtils.isNotBlank(arguments) ? "/" + arguments : "");
+        final String pathVariable = basePath + (StringUtils.isNotBlank(arguments) ? "/" + arguments : "");
+        return StringUtils.removeEnd(pathVariable, "/**");
     }
 }

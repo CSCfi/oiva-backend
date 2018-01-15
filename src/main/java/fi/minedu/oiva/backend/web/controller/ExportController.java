@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
+import fi.minedu.oiva.backend.entity.export.Koulutustarjonta;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
@@ -43,5 +44,12 @@ public class ExportController {
     @ApiOperation(notes = "Palauttaa kaikkien lupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<Collection<KoulutusLupa>> getKoulutusLuvat() {
         return async(service::getKoulutusLuvat);
+    }
+
+    @OivaAccess_BasicAuth
+    @RequestMapping(method = GET, value = "/koulutustarjonta")
+    @ApiOperation(notes = "Palauttaa julkisten lupien koulutustarjonta tiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
+    public CompletableFuture<Collection<Koulutustarjonta>> getKoulutustarjonta() {
+        return async(service::getKoulutustarjonta);
     }
 }
