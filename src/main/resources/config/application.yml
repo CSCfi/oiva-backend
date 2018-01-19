@@ -84,6 +84,7 @@ redis:
     host: override_this_in_local_application_yml
     port: override_this_in_local_application_yml
     userSessionPrefix: spring:session
+    refreshOnStartup: true
 
 prince:
     exec.path: /usr/bin/prince

@@ -4,6 +4,7 @@ import fi.minedu.oiva.backend.service.CacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.env.Environment;
@@ -17,6 +18,9 @@ import java.util.Collections;
 public class BuildCaches implements ApplicationListener<ContextRefreshedEvent> {
 
     private final Logger logger = LoggerFactory.getLogger(BuildCaches.class);
+
+    @Value("${redis.refreshOnStartup}")
+    private boolean refreshOnStartup;
 
     @Autowired
     private Environment env;
@@ -33,7 +37,7 @@ public class BuildCaches implements ApplicationListener<ContextRefreshedEvent> {
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         final boolean isDevEnv = !Collections.disjoint(Arrays.asList(env.getActiveProfiles()), Arrays.asList("test", "dev"));
-        if (!isDevEnv) {
+        if (!isDevEnv && refreshOnStartup) {
             refreshCaches();
         }
     }
