@@ -51,7 +51,7 @@ public class PebbleController {
 
         final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Lupa lupa = lupaService.get(diaariNumero, withAll).get();
+            final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, withAll).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
             return getOr404(service.toHTML(lupa, options));
 

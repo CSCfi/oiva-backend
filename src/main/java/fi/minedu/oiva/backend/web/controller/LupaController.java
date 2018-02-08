@@ -68,7 +68,14 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
+        return getOr404(async(() -> service.getByDiaarinumero(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}")
+    @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus, final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, options(with))));
     }
 
     @OivaAccess_Public

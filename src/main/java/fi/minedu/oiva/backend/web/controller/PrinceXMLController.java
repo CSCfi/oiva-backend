@@ -58,7 +58,7 @@ public class PrinceXMLController {
 
         final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Optional<Lupa> lupaOpt = lupaService.get(diaariNumero, withAll);
+            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, withAll);
             if(lupaOpt.isPresent()) {
                 final Lupa lupa = lupaOpt.get();
                 final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));

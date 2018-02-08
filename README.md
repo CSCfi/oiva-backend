@@ -27,7 +27,6 @@ jackson                         | 2.8.7
 flyway-core                     | 4.2.0
 spring-security-test            | 4.2.1.RELEASE
 spring-data-commons             | 1.13.0.RELEASE
-spring-ldap-core                | 2.3.1.RELEASE
 spring-session                  | 1.3.0.RELEASE
 jersey-rx-client-java8          | 2.25.1
 pebble                          | 2.3.0
