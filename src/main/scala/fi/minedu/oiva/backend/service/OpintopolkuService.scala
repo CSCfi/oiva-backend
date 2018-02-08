@@ -33,7 +33,7 @@ class OpintopolkuService extends CacheAware {
     private lazy val organisaatioQueryServiceUrl: String = organisaatioServiceUrl + "/%s?includeImage=false"
     private lazy val koulutustoimijatServiceUrl: String = organisaatioServiceUrl + "/v2/hae?organisaatioTyyppi=Koulutustoimija&aktiiviset=true&suunnitellut=true&lakkautetut=true"
 
-    @Value("${opintopolku.baseUrl}${opintopolku.kayttooikeus.restUrl}")
+    @Value("${cas.baseUrl}${opintopolku.kayttooikeus.restUrl}")
     private val kayttooikeusServiceUrl: String = null
 
     @Value("${opintopolku.baseUrl}${opintopolku.koodisto.restUrl}")
