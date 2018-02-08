@@ -12,7 +12,7 @@ services:
             - "postgres"
             - "redis"
         networks:
-            - oivanw
+            - vpnsafe
     postgres:
         image: postgres:9.6
         ports:
@@ -22,13 +22,13 @@ services:
             POSTGRES_PASSWORD: oiva
             POSTGRES_DB: oiva
         networks:
-            - oivanw
+            - vpnsafe
     redis:
         image: redis
         ports:
             - "7379:6379"
         networks:
-            - oivanw
+            - vpnsafe
     nginx:
         hostname: localhost
         image: ficusio/openresty:latest
@@ -42,10 +42,10 @@ services:
         extra_hosts:
             hostmachine: HOSTIP
         networks:
-            - oivanw
+            - vpnsafe
 networks:
-    oivanw:
+    vpnsafe:
         ipam:
             driver: default
             config:
-                - subnet: 10.20.20.10/24
+                - subnet: 10.20.23.10/24

@@ -17,7 +17,7 @@ public class AuthService {
 
     public Map<String, Object> getMe() {
         return mapOf(
-            tuple("oid", SecurityUtil.userName()),
+            tuple("username", SecurityUtil.userName().orElse(null)),
             tuple("roles", SecurityUtil.userRoles())
         );
     }

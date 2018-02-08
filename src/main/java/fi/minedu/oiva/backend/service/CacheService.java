@@ -104,7 +104,7 @@ public class CacheService {
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
         lupaService.getAll(RecordMapping.withAll).stream().forEach(lupa ->
-            lupaService.get(lupa.getDiaarinumero(), RecordMapping.withAll));
+            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), RecordMapping.withAll));
         refreshKoulutus(false);
 
         final long duration = System.currentTimeMillis() - startTime;
@@ -122,7 +122,7 @@ public class CacheService {
         final long startTime = System.currentTimeMillis();
 
         final Set<String> cacheKeys = new HashSet<>();
-        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.get(byDiaarinumero, RecordMapping.withAll);
+        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, RecordMapping.withAll);
 
         final BiFunction<Class<?>, String, String> cacheNameBuilder = (cacheBase, cacheSuffix) ->
             cacheBase.getSimpleName() + (StringUtils.isNotBlank(cacheSuffix) ? ":" + cacheSuffix : "");
