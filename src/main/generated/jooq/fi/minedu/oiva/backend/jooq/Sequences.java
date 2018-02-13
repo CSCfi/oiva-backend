@@ -39,11 +39,6 @@ public class Sequences {
     public static final Sequence<Long> ESITYSMALLI_ID_SEQ = new SequenceImpl<Long>("esitysmalli_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
-     * The sequence <code>oiva.fuusio_id_seq</code>
-     */
-    public static final Sequence<Long> FUUSIO_ID_SEQ = new SequenceImpl<Long>("fuusio_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-    /**
      * The sequence <code>oiva.kohde_id_seq</code>
      */
     public static final Sequence<Long> KOHDE_ID_SEQ = new SequenceImpl<Long>("kohde_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -84,19 +79,24 @@ public class Sequences {
     public static final Sequence<Long> MAARAYSTYYPPI_ID_SEQ = new SequenceImpl<Long>("maaraystyyppi_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
-     * The sequence <code>oiva.muutoshistoria_id_seq</code>
+     * The sequence <code>oiva.muutos_id_seq</code>
      */
-    public static final Sequence<Long> MUUTOSHISTORIA_ID_SEQ = new SequenceImpl<Long>("muutoshistoria_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+    public static final Sequence<Long> MUUTOS_ID_SEQ = new SequenceImpl<Long>("muutos_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>oiva.muutosperustelu_id_seq</code>
+     */
+    public static final Sequence<Long> MUUTOSPERUSTELU_ID_SEQ = new SequenceImpl<Long>("muutosperustelu_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
+     * The sequence <code>oiva.muutospyynto_id_seq</code>
+     */
+    public static final Sequence<Long> MUUTOSPYYNTO_ID_SEQ = new SequenceImpl<Long>("muutospyynto_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
      * The sequence <code>oiva.paatoskierros_id_seq</code>
      */
     public static final Sequence<Long> PAATOSKIERROS_ID_SEQ = new SequenceImpl<Long>("paatoskierros_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-    /**
-     * The sequence <code>oiva.tekstityyppi_id_seq</code>
-     */
-    public static final Sequence<Long> TEKSTITYYPPI_ID_SEQ = new SequenceImpl<Long>("tekstityyppi_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
      * The sequence <code>oiva.tiedote_id_seq</code>
