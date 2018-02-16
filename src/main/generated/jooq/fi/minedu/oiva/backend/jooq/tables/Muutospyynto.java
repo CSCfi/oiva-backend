@@ -9,6 +9,7 @@ import fi.minedu.oiva.backend.jooq.Oiva;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
 
-    private static final long serialVersionUID = -2060726299;
+    private static final long serialVersionUID = -487431904;
 
     /**
      * The reference instance of <code>oiva.muutospyynto</code>
@@ -91,6 +92,31 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
      * The column <code>oiva.muutospyynto.tila</code>.
      */
     public final TableField<MuutospyyntoRecord, String> TILA = createField("tila", org.jooq.impl.SQLDataType.VARCHAR.length(20).nullable(false), this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.jarjestaja_ytunnus</code>.
+     */
+    public final TableField<MuutospyyntoRecord, String> JARJESTAJA_YTUNNUS = createField("jarjestaja_ytunnus", org.jooq.impl.SQLDataType.VARCHAR.length(10).nullable(false), this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.luoja</code>.
+     */
+    public final TableField<MuutospyyntoRecord, String> LUOJA = createField("luoja", org.jooq.impl.SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.luontipvm</code>.
+     */
+    public final TableField<MuutospyyntoRecord, Timestamp> LUONTIPVM = createField("luontipvm", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("now()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.paivittaja</code>.
+     */
+    public final TableField<MuutospyyntoRecord, String> PAIVITTAJA = createField("paivittaja", org.jooq.impl.SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.paivityspvm</code>.
+     */
+    public final TableField<MuutospyyntoRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
      * Create a <code>oiva.muutospyynto</code> table reference
