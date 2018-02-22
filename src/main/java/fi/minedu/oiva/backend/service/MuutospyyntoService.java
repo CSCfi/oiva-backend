@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.jooq.tables.pojos.Muutospyynto;
+import fi.minedu.oiva.backend.entity.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
@@ -15,9 +15,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 
-import static fi.minedu.oiva.backend.jooq.Tables.MUUTOSPYYNTO;
-import static fi.minedu.oiva.backend.jooq.Tables.MUUTOS;
-import static fi.minedu.oiva.backend.jooq.Tables.PAATOSKIERROS;
+import static fi.minedu.oiva.backend.jooq.Tables.*;
 import static fi.minedu.oiva.backend.util.DbUtils.combine;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
 import static org.jooq.impl.DSL.*;
@@ -39,8 +37,12 @@ public class MuutospyyntoService {
 
     public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
 
-        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
+        return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
+                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.MUUTOSPERUSTELU_ID, MUUTOSPYYNTO.TILA,
+                MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
+                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO).from(MUUTOSPYYNTO,LUPA)
                 .where(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
+                .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class);
     }
 
