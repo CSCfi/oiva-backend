@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Muutospyynto;
+import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
 import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
@@ -16,11 +17,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
-import static fi.minedu.oiva.backend.util.DbUtils.combine;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
-import static org.jooq.impl.DSL.*;
-import static org.jooq.impl.DSL.currentTimestamp;
-import static org.jooq.util.postgres.PostgresDSL.array;
 
 @Service
 public class MuutospyyntoService {
@@ -53,6 +50,13 @@ public class MuutospyyntoService {
                 .fetchInto(Muutos.class);
     }
 
+    public Collection<Muutosperustelu> getAll() {
+
+        return dsl.select(MUUTOSPERUSTELU.fields()).from(MUUTOSPERUSTELU)
+                .fetchInto(Muutosperustelu.class);
+    }
+
+
     public Optional<Muutospyynto> getById(long id) {
         return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
                 .where(MUUTOSPYYNTO.ID.eq(id)).fetchOptionalInto(Muutospyynto.class);
@@ -63,6 +67,12 @@ public class MuutospyyntoService {
         return dsl.select(MUUTOS.fields()).from(MUUTOS)
                 .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
     }
+
+    public Optional<Muutosperustelu> getPerusteluById(long id) {
+        return dsl.select(MUUTOSPERUSTELU.fields()).from(MUUTOSPERUSTELU)
+                .where(MUUTOSPERUSTELU.ID.eq(id)).fetchOptionalInto(Muutosperustelu.class);
+    }
+
 
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 

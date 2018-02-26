@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos implements Serializable {
 
-    private static final long serialVersionUID = -782187564;
+    private static final long serialVersionUID = 302664522;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -43,6 +43,7 @@ public class Muutos implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private Long      maaraysId;
+    private String    tila;
 
     public Muutos() {}
 
@@ -61,6 +62,7 @@ public class Muutos implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.maaraysId = value.maaraysId;
+        this.tila = value.tila;
     }
 
     public Muutos(
@@ -77,7 +79,8 @@ public class Muutos implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        Long      maaraysId
+        Long      maaraysId,
+        String    tila
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -93,6 +96,7 @@ public class Muutos implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.maaraysId = maaraysId;
+        this.tila = tila;
     }
 
     public Long getId() {
@@ -213,6 +217,15 @@ public class Muutos implements Serializable {
         this.maaraysId = maaraysId;
     }
 
+    @Size(max = 10)
+    public String getTila() {
+        return this.tila;
+    }
+
+    public void setTila(String tila) {
+        this.tila = tila;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutos (");
@@ -231,6 +244,7 @@ public class Muutos implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(maaraysId);
+        sb.append(", ").append(tila);
 
         sb.append(")");
         return sb.toString();
