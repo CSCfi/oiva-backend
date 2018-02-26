@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos extends TableImpl<MuutosRecord> {
 
-    private static final long serialVersionUID = 1951036186;
+    private static final long serialVersionUID = 155787207;
 
     /**
      * The reference instance of <code>oiva.muutos</code>
@@ -124,6 +124,11 @@ public class Muutos extends TableImpl<MuutosRecord> {
      * The column <code>oiva.muutos.maarays_id</code>.
      */
     public final TableField<MuutosRecord, Long> MAARAYS_ID = createField("maarays_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
+     * The column <code>oiva.muutos.tila</code>.
+     */
+    public final TableField<MuutosRecord, String> TILA = createField("tila", org.jooq.impl.SQLDataType.VARCHAR.length(10), this, "");
 
     /**
      * Create a <code>oiva.muutos</code> table reference

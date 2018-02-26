@@ -6,6 +6,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -25,16 +26,21 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 1490044895;
+    private static final long serialVersionUID = 2102578606;
 
-    private Long   id;
-    private Long   lupaId;
-    private Date   hakupvm;
-    private Date   voimassaalkupvm;
-    private Date   voimassaloppupvm;
-    private Long   paatoskierrosId;
-    private Long   muutosperusteluId;
-    private String tila;
+    private Long      id;
+    private Long      lupaId;
+    private Date      hakupvm;
+    private Date      voimassaalkupvm;
+    private Date      voimassaloppupvm;
+    private Long      paatoskierrosId;
+    private Long      muutosperusteluId;
+    private String    tila;
+    private String    jarjestajaYtunnus;
+    private String    luoja;
+    private Timestamp luontipvm;
+    private String    paivittaja;
+    private Timestamp paivityspvm;
 
     public Muutospyynto() {}
 
@@ -47,17 +53,27 @@ public class Muutospyynto implements Serializable {
         this.paatoskierrosId = value.paatoskierrosId;
         this.muutosperusteluId = value.muutosperusteluId;
         this.tila = value.tila;
+        this.jarjestajaYtunnus = value.jarjestajaYtunnus;
+        this.luoja = value.luoja;
+        this.luontipvm = value.luontipvm;
+        this.paivittaja = value.paivittaja;
+        this.paivityspvm = value.paivityspvm;
     }
 
     public Muutospyynto(
-        Long   id,
-        Long   lupaId,
-        Date   hakupvm,
-        Date   voimassaalkupvm,
-        Date   voimassaloppupvm,
-        Long   paatoskierrosId,
-        Long   muutosperusteluId,
-        String tila
+        Long      id,
+        Long      lupaId,
+        Date      hakupvm,
+        Date      voimassaalkupvm,
+        Date      voimassaloppupvm,
+        Long      paatoskierrosId,
+        Long      muutosperusteluId,
+        String    tila,
+        String    jarjestajaYtunnus,
+        String    luoja,
+        Timestamp luontipvm,
+        String    paivittaja,
+        Timestamp paivityspvm
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -67,6 +83,11 @@ public class Muutospyynto implements Serializable {
         this.paatoskierrosId = paatoskierrosId;
         this.muutosperusteluId = muutosperusteluId;
         this.tila = tila;
+        this.jarjestajaYtunnus = jarjestajaYtunnus;
+        this.luoja = luoja;
+        this.luontipvm = luontipvm;
+        this.paivittaja = paivittaja;
+        this.paivityspvm = paivityspvm;
     }
 
     public Long getId() {
@@ -138,6 +159,48 @@ public class Muutospyynto implements Serializable {
         this.tila = tila;
     }
 
+    @NotNull
+    @Size(max = 10)
+    public String getJarjestajaYtunnus() {
+        return this.jarjestajaYtunnus;
+    }
+
+    public void setJarjestajaYtunnus(String jarjestajaYtunnus) {
+        this.jarjestajaYtunnus = jarjestajaYtunnus;
+    }
+
+    public String getLuoja() {
+        return this.luoja;
+    }
+
+    public void setLuoja(String luoja) {
+        this.luoja = luoja;
+    }
+
+    public Timestamp getLuontipvm() {
+        return this.luontipvm;
+    }
+
+    public void setLuontipvm(Timestamp luontipvm) {
+        this.luontipvm = luontipvm;
+    }
+
+    public String getPaivittaja() {
+        return this.paivittaja;
+    }
+
+    public void setPaivittaja(String paivittaja) {
+        this.paivittaja = paivittaja;
+    }
+
+    public Timestamp getPaivityspvm() {
+        return this.paivityspvm;
+    }
+
+    public void setPaivityspvm(Timestamp paivityspvm) {
+        this.paivityspvm = paivityspvm;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -150,6 +213,11 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paatoskierrosId);
         sb.append(", ").append(muutosperusteluId);
         sb.append(", ").append(tila);
+        sb.append(", ").append(jarjestajaYtunnus);
+        sb.append(", ").append(luoja);
+        sb.append(", ").append(luontipvm);
+        sb.append(", ").append(paivittaja);
+        sb.append(", ").append(paivityspvm);
 
         sb.append(")");
         return sb.toString();
