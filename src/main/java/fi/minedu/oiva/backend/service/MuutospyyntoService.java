@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
+import fi.minedu.oiva.backend.entity.Muutosperustelu;
 import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
@@ -49,13 +48,6 @@ public class MuutospyyntoService {
                 .where(MUUTOS.MUUTOSPYYNTO_ID.eq(muutospyynto_id))
                 .fetchInto(Muutos.class);
     }
-
-    public Collection<Muutosperustelu> getAll() {
-
-        return dsl.select(MUUTOSPERUSTELU.fields()).from(MUUTOSPERUSTELU)
-                .fetchInto(Muutosperustelu.class);
-    }
-
 
     public Optional<Muutospyynto> getById(long id) {
         return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
