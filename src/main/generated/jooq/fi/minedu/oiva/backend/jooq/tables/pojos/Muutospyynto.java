@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 2102578606;
+    private static final long serialVersionUID = -2115085373;
 
     private Long      id;
     private Long      lupaId;
@@ -34,7 +34,6 @@ public class Muutospyynto implements Serializable {
     private Date      voimassaalkupvm;
     private Date      voimassaloppupvm;
     private Long      paatoskierrosId;
-    private Long      muutosperusteluId;
     private String    tila;
     private String    jarjestajaYtunnus;
     private String    luoja;
@@ -51,7 +50,6 @@ public class Muutospyynto implements Serializable {
         this.voimassaalkupvm = value.voimassaalkupvm;
         this.voimassaloppupvm = value.voimassaloppupvm;
         this.paatoskierrosId = value.paatoskierrosId;
-        this.muutosperusteluId = value.muutosperusteluId;
         this.tila = value.tila;
         this.jarjestajaYtunnus = value.jarjestajaYtunnus;
         this.luoja = value.luoja;
@@ -67,7 +65,6 @@ public class Muutospyynto implements Serializable {
         Date      voimassaalkupvm,
         Date      voimassaloppupvm,
         Long      paatoskierrosId,
-        Long      muutosperusteluId,
         String    tila,
         String    jarjestajaYtunnus,
         String    luoja,
@@ -81,7 +78,6 @@ public class Muutospyynto implements Serializable {
         this.voimassaalkupvm = voimassaalkupvm;
         this.voimassaloppupvm = voimassaloppupvm;
         this.paatoskierrosId = paatoskierrosId;
-        this.muutosperusteluId = muutosperusteluId;
         this.tila = tila;
         this.jarjestajaYtunnus = jarjestajaYtunnus;
         this.luoja = luoja;
@@ -138,15 +134,6 @@ public class Muutospyynto implements Serializable {
 
     public void setPaatoskierrosId(Long paatoskierrosId) {
         this.paatoskierrosId = paatoskierrosId;
-    }
-
-    @NotNull
-    public Long getMuutosperusteluId() {
-        return this.muutosperusteluId;
-    }
-
-    public void setMuutosperusteluId(Long muutosperusteluId) {
-        this.muutosperusteluId = muutosperusteluId;
     }
 
     @NotNull
@@ -211,7 +198,6 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(voimassaalkupvm);
         sb.append(", ").append(voimassaloppupvm);
         sb.append(", ").append(paatoskierrosId);
-        sb.append(", ").append(muutosperusteluId);
         sb.append(", ").append(tila);
         sb.append(", ").append(jarjestajaYtunnus);
         sb.append(", ").append(luoja);
