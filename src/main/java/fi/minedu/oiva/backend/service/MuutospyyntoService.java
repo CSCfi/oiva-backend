@@ -2,7 +2,7 @@ package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.Muutosperustelu;
 import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
+import fi.minedu.oiva.backend.entity.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosperusteluRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
@@ -49,12 +49,18 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
-                .map(muutospyynto -> withPerustelu(Optional.ofNullable(muutospyynto)))
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"perustelut"))
                 .filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
+    protected Optional<Muutospyynto> with(final Optional<Muutospyynto> muutospyyntoOpt, String reqs) {
+        if(reqs.equals("perustelut")) { withPerustelu(muutospyyntoOpt); }
+        if(reqs.equals("all")) { withMuutokset(muutospyyntoOpt); withPerustelu(muutospyyntoOpt); }
+        return muutospyyntoOpt;
+    }
+
+        protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> getPerusteluByMuutospyynto(muutospyynto.getId()).ifPresent(muutospyynto::setMuutosperustelu));
         return muutospyyntoOpt;
     }
@@ -68,8 +74,13 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
     public Optional<Muutospyynto> getById(long id) {
         return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
                 .where(MUUTOSPYYNTO.ID.eq(id)).fetchOptionalInto(Muutospyynto.class)
-                .map(muutospyynto -> withPerustelu(Optional.ofNullable(muutospyynto)))
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"all"))
                 .filter(Optional::isPresent).map(Optional::get);
+    }
+
+    protected Optional<Muutospyynto> withMuutokset(final Optional<Muutospyynto> muutospyyntoOpt) {
+        muutospyyntoOpt.ifPresent(muutospyynto -> muutospyynto.setMuutokset(getByMuutospyyntoId(muutospyynto.getId())));
+        return muutospyyntoOpt;
     }
 
     public Optional<Long> create(final Muutospyynto muutospyynto) {

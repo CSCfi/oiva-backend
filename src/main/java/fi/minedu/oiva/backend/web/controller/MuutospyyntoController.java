@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
+import fi.minedu.oiva.backend.entity.Muutos;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;

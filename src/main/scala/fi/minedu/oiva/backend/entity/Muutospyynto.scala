@@ -1,5 +1,7 @@
 package fi.minedu.oiva.backend.entity
 
+import java.util.Collection
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 
@@ -8,9 +10,10 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 class Muutospyynto(
                     var diaarinumero: String,
                     var muutosperustelu: Muutosperustelu,
+                    var muutokset: Collection[Muutos],
                     var muutospyynto: Muutospyynto) extends fi.minedu.oiva.backend.jooq.tables.pojos.Muutospyynto  {
 
-  def this() = this(null,null,null)
+  def this() = this(null,null,null,null)
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
@@ -23,5 +26,7 @@ class Muutospyynto(
   def getMuutosperustelu = muutosperustelu
   def setMuutosperustelu(muutosperustelu: Muutosperustelu): Unit = this.muutosperustelu = muutosperustelu
 
+  def getMuutokset = muutokset
+  def setMuutokset(muutokset: Collection[Muutos]): Unit = this.muutokset = muutokset
 
 }
