@@ -33,7 +33,9 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
 
     private enum Muutospyyntotila {
         LUONNOS,
+        VALMIINA_KASITTELYYN,
         KASITTELYSSA,
+        TAYDENNETTAVA,
         VALMIS,
         PASSIVOITU;
     }
@@ -216,6 +218,31 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
 
     }
 
+    // Passivoi muutospyynnön
+    public Optional<Long> changeTila(final long id, String tila) {
+
+        try {
+
+            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.ID.eq(id)));
+
+            if(muutospyyntoOpt.isPresent()) {
+
+                MuutospyyntoRecord mp = muutospyyntoOpt.get();
+                if(tila.equals("valmiina_kasittelyyn")) { mp.setTila(Muutospyyntotila.VALMIINA_KASITTELYYN.name()); }
+                if(tila.equals("kasittelyssa")) { mp.setTila(Muutospyyntotila.KASITTELYSSA.name()); }
+                if(tila.equals("palauta_taydennettavaksi")) { mp.setTila(Muutospyyntotila.TAYDENNETTAVA.name()); }
+                if(tila.equals("valmis")) { mp.setTila(Muutospyyntotila.VALMIS.name()); }
+                dsl.executeUpdate(mp);
+
+            }
+
+            return Optional.ofNullable(muutospyyntoOpt.get().getId());
+
+        } catch(Exception e) {
+            return Optional.empty();
+        }
+
+    }
 
     // VALIDOINNIT
 

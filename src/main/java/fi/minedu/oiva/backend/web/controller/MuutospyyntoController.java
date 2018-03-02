@@ -172,4 +172,41 @@ public class MuutospyyntoController {
         return getOr400(service.updateMuutos(muutos));
     }
 
+
+    // Vaihda muutospyynnön tilaa -> valmiina käsittelyyn
+    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
+    @OivaAccess_Public
+    @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
+    @RequestMapping(method = POST, value = "/tila/kasittelyyn/{muutospyyntoId:[0-9]+}")
+    public HttpEntity<Long> vieKasittelyyn(final @PathVariable long muutospyyntoId) {
+        return getOr404(service.changeTila(muutospyyntoId, "valmiina_kasittelyyn"));
+    }
+
+    // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn
+    //@OivaAccess_Esittelija // TODO testataan kirjautumista
+    @OivaAccess_Public
+    @ApiOperation(notes = "Ota muutospyyntö esittelijän käsittelyyn", value = "")
+    @RequestMapping(method = POST, value = "/tila/kasittelyssa/{muutospyyntoId:[0-9]+}")
+    public HttpEntity<Long> kasittelyssa(final @PathVariable long muutospyyntoId) {
+        return getOr404(service.changeTila(muutospyyntoId, "kasittelyssa"));
+    }
+
+    // Vaihda muutospyynnön tilaa -> palauta täydennettäväksi
+    //@OivaAccess_Esittelija // TODO testataan kirjautumista
+    @OivaAccess_Public
+    @ApiOperation(notes = "Palauta järjestäjän täydennettäväksi", value = "")
+    @RequestMapping(method = POST, value = "/tila/taydennettava/{muutospyyntoId:[0-9]+}")
+    public HttpEntity<Long> taydennettava(final @PathVariable long muutospyyntoId) {
+        return getOr404(service.changeTila(muutospyyntoId, "palauta_taydennettavaksi"));
+    }
+
+    // Vaihda muutospyynnön tilaa -> valmis
+    //@OivaAccess_Esittelija // TODO testataan kirjautumista
+    @OivaAccess_Public
+    @ApiOperation(notes = "Merkitse muutospyyntö valmiiksi", value = "")
+    @RequestMapping(method = POST, value = "/tila/valmis/{muutospyyntoId:[0-9]+}")
+    public HttpEntity<Long> valmis(final @PathVariable long muutospyyntoId) {
+        return getOr404(service.changeTila(muutospyyntoId, "valmis"));
+    }
+
 }
