@@ -57,7 +57,7 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
 
     protected Optional<Muutospyynto> with(final Optional<Muutospyynto> muutospyyntoOpt, String reqs) {
         if(reqs.equals("listaus")) { withPerustelu(muutospyyntoOpt); withPaatoskierros(muutospyyntoOpt); }
-        if(reqs.equals("yksi")) { withMuutokset(muutospyyntoOpt); withPerustelu(muutospyyntoOpt); }
+        if(reqs.equals("yksi")) { withMuutokset(muutospyyntoOpt); withPerustelu(muutospyyntoOpt); withPaatoskierros(muutospyyntoOpt); }
         return muutospyyntoOpt;
     }
 
