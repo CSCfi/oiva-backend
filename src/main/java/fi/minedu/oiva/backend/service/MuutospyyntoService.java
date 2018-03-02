@@ -38,6 +38,23 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
         PASSIVOITU;
     }
 
+    // Muutospyyntölistaus (hakemukset) esittelijälle
+    public Collection<Muutospyynto> getByEsittelija(String nimi) {
+
+        return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
+                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA,
+                MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
+                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID, LUPA.ID.as("lupa_id"))
+                .from(MUUTOSPYYNTO, LUPA)
+                .where( (MUUTOSPYYNTO.LUOJA.eq(nimi)).or(MUUTOSPYYNTO.PAIVITTAJA.eq(nimi)) )
+                .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
+                .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
+                .stream()
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"listaus"))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
     // Muutospyyntölistaus (hakemukset) koulutuksen järjestäjälle
     public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
 
