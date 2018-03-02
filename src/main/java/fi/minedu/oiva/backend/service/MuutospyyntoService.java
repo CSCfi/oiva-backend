@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.service;
 import fi.minedu.oiva.backend.entity.Muutosperustelu;
 import fi.minedu.oiva.backend.entity.Muutospyynto;
 import fi.minedu.oiva.backend.entity.Muutos;
+import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosperusteluRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
@@ -49,19 +50,24 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
-                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"perustelut"))
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"listaus"))
                 .filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toList());
     }
 
     protected Optional<Muutospyynto> with(final Optional<Muutospyynto> muutospyyntoOpt, String reqs) {
-        if(reqs.equals("perustelut")) { withPerustelu(muutospyyntoOpt); }
-        if(reqs.equals("all")) { withMuutokset(muutospyyntoOpt); withPerustelu(muutospyyntoOpt); }
+        if(reqs.equals("listaus")) { withPerustelu(muutospyyntoOpt); withPaatoskierros(muutospyyntoOpt); }
+        if(reqs.equals("yksi")) { withMuutokset(muutospyyntoOpt); withPerustelu(muutospyyntoOpt); }
         return muutospyyntoOpt;
     }
 
-        protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
+    protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> getPerusteluByMuutospyynto(muutospyynto.getId()).ifPresent(muutospyynto::setMuutosperustelu));
+        return muutospyyntoOpt;
+    }
+
+    protected Optional<Muutospyynto> withPaatoskierros(final Optional<Muutospyynto> muutospyyntoOpt) {
+        muutospyyntoOpt.ifPresent(muutospyynto -> getPaatoskierrosByMuutospyynto(muutospyynto.getPaatoskierrosId()).ifPresent(muutospyynto::setPaatoskierros));
         return muutospyyntoOpt;
     }
 
@@ -70,11 +76,16 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
                 .where(MUUTOSPERUSTELU.MUUTOSPYYNTO_ID.eq(id)).fetchOptionalInto(Muutosperustelu.class);
     }
 
+    public Optional<Paatoskierros> getPaatoskierrosByMuutospyynto(long id) {
+        return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS)
+                .where(PAATOSKIERROS.ID.eq(id)).fetchOptionalInto(Paatoskierros.class);
+    }
+
     // hakee yksittäinen muutospyynnön perusteluineen
     public Optional<Muutospyynto> getById(long id) {
         return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
                 .where(MUUTOSPYYNTO.ID.eq(id)).fetchOptionalInto(Muutospyynto.class)
-                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"all"))
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"yksi"))
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
