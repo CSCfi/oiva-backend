@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
+import fi.minedu.oiva.backend.entity.Muutos;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
@@ -47,6 +47,16 @@ public class MuutospyyntoController {
     public CompletableFuture<Collection<Muutospyynto>> getByYtunnus(final @PathVariable String ytunnus,
                                                                     final HttpServletRequest request) {
         return async(() -> service.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
+    }
+
+    // palauttaa kaikki esittelijan muutospyynnöt
+    //@OivaAccess_Esittelija // TODO testataan kirjautumista
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/esittelija/{nimi}")
+    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
+    public CompletableFuture<Collection<Muutospyynto>> getByEsittelija(final @PathVariable String nimi,
+                                                                    final HttpServletRequest request) {
+        return async(() -> service.getByEsittelija(RequestUtils.getPathVariable(request, nimi)));
     }
 
     // hakee yksittäisen muutospyynnön ID:llä (refaktoroidaan UUID:lle)
