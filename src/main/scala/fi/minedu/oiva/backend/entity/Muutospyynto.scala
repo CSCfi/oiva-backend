@@ -16,10 +16,6 @@ class Muutospyynto(
 
   def this() = this(null,null,null,null,null)
 
-  // exclude from json
-  @JsonIgnore override def getId = super.getId
-
-
   def getDiaarinumero = diaarinumero
   def setDiaarinumero(diaarinumero: String): Unit = this.diaarinumero = diaarinumero
 
