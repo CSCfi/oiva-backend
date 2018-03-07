@@ -69,12 +69,8 @@ public class LupaService implements RecordMapping<Lupa> {
         } else if(accessPermission.is(OivaAccess.Type.OrganizationAndPublic)) {
             if(accessPermission.oids.isEmpty()) {
                 return Optional.of(valmisLupaCondition);
-            } else {
-                return Optional.of(valmisLupaCondition.or(LUPA.JARJESTAJA_OID.in(accessPermission.oids)));
-            }
-        } else {
-            return Optional.empty();
-        }
+            } else return Optional.of(valmisLupaCondition.or(LUPA.JARJESTAJA_OID.in(accessPermission.oids)));
+        } else return Optional.empty();
     }
 
     public Collection<Lupa> getAll(final String... withOptions) { // TODO: Implement filter
@@ -86,8 +82,15 @@ public class LupaService implements RecordMapping<Lupa> {
             .collect(Collectors.toList());
     }
 
-    public Optional<Lupa> get(final String diaarinumero, final String... withOptions) {
-        final SelectConditionStep<Record> query = lupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero));
+    public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
+        return get(lupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
+    }
+
+    public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
+        return get(lupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
+    }
+
+    protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
         baseLupaFilter().ifPresent(query::and);
         return entity(query.fetchOne(), withOptions);
     }

@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct
 import fi.minedu.oiva.backend.cache.CacheAware
 import fi.minedu.oiva.backend.cas.CASClient
 import fi.minedu.oiva.backend.entity.Maarays
-import fi.minedu.oiva.backend.entity.dto.OrganisaatioInfo
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton
 import fi.minedu.oiva.backend.entity.opintopolku._
 
@@ -33,6 +32,9 @@ class OpintopolkuService extends CacheAware {
     private val organisaatioServiceUrl: String = null
     private lazy val organisaatioQueryServiceUrl: String = organisaatioServiceUrl + "/%s?includeImage=false"
     private lazy val koulutustoimijatServiceUrl: String = organisaatioServiceUrl + "/v2/hae?organisaatioTyyppi=Koulutustoimija&aktiiviset=true&suunnitellut=true&lakkautetut=true"
+
+    @Value("${cas.baseUrl}${opintopolku.kayttooikeus.restUrl}")
+    private val kayttooikeusServiceUrl: String = null
 
     @Value("${opintopolku.baseUrl}${opintopolku.koodisto.restUrl}")
     private val koodistoServiceUrl: String = null
@@ -67,14 +69,6 @@ class OpintopolkuService extends CacheAware {
 
     def koodistoVersio(versio: Integer) = if(null != versio) s"koodistoVersio=${versio}" else ""
 
-    @Value("${opintopolku.baseUrl}${opintopolku.autentikaatio.restUrl}")
-    private val authenticationServiceUrl: String = null
-    private lazy val securityCheckUrl: String = authenticationServiceUrl + "/j_spring_cas_security_check"
-
-    @Value("${opintopolku.baseUrl}${opintopolku.henkilo.restUrl}")
-    private val henkiloServiceUrl: String = null
-    private lazy val organisaatiohenkiloUrl: String = henkiloServiceUrl + "/%s/organisaatiohenkilo"
-
     @Value("${opintopolku.apiCredentials.username}")
     private val opintopolkuApiUsername: String = null
 
@@ -92,34 +86,47 @@ class OpintopolkuService extends CacheAware {
         setCache("OpintopolkuService")
     }
 
-    def getOrganisaatio(oid: String) = {
-        val url = organisaatioQueryServiceUrl.format(oid)
-        cacheRx(oid) {
-            requestRx(url, classOf[Organisaatio])
-        }
-    }
+    implicit def future2CS[T](future: Future[T]): CompletionStage[T] = FutureConverters.toJava(future)
 
     def requestRx[T](url: String, clazz: Class[T]) = rxClient.target(url).request().rx().get(clazz)
     def request[T](url: String, clazz: Class[T]) = rxClient.target(url).request().get(clazz)
-    def toJson[T](str: String, clazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, clazz)
+    def toEntity[T](str: String, clazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, clazz)
 
-    def getBlockingOrganisaatio(oid: String) = getOrganisaatio(oid).toCompletableFuture.join()
+    def requestWithCasTicket(serviceUrl: String)(httpRequest: dispatch.Req) =
+        casClient.getTicket(serviceUrl, opintopolkuApiUsername, opintopolkuApiPassword)
+            .flatMap { ticket => Http(httpRequest.addQueryParameter("ticket", ticket) OK as.String) }.apply()
 
     /**
-     * Fetches person's organizational data from Opintopolku
-     *
-     * @param oid
-     * @return Organisaatiohenkilo data
-     */
-    def getOrganisaatiohenkilo(oid: String): java.util.List[OrganisaatioInfo] = {
-        val strResp = casClient.getTicket(securityCheckUrl, opintopolkuApiUsername, opintopolkuApiPassword)
-            .flatMap {
-                ticket => Http(url(organisaatiohenkiloUrl.format(oid)).GET.addQueryParameter("ticket", ticket) OK as.String)
-            }.apply()
-        ObjectMapperSingleton.mapper.readValue(strResp, new TypeReference[java.util.List[OrganisaatioInfo]](){})
+      * Käyttöoikeus-palvelu
+      *
+      * @param username käyttäjätunnus
+      * @return Käyttäjän käyttöoikeudet
+      */
+    def getKayttajaKayttooikeus(username: String): Optional[KayttajaKayttooikeus] = {
+        val response = requestWithCasTicket(kayttooikeusServiceUrl) {
+            url(kayttooikeusServiceUrl + "/kayttooikeus/kayttaja?username=" + username).GET
+        }
+        def toEntityList(response: String): java.util.List[KayttajaKayttooikeus] =
+            ObjectMapperSingleton.mapper.readValue(response, new TypeReference[java.util.List[KayttajaKayttooikeus]](){})
+
+        toEntityList(response).toList match {
+            case oikeus :: _ => Optional.ofNullable(oikeus)
+            case _ => Optional.empty()
+        }
     }
 
-    implicit def future2CS[T](future: Future[T]): CompletionStage[T] = FutureConverters.toJava(future)
+    /**
+      * Organisaatiot
+      *
+      * @param oid
+      * @return
+      */
+    def getOrganisaatio(oid: String) = {
+        val url = organisaatioQueryServiceUrl.format(oid)
+        cacheRx(oid) { requestRx(url, classOf[Organisaatio]) }
+    }
+
+    def getBlockingOrganisaatio(oid: String) = getOrganisaatio(oid).toCompletableFuture.join()
 
     /**
      * Hakee ja palauttaa maakunnat ja maakuntaan kuuluvat kaikki kunnat

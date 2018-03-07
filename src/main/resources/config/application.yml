@@ -26,10 +26,8 @@ opintopolku:
         restUrl: /koodisto-service/rest/json
     organisaatio:
         restUrl: /organisaatio-service/rest/organisaatio
-    autentikaatio:
-        restUrl: /authentication-service
-    henkilo:
-        restUrl: ${opintopolku.autentikaatio.restUrl}/resources/henkilo
+    kayttooikeus:
+        restUrl: /kayttooikeus-service
     apiCredentials:
         username: override_this_in_local_application_yml
         password: override_this_in_local_application_yml
@@ -40,21 +38,6 @@ cas:
     url.login: /login
     url.logout: /logout
     service.url: /login/cas
-
-ldap:
-    cache.size: 10000
-    index.cache.size: 10000
-    url: override_this_in_local_application_yml
-    base-prefix: override_this_in_local_application_yml
-    user-search-base: override_this_in_local_application_yml
-    manager:
-        dn: override_this_in_local_application_yml
-        password: override_this_in_local_application_yml
-    cas:
-        user-search-filter: override_this_in_local_application_yml
-        group-search-base: override_this_in_local_application_yml
-        group-search-filter: override_this_in_local_application_yml
-        group-role-attribute: override_this_in_local_application_yml
 
 multipart:
     maxFileSize: 512MB

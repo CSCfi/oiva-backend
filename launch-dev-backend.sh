@@ -22,7 +22,7 @@ elif [[ $userArg == "samu" ]]; then
     OIVA_JREBEL_AGENT=''
 else
     echo "Usage: ./launch-dev-backend.sh [DEVNAME] [OPTIONS]"
-    echo "Options:\n\tc\tUse docker-compose databases\n\td\tUse Java remote debug\n\tr\tUse JRebel\n\to\tUse maven offline mode\n\tl\tUse Ldap ssh-tunnel\n"
+    echo "Options:\n\tc\tUse docker-compose databases\n\td\tUse Java remote debug\n\tr\tUse JRebel\n\to\tUse maven offline mode\n"
     exit 1
 fi
 
@@ -41,7 +41,6 @@ echo "\nLaunching oiva-backend as $userArg using options:"
 #  d    debug mode
 #  r    jrebel mode
 #  o    mvn offline mode
-#  l    ldap-tunnel mode
 
 optionsArg=$@
 
@@ -64,11 +63,6 @@ fi
 if [[ $optionsArg == *"o"* ]]; then
     echo "maven offline mode"
     OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -o"
-fi
-
-if [[ $optionsArg == *"l"* ]]; then
-    echo "ldap ssh-tunnel"
-    OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Dldap.url=ldaps://127.0.0.1:20636"
 fi
 
 echo "\nMaven options:${OIVA_MVN_OPTS}\nJava options:${OIVA_JAVA_OPTS}\n"

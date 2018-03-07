@@ -68,20 +68,27 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero, final HttpServletRequest request,
         final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.get(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
+        return getOr404(async(() -> service.getByDiaarinumero(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/historia")
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}")
+    @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus, final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, options(with))));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/historia/{oid}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän oid:n perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @RequestParam(value = "oid", required = false) String oid) {
-        return async(() -> lhservice.getHistoriaByOid(oid));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @PathVariable String oid, final HttpServletRequest request) {
+        return async(() -> lhservice.getHistoriaByOid(RequestUtils.getPathVariable(request, oid)));
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/historiaytunnus")
+    @RequestMapping(method = GET, value = "/historiaytunnuksella/{ytunnus}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän ytunnuksen perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @RequestParam(value = "ytunnus", required = false) String ytunnus) {
-        return async(() -> lhservice.getHistoriaByYtunnus(ytunnus));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus, final HttpServletRequest request) {
+        return async(() -> lhservice.getHistoriaByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 }
