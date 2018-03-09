@@ -5,6 +5,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -854682780;
+    private static final long serialVersionUID = 1795079426;
 
     private Long   id;
     private String diaarinumero;
@@ -35,6 +36,7 @@ public class Lupahistoria implements Serializable {
     private String voimassaolo;
     private String paatospvm;
     private String filename;
+    private UUID   uuid;
 
     public Lupahistoria() {}
 
@@ -48,6 +50,7 @@ public class Lupahistoria implements Serializable {
         this.voimassaolo = value.voimassaolo;
         this.paatospvm = value.paatospvm;
         this.filename = value.filename;
+        this.uuid = value.uuid;
     }
 
     public Lupahistoria(
@@ -59,7 +62,8 @@ public class Lupahistoria implements Serializable {
         String tila,
         String voimassaolo,
         String paatospvm,
-        String filename
+        String filename,
+        UUID   uuid
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -70,6 +74,7 @@ public class Lupahistoria implements Serializable {
         this.voimassaolo = voimassaolo;
         this.paatospvm = paatospvm;
         this.filename = filename;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -160,6 +165,14 @@ public class Lupahistoria implements Serializable {
         this.filename = filename;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -173,6 +186,7 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(voimassaolo);
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(filename);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

@@ -1,21 +1,16 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Asiatyyppi;
-import fi.minedu.oiva.backend.entity.Esitysmalli;
 import fi.minedu.oiva.backend.entity.Lupa;
-import fi.minedu.oiva.backend.entity.Lupatila;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.OivaTemplates;
-import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.entity.Liite;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
-import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
-import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.OivaPermission;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.template.extension.MaaraysListFilter;
+import fi.minedu.oiva.backend.util.With;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -35,13 +30,25 @@ import org.apache.commons.lang3.StringUtils;
 import static fi.minedu.oiva.backend.jooq.Tables.*;
 
 @Service
-public class LupaService implements RecordMapping<Lupa> {
+public class LupaService {
 
     @Autowired
     private DSLContext dsl;
 
     @Autowired
     private MaaraysService maaraysService;
+
+    @Autowired
+    private PaatoskierrosService paatoskierrosService;
+
+    @Autowired
+    private EsitysmalliService esitysmalliService;
+
+    @Autowired
+    private AsiatyyppiService asiatyyppiService;
+
+    @Autowired
+    private LupatilaService lupatilaService;
 
     @Autowired
     private OrganisaatioService organisaatioService;
@@ -52,13 +59,6 @@ public class LupaService implements RecordMapping<Lupa> {
     protected SelectOnConditionStep<Record> baseLupaSelect() {
         return dsl.select(LUPA.fields()).from(LUPA)
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
-    }
-
-    protected SelectOnConditionStep<Record> lupaSelect() {
-        return baseLupaSelect()
-            .leftOuterJoin(ASIATYYPPI).on(ASIATYYPPI.ID.eq(LUPA.ASIATYYPPI_ID))
-            .leftOuterJoin(PAATOSKIERROS).on(PAATOSKIERROS.ID.eq(LUPA.PAATOSKIERROS_ID))
-            .leftOuterJoin(ESITYSMALLI).on(ESITYSMALLI.ID.eq(PAATOSKIERROS.ESITYSMALLI_ID));
     }
 
     protected Optional<Condition> baseLupaFilter() {
@@ -83,11 +83,11 @@ public class LupaService implements RecordMapping<Lupa> {
     }
 
     public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
-        return get(lupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
+        return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
-        return get(lupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
+        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
     }
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
@@ -95,17 +95,16 @@ public class LupaService implements RecordMapping<Lupa> {
         return entity(query.fetchOne(), withOptions);
     }
 
-    protected Optional<Lupa> entity(final Record record, final String... withOptions) {
+    protected Optional<Lupa> entity(final Record record, final String... with) {
         if(null != record) {
-            final Lupa lupa = convertFieldsTo(record, LUPA.fields(), Lupa.class);
-
-            final Paatoskierros paatoskierros = convertFieldsTo(record, PAATOSKIERROS.fields(), Paatoskierros.class);
-            paatoskierros.setEsitysmalli(convertFieldsTo(record, ESITYSMALLI.fields(), Esitysmalli.class));
-            lupa.setPaatoskierros(paatoskierros);
-
-            lupa.setAsiatyyppi(convertFieldsTo(record, ASIATYYPPI.fields(), Asiatyyppi.class));
-            lupa.setLupatila(convertFieldsTo(record, LUPATILA.fields(), Lupatila.class));
-            return with(Optional.of(lupa), withOptions);
+            final Lupa lupa = record.into(Lupa.class);
+            paatoskierrosService.forLupa(lupa).ifPresent(paatoskierros -> {
+                esitysmalliService.forPaatoskierros(paatoskierros).ifPresent(paatoskierros::setEsitysmalli);
+                lupa.setPaatoskierros(paatoskierros);
+            });
+            asiatyyppiService.forLupa(lupa).ifPresent(lupa::setAsiatyyppi);
+            lupatilaService.forLupa(lupa).ifPresent(lupa::setLupatila);
+            return with(Optional.of(lupa), with);
         }
         return Optional.empty();
     }
@@ -113,7 +112,7 @@ public class LupaService implements RecordMapping<Lupa> {
     protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final String... with) {
         final List withOptions = null == with ? Collections.emptyList() : Arrays.asList(with).stream().map(String::toLowerCase).collect(Collectors.toList());
         final Function<Class<?>, Boolean> hasOption = targetClass ->
-            withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(withAll);
+            withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(With.all);
 
         if(hasOption.apply(Organisaatio.class)) withOrganization(lupaOpt);
         if(hasOption.apply(Maarays.class)) withMaaraykset(lupaOpt);

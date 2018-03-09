@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.entity.TranslatedString;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -26,7 +27,7 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutoshistoria implements Serializable {
 
-    private static final long serialVersionUID = 1625494661;
+    private static final long serialVersionUID = 809215149;
 
     private Long             id;
     private Long             maaraysId;
@@ -34,6 +35,7 @@ public class Muutoshistoria implements Serializable {
     private String           tyyppi;
     private String           kayttaja;
     private Timestamp        paivays;
+    private UUID             uuid;
 
     public Muutoshistoria() {}
 
@@ -44,6 +46,7 @@ public class Muutoshistoria implements Serializable {
         this.tyyppi = value.tyyppi;
         this.kayttaja = value.kayttaja;
         this.paivays = value.paivays;
+        this.uuid = value.uuid;
     }
 
     public Muutoshistoria(
@@ -52,7 +55,8 @@ public class Muutoshistoria implements Serializable {
         TranslatedString selite,
         String           tyyppi,
         String           kayttaja,
-        Timestamp        paivays
+        Timestamp        paivays,
+        UUID             uuid
     ) {
         this.id = id;
         this.maaraysId = maaraysId;
@@ -60,6 +64,7 @@ public class Muutoshistoria implements Serializable {
         this.tyyppi = tyyppi;
         this.kayttaja = kayttaja;
         this.paivays = paivays;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -112,6 +117,14 @@ public class Muutoshistoria implements Serializable {
         this.paivays = paivays;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutoshistoria (");
@@ -122,6 +135,7 @@ public class Muutoshistoria implements Serializable {
         sb.append(", ").append(tyyppi);
         sb.append(", ").append(kayttaja);
         sb.append(", ").append(paivays);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

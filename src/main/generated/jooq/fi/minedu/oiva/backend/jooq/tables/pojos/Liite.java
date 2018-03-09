@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite implements Serializable {
 
-    private static final long serialVersionUID = 1237829722;
+    private static final long serialVersionUID = 315074742;
 
     private Long      id;
     private String    nimi;
@@ -41,6 +42,7 @@ public class Liite implements Serializable {
     private JsonNode  meta;
     private String    tyyppi;
     private String    kieli;
+    private UUID      uuid;
 
     public Liite() {}
 
@@ -57,6 +59,7 @@ public class Liite implements Serializable {
         this.meta = value.meta;
         this.tyyppi = value.tyyppi;
         this.kieli = value.kieli;
+        this.uuid = value.uuid;
     }
 
     public Liite(
@@ -71,7 +74,8 @@ public class Liite implements Serializable {
         Long      koko,
         JsonNode  meta,
         String    tyyppi,
-        String    kieli
+        String    kieli,
+        UUID      uuid
     ) {
         this.id = id;
         this.nimi = nimi;
@@ -85,6 +89,7 @@ public class Liite implements Serializable {
         this.meta = meta;
         this.tyyppi = tyyppi;
         this.kieli = kieli;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -192,6 +197,14 @@ public class Liite implements Serializable {
         this.kieli = kieli;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Liite (");
@@ -208,6 +221,7 @@ public class Liite implements Serializable {
         sb.append(", ").append(meta);
         sb.append(", ").append(tyyppi);
         sb.append(", ").append(kieli);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

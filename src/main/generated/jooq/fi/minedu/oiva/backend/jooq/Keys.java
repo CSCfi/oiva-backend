@@ -84,20 +84,33 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_PKEY = UniqueKeys0.ASIATYYPPI_PKEY;
+    public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_UUID_KEY = UniqueKeys0.ASIATYYPPI_UUID_KEY;
     public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_PKEY = UniqueKeys0.ESITYSMALLI_PKEY;
+    public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_UUID_KEY = UniqueKeys0.ESITYSMALLI_UUID_KEY;
     public static final UniqueKey<FuusioRecord> FUUSIO_PKEY = UniqueKeys0.FUUSIO_PKEY;
+    public static final UniqueKey<FuusioRecord> FUUSIO_UUID_KEY = UniqueKeys0.FUUSIO_UUID_KEY;
     public static final UniqueKey<KohdeRecord> KOHDE_PKEY = UniqueKeys0.KOHDE_PKEY;
+    public static final UniqueKey<KohdeRecord> KOHDE_UUID_KEY = UniqueKeys0.KOHDE_UUID_KEY;
     public static final UniqueKey<LiiteRecord> LIITE_PKEY = UniqueKeys0.LIITE_PKEY;
+    public static final UniqueKey<LiiteRecord> LIITE_UUID_KEY = UniqueKeys0.LIITE_UUID_KEY;
     public static final UniqueKey<LupaRecord> LUPA_PKEY = UniqueKeys0.LUPA_PKEY;
     public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = UniqueKeys0.LUPA_DIAARINUMERO_KEY;
+    public static final UniqueKey<LupaRecord> LUPA_UUID_KEY = UniqueKeys0.LUPA_UUID_KEY;
     public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = UniqueKeys0.LUPA_LIITE_PKEY;
     public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = UniqueKeys0.LUPAHISTORIA_PKEY;
+    public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_UUID_KEY = UniqueKeys0.LUPAHISTORIA_UUID_KEY;
     public static final UniqueKey<LupatilaRecord> LUPATILA_PKEY = UniqueKeys0.LUPATILA_PKEY;
+    public static final UniqueKey<LupatilaRecord> LUPATILA_UUID_KEY = UniqueKeys0.LUPATILA_UUID_KEY;
     public static final UniqueKey<MaaraysRecord> MAARAYS_PKEY = UniqueKeys0.MAARAYS_PKEY;
+    public static final UniqueKey<MaaraysRecord> MAARAYS_UUID_KEY = UniqueKeys0.MAARAYS_UUID_KEY;
     public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = UniqueKeys0.MAARAYSTYYPPI_PKEY;
+    public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_UUID_KEY = UniqueKeys0.MAARAYSTYYPPI_UUID_KEY;
     public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_PKEY = UniqueKeys0.MUUTOSHISTORIA_PKEY;
+    public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_UUID_KEY = UniqueKeys0.MUUTOSHISTORIA_UUID_KEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = UniqueKeys0.PAATOSKIERROS_PKEY;
+    public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = UniqueKeys0.PAATOSKIERROS_UUID_KEY;
     public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_PKEY = UniqueKeys0.TEKSTITYYPPI_PKEY;
+    public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_UUID_KEY = UniqueKeys0.TEKSTITYYPPI_UUID_KEY;
     public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = UniqueKeys0.TIEDOTE_PKEY;
 
     // -------------------------------------------------------------------------
@@ -142,20 +155,33 @@ public class Keys {
 
     private static class UniqueKeys0 extends AbstractKeys {
         public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_PKEY = createUniqueKey(Asiatyyppi.ASIATYYPPI, "asiatyyppi_pkey", Asiatyyppi.ASIATYYPPI.ID);
+        public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_UUID_KEY = createUniqueKey(Asiatyyppi.ASIATYYPPI, "asiatyyppi_uuid_key", Asiatyyppi.ASIATYYPPI.UUID);
         public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_PKEY = createUniqueKey(Esitysmalli.ESITYSMALLI, "esitysmalli_pkey", Esitysmalli.ESITYSMALLI.ID);
+        public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_UUID_KEY = createUniqueKey(Esitysmalli.ESITYSMALLI, "esitysmalli_uuid_key", Esitysmalli.ESITYSMALLI.UUID);
         public static final UniqueKey<FuusioRecord> FUUSIO_PKEY = createUniqueKey(Fuusio.FUUSIO, "fuusio_pkey", Fuusio.FUUSIO.ID);
+        public static final UniqueKey<FuusioRecord> FUUSIO_UUID_KEY = createUniqueKey(Fuusio.FUUSIO, "fuusio_uuid_key", Fuusio.FUUSIO.UUID);
         public static final UniqueKey<KohdeRecord> KOHDE_PKEY = createUniqueKey(Kohde.KOHDE, "kohde_pkey", Kohde.KOHDE.ID);
+        public static final UniqueKey<KohdeRecord> KOHDE_UUID_KEY = createUniqueKey(Kohde.KOHDE, "kohde_uuid_key", Kohde.KOHDE.UUID);
         public static final UniqueKey<LiiteRecord> LIITE_PKEY = createUniqueKey(Liite.LIITE, "liite_pkey", Liite.LIITE.ID);
+        public static final UniqueKey<LiiteRecord> LIITE_UUID_KEY = createUniqueKey(Liite.LIITE, "liite_uuid_key", Liite.LIITE.UUID);
         public static final UniqueKey<LupaRecord> LUPA_PKEY = createUniqueKey(Lupa.LUPA, "lupa_pkey", Lupa.LUPA.ID);
         public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = createUniqueKey(Lupa.LUPA, "lupa_diaarinumero_key", Lupa.LUPA.DIAARINUMERO);
+        public static final UniqueKey<LupaRecord> LUPA_UUID_KEY = createUniqueKey(Lupa.LUPA, "lupa_uuid_key", Lupa.LUPA.UUID);
         public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = createUniqueKey(LupaLiite.LUPA_LIITE, "lupa_liite_pkey", LupaLiite.LUPA_LIITE.ID);
         public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = createUniqueKey(Lupahistoria.LUPAHISTORIA, "lupahistoria_pkey", Lupahistoria.LUPAHISTORIA.ID);
+        public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_UUID_KEY = createUniqueKey(Lupahistoria.LUPAHISTORIA, "lupahistoria_uuid_key", Lupahistoria.LUPAHISTORIA.UUID);
         public static final UniqueKey<LupatilaRecord> LUPATILA_PKEY = createUniqueKey(Lupatila.LUPATILA, "lupatila_pkey", Lupatila.LUPATILA.ID);
+        public static final UniqueKey<LupatilaRecord> LUPATILA_UUID_KEY = createUniqueKey(Lupatila.LUPATILA, "lupatila_uuid_key", Lupatila.LUPATILA.UUID);
         public static final UniqueKey<MaaraysRecord> MAARAYS_PKEY = createUniqueKey(Maarays.MAARAYS, "maarays_pkey", Maarays.MAARAYS.ID);
+        public static final UniqueKey<MaaraysRecord> MAARAYS_UUID_KEY = createUniqueKey(Maarays.MAARAYS, "maarays_uuid_key", Maarays.MAARAYS.UUID);
         public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_PKEY = createUniqueKey(Maaraystyyppi.MAARAYSTYYPPI, "maaraystyyppi_pkey", Maaraystyyppi.MAARAYSTYYPPI.ID);
+        public static final UniqueKey<MaaraystyyppiRecord> MAARAYSTYYPPI_UUID_KEY = createUniqueKey(Maaraystyyppi.MAARAYSTYYPPI, "maaraystyyppi_uuid_key", Maaraystyyppi.MAARAYSTYYPPI.UUID);
         public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_PKEY = createUniqueKey(Muutoshistoria.MUUTOSHISTORIA, "muutoshistoria_pkey", Muutoshistoria.MUUTOSHISTORIA.ID);
+        public static final UniqueKey<MuutoshistoriaRecord> MUUTOSHISTORIA_UUID_KEY = createUniqueKey(Muutoshistoria.MUUTOSHISTORIA, "muutoshistoria_uuid_key", Muutoshistoria.MUUTOSHISTORIA.UUID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_pkey", Paatoskierros.PAATOSKIERROS.ID);
+        public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_uuid_key", Paatoskierros.PAATOSKIERROS.UUID);
         public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_PKEY = createUniqueKey(Tekstityyppi.TEKSTITYYPPI, "tekstityyppi_pkey", Tekstityyppi.TEKSTITYYPPI.ID);
+        public static final UniqueKey<TekstityyppiRecord> TEKSTITYYPPI_UUID_KEY = createUniqueKey(Tekstityyppi.TEKSTITYYPPI, "tekstityyppi_uuid_key", Tekstityyppi.TEKSTITYYPPI.UUID);
         public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_pkey", Tiedote.TIEDOTE.ID);
     }
 

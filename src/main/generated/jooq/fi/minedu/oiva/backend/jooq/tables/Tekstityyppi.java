@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.TekstityyppiRecord;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tekstityyppi extends TableImpl<TekstityyppiRecord> {
 
-    private static final long serialVersionUID = -838975225;
+    private static final long serialVersionUID = -1887937690;
 
     /**
      * The reference instance of <code>oiva.tekstityyppi</code>
@@ -68,6 +69,11 @@ public class Tekstityyppi extends TableImpl<TekstityyppiRecord> {
      * The column <code>oiva.tekstityyppi.selite</code>.
      */
     public final TableField<TekstityyppiRecord, TranslatedString> SELITE = createField("selite", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new TranslatedStringBinding());
+
+    /**
+     * The column <code>oiva.tekstityyppi.uuid</code>.
+     */
+    public final TableField<TekstityyppiRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.tekstityyppi</code> table reference
@@ -120,7 +126,7 @@ public class Tekstityyppi extends TableImpl<TekstityyppiRecord> {
      */
     @Override
     public List<UniqueKey<TekstityyppiRecord>> getKeys() {
-        return Arrays.<UniqueKey<TekstityyppiRecord>>asList(Keys.TEKSTITYYPPI_PKEY);
+        return Arrays.<UniqueKey<TekstityyppiRecord>>asList(Keys.TEKSTITYYPPI_PKEY, Keys.TEKSTITYYPPI_UUID_KEY);
     }
 
     /**

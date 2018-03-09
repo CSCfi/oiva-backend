@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.FuusioRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Fuusio extends TableImpl<FuusioRecord> {
 
-    private static final long serialVersionUID = -1773525545;
+    private static final long serialVersionUID = -32005476;
 
     /**
      * The reference instance of <code>oiva.fuusio</code>
@@ -89,6 +90,11 @@ public class Fuusio extends TableImpl<FuusioRecord> {
      * The column <code>oiva.fuusio.paivityspvm</code>.
      */
     public final TableField<FuusioRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+    /**
+     * The column <code>oiva.fuusio.uuid</code>.
+     */
+    public final TableField<FuusioRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.fuusio</code> table reference
@@ -141,7 +147,7 @@ public class Fuusio extends TableImpl<FuusioRecord> {
      */
     @Override
     public List<UniqueKey<FuusioRecord>> getKeys() {
-        return Arrays.<UniqueKey<FuusioRecord>>asList(Keys.FUUSIO_PKEY);
+        return Arrays.<UniqueKey<FuusioRecord>>asList(Keys.FUUSIO_PKEY, Keys.FUUSIO_UUID_KEY);
     }
 
     /**

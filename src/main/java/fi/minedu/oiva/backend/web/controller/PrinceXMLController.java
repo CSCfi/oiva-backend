@@ -6,16 +6,15 @@ import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
 import fi.minedu.oiva.backend.service.PrinceXMLService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.service.LupaService.*;
 import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -58,7 +56,7 @@ public class PrinceXMLController {
 
         final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, withAll);
+            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
                 final Lupa lupa = lupaOpt.get();
                 final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));

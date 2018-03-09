@@ -13,6 +13,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MuutoshistoriaRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutoshistoria extends TableImpl<MuutoshistoriaRecord> {
 
-    private static final long serialVersionUID = -1268774370;
+    private static final long serialVersionUID = 685600492;
 
     /**
      * The reference instance of <code>oiva.muutoshistoria</code>
@@ -83,6 +84,11 @@ public class Muutoshistoria extends TableImpl<MuutoshistoriaRecord> {
      * The column <code>oiva.muutoshistoria.paivays</code>.
      */
     public final TableField<MuutoshistoriaRecord, Timestamp> PAIVAYS = createField("paivays", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("now()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
+
+    /**
+     * The column <code>oiva.muutoshistoria.uuid</code>.
+     */
+    public final TableField<MuutoshistoriaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.muutoshistoria</code> table reference
@@ -135,7 +141,7 @@ public class Muutoshistoria extends TableImpl<MuutoshistoriaRecord> {
      */
     @Override
     public List<UniqueKey<MuutoshistoriaRecord>> getKeys() {
-        return Arrays.<UniqueKey<MuutoshistoriaRecord>>asList(Keys.MUUTOSHISTORIA_PKEY);
+        return Arrays.<UniqueKey<MuutoshistoriaRecord>>asList(Keys.MUUTOSHISTORIA_PKEY, Keys.MUUTOSHISTORIA_UUID_KEY);
     }
 
     /**

@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
 
@@ -17,5 +19,9 @@ public class KohdeService {
 
     public Collection<Kohde> getAll() {
         return dsl.select(KOHDE.fields()).from(KOHDE).fetchInto(Kohde.class);
+    }
+
+    public Map<Long, Kohde> mapAll() {
+        return getAll().stream().collect(Collectors.toMap(Kohde::getId, kohde -> kohde));
     }
 }

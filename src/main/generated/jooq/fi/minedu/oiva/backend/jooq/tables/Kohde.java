@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.KohdeRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Kohde extends TableImpl<KohdeRecord> {
 
-    private static final long serialVersionUID = 1110188058;
+    private static final long serialVersionUID = 383666965;
 
     /**
      * The reference instance of <code>oiva.kohde</code>
@@ -88,6 +89,11 @@ public class Kohde extends TableImpl<KohdeRecord> {
      * The column <code>oiva.kohde.paivityspvm</code>.
      */
     public final TableField<KohdeRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
+
+    /**
+     * The column <code>oiva.kohde.uuid</code>.
+     */
+    public final TableField<KohdeRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.kohde</code> table reference
@@ -140,7 +146,7 @@ public class Kohde extends TableImpl<KohdeRecord> {
      */
     @Override
     public List<UniqueKey<KohdeRecord>> getKeys() {
-        return Arrays.<UniqueKey<KohdeRecord>>asList(Keys.KOHDE_PKEY);
+        return Arrays.<UniqueKey<KohdeRecord>>asList(Keys.KOHDE_PKEY, Keys.KOHDE_UUID_KEY);
     }
 
     /**

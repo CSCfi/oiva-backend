@@ -20,6 +20,7 @@ class Maarays(
     def this() = this(null, null, null, null, null)
 
     // exclude from json
+    @JsonIgnore override def getId = super.getId
     @JsonIgnore override def getKohdeId = super.getKohdeId
     @JsonIgnore override def getMaaraystyyppiId = super.getMaaraystyyppiId
     @JsonIgnore override def getParentId = super.getParentId

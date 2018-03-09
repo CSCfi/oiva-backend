@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
+import fi.minedu.oiva.backend.entity.Asiatyyppi;
 import fi.minedu.oiva.backend.entity.Lupa;
-import fi.minedu.oiva.backend.entity.Paatoskierros;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectJoinStep;
@@ -11,24 +11,24 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Optional;
 
-import static fi.minedu.oiva.backend.jooq.Tables.PAATOSKIERROS;
+import static fi.minedu.oiva.backend.jooq.Tables.ASIATYYPPI;
 
 @Service
-public class PaatoskierrosService {
+public class AsiatyyppiService {
 
     @Autowired
     private DSLContext dsl;
 
     protected SelectJoinStep<Record> baseQuery() {
-        return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS);
+        return dsl.select(ASIATYYPPI.fields()).from(ASIATYYPPI);
     }
 
-    public Collection<Paatoskierros> getAll() {
-        return baseQuery().fetchInto(Paatoskierros.class);
+    public Collection<Asiatyyppi> getAll() {
+        return baseQuery().fetchInto(Asiatyyppi.class);
     }
 
-    public Optional<Paatoskierros> forLupa(final Lupa lupa) {
+    public Optional<Asiatyyppi> forLupa(final Lupa lupa) {
         return Optional.ofNullable(null != lupa ?
-            baseQuery().where(PAATOSKIERROS.ID.eq(lupa.getPaatoskierrosId())).fetchOneInto(Paatoskierros.class) : null);
+            baseQuery().where(ASIATYYPPI.ID.eq(lupa.getAsiatyyppiId())).fetchOneInto(Asiatyyppi.class) : null);
     }
 }

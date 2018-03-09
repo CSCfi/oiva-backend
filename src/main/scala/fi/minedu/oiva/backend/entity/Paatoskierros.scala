@@ -11,6 +11,7 @@ class Paatoskierros(
     def this() = this(null)
 
     // exclude from json
+    @JsonIgnore override def getId = super.getId
     @JsonIgnore override def getEsitysmalliId = super.getEsitysmalliId
     @JsonIgnore override def getLuoja = super.getLuoja
     @JsonIgnore override def getLuontipvm = super.getLuontipvm
