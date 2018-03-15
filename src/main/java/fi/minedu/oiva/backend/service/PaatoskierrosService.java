@@ -19,11 +19,11 @@ public class PaatoskierrosService {
     @Autowired
     private DSLContext dsl;
 
-    public Collection<Paatoskierros> getAll() { // TODO: IS THIS NEEDED?
+    public Collection<Paatoskierros> getAll() { 
         return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS).fetchInto(Paatoskierros.class);
     }
 
-    public Collection<Paatoskierros> getOpen() { // TODO: IS THIS NEEDED?
+    public Collection<Paatoskierros> getOpen() {
         return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS)
                 .where( (PAATOSKIERROS.ALKUPVM.le(DSL.currentDate()).and(PAATOSKIERROS.LOPPUPVM.greaterOrEqual(DSL.currentDate()))))
                 .fetchInto(Paatoskierros.class);
