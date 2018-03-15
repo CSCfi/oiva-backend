@@ -144,6 +144,14 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
             muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
             muutosperusteluRecord.store();
 
+            muutospyynto.getMuutokset().stream().forEach(muutos -> {
+                final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
+                //muutosRecord.setLuoja(SecurityUtil.userName().get());
+                muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
+                muutosRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
+                muutosRecord.store();
+            });
+
             return Optional.of(muutospyyntoRecord.getId());
 
         } catch(Exception e) {
