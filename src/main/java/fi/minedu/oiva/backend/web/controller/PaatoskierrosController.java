@@ -33,4 +33,13 @@ public class PaatoskierrosController {
     public CompletableFuture<Collection<Paatoskierros>> getAll() {
         return async(service::getAll);
     }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/open")
+    @ApiOperation(notes = "Palauttaa avoimet päätöskierrokset", value = "")
+    public CompletableFuture<Collection<Paatoskierros>> getOpen() {
+        return async(service::getOpen);
+    }
+
+
 }
