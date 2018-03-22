@@ -5,8 +5,12 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Tekstityyppi() extends fi.minedu.oiva.backend.jooq.tables.pojos.Tekstityyppi  {
+class Muutosperustelu(
+                    var muutosperustelu: Muutosperustelu) extends fi.minedu.oiva.backend.jooq.tables.pojos.Muutosperustelu  {
 
-    // exclude from json
-    @JsonIgnore override def getId = super.getId
+  def this() = this(null)
+
+  // exclude from json
+  @JsonIgnore override def getId = super.getId
+
 }

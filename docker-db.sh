@@ -17,14 +17,16 @@ if [[ $optionsArg == *"o"* ]]; then
     OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -o"
 fi
 
-if [[ $actionArg == "create" ]]; then
+if [[ $actionArg == "clean" ]]; then
+	mvn $OIVA_MVN_OPTS initialize sql:execute@clean-db
+elif [[ $actionArg == "create" ]]; then
 	mvn $OIVA_MVN_OPTS initialize sql:execute@clean-db
 	mvn $OIVA_MVN_OPTS compile -Pgenerate-db
 elif [[ $actionArg == "populate" ]]; then
 	mvn $OIVA_MVN_OPTS initialize sql:execute@populate-db
 else
 	echo "Usage: ./docker-db.sh [ACTION] [OPTIONS]"
-	echo -e "Actions:\n\tcreate\t\tRe-create database schema\n\tpopulate\tPopulate database with test data\n"
+	echo -e "Actions:\n\tclean\t\tRemove database schema\n\tcreate\t\tRe-create database schema\n\tpopulate\tPopulate database with test data\n"
     echo -e "Options:\n\to\tUse maven offline mode\n"
     exit 1
 fi

@@ -5,6 +5,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.UUID;
 
 import javax.annotation.Generated;
@@ -25,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = 1795079426;
+    private static final long serialVersionUID = 1922849981;
 
     private Long   id;
     private String diaarinumero;
@@ -33,8 +34,9 @@ public class Lupahistoria implements Serializable {
     private String oid;
     private String maakunta;
     private String tila;
-    private String voimassaolo;
-    private String paatospvm;
+    private Date   voimassaoloalkupvm;
+    private Date   voimassaololoppupvm;
+    private Date   paatospvm;
     private String filename;
     private UUID   uuid;
 
@@ -47,7 +49,8 @@ public class Lupahistoria implements Serializable {
         this.oid = value.oid;
         this.maakunta = value.maakunta;
         this.tila = value.tila;
-        this.voimassaolo = value.voimassaolo;
+        this.voimassaoloalkupvm = value.voimassaoloalkupvm;
+        this.voimassaololoppupvm = value.voimassaololoppupvm;
         this.paatospvm = value.paatospvm;
         this.filename = value.filename;
         this.uuid = value.uuid;
@@ -60,8 +63,9 @@ public class Lupahistoria implements Serializable {
         String oid,
         String maakunta,
         String tila,
-        String voimassaolo,
-        String paatospvm,
+        Date   voimassaoloalkupvm,
+        Date   voimassaololoppupvm,
+        Date   paatospvm,
         String filename,
         UUID   uuid
     ) {
@@ -71,7 +75,8 @@ public class Lupahistoria implements Serializable {
         this.oid = oid;
         this.maakunta = maakunta;
         this.tila = tila;
-        this.voimassaolo = voimassaolo;
+        this.voimassaoloalkupvm = voimassaoloalkupvm;
+        this.voimassaololoppupvm = voimassaololoppupvm;
         this.paatospvm = paatospvm;
         this.filename = filename;
         this.uuid = uuid;
@@ -136,22 +141,29 @@ public class Lupahistoria implements Serializable {
     }
 
     @NotNull
-    @Size(max = 100)
-    public String getVoimassaolo() {
-        return this.voimassaolo;
+    public Date getVoimassaoloalkupvm() {
+        return this.voimassaoloalkupvm;
     }
 
-    public void setVoimassaolo(String voimassaolo) {
-        this.voimassaolo = voimassaolo;
+    public void setVoimassaoloalkupvm(Date voimassaoloalkupvm) {
+        this.voimassaoloalkupvm = voimassaoloalkupvm;
     }
 
     @NotNull
-    @Size(max = 20)
-    public String getPaatospvm() {
+    public Date getVoimassaololoppupvm() {
+        return this.voimassaololoppupvm;
+    }
+
+    public void setVoimassaololoppupvm(Date voimassaololoppupvm) {
+        this.voimassaololoppupvm = voimassaololoppupvm;
+    }
+
+    @NotNull
+    public Date getPaatospvm() {
         return this.paatospvm;
     }
 
-    public void setPaatospvm(String paatospvm) {
+    public void setPaatospvm(Date paatospvm) {
         this.paatospvm = paatospvm;
     }
 
@@ -183,7 +195,8 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(oid);
         sb.append(", ").append(maakunta);
         sb.append(", ").append(tila);
-        sb.append(", ").append(voimassaolo);
+        sb.append(", ").append(voimassaoloalkupvm);
+        sb.append(", ").append(voimassaololoppupvm);
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(filename);
         sb.append(", ").append(uuid);

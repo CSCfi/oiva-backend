@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.jooq.Keys;
 import fi.minedu.oiva.backend.jooq.Oiva;
 import fi.minedu.oiva.backend.jooq.tables.records.LupahistoriaRecord;
 
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
 
-    private static final long serialVersionUID = -102390389;
+    private static final long serialVersionUID = -626828274;
 
     /**
      * The reference instance of <code>oiva.lupahistoria</code>
@@ -82,14 +83,19 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     public final TableField<LupahistoriaRecord, String> TILA = createField("tila", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
 
     /**
-     * The column <code>oiva.lupahistoria.voimassaolo</code>.
+     * The column <code>oiva.lupahistoria.voimassaoloalkupvm</code>.
      */
-    public final TableField<LupahistoriaRecord, String> VOIMASSAOLO = createField("voimassaolo", org.jooq.impl.SQLDataType.VARCHAR.length(100).nullable(false), this, "");
+    public final TableField<LupahistoriaRecord, Date> VOIMASSAOLOALKUPVM = createField("voimassaoloalkupvm", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
+
+    /**
+     * The column <code>oiva.lupahistoria.voimassaololoppupvm</code>.
+     */
+    public final TableField<LupahistoriaRecord, Date> VOIMASSAOLOLOPPUPVM = createField("voimassaololoppupvm", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
 
     /**
      * The column <code>oiva.lupahistoria.paatospvm</code>.
      */
-    public final TableField<LupahistoriaRecord, String> PAATOSPVM = createField("paatospvm", org.jooq.impl.SQLDataType.VARCHAR.length(20).nullable(false), this, "");
+    public final TableField<LupahistoriaRecord, Date> PAATOSPVM = createField("paatospvm", org.jooq.impl.SQLDataType.DATE.nullable(false), this, "");
 
     /**
      * The column <code>oiva.lupahistoria.filename</code>.

@@ -6,7 +6,6 @@ package fi.minedu.oiva.backend.jooq;
 
 import fi.minedu.oiva.backend.jooq.tables.Asiatyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Esitysmalli;
-import fi.minedu.oiva.backend.jooq.tables.Fuusio;
 import fi.minedu.oiva.backend.jooq.tables.Kohde;
 import fi.minedu.oiva.backend.jooq.tables.Liite;
 import fi.minedu.oiva.backend.jooq.tables.Lupa;
@@ -15,10 +14,11 @@ import fi.minedu.oiva.backend.jooq.tables.Lupahistoria;
 import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
-import fi.minedu.oiva.backend.jooq.tables.Muutoshistoria;
+import fi.minedu.oiva.backend.jooq.tables.Muutos;
+import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
+import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
+import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink;
-import fi.minedu.oiva.backend.jooq.tables.Tekstityyppi;
 import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = -1971627221;
+    private static final long serialVersionUID = -799471196;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -62,11 +62,6 @@ public class Oiva extends SchemaImpl {
      * The table <code>oiva.esitysmalli</code>.
      */
     public final Esitysmalli ESITYSMALLI = fi.minedu.oiva.backend.jooq.tables.Esitysmalli.ESITYSMALLI;
-
-    /**
-     * The table <code>oiva.fuusio</code>.
-     */
-    public final Fuusio FUUSIO = fi.minedu.oiva.backend.jooq.tables.Fuusio.FUUSIO;
 
     /**
      * The table <code>oiva.kohde</code>.
@@ -109,24 +104,29 @@ public class Oiva extends SchemaImpl {
     public final Maaraystyyppi MAARAYSTYYPPI = fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi.MAARAYSTYYPPI;
 
     /**
-     * The table <code>oiva.muutoshistoria</code>.
+     * The table <code>oiva.muutos</code>.
      */
-    public final Muutoshistoria MUUTOSHISTORIA = fi.minedu.oiva.backend.jooq.tables.Muutoshistoria.MUUTOSHISTORIA;
+    public final Muutos MUUTOS = fi.minedu.oiva.backend.jooq.tables.Muutos.MUUTOS;
+
+    /**
+     * The table <code>oiva.muutosliite</code>.
+     */
+    public final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
+
+    /**
+     * The table <code>oiva.muutosperustelu</code>.
+     */
+    public final Muutosperustelu MUUTOSPERUSTELU = fi.minedu.oiva.backend.jooq.tables.Muutosperustelu.MUUTOSPERUSTELU;
+
+    /**
+     * The table <code>oiva.muutospyynto</code>.
+     */
+    public final Muutospyynto MUUTOSPYYNTO = fi.minedu.oiva.backend.jooq.tables.Muutospyynto.MUUTOSPYYNTO;
 
     /**
      * The table <code>oiva.paatoskierros</code>.
      */
     public final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.jooq.tables.Paatoskierros.PAATOSKIERROS;
-
-    /**
-     * The table <code>oiva.paatoskierros_kohde_link</code>.
-     */
-    public final PaatoskierrosKohdeLink PAATOSKIERROS_KOHDE_LINK = fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK;
-
-    /**
-     * The table <code>oiva.tekstityyppi</code>.
-     */
-    public final Tekstityyppi TEKSTITYYPPI = fi.minedu.oiva.backend.jooq.tables.Tekstityyppi.TEKSTITYYPPI;
 
     /**
      * The table <code>oiva.tiedote</code>.
@@ -161,7 +161,6 @@ public class Oiva extends SchemaImpl {
             Sequences.ASIATYYPPI_ID_SEQ,
             Sequences.DIAARINUMERO_SEQ,
             Sequences.ESITYSMALLI_ID_SEQ,
-            Sequences.FUUSIO_ID_SEQ,
             Sequences.KOHDE_ID_SEQ,
             Sequences.LIITE_ID_SEQ,
             Sequences.LUPAHISTORIA_ID_SEQ,
@@ -170,9 +169,11 @@ public class Oiva extends SchemaImpl {
             Sequences.LUPATILA_ID_SEQ,
             Sequences.MAARAYS_ID_SEQ,
             Sequences.MAARAYSTYYPPI_ID_SEQ,
-            Sequences.MUUTOSHISTORIA_ID_SEQ,
+            Sequences.MUUTOS_ID_SEQ,
+            Sequences.MUUTOSLIITE_ID_SEQ,
+            Sequences.MUUTOSPERUSTELU_ID_SEQ,
+            Sequences.MUUTOSPYYNTO_ID_SEQ,
             Sequences.PAATOSKIERROS_ID_SEQ,
-            Sequences.TEKSTITYYPPI_ID_SEQ,
             Sequences.TIEDOTE_ID_SEQ);
     }
 
@@ -187,7 +188,6 @@ public class Oiva extends SchemaImpl {
         return Arrays.<Table<?>>asList(
             Asiatyyppi.ASIATYYPPI,
             Esitysmalli.ESITYSMALLI,
-            Fuusio.FUUSIO,
             Kohde.KOHDE,
             Liite.LIITE,
             Lupa.LUPA,
@@ -196,10 +196,11 @@ public class Oiva extends SchemaImpl {
             Lupatila.LUPATILA,
             Maarays.MAARAYS,
             Maaraystyyppi.MAARAYSTYYPPI,
-            Muutoshistoria.MUUTOSHISTORIA,
+            Muutos.MUUTOS,
+            Muutosliite.MUUTOSLIITE,
+            Muutosperustelu.MUUTOSPERUSTELU,
+            Muutospyynto.MUUTOSPYYNTO,
             Paatoskierros.PAATOSKIERROS,
-            PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK,
-            Tekstityyppi.TEKSTITYYPPI,
             Tiedote.TIEDOTE);
     }
 }

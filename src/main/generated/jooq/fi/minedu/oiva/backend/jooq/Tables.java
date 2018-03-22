@@ -6,7 +6,6 @@ package fi.minedu.oiva.backend.jooq;
 
 import fi.minedu.oiva.backend.jooq.tables.Asiatyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Esitysmalli;
-import fi.minedu.oiva.backend.jooq.tables.Fuusio;
 import fi.minedu.oiva.backend.jooq.tables.Kohde;
 import fi.minedu.oiva.backend.jooq.tables.Liite;
 import fi.minedu.oiva.backend.jooq.tables.Lupa;
@@ -15,10 +14,11 @@ import fi.minedu.oiva.backend.jooq.tables.Lupahistoria;
 import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
-import fi.minedu.oiva.backend.jooq.tables.Muutoshistoria;
+import fi.minedu.oiva.backend.jooq.tables.Muutos;
+import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
+import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
+import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink;
-import fi.minedu.oiva.backend.jooq.tables.Tekstityyppi;
 import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 
 import javax.annotation.Generated;
@@ -46,11 +46,6 @@ public class Tables {
      * The table <code>oiva.esitysmalli</code>.
      */
     public static final Esitysmalli ESITYSMALLI = fi.minedu.oiva.backend.jooq.tables.Esitysmalli.ESITYSMALLI;
-
-    /**
-     * The table <code>oiva.fuusio</code>.
-     */
-    public static final Fuusio FUUSIO = fi.minedu.oiva.backend.jooq.tables.Fuusio.FUUSIO;
 
     /**
      * The table <code>oiva.kohde</code>.
@@ -93,24 +88,29 @@ public class Tables {
     public static final Maaraystyyppi MAARAYSTYYPPI = fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi.MAARAYSTYYPPI;
 
     /**
-     * The table <code>oiva.muutoshistoria</code>.
+     * The table <code>oiva.muutos</code>.
      */
-    public static final Muutoshistoria MUUTOSHISTORIA = fi.minedu.oiva.backend.jooq.tables.Muutoshistoria.MUUTOSHISTORIA;
+    public static final Muutos MUUTOS = fi.minedu.oiva.backend.jooq.tables.Muutos.MUUTOS;
+
+    /**
+     * The table <code>oiva.muutosliite</code>.
+     */
+    public static final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
+
+    /**
+     * The table <code>oiva.muutosperustelu</code>.
+     */
+    public static final Muutosperustelu MUUTOSPERUSTELU = fi.minedu.oiva.backend.jooq.tables.Muutosperustelu.MUUTOSPERUSTELU;
+
+    /**
+     * The table <code>oiva.muutospyynto</code>.
+     */
+    public static final Muutospyynto MUUTOSPYYNTO = fi.minedu.oiva.backend.jooq.tables.Muutospyynto.MUUTOSPYYNTO;
 
     /**
      * The table <code>oiva.paatoskierros</code>.
      */
     public static final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.jooq.tables.Paatoskierros.PAATOSKIERROS;
-
-    /**
-     * The table <code>oiva.paatoskierros_kohde_link</code>.
-     */
-    public static final PaatoskierrosKohdeLink PAATOSKIERROS_KOHDE_LINK = fi.minedu.oiva.backend.jooq.tables.PaatoskierrosKohdeLink.PAATOSKIERROS_KOHDE_LINK;
-
-    /**
-     * The table <code>oiva.tekstityyppi</code>.
-     */
-    public static final Tekstityyppi TEKSTITYYPPI = fi.minedu.oiva.backend.jooq.tables.Tekstityyppi.TEKSTITYYPPI;
 
     /**
      * The table <code>oiva.tiedote</code>.
