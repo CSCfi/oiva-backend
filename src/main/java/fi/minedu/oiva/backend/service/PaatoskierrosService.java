@@ -8,6 +8,8 @@ import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -31,4 +33,11 @@ public class PaatoskierrosService {
         return Optional.ofNullable(null != lupa ?
             baseQuery().where(PAATOSKIERROS.ID.eq(lupa.getPaatoskierrosId())).fetchOneInto(Paatoskierros.class) : null);
     }
+
+    public Collection<Paatoskierros> getOpen() {
+        return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS)
+                .where( (PAATOSKIERROS.ALKUPVM.le(DSL.currentDate()).and(PAATOSKIERROS.LOPPUPVM.greaterOrEqual(DSL.currentDate()))))
+                .fetchInto(Paatoskierros.class);
+    }
+
 }

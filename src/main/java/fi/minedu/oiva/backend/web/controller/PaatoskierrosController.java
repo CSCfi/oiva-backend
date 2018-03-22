@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Paatoskierros;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.PaatoskierrosService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,19 @@ public class PaatoskierrosController {
     @Autowired
     private PaatoskierrosService service;
 
-    @OivaAccess_Application
+    @OivaAccess_Public
     @RequestMapping(method = GET)
     @ApiOperation(notes = "Palauttaa kaikki päätöskierrokset", value = "")
     public CompletableFuture<Collection<Paatoskierros>> getAll() {
         return async(service::getAll);
     }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/open")
+    @ApiOperation(notes = "Palauttaa avoimet päätöskierrokset", value = "")
+    public CompletableFuture<Collection<Paatoskierros>> getOpen() {
+        return async(service::getOpen);
+    }
+
+
 }
