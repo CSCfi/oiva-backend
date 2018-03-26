@@ -19,7 +19,7 @@ import static fi.minedu.oiva.backend.jooq.Tables.*;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
 
 @Service
-public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
+public class MuutospyyntoService {
 
     @Autowired
     private DSLContext dsl;

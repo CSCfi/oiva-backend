@@ -12,6 +12,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -38,7 +39,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
 
-    private static final long serialVersionUID = 702680379;
+    private static final long serialVersionUID = 410504275;
 
     /**
      * The reference instance of <code>oiva.muutospyynto</code>
@@ -114,6 +115,11 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
     public final TableField<MuutospyyntoRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
+     * The column <code>oiva.muutospyynto.uuid</code>.
+     */
+    public final TableField<MuutospyyntoRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.muutospyynto</code> table reference
      */
     public Muutospyynto() {
@@ -164,7 +170,7 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
      */
     @Override
     public List<UniqueKey<MuutospyyntoRecord>> getKeys() {
-        return Arrays.<UniqueKey<MuutospyyntoRecord>>asList(Keys.MUUTOSPYYNTO_PKEY);
+        return Arrays.<UniqueKey<MuutospyyntoRecord>>asList(Keys.MUUTOSPYYNTO_PKEY, Keys.MUUTOSPYYNTO_UUID_KEY);
     }
 
     /**

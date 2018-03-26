@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -41,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Paatoskierros extends TableImpl<PaatoskierrosRecord> {
 
-    private static final long serialVersionUID = -1389059524;
+    private static final long serialVersionUID = 1860787877;
 
     /**
      * The reference instance of <code>oiva.paatoskierros</code>
@@ -107,6 +108,11 @@ public class Paatoskierros extends TableImpl<PaatoskierrosRecord> {
     public final TableField<PaatoskierrosRecord, JsonNode> META = createField("meta", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new PostgresJSONJacksonBinding());
 
     /**
+     * The column <code>oiva.paatoskierros.uuid</code>.
+     */
+    public final TableField<PaatoskierrosRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.paatoskierros</code> table reference
      */
     public Paatoskierros() {
@@ -157,7 +163,7 @@ public class Paatoskierros extends TableImpl<PaatoskierrosRecord> {
      */
     @Override
     public List<UniqueKey<PaatoskierrosRecord>> getKeys() {
-        return Arrays.<UniqueKey<PaatoskierrosRecord>>asList(Keys.PAATOSKIERROS_PKEY);
+        return Arrays.<UniqueKey<PaatoskierrosRecord>>asList(Keys.PAATOSKIERROS_PKEY, Keys.PAATOSKIERROS_UUID_KEY);
     }
 
     /**

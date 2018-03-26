@@ -6,6 +6,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -25,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -1183734435;
+    private static final long serialVersionUID = 1922849981;
 
     private Long   id;
     private String diaarinumero;
@@ -37,6 +38,7 @@ public class Lupahistoria implements Serializable {
     private Date   voimassaololoppupvm;
     private Date   paatospvm;
     private String filename;
+    private UUID   uuid;
 
     public Lupahistoria() {}
 
@@ -51,6 +53,7 @@ public class Lupahistoria implements Serializable {
         this.voimassaololoppupvm = value.voimassaololoppupvm;
         this.paatospvm = value.paatospvm;
         this.filename = value.filename;
+        this.uuid = value.uuid;
     }
 
     public Lupahistoria(
@@ -63,7 +66,8 @@ public class Lupahistoria implements Serializable {
         Date   voimassaoloalkupvm,
         Date   voimassaololoppupvm,
         Date   paatospvm,
-        String filename
+        String filename,
+        UUID   uuid
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -75,6 +79,7 @@ public class Lupahistoria implements Serializable {
         this.voimassaololoppupvm = voimassaololoppupvm;
         this.paatospvm = paatospvm;
         this.filename = filename;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -172,6 +177,14 @@ public class Lupahistoria implements Serializable {
         this.filename = filename;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -186,6 +199,7 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(voimassaololoppupvm);
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(filename);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

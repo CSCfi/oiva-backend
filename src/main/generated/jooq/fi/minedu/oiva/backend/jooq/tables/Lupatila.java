@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.LupatilaRecord;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupatila extends TableImpl<LupatilaRecord> {
 
-    private static final long serialVersionUID = 279472753;
+    private static final long serialVersionUID = 826465065;
 
     /**
      * The reference instance of <code>oiva.lupatila</code>
@@ -68,6 +69,11 @@ public class Lupatila extends TableImpl<LupatilaRecord> {
      * The column <code>oiva.lupatila.selite</code>.
      */
     public final TableField<LupatilaRecord, TranslatedString> SELITE = createField("selite", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new TranslatedStringBinding());
+
+    /**
+     * The column <code>oiva.lupatila.uuid</code>.
+     */
+    public final TableField<LupatilaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.lupatila</code> table reference
@@ -120,7 +126,7 @@ public class Lupatila extends TableImpl<LupatilaRecord> {
      */
     @Override
     public List<UniqueKey<LupatilaRecord>> getKeys() {
-        return Arrays.<UniqueKey<LupatilaRecord>>asList(Keys.LUPATILA_PKEY);
+        return Arrays.<UniqueKey<LupatilaRecord>>asList(Keys.LUPATILA_PKEY, Keys.LUPATILA_UUID_KEY);
     }
 
     /**

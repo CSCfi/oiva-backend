@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.Size;
@@ -26,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Kohde implements Serializable {
 
-    private static final long serialVersionUID = -1324077719;
+    private static final long serialVersionUID = 1321436435;
 
     private Long      id;
     private String    tunniste;
@@ -35,6 +36,7 @@ public class Kohde implements Serializable {
     private Timestamp luontipvm;
     private String    paivittaja;
     private Timestamp paivityspvm;
+    private UUID      uuid;
 
     public Kohde() {}
 
@@ -46,6 +48,7 @@ public class Kohde implements Serializable {
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
+        this.uuid = value.uuid;
     }
 
     public Kohde(
@@ -55,7 +58,8 @@ public class Kohde implements Serializable {
         String    luoja,
         Timestamp luontipvm,
         String    paivittaja,
-        Timestamp paivityspvm
+        Timestamp paivityspvm,
+        UUID      uuid
     ) {
         this.id = id;
         this.tunniste = tunniste;
@@ -64,6 +68,7 @@ public class Kohde implements Serializable {
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -123,6 +128,14 @@ public class Kohde implements Serializable {
         this.paivityspvm = paivityspvm;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Kohde (");
@@ -134,6 +147,7 @@ public class Kohde implements Serializable {
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.LiiteRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite extends TableImpl<LiiteRecord> {
 
-    private static final long serialVersionUID = 732337312;
+    private static final long serialVersionUID = 981228213;
 
     /**
      * The reference instance of <code>oiva.liite</code>
@@ -115,6 +116,11 @@ public class Liite extends TableImpl<LiiteRecord> {
     public final TableField<LiiteRecord, String> KIELI = createField("kieli", org.jooq.impl.SQLDataType.VARCHAR.length(2).nullable(false), this, "");
 
     /**
+     * The column <code>oiva.liite.uuid</code>.
+     */
+    public final TableField<LiiteRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.liite</code> table reference
      */
     public Liite() {
@@ -165,7 +171,7 @@ public class Liite extends TableImpl<LiiteRecord> {
      */
     @Override
     public List<UniqueKey<LiiteRecord>> getKeys() {
-        return Arrays.<UniqueKey<LiiteRecord>>asList(Keys.LIITE_PKEY);
+        return Arrays.<UniqueKey<LiiteRecord>>asList(Keys.LIITE_PKEY, Keys.LIITE_UUID_KEY);
     }
 
     /**

@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -33,7 +32,7 @@ import static fi.minedu.oiva.backend.jooq.Tables.MAARAYSTYYPPI;
 import static fi.minedu.oiva.backend.util.ControllerUtil.options;
 
 @Service
-public class ExportService implements RecordMapping<Lupa> {
+public class ExportService {
 
     @Autowired
     private DSLContext dsl;

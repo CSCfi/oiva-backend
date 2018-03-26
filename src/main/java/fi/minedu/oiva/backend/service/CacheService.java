@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.service;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.util.With;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,8 +104,8 @@ public class CacheService {
         koodistoService.getOpetuskielet();
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
-        lupaService.getAll(RecordMapping.withAll).stream().forEach(lupa ->
-            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), RecordMapping.withAll));
+        lupaService.getAll(With.all).stream().forEach(lupa ->
+            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), With.all));
         refreshKoulutus(false);
 
         final long duration = System.currentTimeMillis() - startTime;
@@ -122,7 +123,7 @@ public class CacheService {
         final long startTime = System.currentTimeMillis();
 
         final Set<String> cacheKeys = new HashSet<>();
-        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, RecordMapping.withAll);
+        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, With.all);
 
         final BiFunction<Class<?>, String, String> cacheNameBuilder = (cacheBase, cacheSuffix) ->
             cacheBase.getSimpleName() + (StringUtils.isNotBlank(cacheSuffix) ? ":" + cacheSuffix : "");

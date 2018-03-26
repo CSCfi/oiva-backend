@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Paatoskierros implements Serializable {
 
-    private static final long serialVersionUID = -119602334;
+    private static final long serialVersionUID = -1865098430;
 
     private Long      id;
     private Date      alkupvm;
@@ -39,6 +40,7 @@ public class Paatoskierros implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private JsonNode  meta;
+    private UUID      uuid;
 
     public Paatoskierros() {}
 
@@ -53,6 +55,7 @@ public class Paatoskierros implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.meta = value.meta;
+        this.uuid = value.uuid;
     }
 
     public Paatoskierros(
@@ -65,7 +68,8 @@ public class Paatoskierros implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        JsonNode  meta
+        JsonNode  meta,
+        UUID      uuid
     ) {
         this.id = id;
         this.alkupvm = alkupvm;
@@ -77,6 +81,7 @@ public class Paatoskierros implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.meta = meta;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -161,6 +166,14 @@ public class Paatoskierros implements Serializable {
         this.meta = meta;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Paatoskierros (");
@@ -175,6 +188,7 @@ public class Paatoskierros implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(meta);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos implements Serializable {
 
-    private static final long serialVersionUID = 302664522;
+    private static final long serialVersionUID = -315137032;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -44,6 +45,7 @@ public class Muutos implements Serializable {
     private Timestamp paivityspvm;
     private Long      maaraysId;
     private String    tila;
+    private UUID      uuid;
 
     public Muutos() {}
 
@@ -63,6 +65,7 @@ public class Muutos implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.maaraysId = value.maaraysId;
         this.tila = value.tila;
+        this.uuid = value.uuid;
     }
 
     public Muutos(
@@ -80,7 +83,8 @@ public class Muutos implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         Long      maaraysId,
-        String    tila
+        String    tila,
+        UUID      uuid
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -97,6 +101,7 @@ public class Muutos implements Serializable {
         this.paivityspvm = paivityspvm;
         this.maaraysId = maaraysId;
         this.tila = tila;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -226,6 +231,14 @@ public class Muutos implements Serializable {
         this.tila = tila;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutos (");
@@ -245,6 +258,7 @@ public class Muutos implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(maaraysId);
         sb.append(", ").append(tila);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();
