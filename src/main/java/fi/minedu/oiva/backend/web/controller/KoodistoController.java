@@ -6,7 +6,6 @@ import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.KoodistoService;
-import fi.minedu.oiva.backend.service.OpintopolkuService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -193,5 +192,12 @@ public class KoodistoController {
     @ApiOperation(notes = "Palauttaa koulutusten koulutustyyppi relaatiot", value = "")
     public CompletableFuture<Map<String, String>> getKoulutusToKoulutustyyppiRelation() {
         return async(service::getKoulutusToKoulutustyyppiRelation);
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/ammatillinen/koulutukset", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun ammatilliset koulutukset", value = "")
+    public CompletableFuture<Collection<KoodistoKoodi>> getAmmatillinenKoulutukset() {
+        return async(service::getAmmatillinenKoulutukset);
     }
 }

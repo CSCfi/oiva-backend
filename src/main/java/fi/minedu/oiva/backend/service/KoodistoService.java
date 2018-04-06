@@ -1,6 +1,5 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
@@ -8,10 +7,13 @@ import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,13 @@ public class KoodistoService {
 
     @Autowired
     private OpintopolkuService opintopolkuService;
+
+    @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
+    private String ammatillinenKoulutustyyppiKoodiArvot;
+
+    public List<String> getAmmatillinenKoulutustyyppiArvot() {
+        return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
+    }
 
     /**
      * Hae koodisto koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
@@ -193,5 +202,12 @@ public class KoodistoService {
                 map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo()))
         );
         return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getAmmatillinenKoulutukset", key = "''")
+    public List<KoodistoKoodi> getAmmatillinenKoulutukset() {
+        final List<KoodistoKoodi> koulutukset = new ArrayList<>();
+        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiArvo).forEach(koulutukset::add));
+        return koulutukset;
     }
 }

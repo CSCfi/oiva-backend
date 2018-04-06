@@ -16,7 +16,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -199,6 +198,8 @@ public class CacheService {
                 cacheKey.accept("KoodistoService:getKoulutustyyppiKoulutukset", koulutustyyppi.koodiArvo());
             });
 
+            cacheKey.accept("KoodistoService:getAmmatillinenKoulutukset", "");
+
             // delete cache keys
             flushCacheKeys(cacheKeys);
         }
@@ -215,6 +216,8 @@ public class CacheService {
             koodistoService.getKoulutustyyppi(koulutustyyppi.koodiArvo());
             koodistoService.getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo());
         });
+
+        koodistoService.getAmmatillinenKoulutukset();
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Koulutus cache refreshed in {}ms", duration);
