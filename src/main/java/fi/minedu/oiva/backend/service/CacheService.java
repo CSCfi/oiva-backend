@@ -192,6 +192,13 @@ public class CacheService {
                 cacheKey.accept("KoodistoService:getKoulutusalaKoulutukset", koulutusala.koodiArvo());
             });
 
+            cacheKey.accept("KoodistoService:getKoulutustyypit", "");
+            cacheKey.accept("KoodistoService:getKoulutusToKoulutustyyppiRelation", "");
+            koodistoService.getKoulutustyypit().stream().forEach(koulutustyyppi -> {
+                cacheKey.accept("KoodistoService:getKoulutustyyppi", koulutustyyppi.koodiArvo());
+                cacheKey.accept("KoodistoService:getKoulutustyyppiKoulutukset", koulutustyyppi.koodiArvo());
+            });
+
             // delete cache keys
             flushCacheKeys(cacheKeys);
         }
@@ -201,6 +208,12 @@ public class CacheService {
         koodistoService.getKoulutusalat().stream().forEach(koulutusala -> {
             koodistoService.getKoulutusala(koulutusala.koodiArvo());
             koodistoService.getKoulutusalaKoulutukset(koulutusala.koodiArvo());
+        });
+
+        koodistoService.getKoulutusToKoulutustyyppiRelation();
+        koodistoService.getKoulutustyypit().stream().forEach(koulutustyyppi -> {
+            koodistoService.getKoulutustyyppi(koulutustyyppi.koodiArvo());
+            koodistoService.getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo());
         });
 
         final long duration = System.currentTimeMillis() - startTime;

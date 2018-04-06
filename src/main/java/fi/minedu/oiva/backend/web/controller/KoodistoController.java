@@ -161,9 +161,37 @@ public class KoodistoController {
     }
 
     @OivaAccess_Public
+    @RequestMapping(value = "/koulutustyypit", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koulutustyypit", value = "")
+    public CompletableFuture<Collection<KoodistoKoodi>> getKoulutustyypit() {
+        return async(service::getKoulutustyypit);
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koulutustyypit/{koodiArvo}", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koulutustyypin koodiarvon perusteela", value = "")
+    public CompletableFuture<KoodistoKoodi> getKoulutustyyppi(final @PathVariable String koodiArvo) {
+        return async(() -> service.getKoulutustyyppi(koodiArvo));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koulutustyypit/{koodiArvo}/koulutukset", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun koulutukset koulutustyypin perusteella", value = "")
+    public CompletableFuture<List<KoodistoKoodi>> getKoulutustyyppiKoulutukset(final @PathVariable String koodiArvo) {
+        return async(() -> service.getKoulutustyyppiKoulutukset(koodiArvo));
+    }
+
+    @OivaAccess_Public
     @RequestMapping(value = "/koulutus-koulutusala-relaatio", method = GET)
     @ApiOperation(notes = "Palauttaa koulutusten koulutusala relaatiot", value = "")
     public CompletableFuture<Map<String, String>> getKoulutusToKoulutusalaRelation() {
         return async(service::getKoulutusToKoulutusalaRelation);
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/koulutus-koulutustyyppi-relaatio", method = GET)
+    @ApiOperation(notes = "Palauttaa koulutusten koulutustyyppi relaatiot", value = "")
+    public CompletableFuture<Map<String, String>> getKoulutusToKoulutustyyppiRelation() {
+        return async(service::getKoulutusToKoulutustyyppiRelation);
     }
 }

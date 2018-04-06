@@ -163,10 +163,35 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutusalat().stream().forEach(koulutusalaKoodi -> {
+        getKoulutusalat().stream().forEach(koulutusalaKoodi ->
             getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
-                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()));
-        });
+                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
+        );
+        return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyypit", key = "''")
+    public List<KoodistoKoodi> getKoulutustyypit() {
+        return opintopolkuService.getKoulutustyyppiKoodit();
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyyppi", key = "#koodi")
+    public KoodistoKoodi getKoulutustyyppi(final String koodi) {
+        return opintopolkuService.getKoulutustyyppiKoodi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyyppiKoulutukset", key = "#koodi")
+    public List<KoodistoKoodi> getKoulutustyyppiKoulutukset(final String koodi) {
+        return opintopolkuService.getKoulutusKooditForKoulutustyyppi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
+    public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
+        final Map<String, String> map = new HashMap<>();
+        getKoulutustyypit().stream().forEach(koulutustyyppiKoodi ->
+            getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
+                map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo()))
+        );
         return map;
     }
 }
