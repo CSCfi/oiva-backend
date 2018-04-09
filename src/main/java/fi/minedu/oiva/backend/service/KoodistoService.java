@@ -1,20 +1,24 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +26,13 @@ public class KoodistoService {
 
     @Autowired
     private OpintopolkuService opintopolkuService;
+
+    @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
+    private String ammatillinenKoulutustyyppiKoodiArvot;
+
+    private List<String> getAmmatillinenKoulutustyyppiArvot() {
+        return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
+    }
 
     /**
      * Hae koodisto koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
@@ -163,10 +174,49 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutusalat().stream().forEach(koulutusalaKoodi -> {
+        getKoulutusalat().stream().forEach(koulutusalaKoodi ->
             getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
-                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()));
-        });
+                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
+        );
         return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyypit", key = "''")
+    public List<KoodistoKoodi> getKoulutustyypit() {
+        return opintopolkuService.getKoulutustyyppiKoodit();
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyyppi", key = "#koodi")
+    public KoodistoKoodi getKoulutustyyppi(final String koodi) {
+        return opintopolkuService.getKoulutustyyppiKoodi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutustyyppiKoulutukset", key = "#koodi")
+    public List<KoodistoKoodi> getKoulutustyyppiKoulutukset(final String koodi) {
+        return opintopolkuService.getKoulutusKooditForKoulutustyyppi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
+    public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
+        final Map<String, String> map = new HashMap<>();
+        getKoulutustyypit().stream().forEach(koulutustyyppiKoodi ->
+            getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
+                map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo()))
+        );
+        return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getAmmatillinenKoulutukset", key = "''")
+    public List<KoulutusKoodi> getAmmatillinenKoulutukset() {
+        final List<KoulutusKoodi> koulutukset = new ArrayList<>();
+        final Map<String, String> koulutusToKoulutusala = getKoulutusToKoulutusalaRelation();
+        final Map<String, String> koulutusToKoulutustyyppi = getKoulutusToKoulutustyyppiRelation();
+        final Consumer<KoodistoKoodi> includeKoulutus = koodistoKoodi -> {
+            final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koodistoKoodi.koodiArvo(), null);
+            final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koodistoKoodi.koodiArvo(), null);
+            koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo));
+        };
+        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
+        return koulutukset;
     }
 }
