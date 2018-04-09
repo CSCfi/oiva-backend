@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
@@ -197,7 +198,7 @@ public class KoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/ammatillinen/koulutukset", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun ammatilliset koulutukset", value = "")
-    public CompletableFuture<Collection<KoodistoKoodi>> getAmmatillinenKoulutukset() {
+    public CompletableFuture<Collection<KoulutusKoodi>> getAmmatillinenKoulutukset() {
         return async(service::getAmmatillinenKoulutukset);
     }
 }

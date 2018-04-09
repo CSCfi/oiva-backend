@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +30,7 @@ public class KoodistoService {
     @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
     private String ammatillinenKoulutustyyppiKoodiArvot;
 
-    public List<String> getAmmatillinenKoulutustyyppiArvot() {
+    private List<String> getAmmatillinenKoulutustyyppiArvot() {
         return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
     }
 
@@ -205,9 +207,16 @@ public class KoodistoService {
     }
 
     @Cacheable(value = "KoodistoService:getAmmatillinenKoulutukset", key = "''")
-    public List<KoodistoKoodi> getAmmatillinenKoulutukset() {
-        final List<KoodistoKoodi> koulutukset = new ArrayList<>();
-        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiArvo).forEach(koulutukset::add));
+    public List<KoulutusKoodi> getAmmatillinenKoulutukset() {
+        final List<KoulutusKoodi> koulutukset = new ArrayList<>();
+        final Map<String, String> koulutusToKoulutusala = getKoulutusToKoulutusalaRelation();
+        final Map<String, String> koulutusToKoulutustyyppi = getKoulutusToKoulutustyyppiRelation();
+        final Consumer<KoodistoKoodi> includeKoulutus = koodistoKoodi -> {
+            final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koodistoKoodi.koodiArvo(), null);
+            final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koodistoKoodi.koodiArvo(), null);
+            koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo));
+        };
+        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
         return koulutukset;
     }
 }
