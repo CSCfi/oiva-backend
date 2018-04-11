@@ -200,8 +200,11 @@ public class KoodistoService {
     public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
         getKoulutustyypit().stream().forEach(koulutustyyppiKoodi ->
-            getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
-                map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo()))
+            getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi -> {
+                if(getAmmatillinenKoulutustyyppiArvot().contains(koulutustyyppiKoodi.koodiArvo())) {
+                    map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo());
+                }
+            })
         );
         return map;
     }
@@ -214,7 +217,19 @@ public class KoodistoService {
         final Consumer<KoodistoKoodi> includeKoulutus = koodistoKoodi -> {
             final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koodistoKoodi.koodiArvo(), null);
             final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koodistoKoodi.koodiArvo(), null);
-            koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo));
+
+            // Voimassaolon päättyminen ja koodisto
+            if(null == koodistoKoodi.voimassaLoppuPvm() && koodistoKoodi.koodisto().getKoodistoUri().equals("koulutus")) {
+
+                // Erikoisammattitutkinnoilta kolmosalkuiset pois
+                if(!(koodistoKoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
+
+                    // Tarkistetaan versio-duplikaatit
+                    if(null == koulutukset.stream().filter(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koodistoKoodi.getKoodiArvo())).findFirst().orElse(null)) {
+                        koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo));
+                    }
+                }
+            }
         };
         getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
         return koulutukset;
