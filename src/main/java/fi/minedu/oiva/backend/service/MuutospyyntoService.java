@@ -31,17 +31,26 @@ public class MuutospyyntoService {
     @Autowired
     private OrganisaatioService organisaatioService;
 
-    private enum Muutospyyntotila {
-        LUONNOS,
-        VALMIINA_KASITTELYYN,
-        KASITTELYSSA,
-        TAYDENNETTAVA,
-        VALMIS,
-        PASSIVOITU;
+    public enum Muutospyyntotila {
+        LUONNOS,            // KJ:n tekemä hakemus
+        AVOIN,              // KJ lähettänyt hakemuksen eteenpäin
+        VALMISTELUSSA,      // Esittelijä ottanut valmisteluun
+        TAYDENNETTAVA,      // Esittelijä palauttanut täydennettäväksi
+        PAATETTY,           // Valmis allekirjoitettu lupa
+        PASSIVOITU;         // Lupa poistettu
+
+        public static Muutospyyntotila convert(String str) {
+            for (Muutospyyntotila muutospyyntotila : Muutospyyntotila.values()) {
+                if (muutospyyntotila.toString().equals(str)) {
+                    return muutospyyntotila;
+                }
+            }
+            return null;
+        }
     }
 
     // Muutospyyntölistaus (hakemukset) esittelijälle
-    public Collection<Muutospyynto> getByEsittelija(String nimi) {
+    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
 
         return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
                 MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
@@ -49,7 +58,7 @@ public class MuutospyyntoService {
                 MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID,
                 LUPA.JARJESTAJA_OID, LUPA.ID.as("lupa_id"))
                 .from(MUUTOSPYYNTO, LUPA)
-                .where( (MUUTOSPYYNTO.LUOJA.eq(nimi)).or(MUUTOSPYYNTO.PAIVITTAJA.eq(nimi)) )
+                .where( (MUUTOSPYYNTO.TILA.eq(tila.toString())) )
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
@@ -62,7 +71,7 @@ public class MuutospyyntoService {
     public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
 
         return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
-                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA,
+                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
                 MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
                 MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID, LUPA.ID.as("lupa_id"))
                 .from(MUUTOSPYYNTO, LUPA)
@@ -125,7 +134,7 @@ public class MuutospyyntoService {
     }
 
     protected void withOrganization(final Optional<Muutospyynto> muutospyyntoOpt) {
-        muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaOid()).ifPresent(muutospyynto::setJarjestaja));
+        muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaYtunnus()).ifPresent(muutospyynto::setJarjestaja));
     }
 
 
@@ -242,8 +251,8 @@ public class MuutospyyntoService {
 
     }
 
-    // Passivoi muutospyynnön
-    public Optional<Long> changeTila(final long id, String tila) {
+    // Vaihtaa muutospyynnön tilan
+    public Optional<Long> changeTila(final long id, Muutospyyntotila tila) {
 
         try {
 
@@ -252,10 +261,7 @@ public class MuutospyyntoService {
             if(muutospyyntoOpt.isPresent()) {
 
                 MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                if(tila.equals("valmiina_kasittelyyn")) { mp.setTila(Muutospyyntotila.VALMIINA_KASITTELYYN.name()); }
-                if(tila.equals("kasittelyssa")) { mp.setTila(Muutospyyntotila.KASITTELYSSA.name()); }
-                if(tila.equals("palauta_taydennettavaksi")) { mp.setTila(Muutospyyntotila.TAYDENNETTAVA.name()); }
-                if(tila.equals("valmis")) { mp.setTila(Muutospyyntotila.VALMIS.name()); }
+                mp.setTila(tila.name());
                 dsl.executeUpdate(mp);
 
             }
