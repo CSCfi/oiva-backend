@@ -14,6 +14,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
@@ -128,6 +129,15 @@ public class MuutospyyntoService {
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
+    // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
+    public Optional<Muutospyynto> getByUuid(String uuid) {
+        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
+                .where(MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))).fetchOptionalInto(Muutospyynto.class)
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"yksi"))
+                .filter(Optional::isPresent).map(Optional::get);
+    }
+
+
     protected Optional<Muutospyynto> withMuutokset(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> muutospyynto.setMuutokset(getByMuutospyyntoId(muutospyynto.getId())));
         return muutospyyntoOpt;
@@ -136,7 +146,6 @@ public class MuutospyyntoService {
     protected void withOrganization(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaYtunnus()).ifPresent(muutospyynto::setJarjestaja));
     }
-
 
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 
