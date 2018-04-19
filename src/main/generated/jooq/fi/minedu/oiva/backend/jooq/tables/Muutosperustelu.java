@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MuutosperusteluRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
 
-    private static final long serialVersionUID = -1733936234;
+    private static final long serialVersionUID = -1852188832;
 
     /**
      * The reference instance of <code>oiva.muutosperustelu</code>
@@ -106,6 +107,11 @@ public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
     public final TableField<MuutosperusteluRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
+     * The column <code>oiva.muutosperustelu.uuid</code>.
+     */
+    public final TableField<MuutosperusteluRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.muutosperustelu</code> table reference
      */
     public Muutosperustelu() {
@@ -156,7 +162,7 @@ public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
      */
     @Override
     public List<UniqueKey<MuutosperusteluRecord>> getKeys() {
-        return Arrays.<UniqueKey<MuutosperusteluRecord>>asList(Keys.MUUTOSPERUSTELU_PKEY);
+        return Arrays.<UniqueKey<MuutosperusteluRecord>>asList(Keys.MUUTOSPERUSTELU_PKEY, Keys.MUUTOSPERUSTELU_UUID_KEY);
     }
 
     /**

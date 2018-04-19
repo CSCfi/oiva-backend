@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays implements Serializable {
 
-    private static final long serialVersionUID = -980161541;
+    private static final long serialVersionUID = -13047163;
 
     private Long      id;
     private Long      parentId;
@@ -43,6 +44,7 @@ public class Maarays implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private Integer   koodistoversio;
+    private UUID      uuid;
 
     public Maarays() {}
 
@@ -61,6 +63,7 @@ public class Maarays implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.koodistoversio = value.koodistoversio;
+        this.uuid = value.uuid;
     }
 
     public Maarays(
@@ -77,7 +80,8 @@ public class Maarays implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        Integer   koodistoversio
+        Integer   koodistoversio,
+        UUID      uuid
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -93,6 +97,7 @@ public class Maarays implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.koodistoversio = koodistoversio;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -213,6 +218,14 @@ public class Maarays implements Serializable {
         this.koodistoversio = koodistoversio;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Maarays (");
@@ -231,6 +244,7 @@ public class Maarays implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(koodistoversio);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

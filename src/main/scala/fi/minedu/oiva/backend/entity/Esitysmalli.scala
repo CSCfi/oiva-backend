@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 class Esitysmalli() extends fi.minedu.oiva.backend.jooq.tables.pojos.Esitysmalli  {
 
     // exclude from json
+    @JsonIgnore override def getId = super.getId
     @JsonIgnore override def getLuoja = super.getLuoja
     @JsonIgnore override def getLuontipvm = super.getLuontipvm
     @JsonIgnore override def getPaivittaja = super.getPaivittaja

@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.TiedoteRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tiedote extends TableImpl<TiedoteRecord> {
 
-    private static final long serialVersionUID = 1915714458;
+    private static final long serialVersionUID = 438631082;
 
     /**
      * The reference instance of <code>oiva.tiedote</code>
@@ -88,6 +89,11 @@ public class Tiedote extends TableImpl<TiedoteRecord> {
      * The column <code>oiva.tiedote.paivityspvm</code>.
      */
     public final TableField<TiedoteRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false).defaultValue(org.jooq.impl.DSL.field("now()", org.jooq.impl.SQLDataType.TIMESTAMP)), this, "");
+
+    /**
+     * The column <code>oiva.tiedote.uuid</code>.
+     */
+    public final TableField<TiedoteRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.tiedote</code> table reference
@@ -140,7 +146,7 @@ public class Tiedote extends TableImpl<TiedoteRecord> {
      */
     @Override
     public List<UniqueKey<TiedoteRecord>> getKeys() {
-        return Arrays.<UniqueKey<TiedoteRecord>>asList(Keys.TIEDOTE_PKEY);
+        return Arrays.<UniqueKey<TiedoteRecord>>asList(Keys.TIEDOTE_PKEY, Keys.TIEDOTE_UUID_KEY);
     }
 
     /**

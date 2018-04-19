@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.AsiatyyppiRecord;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Asiatyyppi extends TableImpl<AsiatyyppiRecord> {
 
-    private static final long serialVersionUID = -1183192033;
+    private static final long serialVersionUID = -18180006;
 
     /**
      * The reference instance of <code>oiva.asiatyyppi</code>
@@ -68,6 +69,11 @@ public class Asiatyyppi extends TableImpl<AsiatyyppiRecord> {
      * The column <code>oiva.asiatyyppi.selite</code>.
      */
     public final TableField<AsiatyyppiRecord, TranslatedString> SELITE = createField("selite", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new TranslatedStringBinding());
+
+    /**
+     * The column <code>oiva.asiatyyppi.uuid</code>.
+     */
+    public final TableField<AsiatyyppiRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.asiatyyppi</code> table reference
@@ -120,7 +126,7 @@ public class Asiatyyppi extends TableImpl<AsiatyyppiRecord> {
      */
     @Override
     public List<UniqueKey<AsiatyyppiRecord>> getKeys() {
-        return Arrays.<UniqueKey<AsiatyyppiRecord>>asList(Keys.ASIATYYPPI_PKEY);
+        return Arrays.<UniqueKey<AsiatyyppiRecord>>asList(Keys.ASIATYYPPI_PKEY, Keys.ASIATYYPPI_UUID_KEY);
     }
 
     /**

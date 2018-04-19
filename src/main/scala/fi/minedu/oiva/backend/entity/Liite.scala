@@ -7,9 +7,10 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 @JsonInclude(Include.NON_NULL)
 class Liite() extends fi.minedu.oiva.backend.jooq.tables.pojos.Liite  {
 
-  @JsonIgnore override def getLuoja = super.getLuoja
-  @JsonIgnore override def getLuontipvm = super.getLuontipvm
-  @JsonIgnore override def getPaivittaja = super.getPaivittaja
-  @JsonIgnore override def getPaivityspvm = super.getPaivityspvm
-
+    // exclude from json
+    @JsonIgnore override def getId = super.getId
+    @JsonIgnore override def getLuoja = super.getLuoja
+    @JsonIgnore override def getLuontipvm = super.getLuontipvm
+    @JsonIgnore override def getPaivittaja = super.getPaivittaja
+    @JsonIgnore override def getPaivityspvm = super.getPaivityspvm
 }

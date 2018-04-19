@@ -5,11 +5,11 @@ import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
@@ -18,14 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.Optional;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.service.LupaService.*;
 import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -51,7 +49,7 @@ public class PebbleController {
 
         final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
         try {
-            final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, withAll).get();
+            final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, With.all).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
             return getOr404(service.toHTML(lupa, options));
 

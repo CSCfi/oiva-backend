@@ -5,6 +5,8 @@ import fi.minedu.oiva.backend.entity.Muutos;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
+
 import fi.minedu.oiva.backend.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +25,8 @@ import static fi.minedu.oiva.backend.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotila;
+
 
 @RestController
 @RequestMapping(
@@ -40,7 +44,6 @@ public class MuutospyyntoController {
 
 
     // palauttaa kaikki järjestäjän muutospyynnöt
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/{ytunnus}")
     @ApiOperation(notes = "Palauttaa muutospyynnöt järjestäjän ytunnuksen perusteella", value = "")
@@ -49,27 +52,40 @@ public class MuutospyyntoController {
         return async(() -> service.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 
-    // palauttaa kaikki esittelijan muutospyynnöt
-    //@OivaAccess_Esittelija // TODO testataan kirjautumista
+    // palauttaa kaikki avoimet muutospyynnöt
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/esittelija/{nimi}")
+    @RequestMapping(method = GET, value = "/avoimet")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getByEsittelija(final @PathVariable String nimi,
-                                                                    final HttpServletRequest request) {
-        return async(() -> service.getByEsittelija(RequestUtils.getPathVariable(request, nimi)));
+    public CompletableFuture<Collection<Muutospyynto>> getAvoimetMuutospyynnot(final HttpServletRequest request) {
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.AVOIN));
     }
 
-    // hakee yksittäisen muutospyynnön ID:llä (refaktoroidaan UUID:lle)
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
+    // palauttaa kaikki valmistelussa olevat muutospyynnöt
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/id/{muutospyyntoId:[0-9]+}")
+    @RequestMapping(method = GET, value = "/valmistelussa")
+    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
+    public CompletableFuture<Collection<Muutospyynto>> getValmistelussaMuutospyynnot(final HttpServletRequest request) {
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA));
+    }
+
+    // palauttaa kaikki päätetyt muutospyynnöt (TARVITAANKO!!!?)
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/paatetyt")
+    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
+    public CompletableFuture<Collection<Muutospyynto>> getPaatetytMuutospyynnot(final HttpServletRequest request) {
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.PAATETTY));
+    }
+
+
+    // hakee yksittäisen muutospyynnön ID:llä (refaktoroidaan UUID:lle)
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/id/{uuid}")
     @ApiOperation(notes = "Palauttaa muutospyynnön tietokantatunnuksen perusteella", value = "") // TODO UUID
-    public CompletableFuture<HttpEntity<Muutospyynto>> getById(final @PathVariable long muutospyyntoId) {
-        return getOr404(async(() -> service.getById(muutospyyntoId)));
+    public CompletableFuture<HttpEntity<Muutospyynto>> getById(final @PathVariable String uuid) {
+        return getOr404(async(() -> service.getByUuid(uuid)));
     }
 
     // palauttaa kaikki muutospyynnön muutokset
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/muutokset/{muutospyyntoId}")
     @ApiOperation(notes = "Palauttaa kaikki muutospyynnön muutokset", value = "")
@@ -79,7 +95,6 @@ public class MuutospyyntoController {
     }
 
     // muokkaa muutospyyntöä
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Muokkaa muutospyyntöä", value = "")
     @RequestMapping(method = POST, value = "/update")
@@ -99,7 +114,6 @@ public class MuutospyyntoController {
     }
 
     // tallentaa uuden muutospyynnön
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Tallentaa uuden muutospyynnön", value = "")
     @RequestMapping(method = PUT, value = "/create")
@@ -117,7 +131,6 @@ public class MuutospyyntoController {
     }
 
     // passivoi muutospyyntö
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
     @RequestMapping(method = POST, value = "/passivoi/{muutospyyntoId:[0-9]+}")
@@ -126,7 +139,6 @@ public class MuutospyyntoController {
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/muutos/id/{muutosId:[0-9]+}")
     @ApiOperation(notes = "Palauttaa muutoksen tietokantatunnuksen perusteella", value = "") // TODO UUID
@@ -135,7 +147,6 @@ public class MuutospyyntoController {
     }
 
     // tallentaa uuden muutoksen
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Tallentaa uuden muutoksen", value = "")
     @RequestMapping(method = PUT, value = "/muutos/create")
@@ -153,7 +164,6 @@ public class MuutospyyntoController {
     }
 
     // muokkaa muutosta
-    // @OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Muokkaa muutosta", value = "")
     @RequestMapping(method = POST, value = "/muutos/update")
@@ -174,39 +184,35 @@ public class MuutospyyntoController {
 
 
     // Vaihda muutospyynnön tilaa -> valmiina käsittelyyn
-    //@OivaAccess_Kayttaja // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/kasittelyyn/{muutospyyntoId:[0-9]+}")
     public HttpEntity<Long> vieKasittelyyn(final @PathVariable long muutospyyntoId) {
-        return getOr404(service.changeTila(muutospyyntoId, "valmiina_kasittelyyn"));
+        return getOr404(service.changeTila(muutospyyntoId, Muutospyyntotila.AVOIN));
     }
 
     // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn
-    //@OivaAccess_Esittelija // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Ota muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/kasittelyssa/{muutospyyntoId:[0-9]+}")
     public HttpEntity<Long> kasittelyssa(final @PathVariable long muutospyyntoId) {
-        return getOr404(service.changeTila(muutospyyntoId, "kasittelyssa"));
+        return getOr404(service.changeTila(muutospyyntoId, Muutospyyntotila.VALMISTELUSSA));
     }
 
     // Vaihda muutospyynnön tilaa -> palauta täydennettäväksi
-    //@OivaAccess_Esittelija // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Palauta järjestäjän täydennettäväksi", value = "")
     @RequestMapping(method = POST, value = "/tila/taydennettava/{muutospyyntoId:[0-9]+}")
     public HttpEntity<Long> taydennettava(final @PathVariable long muutospyyntoId) {
-        return getOr404(service.changeTila(muutospyyntoId, "palauta_taydennettavaksi"));
+        return getOr404(service.changeTila(muutospyyntoId, Muutospyyntotila.TAYDENNETTAVA));
     }
 
     // Vaihda muutospyynnön tilaa -> valmis
-    //@OivaAccess_Esittelija // TODO testataan kirjautumista
     @OivaAccess_Public
     @ApiOperation(notes = "Merkitse muutospyyntö valmiiksi", value = "")
     @RequestMapping(method = POST, value = "/tila/valmis/{muutospyyntoId:[0-9]+}")
     public HttpEntity<Long> valmis(final @PathVariable long muutospyyntoId) {
-        return getOr404(service.changeTila(muutospyyntoId, "valmis"));
+        return getOr404(service.changeTila(muutospyyntoId, Muutospyyntotila.PAATETTY));
     }
 
 }

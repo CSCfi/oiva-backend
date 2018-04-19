@@ -6,6 +6,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.Size;
@@ -24,7 +25,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Esitysmalli implements Serializable {
 
-    private static final long serialVersionUID = -2061079589;
+    private static final long serialVersionUID = 68367873;
 
     private Long      id;
     private String    templatepath;
@@ -33,6 +34,7 @@ public class Esitysmalli implements Serializable {
     private Timestamp luontipvm;
     private String    paivittaja;
     private Timestamp paivityspvm;
+    private UUID      uuid;
 
     public Esitysmalli() {}
 
@@ -44,6 +46,7 @@ public class Esitysmalli implements Serializable {
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
+        this.uuid = value.uuid;
     }
 
     public Esitysmalli(
@@ -53,7 +56,8 @@ public class Esitysmalli implements Serializable {
         String    luoja,
         Timestamp luontipvm,
         String    paivittaja,
-        Timestamp paivityspvm
+        Timestamp paivityspvm,
+        UUID      uuid
     ) {
         this.id = id;
         this.templatepath = templatepath;
@@ -62,6 +66,7 @@ public class Esitysmalli implements Serializable {
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -122,6 +127,14 @@ public class Esitysmalli implements Serializable {
         this.paivityspvm = paivityspvm;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Esitysmalli (");
@@ -133,6 +146,7 @@ public class Esitysmalli implements Serializable {
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos extends TableImpl<MuutosRecord> {
 
-    private static final long serialVersionUID = 155787207;
+    private static final long serialVersionUID = 942090804;
 
     /**
      * The reference instance of <code>oiva.muutos</code>
@@ -131,6 +132,11 @@ public class Muutos extends TableImpl<MuutosRecord> {
     public final TableField<MuutosRecord, String> TILA = createField("tila", org.jooq.impl.SQLDataType.VARCHAR.length(10), this, "");
 
     /**
+     * The column <code>oiva.muutos.uuid</code>.
+     */
+    public final TableField<MuutosRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.muutos</code> table reference
      */
     public Muutos() {
@@ -181,7 +187,7 @@ public class Muutos extends TableImpl<MuutosRecord> {
      */
     @Override
     public List<UniqueKey<MuutosRecord>> getKeys() {
-        return Arrays.<UniqueKey<MuutosRecord>>asList(Keys.MUUTOS_PKEY);
+        return Arrays.<UniqueKey<MuutosRecord>>asList(Keys.MUUTOS_PKEY, Keys.MUUTOS_UUID_KEY);
     }
 
     /**

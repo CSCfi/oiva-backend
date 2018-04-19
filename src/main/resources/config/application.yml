@@ -32,6 +32,10 @@ opintopolku:
         username: override_this_in_local_application_yml
         password: override_this_in_local_application_yml
 
+koulutustyyppi:
+  ammatillinen:
+    koodiarvot: 1,11,12
+
 cas:
     baseUrl: override_this_in_local_application_yml
     url.prefix: /cas

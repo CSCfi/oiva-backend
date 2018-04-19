@@ -14,12 +14,13 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
 import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
 
 @Service
-public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
+public class MuutospyyntoService {
 
     @Autowired
     private DSLContext dsl;
@@ -31,25 +32,34 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
     @Autowired
     private OrganisaatioService organisaatioService;
 
-    private enum Muutospyyntotila {
-        LUONNOS,
-        VALMIINA_KASITTELYYN,
-        KASITTELYSSA,
-        TAYDENNETTAVA,
-        VALMIS,
-        PASSIVOITU;
+    public enum Muutospyyntotila {
+        LUONNOS,            // KJ:n tekemä hakemus
+        AVOIN,              // KJ lähettänyt hakemuksen eteenpäin
+        VALMISTELUSSA,      // Esittelijä ottanut valmisteluun
+        TAYDENNETTAVA,      // Esittelijä palauttanut täydennettäväksi
+        PAATETTY,           // Valmis allekirjoitettu lupa
+        PASSIVOITU;         // Lupa poistettu
+
+        public static Muutospyyntotila convert(String str) {
+            for (Muutospyyntotila muutospyyntotila : Muutospyyntotila.values()) {
+                if (muutospyyntotila.toString().equals(str)) {
+                    return muutospyyntotila;
+                }
+            }
+            return null;
+        }
     }
 
     // Muutospyyntölistaus (hakemukset) esittelijälle
-    public Collection<Muutospyynto> getByEsittelija(String nimi) {
+    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
 
         return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
-                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA,
+                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
                 MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
                 MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID,
                 LUPA.JARJESTAJA_OID, LUPA.ID.as("lupa_id"))
                 .from(MUUTOSPYYNTO, LUPA)
-                .where( (MUUTOSPYYNTO.LUOJA.eq(nimi)).or(MUUTOSPYYNTO.PAIVITTAJA.eq(nimi)) )
+                .where( (MUUTOSPYYNTO.TILA.eq(tila.toString())) )
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
@@ -62,7 +72,7 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
     public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
 
         return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
-                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA,
+                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
                 MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
                 MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID, LUPA.ID.as("lupa_id"))
                 .from(MUUTOSPYYNTO, LUPA)
@@ -119,15 +129,23 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
+    // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
+    public Optional<Muutospyynto> getByUuid(String uuid) {
+        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
+                .where(MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))).fetchOptionalInto(Muutospyynto.class)
+                .map(muutospyynto -> with(Optional.ofNullable(muutospyynto),"yksi"))
+                .filter(Optional::isPresent).map(Optional::get);
+    }
+
+
     protected Optional<Muutospyynto> withMuutokset(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> muutospyynto.setMuutokset(getByMuutospyyntoId(muutospyynto.getId())));
         return muutospyyntoOpt;
     }
 
     protected void withOrganization(final Optional<Muutospyynto> muutospyyntoOpt) {
-        muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaOid()).ifPresent(muutospyynto::setJarjestaja));
+        muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaYtunnus()).ifPresent(muutospyynto::setJarjestaja));
     }
-
 
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 
@@ -143,6 +161,14 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
             //muutosperusteluRecord.setLuoja(SecurityUtil.userName().get());
             muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
             muutosperusteluRecord.store();
+
+            muutospyynto.getMuutokset().stream().forEach(muutos -> {
+                final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
+                //muutosRecord.setLuoja(SecurityUtil.userName().get());
+                muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
+                muutosRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
+                muutosRecord.store();
+            });
 
             return Optional.of(muutospyyntoRecord.getId());
 
@@ -234,8 +260,8 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
 
     }
 
-    // Passivoi muutospyynnön
-    public Optional<Long> changeTila(final long id, String tila) {
+    // Vaihtaa muutospyynnön tilan
+    public Optional<Long> changeTila(final long id, Muutospyyntotila tila) {
 
         try {
 
@@ -244,10 +270,7 @@ public class MuutospyyntoService implements RecordMapping<Muutospyynto>{
             if(muutospyyntoOpt.isPresent()) {
 
                 MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                if(tila.equals("valmiina_kasittelyyn")) { mp.setTila(Muutospyyntotila.VALMIINA_KASITTELYYN.name()); }
-                if(tila.equals("kasittelyssa")) { mp.setTila(Muutospyyntotila.KASITTELYSSA.name()); }
-                if(tila.equals("palauta_taydennettavaksi")) { mp.setTila(Muutospyyntotila.TAYDENNETTAVA.name()); }
-                if(tila.equals("valmis")) { mp.setTila(Muutospyyntotila.VALMIS.name()); }
+                mp.setTila(tila.name());
                 dsl.executeUpdate(mp);
 
             }

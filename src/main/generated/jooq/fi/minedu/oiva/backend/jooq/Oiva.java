@@ -15,6 +15,7 @@ import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutos;
+import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
 import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
@@ -45,7 +46,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = -290354964;
+    private static final long serialVersionUID = -799471196;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -108,6 +109,11 @@ public class Oiva extends SchemaImpl {
     public final Muutos MUUTOS = fi.minedu.oiva.backend.jooq.tables.Muutos.MUUTOS;
 
     /**
+     * The table <code>oiva.muutosliite</code>.
+     */
+    public final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
+
+    /**
      * The table <code>oiva.muutosperustelu</code>.
      */
     public final Muutosperustelu MUUTOSPERUSTELU = fi.minedu.oiva.backend.jooq.tables.Muutosperustelu.MUUTOSPERUSTELU;
@@ -164,6 +170,7 @@ public class Oiva extends SchemaImpl {
             Sequences.MAARAYS_ID_SEQ,
             Sequences.MAARAYSTYYPPI_ID_SEQ,
             Sequences.MUUTOS_ID_SEQ,
+            Sequences.MUUTOSLIITE_ID_SEQ,
             Sequences.MUUTOSPERUSTELU_ID_SEQ,
             Sequences.MUUTOSPYYNTO_ID_SEQ,
             Sequences.PAATOSKIERROS_ID_SEQ,
@@ -190,6 +197,7 @@ public class Oiva extends SchemaImpl {
             Maarays.MAARAYS,
             Maaraystyyppi.MAARAYSTYYPPI,
             Muutos.MUUTOS,
+            Muutosliite.MUUTOSLIITE,
             Muutosperustelu.MUUTOSPERUSTELU,
             Muutospyynto.MUUTOSPYYNTO,
             Paatoskierros.PAATOSKIERROS,

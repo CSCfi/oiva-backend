@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MaaraystyyppiRecord;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -39,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maaraystyyppi extends TableImpl<MaaraystyyppiRecord> {
 
-    private static final long serialVersionUID = 432926093;
+    private static final long serialVersionUID = 1131416490;
 
     /**
      * The reference instance of <code>oiva.maaraystyyppi</code>
@@ -68,6 +69,11 @@ public class Maaraystyyppi extends TableImpl<MaaraystyyppiRecord> {
      * The column <code>oiva.maaraystyyppi.selite</code>.
      */
     public final TableField<MaaraystyyppiRecord, TranslatedString> SELITE = createField("selite", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new TranslatedStringBinding());
+
+    /**
+     * The column <code>oiva.maaraystyyppi.uuid</code>.
+     */
+    public final TableField<MaaraystyyppiRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
      * Create a <code>oiva.maaraystyyppi</code> table reference
@@ -120,7 +126,7 @@ public class Maaraystyyppi extends TableImpl<MaaraystyyppiRecord> {
      */
     @Override
     public List<UniqueKey<MaaraystyyppiRecord>> getKeys() {
-        return Arrays.<UniqueKey<MaaraystyyppiRecord>>asList(Keys.MAARAYSTYYPPI_PKEY);
+        return Arrays.<UniqueKey<MaaraystyyppiRecord>>asList(Keys.MAARAYSTYYPPI_PKEY, Keys.MAARAYSTYYPPI_UUID_KEY);
     }
 
     /**

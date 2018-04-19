@@ -18,6 +18,7 @@ class Lupa(
     def this() = this(null, null, null, null, null)
 
     // exclude from json
+    @JsonIgnore override def getId = super.getId
     @JsonIgnore override def getPaatoskierrosId = super.getPaatoskierrosId
     @JsonIgnore override def getAsiatyyppiId = super.getAsiatyyppiId
     @JsonIgnore override def getLupatilaId = super.getLupatilaId

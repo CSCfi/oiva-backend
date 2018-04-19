@@ -5,8 +5,7 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Lupahistoria(
-                     var lupahistoria: Lupahistoria) extends fi.minedu.oiva.backend.jooq.tables.pojos.Lupahistoria  {
+class Lupahistoria(var lupahistoria: Lupahistoria) extends fi.minedu.oiva.backend.jooq.tables.pojos.Lupahistoria  {
 
   def this() = this(null)
 

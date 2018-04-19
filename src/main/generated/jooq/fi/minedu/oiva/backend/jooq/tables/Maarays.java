@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.MaaraysRecord;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -40,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays extends TableImpl<MaaraysRecord> {
 
-    private static final long serialVersionUID = -397748773;
+    private static final long serialVersionUID = -1620325955;
 
     /**
      * The reference instance of <code>oiva.maarays</code>
@@ -126,6 +127,11 @@ public class Maarays extends TableImpl<MaaraysRecord> {
     public final TableField<MaaraysRecord, Integer> KOODISTOVERSIO = createField("koodistoversio", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
+     * The column <code>oiva.maarays.uuid</code>.
+     */
+    public final TableField<MaaraysRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.maarays</code> table reference
      */
     public Maarays() {
@@ -176,7 +182,7 @@ public class Maarays extends TableImpl<MaaraysRecord> {
      */
     @Override
     public List<UniqueKey<MaaraysRecord>> getKeys() {
-        return Arrays.<UniqueKey<MaaraysRecord>>asList(Keys.MAARAYS_PKEY);
+        return Arrays.<UniqueKey<MaaraysRecord>>asList(Keys.MAARAYS_PKEY, Keys.MAARAYS_UUID_KEY);
     }
 
     /**

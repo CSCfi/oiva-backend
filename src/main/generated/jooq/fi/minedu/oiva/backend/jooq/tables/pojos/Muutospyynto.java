@@ -7,6 +7,7 @@ package fi.minedu.oiva.backend.jooq.tables.pojos;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -26,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -2115085373;
+    private static final long serialVersionUID = 879471229;
 
     private Long      id;
     private Long      lupaId;
@@ -40,6 +41,7 @@ public class Muutospyynto implements Serializable {
     private Timestamp luontipvm;
     private String    paivittaja;
     private Timestamp paivityspvm;
+    private UUID      uuid;
 
     public Muutospyynto() {}
 
@@ -56,6 +58,7 @@ public class Muutospyynto implements Serializable {
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
+        this.uuid = value.uuid;
     }
 
     public Muutospyynto(
@@ -70,7 +73,8 @@ public class Muutospyynto implements Serializable {
         String    luoja,
         Timestamp luontipvm,
         String    paivittaja,
-        Timestamp paivityspvm
+        Timestamp paivityspvm,
+        UUID      uuid
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -84,6 +88,7 @@ public class Muutospyynto implements Serializable {
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -188,6 +193,14 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = paivityspvm;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -204,6 +217,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

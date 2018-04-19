@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -28,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = 427097702;
+    private static final long serialVersionUID = 1575830450;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -47,6 +48,7 @@ public class Lupa implements Serializable {
     private Timestamp luontipvm;
     private String    paivittaja;
     private Timestamp paivityspvm;
+    private UUID      uuid;
 
     public Lupa() {}
 
@@ -68,6 +70,7 @@ public class Lupa implements Serializable {
         this.luontipvm = value.luontipvm;
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
+        this.uuid = value.uuid;
     }
 
     public Lupa(
@@ -87,7 +90,8 @@ public class Lupa implements Serializable {
         String    luoja,
         Timestamp luontipvm,
         String    paivittaja,
-        Timestamp paivityspvm
+        Timestamp paivityspvm,
+        UUID      uuid
     ) {
         this.id = id;
         this.edellinenLupaId = edellinenLupaId;
@@ -106,6 +110,7 @@ public class Lupa implements Serializable {
         this.luontipvm = luontipvm;
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -253,6 +258,14 @@ public class Lupa implements Serializable {
         this.paivityspvm = paivityspvm;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupa (");
@@ -274,6 +287,7 @@ public class Lupa implements Serializable {
         sb.append(", ").append(luontipvm);
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

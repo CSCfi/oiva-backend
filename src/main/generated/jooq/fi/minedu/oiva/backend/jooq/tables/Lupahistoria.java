@@ -11,6 +11,7 @@ import fi.minedu.oiva.backend.jooq.tables.records.LupahistoriaRecord;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -36,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
 
-    private static final long serialVersionUID = 1371752347;
+    private static final long serialVersionUID = -626828274;
 
     /**
      * The reference instance of <code>oiva.lupahistoria</code>
@@ -102,6 +103,11 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     public final TableField<LupahistoriaRecord, String> FILENAME = createField("filename", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false), this, "");
 
     /**
+     * The column <code>oiva.lupahistoria.uuid</code>.
+     */
+    public final TableField<LupahistoriaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.lupahistoria</code> table reference
      */
     public Lupahistoria() {
@@ -152,7 +158,7 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
      */
     @Override
     public List<UniqueKey<LupahistoriaRecord>> getKeys() {
-        return Arrays.<UniqueKey<LupahistoriaRecord>>asList(Keys.LUPAHISTORIA_PKEY);
+        return Arrays.<UniqueKey<LupahistoriaRecord>>asList(Keys.LUPAHISTORIA_PKEY, Keys.LUPAHISTORIA_UUID_KEY);
     }
 
     /**

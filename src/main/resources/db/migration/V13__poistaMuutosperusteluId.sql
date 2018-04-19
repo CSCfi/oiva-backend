@@ -1,0 +1,1 @@
+ALTER TABLE muutosliite SET SCHEMA oiva;

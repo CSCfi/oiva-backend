@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.entity.TranslatedString;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 import javax.validation.constraints.NotNull;
@@ -26,11 +27,12 @@ import javax.validation.constraints.NotNull;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Asiatyyppi implements Serializable {
 
-    private static final long serialVersionUID = 1611333062;
+    private static final long serialVersionUID = 671649652;
 
     private Long             id;
     private AsiatyyppiValue  tunniste;
     private TranslatedString selite;
+    private UUID             uuid;
 
     public Asiatyyppi() {}
 
@@ -38,16 +40,19 @@ public class Asiatyyppi implements Serializable {
         this.id = value.id;
         this.tunniste = value.tunniste;
         this.selite = value.selite;
+        this.uuid = value.uuid;
     }
 
     public Asiatyyppi(
         Long             id,
         AsiatyyppiValue  tunniste,
-        TranslatedString selite
+        TranslatedString selite,
+        UUID             uuid
     ) {
         this.id = id;
         this.tunniste = tunniste;
         this.selite = selite;
+        this.uuid = uuid;
     }
 
     public Long getId() {
@@ -75,6 +80,14 @@ public class Asiatyyppi implements Serializable {
         this.selite = selite;
     }
 
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Asiatyyppi (");
@@ -82,6 +95,7 @@ public class Asiatyyppi implements Serializable {
         sb.append(id);
         sb.append(", ").append(tunniste);
         sb.append(", ").append(selite);
+        sb.append(", ").append(uuid);
 
         sb.append(")");
         return sb.toString();

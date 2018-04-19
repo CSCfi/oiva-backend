@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.service;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.util.With;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -103,8 +103,8 @@ public class CacheService {
         koodistoService.getOpetuskielet();
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
-        lupaService.getAll(RecordMapping.withAll).stream().forEach(lupa ->
-            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), RecordMapping.withAll));
+        lupaService.getAll(With.all).stream().forEach(lupa ->
+            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), With.all));
         refreshKoulutus(false);
 
         final long duration = System.currentTimeMillis() - startTime;
@@ -122,7 +122,7 @@ public class CacheService {
         final long startTime = System.currentTimeMillis();
 
         final Set<String> cacheKeys = new HashSet<>();
-        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, RecordMapping.withAll);
+        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, With.all);
 
         final BiFunction<Class<?>, String, String> cacheNameBuilder = (cacheBase, cacheSuffix) ->
             cacheBase.getSimpleName() + (StringUtils.isNotBlank(cacheSuffix) ? ":" + cacheSuffix : "");
@@ -191,6 +191,15 @@ public class CacheService {
                 cacheKey.accept("KoodistoService:getKoulutusalaKoulutukset", koulutusala.koodiArvo());
             });
 
+            cacheKey.accept("KoodistoService:getKoulutustyypit", "");
+            cacheKey.accept("KoodistoService:getKoulutusToKoulutustyyppiRelation", "");
+            koodistoService.getKoulutustyypit().stream().forEach(koulutustyyppi -> {
+                cacheKey.accept("KoodistoService:getKoulutustyyppi", koulutustyyppi.koodiArvo());
+                cacheKey.accept("KoodistoService:getKoulutustyyppiKoulutukset", koulutustyyppi.koodiArvo());
+            });
+
+            cacheKey.accept("KoodistoService:getAmmatillinenKoulutukset", "");
+
             // delete cache keys
             flushCacheKeys(cacheKeys);
         }
@@ -201,6 +210,14 @@ public class CacheService {
             koodistoService.getKoulutusala(koulutusala.koodiArvo());
             koodistoService.getKoulutusalaKoulutukset(koulutusala.koodiArvo());
         });
+
+        koodistoService.getKoulutusToKoulutustyyppiRelation();
+        koodistoService.getKoulutustyypit().stream().forEach(koulutustyyppi -> {
+            koodistoService.getKoulutustyyppi(koulutustyyppi.koodiArvo());
+            koodistoService.getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo());
+        });
+
+        koodistoService.getAmmatillinenKoulutukset();
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Koulutus cache refreshed in {}ms", duration);

@@ -15,6 +15,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -41,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa extends TableImpl<LupaRecord> {
 
-    private static final long serialVersionUID = 440305343;
+    private static final long serialVersionUID = 2099079163;
 
     /**
      * The reference instance of <code>oiva.lupa</code>
@@ -142,6 +143,11 @@ public class Lupa extends TableImpl<LupaRecord> {
     public final TableField<LupaRecord, Timestamp> PAIVITYSPVM = createField("paivityspvm", org.jooq.impl.SQLDataType.TIMESTAMP, this, "");
 
     /**
+     * The column <code>oiva.lupa.uuid</code>.
+     */
+    public final TableField<LupaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
      * Create a <code>oiva.lupa</code> table reference
      */
     public Lupa() {
@@ -192,7 +198,7 @@ public class Lupa extends TableImpl<LupaRecord> {
      */
     @Override
     public List<UniqueKey<LupaRecord>> getKeys() {
-        return Arrays.<UniqueKey<LupaRecord>>asList(Keys.LUPA_PKEY, Keys.LUPA_DIAARINUMERO_KEY);
+        return Arrays.<UniqueKey<LupaRecord>>asList(Keys.LUPA_PKEY, Keys.LUPA_DIAARINUMERO_KEY, Keys.LUPA_UUID_KEY);
     }
 
     /**
