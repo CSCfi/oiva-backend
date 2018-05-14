@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,7 +13,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SecurityUtil {
@@ -23,14 +21,9 @@ public class SecurityUtil {
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication());
     }
 
-    protected static Optional<UserDetails> userPrincipal() {
-        final Optional<Authentication> authOpt = userAuthentication();
-        return Optional.ofNullable(authOpt.isPresent() ? (UserDetails) authOpt.get().getPrincipal() : null);
-    }
-
     public static Optional<String> userName() {
-        final Optional<UserDetails> principalOpt = userPrincipal();
-        return Optional.ofNullable(principalOpt.isPresent() ? principalOpt.get().getUsername() : null);
+        final Optional<Authentication> authOpt = userAuthentication();
+        return Optional.ofNullable(authOpt.isPresent() ? authOpt.get().getName() : null);
     }
 
     public static List<String> userRoles() {

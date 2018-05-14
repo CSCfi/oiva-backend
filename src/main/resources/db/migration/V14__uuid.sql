@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 ALTER TABLE oiva.asiatyyppi ADD COLUMN uuid UUID NOT NULL UNIQUE DEFAULT uuid_generate_v1();
 ALTER TABLE oiva.esitysmalli ADD COLUMN uuid UUID NOT NULL UNIQUE DEFAULT uuid_generate_v1();
 ALTER TABLE oiva.kohde ADD COLUMN uuid UUID NOT NULL UNIQUE DEFAULT uuid_generate_v1();
