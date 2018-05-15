@@ -9,10 +9,9 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.PAATOSKIERROS;
 
@@ -33,6 +32,10 @@ public class PaatoskierrosService {
     public Optional<Paatoskierros> forLupa(final Lupa lupa) {
         return Optional.ofNullable(null != lupa ?
             baseQuery().where(PAATOSKIERROS.ID.eq(lupa.getPaatoskierrosId())).fetchOneInto(Paatoskierros.class) : null);
+    }
+
+    public Optional<Long> idForUuid(final UUID uuid) {
+        return Optional.ofNullable(null != uuid ? dsl.select(PAATOSKIERROS.ID).from(PAATOSKIERROS).where(PAATOSKIERROS.UUID.eq(uuid)).fetchOne().value1() : null);
     }
 
     public Collection<Paatoskierros> getOpen() {

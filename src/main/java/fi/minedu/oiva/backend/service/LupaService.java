@@ -20,7 +20,11 @@ import org.jooq.SelectOnConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Optional;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
+import static fi.minedu.oiva.backend.jooq.tables.Lupa.LUPA;
 
 @Service
 public class LupaService {
@@ -59,6 +64,10 @@ public class LupaService {
     protected SelectOnConditionStep<Record> baseLupaSelect() {
         return dsl.select(LUPA.fields()).from(LUPA)
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
+    }
+
+    protected Optional<Lupa> getById(final Long id) {
+        return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id)).fetchOneInto(Lupa.class) : null);
     }
 
     protected Optional<Condition> baseLupaFilter() {

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.LUPATILA;
 
@@ -30,5 +31,9 @@ public class LupatilaService {
     public Optional<Lupatila> forLupa(final Lupa lupa) {
         return Optional.ofNullable(null != lupa ?
             baseQuery().where(LUPATILA.ID.eq(lupa.getLupatilaId())).fetchOneInto(Lupatila.class) : null);
+    }
+
+    public Optional<Long> idForUuid(final UUID uuid) {
+        return Optional.ofNullable(null != uuid ? dsl.select(LUPATILA.ID).from(LUPATILA).where(LUPATILA.UUID.eq(uuid)).fetchOne().value1() : null);
     }
 }
