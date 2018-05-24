@@ -1,30 +1,36 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.*;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.LupaService;
-import fi.minedu.oiva.backend.service.PebbleService;
-import fi.minedu.oiva.backend.service.PrinceXMLService;
+import fi.minedu.oiva.backend.service.*;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.ApiOperation;
+import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
-import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
 @RequestMapping(
@@ -46,6 +52,15 @@ public class PrinceXMLController {
 
     @Autowired
     private LupaService lupaService;
+
+    @Autowired
+    private KohdeService kohdeService;
+
+    @Autowired
+    private MaaraystyyppiService maaraystyyppiService;
+
+    @Autowired
+    private OpintopolkuService opintopolkuService;
 
     @OivaAccess_Public
     @RequestMapping(value = "/{diaarinumero}/**", method = GET)
@@ -70,11 +85,11 @@ public class PrinceXMLController {
 
                     });
 
-                    // TODO: lisää pdf kantaan tarvittaville luville
                     if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
 
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaariNumero, "/", "-") + ".pdf");
+                    System.out.println("JOO: " + htmlOpt.get().toString());
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
                         response.setStatus(get500().getStatusCode().value());
                         response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
@@ -89,4 +104,79 @@ public class PrinceXMLController {
             response.setStatus(get500().getStatusCode().value());
         }
     }
+
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/muutospyyntoToPdf", method = PUT)
+    @ResponseBody
+    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
+    public void MuutospyyntoToPdf(@RequestBody String muutospyyntoHtml,
+                                              final HttpServletResponse response, final HttpServletRequest request) {
+
+        try {
+            // TODO: kielivalinta koulutuksen järjestäjän mukaan
+            final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
+            if (!princeXMLService.toPDF(muutospyyntoHtml, response.getOutputStream(), options)) {
+                response.setStatus(get500().getStatusCode().value());
+                response.getWriter().write("Failed to generate Lupa with html " + muutospyyntoHtml);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to generate Lupa PDF with html {}", muutospyyntoHtml, e);
+            response.setStatus(get500().getStatusCode().value());
+        }
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/muutospyyntoObjToPdf", method = PUT)
+    @ResponseBody
+    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
+    public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto,
+                                  final HttpServletResponse response, final HttpServletRequest request) {
+
+
+        final Map<Long, Kohde> kohteet = kohdeService.mapAll();
+        final Map<Long, Maaraystyyppi> maaraystyypit = maaraystyyppiService.mapAll();
+
+        muutospyynto.getMuutokset().stream().forEach(muutos -> {
+            muutos.setKohde(kohteet.getOrDefault(muutos.getKohdeId(), null));
+            muutos.setMaaraystyyppi(maaraystyypit.getOrDefault(muutos.getMaaraystyyppiId(), null));
+
+            // jos lisätään tutkintokieliä:
+            if(null != muutos.getParentId()) {
+                System.out.println("kielikoodilla jolla haetaan: " + muutos.getParentId());
+
+                KoodistoKoodi koodi = opintopolkuService.getKoodi("koulutus", muutos.getParentId().toString(),null);
+                if(null!=koodi) {
+                    muutos.setKoodi(koodi);
+                    System.out.println("kielikoodin tutkinto" + koodi.getNimi().toJson().asText());
+                }
+            }
+
+            opintopolkuService.getKoodi(muutos).ifPresent(koodi -> {
+                muutos.setKoodi(koodi);
+                if (koodi.isKoodisto("koulutus")) {
+                    final String koodiArvo = koodi.koodiArvo();
+                    opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo).ifPresent(koulutustyyppiKoodit -> koulutustyyppiKoodit.stream().forEach(muutos::addYlaKoodi));
+                    opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(muutos::addYlaKoodi);
+                }
+            });
+
+        });
+
+
+        try {
+            // TODO: kielivalinta koulutuksen järjestäjän mukaan
+            final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
+            final Optional<String> muutospyyntoHtml = pebbleService.muutospyyntoToHTML(muutospyynto, options);
+
+            if (!princeXMLService.toPDF(muutospyyntoHtml.get(), response.getOutputStream(), options)) {
+                response.setStatus(get500().getStatusCode().value());
+                response.getWriter().write("Failed to generate Muutospyynto with html " + muutospyyntoHtml.get());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to generate Muutospyynto PDF with html {}", e);
+            response.setStatus(get500().getStatusCode().value());
+        }
+    }
+
 }

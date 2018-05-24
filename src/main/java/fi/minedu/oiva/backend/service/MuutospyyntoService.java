@@ -287,15 +287,14 @@ public class MuutospyyntoService {
 
     public boolean validate(Muutospyynto muutospyynto) {
         return ValidationUtils.validate(
-                validation(muutospyynto.getLupaId(), "Muutospyyntö lupaId is missing"),
-                validation(muutospyynto.getPaatoskierrosId(), "PaatoskierrosId is missing"),
+                validation(muutospyynto.getUuid(), "Muutospyyntö lupa uuid is missing"),
                 validation(muutospyynto.getTila(), "Muutospyynto tila is missing")
         );
     }
 
     public boolean validate(Muutos muutos) {
         return ValidationUtils.validate(
-                validation(muutos.getMuutospyyntoId(), "Muutos: muutospyyntoId is missing"),
+                validation(muutos.getUuid(), "Muutos: muutospyyntoUuid is missing"),
                 validation(muutos.getKohdeId(), "Muutos: kohdeId is missing"),
                 validation(muutos.getKoodiarvo(), "Muutos: koodiarvo is missing"),
                 validation(muutos.getKoodisto(), "Muutos: koodisto is missing"),
