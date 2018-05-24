@@ -27,6 +27,12 @@ public class PrinceXMLService {
     @Value("${prince.exec.path}")
     private String princeExecPath;
 
+    public boolean toPDF(final String html)  {
+        final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
+        if(generatePDF(html, basePDFStream)) return true;
+        return false;
+
+    }
     public boolean toPDF(final String html, final OutputStream output, final RenderOptions options)  {
         final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
         if(generatePDF(html, basePDFStream)) {

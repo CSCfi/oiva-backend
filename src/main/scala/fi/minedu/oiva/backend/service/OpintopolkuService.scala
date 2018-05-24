@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct
 import fi.minedu.oiva.backend.cache.CacheAware
 import fi.minedu.oiva.backend.cas.CASClient
 import fi.minedu.oiva.backend.entity.Maarays
+import fi.minedu.oiva.backend.entity.Muutos
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton
 import fi.minedu.oiva.backend.entity.opintopolku._
 
@@ -168,6 +169,9 @@ class OpintopolkuService extends CacheAware {
 
     def getKoodi(koodistoUri: String, koodiArvo: String, koodistoVersio: Integer) =
         getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo), koodistoVersio)
+
+    def getKoodi(muutos: Muutos): Optional[KoodistoKoodi] =
+        Optional.ofNullable(getKoodi(muutos.getKoodisto, muutos.getKoodiarvo, null))
 
     def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiPath)
 

@@ -7,6 +7,8 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 import fi.minedu.oiva.backend.config.PebbleConfig;
 import fi.minedu.oiva.backend.entity.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
+import fi.minedu.oiva.backend.entity.Muutos;
+import fi.minedu.oiva.backend.entity.Muutospyynto;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,5 +109,34 @@ public class PebbleService {
         if(null == lupa.getMeta()) lupa.setMeta(JsonNodeFactory.instance.nullNode());
         if(null == lupa.getMaaraykset()) lupa.setMaaraykset(Collections.emptyList());
         return lupa;
+    }
+
+
+    public Optional<String> muutospyyntoToHTML(final Muutospyynto muutospyynto, final RenderOptions options) {
+        options.setTemplateName("hakemus/base");
+        return generateMuutospyyntoHtml(muutospyynto, options);
+    }
+
+    private Optional<String> generateMuutospyyntoHtml(final Muutospyynto muutospyynto, final RenderOptions options) {
+
+        // TODO: tarvitaanko erilaisia hakemuspohjia?
+        final String contextPath = "hakemukset2018";
+        final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
+
+        logger.debug("Using base path: {}", pebble.getTemplateBasePath());
+        logger.debug("Using context path: {}", contextPath);
+        logger.debug("Using template: {}", templateName);
+
+        final String templatePath = contextPath + templateName;
+        final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
+        context.put("muutospyynto", nonNullVersionOfMuutospyynto(muutospyynto));
+        context.put("jarjestaja", muutospyynto.getJarjestaja());
+
+        return writeHTML(templatePath, context);
+    }
+
+    private Muutospyynto nonNullVersionOfMuutospyynto(final Muutospyynto muutospyynto) {
+        if(null == muutospyynto.getMuutokset()) muutospyynto.setMuutokset(Collections.emptyList());
+        return muutospyynto;
     }
 }
