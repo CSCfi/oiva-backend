@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.security.Http401UnauthorizedEntryPoint;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.web.controller.AuthController;
 import fi.minedu.oiva.backend.web.controller.ExportController;
+import fi.minedu.oiva.backend.web.controller.ImportController;
 import org.jasig.cas.client.session.SingleSignOutFilter;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class WebSecurityConfig {
         @Value("${api.url.prefix}" + ExportController.path + "/**")
         private String oivaExportPath;
 
+        @Value("${api.url.prefix}" + ImportController.path + "/**")
+        private String oivaImportPath;
+
         @Value("${api.basicauth.username}")
         private String oivaBasicAuthUsername;
 
@@ -52,7 +56,8 @@ public class WebSecurityConfig {
 
         @Override
         protected void configure(final HttpSecurity http) throws Exception {
-            http.antMatcher(oivaExportPath).httpBasic().and()
+            http.csrf().disable();
+            http.httpBasic().and().requestMatchers().antMatchers(oivaExportPath, oivaImportPath).and()
                 .authorizeRequests().anyRequest().hasRole(OivaAccess.Role_Application).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         }

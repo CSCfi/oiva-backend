@@ -56,6 +56,10 @@ public class MaaraysService {
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
     }
 
+    protected Optional<Maarays> getById(final Long id) {
+        return Optional.ofNullable(null != id ? dsl.select(MAARAYS.fields()).from(MAARAYS).where(MAARAYS.ID.eq(id)).fetchOneInto(Maarays.class) : null);
+    }
+
     public Collection<Maarays> getByLupa(final Long lupaId, final String... with) {
         final SelectConditionStep<Record> query = baseMaaraysQuery().where(LUPA.ID.eq(lupaId));
         lupaService.baseLupaFilter().ifPresent(query::and);
