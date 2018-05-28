@@ -4,6 +4,8 @@
 package fi.minedu.oiva.backend.jooq.tables.pojos;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -27,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 879471229;
+    private static final long serialVersionUID = 1834434015;
 
     private Long      id;
     private Long      lupaId;
@@ -42,6 +44,7 @@ public class Muutospyynto implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private JsonNode  meta;
 
     public Muutospyynto() {}
 
@@ -59,6 +62,7 @@ public class Muutospyynto implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.meta = value.meta;
     }
 
     public Muutospyynto(
@@ -74,7 +78,8 @@ public class Muutospyynto implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        UUID      uuid
+        UUID      uuid,
+        JsonNode  meta
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -89,6 +94,7 @@ public class Muutospyynto implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.meta = meta;
     }
 
     public Long getId() {
@@ -201,6 +207,14 @@ public class Muutospyynto implements Serializable {
         this.uuid = uuid;
     }
 
+    public JsonNode getMeta() {
+        return this.meta;
+    }
+
+    public void setMeta(JsonNode meta) {
+        this.meta = meta;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -218,6 +232,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(meta);
 
         sb.append(")");
         return sb.toString();

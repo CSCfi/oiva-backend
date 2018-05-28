@@ -4,8 +4,11 @@
 package fi.minedu.oiva.backend.jooq.tables;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import fi.minedu.oiva.backend.jooq.Keys;
 import fi.minedu.oiva.backend.jooq.Oiva;
+import fi.minedu.oiva.backend.jooq.PostgresJSONJacksonBinding;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 
 import java.sql.Date;
@@ -39,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
 
-    private static final long serialVersionUID = 410504275;
+    private static final long serialVersionUID = 2084889615;
 
     /**
      * The reference instance of <code>oiva.muutospyynto</code>
@@ -118,6 +121,11 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
      * The column <code>oiva.muutospyynto.uuid</code>.
      */
     public final TableField<MuutospyyntoRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
+     * The column <code>oiva.muutospyynto.meta</code>.
+     */
+    public final TableField<MuutospyyntoRecord, JsonNode> META = createField("meta", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new PostgresJSONJacksonBinding());
 
     /**
      * Create a <code>oiva.muutospyynto</code> table reference
