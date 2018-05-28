@@ -132,7 +132,9 @@ public class Keys {
     public static final ForeignKey<MuutosRecord, MuutospyyntoRecord> MUUTOS__FK_MUUTOSPYYNTO = ForeignKeys0.MUUTOS__FK_MUUTOSPYYNTO;
     public static final ForeignKey<MuutosRecord, KohdeRecord> MUUTOS__FK_KOHDE = ForeignKeys0.MUUTOS__FK_KOHDE;
     public static final ForeignKey<MuutosliiteRecord, MuutospyyntoRecord> MUUTOSLIITE__FK_MUUTOSPYYNTO = ForeignKeys0.MUUTOSLIITE__FK_MUUTOSPYYNTO;
+    public static final ForeignKey<MuutosliiteRecord, MuutosRecord> MUUTOSLIITE__FK_MUUTOS = ForeignKeys0.MUUTOSLIITE__FK_MUUTOS;
     public static final ForeignKey<MuutosperusteluRecord, MuutospyyntoRecord> MUUTOSPERUSTELU__FK_MUUTOSPYYNTO = ForeignKeys0.MUUTOSPERUSTELU__FK_MUUTOSPYYNTO;
+    public static final ForeignKey<MuutosperusteluRecord, MuutosRecord> MUUTOSPERUSTELU__FK_MUUTOS = ForeignKeys0.MUUTOSPERUSTELU__FK_MUUTOS;
     public static final ForeignKey<MuutospyyntoRecord, LupaRecord> MUUTOSPYYNTO__FK_LUPA = ForeignKeys0.MUUTOSPYYNTO__FK_LUPA;
     public static final ForeignKey<MuutospyyntoRecord, PaatoskierrosRecord> MUUTOSPYYNTO__FK_PAATOSKIERROS = ForeignKeys0.MUUTOSPYYNTO__FK_PAATOSKIERROS;
     public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = ForeignKeys0.PAATOSKIERROS__FK_ESITYSMALLI;
@@ -207,7 +209,9 @@ public class Keys {
         public static final ForeignKey<MuutosRecord, MuutospyyntoRecord> MUUTOS__FK_MUUTOSPYYNTO = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MUUTOSPYYNTO_PKEY, Muutos.MUUTOS, "muutos__fk_muutospyynto", Muutos.MUUTOS.MUUTOSPYYNTO_ID);
         public static final ForeignKey<MuutosRecord, KohdeRecord> MUUTOS__FK_KOHDE = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.KOHDE_PKEY, Muutos.MUUTOS, "muutos__fk_kohde", Muutos.MUUTOS.KOHDE_ID);
         public static final ForeignKey<MuutosliiteRecord, MuutospyyntoRecord> MUUTOSLIITE__FK_MUUTOSPYYNTO = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MUUTOSPYYNTO_PKEY, Muutosliite.MUUTOSLIITE, "muutosliite__fk_muutospyynto", Muutosliite.MUUTOSLIITE.MUUTOSPYYNTO_ID);
+        public static final ForeignKey<MuutosliiteRecord, MuutosRecord> MUUTOSLIITE__FK_MUUTOS = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MUUTOS_PKEY, Muutosliite.MUUTOSLIITE, "muutosliite__fk_muutos", Muutosliite.MUUTOSLIITE.MUUTOS_ID);
         public static final ForeignKey<MuutosperusteluRecord, MuutospyyntoRecord> MUUTOSPERUSTELU__FK_MUUTOSPYYNTO = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MUUTOSPYYNTO_PKEY, Muutosperustelu.MUUTOSPERUSTELU, "muutosperustelu__fk_muutospyynto", Muutosperustelu.MUUTOSPERUSTELU.MUUTOSPYYNTO_ID);
+        public static final ForeignKey<MuutosperusteluRecord, MuutosRecord> MUUTOSPERUSTELU__FK_MUUTOS = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.MUUTOS_PKEY, Muutosperustelu.MUUTOSPERUSTELU, "muutosperustelu__fk_muutos", Muutosperustelu.MUUTOSPERUSTELU.MUUTOS_ID);
         public static final ForeignKey<MuutospyyntoRecord, LupaRecord> MUUTOSPYYNTO__FK_LUPA = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.LUPA_PKEY, Muutospyynto.MUUTOSPYYNTO, "muutospyynto__fk_lupa", Muutospyynto.MUUTOSPYYNTO.LUPA_ID);
         public static final ForeignKey<MuutospyyntoRecord, PaatoskierrosRecord> MUUTOSPYYNTO__FK_PAATOSKIERROS = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.PAATOSKIERROS_PKEY, Muutospyynto.MUUTOSPYYNTO, "muutospyynto__fk_paatoskierros", Muutospyynto.MUUTOSPYYNTO.PAATOSKIERROS_ID);
         public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = createForeignKey(fi.minedu.oiva.backend.jooq.Keys.ESITYSMALLI_PKEY, Paatoskierros.PAATOSKIERROS, "paatoskierros__fk_esitysmalli", Paatoskierros.PAATOSKIERROS.ESITYSMALLI_ID);

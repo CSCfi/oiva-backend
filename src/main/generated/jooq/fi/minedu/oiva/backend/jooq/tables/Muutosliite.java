@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutosliite extends TableImpl<MuutosliiteRecord> {
 
-    private static final long serialVersionUID = 1584700776;
+    private static final long serialVersionUID = 1232597504;
 
     /**
      * The reference instance of <code>oiva.muutosliite</code>
@@ -117,6 +117,11 @@ public class Muutosliite extends TableImpl<MuutosliiteRecord> {
     public final TableField<MuutosliiteRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
+     * The column <code>oiva.muutosliite.muutos_id</code>.
+     */
+    public final TableField<MuutosliiteRecord, Long> MUUTOS_ID = createField("muutos_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * Create a <code>oiva.muutosliite</code> table reference
      */
     public Muutosliite() {
@@ -175,7 +180,7 @@ public class Muutosliite extends TableImpl<MuutosliiteRecord> {
      */
     @Override
     public List<ForeignKey<MuutosliiteRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<MuutosliiteRecord, ?>>asList(Keys.MUUTOSLIITE__FK_MUUTOSPYYNTO);
+        return Arrays.<ForeignKey<MuutosliiteRecord, ?>>asList(Keys.MUUTOSLIITE__FK_MUUTOSPYYNTO, Keys.MUUTOSLIITE__FK_MUUTOS);
     }
 
     /**

@@ -89,7 +89,6 @@ public class PrinceXMLController {
 
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaariNumero, "/", "-") + ".pdf");
-                    System.out.println("JOO: " + htmlOpt.get().toString());
                     if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
                         response.setStatus(get500().getStatusCode().value());
                         response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);

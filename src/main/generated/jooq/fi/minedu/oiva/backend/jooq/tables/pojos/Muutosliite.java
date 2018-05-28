@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutosliite implements Serializable {
 
-    private static final long serialVersionUID = -449320372;
+    private static final long serialVersionUID = -1894943876;
 
     private Long      id;
     private String    nimi;
@@ -42,6 +42,7 @@ public class Muutosliite implements Serializable {
     private JsonNode  meta;
     private Long      muutospyyntoId;
     private UUID      uuid;
+    private Long      muutosId;
 
     public Muutosliite() {}
 
@@ -58,6 +59,7 @@ public class Muutosliite implements Serializable {
         this.meta = value.meta;
         this.muutospyyntoId = value.muutospyyntoId;
         this.uuid = value.uuid;
+        this.muutosId = value.muutosId;
     }
 
     public Muutosliite(
@@ -72,7 +74,8 @@ public class Muutosliite implements Serializable {
         Long      koko,
         JsonNode  meta,
         Long      muutospyyntoId,
-        UUID      uuid
+        UUID      uuid,
+        Long      muutosId
     ) {
         this.id = id;
         this.nimi = nimi;
@@ -86,6 +89,7 @@ public class Muutosliite implements Serializable {
         this.meta = meta;
         this.muutospyyntoId = muutospyyntoId;
         this.uuid = uuid;
+        this.muutosId = muutosId;
     }
 
     public Long getId() {
@@ -190,6 +194,14 @@ public class Muutosliite implements Serializable {
         this.uuid = uuid;
     }
 
+    public Long getMuutosId() {
+        return this.muutosId;
+    }
+
+    public void setMuutosId(Long muutosId) {
+        this.muutosId = muutosId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutosliite (");
@@ -206,6 +218,7 @@ public class Muutosliite implements Serializable {
         sb.append(", ").append(meta);
         sb.append(", ").append(muutospyyntoId);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(muutosId);
 
         sb.append(")");
         return sb.toString();
