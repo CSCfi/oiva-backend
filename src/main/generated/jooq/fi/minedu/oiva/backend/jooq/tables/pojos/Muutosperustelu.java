@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutosperustelu implements Serializable {
 
-    private static final long serialVersionUID = -197125282;
+    private static final long serialVersionUID = -272447144;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -41,6 +41,7 @@ public class Muutosperustelu implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private Long      muutosId;
 
     public Muutosperustelu() {}
 
@@ -56,6 +57,7 @@ public class Muutosperustelu implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.muutosId = value.muutosId;
     }
 
     public Muutosperustelu(
@@ -69,7 +71,8 @@ public class Muutosperustelu implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        UUID      uuid
+        UUID      uuid,
+        Long      muutosId
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -82,6 +85,7 @@ public class Muutosperustelu implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.muutosId = muutosId;
     }
 
     public Long getId() {
@@ -176,6 +180,14 @@ public class Muutosperustelu implements Serializable {
         this.uuid = uuid;
     }
 
+    public Long getMuutosId() {
+        return this.muutosId;
+    }
+
+    public void setMuutosId(Long muutosId) {
+        this.muutosId = muutosId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutosperustelu (");
@@ -191,6 +203,7 @@ public class Muutosperustelu implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(muutosId);
 
         sb.append(")");
         return sb.toString();

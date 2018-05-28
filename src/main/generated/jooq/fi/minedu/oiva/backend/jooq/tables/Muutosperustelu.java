@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
 
-    private static final long serialVersionUID = -1852188832;
+    private static final long serialVersionUID = -1000136368;
 
     /**
      * The reference instance of <code>oiva.muutosperustelu</code>
@@ -112,6 +112,11 @@ public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
     public final TableField<MuutosperusteluRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
+     * The column <code>oiva.muutosperustelu.muutos_id</code>.
+     */
+    public final TableField<MuutosperusteluRecord, Long> MUUTOS_ID = createField("muutos_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * Create a <code>oiva.muutosperustelu</code> table reference
      */
     public Muutosperustelu() {
@@ -170,7 +175,7 @@ public class Muutosperustelu extends TableImpl<MuutosperusteluRecord> {
      */
     @Override
     public List<ForeignKey<MuutosperusteluRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<MuutosperusteluRecord, ?>>asList(Keys.MUUTOSPERUSTELU__FK_MUUTOSPYYNTO);
+        return Arrays.<ForeignKey<MuutosperusteluRecord, ?>>asList(Keys.MUUTOSPERUSTELU__FK_MUUTOSPYYNTO, Keys.MUUTOSPERUSTELU__FK_MUUTOS);
     }
 
     /**
