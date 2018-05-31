@@ -20,11 +20,7 @@ import org.jooq.SelectOnConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -97,6 +93,10 @@ public class LupaService {
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
+    }
+
+    public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
+        return get(baseLupaSelect().where(LUPA.UUID.equal(UUID.fromString(uuid))), withOptions);
     }
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
