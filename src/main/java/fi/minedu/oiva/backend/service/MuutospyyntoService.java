@@ -126,6 +126,16 @@ public class MuutospyyntoService {
                 .where(MUUTOSPERUSTELU.MUUTOSPYYNTO_ID.eq(id)).fetchOptionalInto(Muutosperustelu.class);
     }
 
+    public Optional<Long> getKohdeId(UUID uuid) {
+        return dsl.select(KOHDE.ID).from(KOHDE)
+                .where(KOHDE.UUID.equal(uuid)).fetchOptionalInto(Long.class);
+    }
+
+    public Optional<Long> getMaaraystyyppiId(UUID uuid) {
+        return dsl.select(MAARAYSTYYPPI.ID).from(MAARAYSTYYPPI)
+                .where(MAARAYSTYYPPI.UUID.equal(uuid)).fetchOptionalInto(Long.class);
+    }
+
     public Optional<Paatoskierros> getPaatoskierrosByMuutospyynto(long id) {
         return dsl.select(PAATOSKIERROS.fields()).from(PAATOSKIERROS)
                 .where(PAATOSKIERROS.ID.eq(id)).fetchOptionalInto(Paatoskierros.class);
@@ -164,6 +174,7 @@ public class MuutospyyntoService {
             final MuutospyyntoRecord muutospyyntoRecord = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
             //muutospyyntoRecord.setLuoja(SecurityUtil.userName().get());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+
             muutospyyntoRecord.store();
 
             final MuutosperusteluRecord muutosperusteluRecord = dsl.newRecord(MUUTOSPERUSTELU, muutospyynto.getMuutosperustelu());
@@ -177,6 +188,8 @@ public class MuutospyyntoService {
                 //muutosRecord.setLuoja(SecurityUtil.userName().get());
                 muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
                 muutosRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
+                muutosRecord.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).get());
+                muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).get());
                 muutosRecord.store();
             });
 
@@ -297,7 +310,6 @@ public class MuutospyyntoService {
 
     public boolean validate(Muutospyynto muutospyynto) {
         return ValidationUtils.validate(
-                validation(muutospyynto.getUuid(), "Muutospyyntö lupa uuid is missing"),
                 validation(muutospyynto.getTila(), "Muutospyynto tila is missing")
         );
     }
