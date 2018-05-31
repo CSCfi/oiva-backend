@@ -57,7 +57,7 @@ public class MuutospyyntoService {
                 MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
                 MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
                 MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID,
-                LUPA.JARJESTAJA_OID, LUPA.ID.as("lupa_id"))
+                LUPA.JARJESTAJA_OID, LUPA.UUID.as("lupa_uuid"))
                 .from(MUUTOSPYYNTO, LUPA)
                 .where( (MUUTOSPYYNTO.TILA.eq(tila.toString())) )
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
@@ -91,6 +91,7 @@ public class MuutospyyntoService {
             withMuutokset(muutospyyntoOpt);
             withPerustelu(muutospyyntoOpt);
             withPaatoskierros(muutospyyntoOpt);
+            withLupaUuid(muutospyyntoOpt);
         }
         if(reqs.equals("esittelija")) {
             withMuutokset(muutospyyntoOpt);
@@ -101,6 +102,10 @@ public class MuutospyyntoService {
         return muutospyyntoOpt;
     }
 
+    protected Optional<Muutospyynto> withLupaUuid(final Optional<Muutospyynto> muutospyyntoOpt) {
+        muutospyyntoOpt.ifPresent(muutospyynto -> getLupaUuid(muutospyynto.getLupaId()).ifPresent(muutospyynto::setLupaUuid));
+        return muutospyyntoOpt;
+    }
     protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> getPerusteluByMuutospyynto(muutospyynto.getId()).ifPresent(muutospyynto::setMuutosperustelu));
         return muutospyyntoOpt;
@@ -109,6 +114,11 @@ public class MuutospyyntoService {
     protected Optional<Muutospyynto> withPaatoskierros(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> getPaatoskierrosByMuutospyynto(muutospyynto.getPaatoskierrosId()).ifPresent(muutospyynto::setPaatoskierros));
         return muutospyyntoOpt;
+    }
+
+    public Optional<String> getLupaUuid(long id) {
+        return dsl.select(LUPA.UUID).from(LUPA)
+                .where(LUPA.ID.eq(id)).fetchOptionalInto(String.class);
     }
 
     public Optional<Muutosperustelu> getPerusteluByMuutospyynto(long id) {
