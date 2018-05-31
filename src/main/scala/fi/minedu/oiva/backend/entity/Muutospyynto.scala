@@ -11,19 +11,23 @@ import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio
 class Muutospyynto(
     var diaarinumero: String,
     var jarjestaja_oid: String,
+    var lupa_uuid: String,
     var muutosperustelu: Muutosperustelu,
     var muutokset: Collection[Muutos],
     var paatoskierros: Paatoskierros,
     var jarjestaja: Organisaatio,
     var muutospyynto: Muutospyynto) extends fi.minedu.oiva.backend.jooq.tables.pojos.Muutospyynto  {
 
-  def this() = this(null,null,null,null,null,null,null)
+  def this() = this(null,null,null,null,null,null,null,null)
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
 
   def getJarjestajaOid = jarjestaja_oid
   def setJarjestajaOid(jarjestajaOid: String): Unit = this.jarjestaja_oid = jarjestajaOid
+
+  def getLupaUuid = lupa_uuid
+  def setLupaUuid(lupaUuid: String): Unit = this.lupa_uuid = lupaUuid
 
   def getDiaarinumero = diaarinumero
   def setDiaarinumero(diaarinumero: String): Unit = this.diaarinumero = diaarinumero
