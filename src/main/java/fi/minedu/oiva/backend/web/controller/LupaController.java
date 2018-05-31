@@ -91,4 +91,11 @@ public class LupaController {
     public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus, final HttpServletRequest request) {
         return async(() -> lhservice.getHistoriaByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/lupa/{uuid}")
+    @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.getByUuid(uuid, options(with))));
+    }
 }
