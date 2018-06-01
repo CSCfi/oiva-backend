@@ -25,10 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
-import static fi.minedu.oiva.backend.jooq.Tables.LUPA;
-import static fi.minedu.oiva.backend.jooq.Tables.LUPATILA;
-import static fi.minedu.oiva.backend.jooq.Tables.MAARAYS;
+import static fi.minedu.oiva.backend.jooq.Tables.*;
 
 @Service
 public class MaaraysService {
@@ -127,4 +124,9 @@ public class MaaraysService {
         final Function<Class<?>, Boolean> hasOption = targetClass -> withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(With.all);
         return hasOption.apply(clazz);
     }
+
+    public Collection<Maaraystyyppi> getAllMaaraystyyppi() {
+        return dsl.select(MAARAYSTYYPPI.fields()).from(MAARAYSTYYPPI).fetchInto(Maaraystyyppi.class);
+    }
+
 }
