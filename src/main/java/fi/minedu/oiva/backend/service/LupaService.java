@@ -87,6 +87,19 @@ public class LupaService {
             .collect(Collectors.toList());
     }
 
+    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) { // TODO: Implement filter
+        final SelectJoinStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        // filteröidään pois lisäkouluttajat
+        query.where(LUPA.JARJESTAJA_YTUNNUS.notIn("0763403-0","0986820-1","0108023-3","0188756-3","0950895-1",
+                "0206976-5","0151534-8","0112038-9","0201789-3","0210311-8","1524361-1","1099221-8","0215382-8",
+                "1041090-0","0195032-3","0773744-3"));
+        return query.fetchInto(Lupa.class).stream()
+                .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
     public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
     }
