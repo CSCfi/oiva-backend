@@ -149,6 +149,16 @@ public class MuutospyyntoService {
                 .where(KOHDE.UUID.equal(uuid)).fetchOptionalInto(Long.class);
     }
 
+    public Optional<Long> getPaatoskierrosId(UUID uuid) {
+        return dsl.select(PAATOSKIERROS.ID).from(PAATOSKIERROS)
+                .where(PAATOSKIERROS.UUID.equal(uuid)).fetchOptionalInto(Long.class);
+    }
+
+    public Optional<Long> getLupaId(String uuid) {
+        return dsl.select(LUPA.ID).from(LUPA)
+                .where(LUPA.UUID.equal(UUID.fromString(uuid))).fetchOptionalInto(Long.class);
+    }
+
     public Optional<Long> getMaaraystyyppiId(UUID uuid) {
         return dsl.select(MAARAYSTYYPPI.ID).from(MAARAYSTYYPPI)
                 .where(MAARAYSTYYPPI.UUID.equal(uuid)).fetchOptionalInto(Long.class);
@@ -188,20 +198,18 @@ public class MuutospyyntoService {
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 
         try {
+
             muutospyynto.setId(null);
             final MuutospyyntoRecord muutospyyntoRecord = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
+
             //muutospyyntoRecord.setLuoja(SecurityUtil.userName().get());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
-
+            muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()).get());
+            muutospyyntoRecord.setPaatoskierrosId(getPaatoskierrosId(muutospyynto.getPaatoskierros().getUuid()).get());
             muutospyyntoRecord.store();
 
-            final MuutosperusteluRecord muutosperusteluRecord = dsl.newRecord(MUUTOSPERUSTELU, muutospyynto.getMuutosperustelu());
-            muutosperusteluRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
-            //muutosperusteluRecord.setLuoja(SecurityUtil.userName().get());
-            muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutosperusteluRecord.store();
-
             muutospyynto.getMuutokset().stream().forEach(muutos -> {
+
                 final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
                 //muutosRecord.setLuoja(SecurityUtil.userName().get());
                 muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
