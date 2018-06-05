@@ -50,6 +50,24 @@ public class MuutospyyntoService {
         }
     }
 
+    public enum MuutosPaatostila {
+        AVOIN,              // Esittelijä ei ole tehnyt vielä päätöstä
+        HYVAKSYTTY,         // Esittelijä on hyväksynyt muutoksen
+        HYLATTY,            // Esittelijä on hylännyt muutoksen
+        TAYDENNETTAVA,      // Esittelijä palauttaa muutoksen täydennettäväksi
+        HYV_MUUTETTUNA,     // Esittelijä on hyväksynyt muutoksen muutettuna
+        PASSIVOITU;         // Muutos on muusta syystä poistettu
+
+        public static MuutosPaatostila convert(String str) {
+            for (MuutosPaatostila muutospaatostila : MuutosPaatostila.values()) {
+                if (muutospaatostila.toString().equals(str)) {
+                    return muutospaatostila;
+                }
+            }
+            return null;
+        }
+    }
+
     // Muutospyyntölistaus (hakemukset) esittelijälle
     public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
 
