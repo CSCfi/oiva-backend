@@ -198,23 +198,18 @@ public class MuutospyyntoService {
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 
         try {
+
             muutospyynto.setId(null);
             final MuutospyyntoRecord muutospyyntoRecord = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
+
             //muutospyyntoRecord.setLuoja(SecurityUtil.userName().get());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
             muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()).get());
             muutospyyntoRecord.setPaatoskierrosId(getPaatoskierrosId(muutospyynto.getPaatoskierros().getUuid()).get());
-
-
             muutospyyntoRecord.store();
 
-            final MuutosperusteluRecord muutosperusteluRecord = dsl.newRecord(MUUTOSPERUSTELU, muutospyynto.getMuutosperustelu());
-            muutosperusteluRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
-            //muutosperusteluRecord.setLuoja(SecurityUtil.userName().get());
-            muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutosperusteluRecord.store();
-
             muutospyynto.getMuutokset().stream().forEach(muutos -> {
+
                 final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
                 //muutosRecord.setLuoja(SecurityUtil.userName().get());
                 muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
