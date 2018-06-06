@@ -195,6 +195,54 @@ public class MuutospyyntoService {
         muutospyyntoOpt.ifPresent(muutospyynto -> organisaatioService.getWithLocation(muutospyynto.getJarjestajaYtunnus()).ifPresent(muutospyynto::setJarjestaja));
     }
 
+    // Hakee muutospyyntöön liittyvät muutokset
+    public Collection<Muutos> getByMuutospyyntoId(long muutospyynto_id) {
+        return dsl.select(MUUTOS.fields()).from(MUUTOS)
+                .where(MUUTOS.MUUTOSPYYNTO_ID.eq(muutospyynto_id))
+                .fetchInto(Muutos.class)
+                .stream()
+                .map(muutos -> withAll(Optional.ofNullable(muutos)))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    protected Optional<Muutos> withAll(final Optional<Muutos> muutosOpt) {
+        withKohde(muutosOpt);
+        withMaaraystyyppi(muutosOpt);
+        return muutosOpt;
+    }
+
+    protected Optional<Muutos> withKohde(final Optional<Muutos> muutosOpt) {
+        muutosOpt.ifPresent(muutos -> getKohdeByMuutospyynto(muutos.getKohdeId()).ifPresent(muutos::setKohde));
+        return muutosOpt;
+    }
+
+    protected Optional<Kohde> getKohdeByMuutospyynto(long id) {
+        return dsl.select(KOHDE.fields()).from(KOHDE)
+                .where(KOHDE.ID.eq(id)).fetchOptionalInto(Kohde.class);
+    }
+
+    protected Optional<Muutos> withMaaraystyyppi(final Optional<Muutos> muutosOpt) {
+        muutosOpt.ifPresent(muutos -> getMaaraystyyppiByMuutospyynto(muutos.getMaaraystyyppiId()).ifPresent(muutos::setMaaraystyyppi));
+        return muutosOpt;
+    }
+
+    protected Optional<Maaraystyyppi> getMaaraystyyppiByMuutospyynto(long id) {
+        return dsl.select(MAARAYSTYYPPI.fields()).from(MAARAYSTYYPPI)
+                .where(MAARAYSTYYPPI.ID.eq(id)).fetchOptionalInto(Maaraystyyppi.class);
+    }
+
+
+    // Hakee yksittäisen muutoksen
+    public Optional<Muutos> getMuutosById(long id) {
+
+        return dsl.select(MUUTOS.fields()).from(MUUTOS)
+                .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
+    }
+
+
+    /// CRUD
+
     public Optional<Long> create(final Muutospyynto muutospyynto) {
 
         try {
@@ -240,20 +288,6 @@ public class MuutospyyntoService {
         }
     }
 
-
-    // Hakee muutospyyntöön liittyvät muutokset
-    public Collection<Muutos> getByMuutospyyntoId(long muutospyynto_id) {
-        return dsl.select(MUUTOS.fields()).from(MUUTOS)
-                .where(MUUTOS.MUUTOSPYYNTO_ID.eq(muutospyynto_id))
-                .fetchInto(Muutos.class);
-    }
-
-    // Hakee yksittäisen muutoksen
-    public Optional<Muutos> getMuutosById(long id) {
-
-        return dsl.select(MUUTOS.fields()).from(MUUTOS)
-                .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
-    }
 
     // Luo muutoksen
     public Optional<Long> createMuutos(final Muutos muutos) {
