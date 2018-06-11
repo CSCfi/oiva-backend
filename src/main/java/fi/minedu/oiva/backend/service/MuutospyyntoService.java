@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import fi.minedu.oiva.backend.entity.*;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosperusteluRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
@@ -92,7 +93,7 @@ public class MuutospyyntoService {
         return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
                 MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
                 MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
-                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID, LUPA.ID.as("lupa_id"))
+                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID, LUPA.UUID.as("lupa_uuid"))
                 .from(MUUTOSPYYNTO, LUPA)
                 .where(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
                 .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
@@ -196,6 +197,14 @@ public class MuutospyyntoService {
     }
 
     // Hakee muutospyyntöön liittyvät muutokset
+    public Collection<Muutos> getByMuutospyyntoUuid(String muutospyynto_uuid) {
+        Optional<Muutospyynto> muutospyyntoOpt = dsl.select(MUUTOSPYYNTO.ID).from(MUUTOSPYYNTO)
+                .where(MUUTOSPYYNTO.UUID.equal(UUID.fromString(muutospyynto_uuid))).fetchOptionalInto(Muutospyynto.class);
+
+        return getByMuutospyyntoId(muutospyyntoOpt.get().getId());
+    }
+
+    // Hakee muutospyyntöön liittyvät muutokset
     public Collection<Muutos> getByMuutospyyntoId(long muutospyynto_id) {
         return dsl.select(MUUTOS.fields()).from(MUUTOS)
                 .where(MUUTOS.MUUTOSPYYNTO_ID.eq(muutospyynto_id))
@@ -234,10 +243,10 @@ public class MuutospyyntoService {
 
 
     // Hakee yksittäisen muutoksen
-    public Optional<Muutos> getMuutosById(long id) {
+    public Optional<Muutos> getMuutosByUuId(String uuid) {
 
         return dsl.select(MUUTOS.fields()).from(MUUTOS)
-                .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
+                .where(MUUTOS.UUID.eq(UUID.fromString(uuid))).fetchOptionalInto(Muutos.class);
     }
 
 
@@ -257,7 +266,6 @@ public class MuutospyyntoService {
             muutospyyntoRecord.store();
 
             muutospyynto.getMuutokset().stream().forEach(muutos -> {
-
                 final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
                 //muutosRecord.setLuoja(SecurityUtil.userName().get());
                 muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
@@ -265,7 +273,17 @@ public class MuutospyyntoService {
                 muutosRecord.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).get());
                 muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).get());
                 muutosRecord.store();
+
+                //final MuutosperusteluRecord muutosperusteluRecord = dsl.newRecord(MUUTOSPERUSTELU, muutospyynto.getMuutosperustelu());
+                //muutosperusteluRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
+                //muutosperusteluRecord.setMuutosId(muutosRecord.getId());
+                //muutosperusteluRecord.setLuoja(SecurityUtil.userName().get());
+                //muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
+                //muutosperusteluRecord.store();
+
             });
+
+
 
             return Optional.of(muutospyyntoRecord.getId());
 
@@ -322,17 +340,21 @@ public class MuutospyyntoService {
     }
 
     // Passivoi muutospyynnön
-    public Optional<Long> passivoi(final long id) {
+    public Optional<UUID> passivoi(final String uuid) {
 
         try {
 
-            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.ID.eq(id)));
+            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
 
             if(muutospyyntoOpt.isPresent()) {
 
                 MuutospyyntoRecord mp = muutospyyntoOpt.get();
                 mp.setTila(Muutospyyntotila.PASSIVOITU.name());
                 dsl.executeUpdate(mp);
+
+                return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
+
+
             }
 
             return Optional.empty();
@@ -344,11 +366,11 @@ public class MuutospyyntoService {
     }
 
     // Vaihtaa muutospyynnön tilan
-    public Optional<Long> changeTila(final long id, Muutospyyntotila tila) {
+    public Optional<UUID> changeTila(final String uuid, Muutospyyntotila tila) {
 
         try {
 
-            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.ID.eq(id)));
+            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
 
             if(muutospyyntoOpt.isPresent()) {
 
@@ -356,9 +378,11 @@ public class MuutospyyntoService {
                 mp.setTila(tila.name());
                 dsl.executeUpdate(mp);
 
+                return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
+
             }
 
-            return Optional.ofNullable(muutospyyntoOpt.get().getId());
+            return Optional.empty();
 
         } catch(Exception e) {
             return Optional.empty();
