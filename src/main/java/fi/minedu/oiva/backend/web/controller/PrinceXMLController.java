@@ -97,26 +97,6 @@ public class PrinceXMLController {
 
 
     @OivaAccess_Public
-    @RequestMapping(value = "/muutospyyntoToPdf", method = PUT)
-    @ResponseBody
-    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
-    public void MuutospyyntoToPdf(@RequestBody String muutospyyntoHtml,
-                                              final HttpServletResponse response, final HttpServletRequest request) {
-
-        try {
-            // TODO: kielivalinta koulutuksen järjestäjän mukaan
-            final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
-            if (!princeXMLService.toPDF(muutospyyntoHtml, response.getOutputStream(), options)) {
-                response.setStatus(get500().getStatusCode().value());
-                response.getWriter().write("Failed to generate Lupa with html " + muutospyyntoHtml);
-            }
-        } catch (Exception e) {
-            logger.error("Failed to generate Lupa PDF with html {}", muutospyyntoHtml, e);
-            response.setStatus(get500().getStatusCode().value());
-        }
-    }
-
-    @OivaAccess_Public
     @RequestMapping(value = "/muutospyyntoObjToPdf", method = PUT)
     @ResponseBody
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
@@ -125,6 +105,7 @@ public class PrinceXMLController {
 
         muutospyynto.setJarjestaja(organisaatioService.getWithLocation(muutospyynto.getJarjestajaOid()).get());
 
+        System.out.println("meta: " + muutospyynto.getMeta());
 
         muutospyynto.getMuutokset().stream().forEach(muutos -> {
 
