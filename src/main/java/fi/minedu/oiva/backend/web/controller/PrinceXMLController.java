@@ -7,12 +7,10 @@ import fi.minedu.oiva.backend.service.*;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.ApiOperation;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,15 +19,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
 import static fi.minedu.oiva.backend.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
@@ -54,10 +48,7 @@ public class PrinceXMLController {
     private LupaService lupaService;
 
     @Autowired
-    private KohdeService kohdeService;
-
-    @Autowired
-    private MaaraystyyppiService maaraystyyppiService;
+    private OrganisaatioService organisaatioService;
 
     @Autowired
     private OpintopolkuService opintopolkuService;
@@ -131,6 +122,8 @@ public class PrinceXMLController {
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
     public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto,
                                   final HttpServletResponse response, final HttpServletRequest request) {
+
+        muutospyynto.setJarjestaja(organisaatioService.getWithLocation(muutospyynto.getJarjestajaOid()).get());
 
 
         muutospyynto.getMuutokset().stream().forEach(muutos -> {
