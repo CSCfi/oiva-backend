@@ -133,16 +133,10 @@ public class PrinceXMLController {
                                   final HttpServletResponse response, final HttpServletRequest request) {
 
 
-        final Map<Long, Kohde> kohteet = kohdeService.mapAll();
-        final Map<Long, Maaraystyyppi> maaraystyypit = maaraystyyppiService.mapAll();
-
         muutospyynto.getMuutokset().stream().forEach(muutos -> {
-            muutos.setKohde(kohteet.getOrDefault(muutos.getKohdeId(), null));
-            muutos.setMaaraystyyppi(maaraystyypit.getOrDefault(muutos.getMaaraystyyppiId(), null));
 
-            // jos lisätään tutkintokieliä:
+            // jos lisätään tutkintokieliä: (TODO: UUID)
             if(null != muutos.getParentId()) {
-                System.out.println("kielikoodilla jolla haetaan: " + muutos.getParentId());
 
                 KoodistoKoodi koodi = opintopolkuService.getKoodi("koulutus", muutos.getParentId().toString(),null);
                 if(null!=koodi) {
@@ -167,7 +161,7 @@ public class PrinceXMLController {
             // TODO: kielivalinta koulutuksen järjestäjän mukaan
             final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
             final Optional<String> muutospyyntoHtml = pebbleService.muutospyyntoToHTML(muutospyynto, options);
-
+            
             if (!princeXMLService.toPDF(muutospyyntoHtml.get(), response.getOutputStream(), options)) {
                 response.setStatus(get500().getStatusCode().value());
                 response.getWriter().write("Failed to generate Muutospyynto with html " + muutospyyntoHtml.get());
