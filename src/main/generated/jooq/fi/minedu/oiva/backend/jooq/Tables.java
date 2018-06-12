@@ -16,7 +16,6 @@ import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
-import fi.minedu.oiva.backend.jooq.tables.Muutosperustelu;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.Tiedote;
@@ -96,11 +95,6 @@ public class Tables {
      * The table <code>oiva.muutosliite</code>.
      */
     public static final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
-
-    /**
-     * The table <code>oiva.muutosperustelu</code>.
-     */
-    public static final Muutosperustelu MUUTOSPERUSTELU = fi.minedu.oiva.backend.jooq.tables.Muutosperustelu.MUUTOSPERUSTELU;
 
     /**
      * The table <code>oiva.muutospyynto</code>.

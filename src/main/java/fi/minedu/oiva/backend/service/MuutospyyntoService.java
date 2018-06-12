@@ -2,7 +2,6 @@ package fi.minedu.oiva.backend.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fi.minedu.oiva.backend.entity.*;
-import fi.minedu.oiva.backend.jooq.tables.records.MuutosperusteluRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.security.SecurityUtil;
@@ -105,16 +104,14 @@ public class MuutospyyntoService {
     }
 
     protected Optional<Muutospyynto> with(final Optional<Muutospyynto> muutospyyntoOpt, String reqs) {
-        if(reqs.equals("listaus")) { withPerustelu(muutospyyntoOpt); withPaatoskierros(muutospyyntoOpt); }
+        if(reqs.equals("listaus")) { withPaatoskierros(muutospyyntoOpt); }
         if(reqs.equals("yksi")) {
             withMuutokset(muutospyyntoOpt);
-            withPerustelu(muutospyyntoOpt);
             withPaatoskierros(muutospyyntoOpt);
             withLupaUuid(muutospyyntoOpt);
         }
         if(reqs.equals("esittelija")) {
             withMuutokset(muutospyyntoOpt);
-            withPerustelu(muutospyyntoOpt);
             withPaatoskierros(muutospyyntoOpt);
             withOrganization(muutospyyntoOpt);
         }
@@ -125,10 +122,7 @@ public class MuutospyyntoService {
         muutospyyntoOpt.ifPresent(muutospyynto -> getLupaUuid(muutospyynto.getLupaId()).ifPresent(muutospyynto::setLupaUuid));
         return muutospyyntoOpt;
     }
-    protected Optional<Muutospyynto> withPerustelu(final Optional<Muutospyynto> muutospyyntoOpt) {
-        muutospyyntoOpt.ifPresent(muutospyynto -> getPerusteluByMuutospyynto(muutospyynto.getId()).ifPresent(muutospyynto::setMuutosperustelu));
-        return muutospyyntoOpt;
-    }
+
 
     protected Optional<Muutospyynto> withPaatoskierros(final Optional<Muutospyynto> muutospyyntoOpt) {
         muutospyyntoOpt.ifPresent(muutospyynto -> getPaatoskierrosByMuutospyynto(muutospyynto.getPaatoskierrosId()).ifPresent(muutospyynto::setPaatoskierros));
@@ -138,11 +132,6 @@ public class MuutospyyntoService {
     public Optional<String> getLupaUuid(long id) {
         return dsl.select(LUPA.UUID).from(LUPA)
                 .where(LUPA.ID.eq(id)).fetchOptionalInto(String.class);
-    }
-
-    public Optional<Muutosperustelu> getPerusteluByMuutospyynto(long id) {
-        return dsl.select(MUUTOSPERUSTELU.fields()).from(MUUTOSPERUSTELU)
-                .where(MUUTOSPERUSTELU.MUUTOSPYYNTO_ID.eq(id)).fetchOptionalInto(Muutosperustelu.class);
     }
 
     public Optional<Long> getKohdeId(UUID uuid) {
@@ -274,12 +263,6 @@ public class MuutospyyntoService {
                 muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).get());
                 muutosRecord.store();
 
-                //final MuutosperusteluRecord muutosperusteluRecord = dsl.newRecord(MUUTOSPERUSTELU, muutospyynto.getMuutosperustelu());
-                //muutosperusteluRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
-                //muutosperusteluRecord.setMuutosId(muutosRecord.getId());
-                //muutosperusteluRecord.setLuoja(SecurityUtil.userName().get());
-                //muutosperusteluRecord.setLuontipvm(Timestamp.from(Instant.now()));
-                //muutosperusteluRecord.store();
 
             });
 
