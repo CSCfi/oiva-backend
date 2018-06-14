@@ -53,7 +53,7 @@ public class ExportService {
      * @return Lista kaikista luvista
      */
     public Collection<Lupa> getJarjestysluvat() {
-        return lupaService.getAll(options(Maarays.class));
+        return lupaService.getAllJarjestamisluvat(options(Maarays.class));
     }
 
     /**

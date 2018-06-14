@@ -24,6 +24,7 @@ import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.wording;
 import static fi.minedu.oiva.backend.template.extension.OivaFormatterFilter.Type.pick;
 import static fi.minedu.oiva.backend.template.extension.SortListFilter.SortTarget.*;
+import static fi.minedu.oiva.backend.template.extension.MuutosTransformerFilter.Type.muutosYlakoodi;
 
 public class OivaTemplateExtension implements Extension {
 
@@ -48,6 +49,8 @@ public class OivaTemplateExtension implements Extension {
         filters.put("htmlClass", new MaaraysTransformerFilter(htmlClass));
         filters.put("sortLupa", new SortListFilter(luvat));
         filters.put("sortMaarays", new SortListFilter(maaraykset));
+        filters.put("filterMuutos", new MuutosListFilter());
+        filters.put("muutosYlakoodi", new MuutosTransformerFilter(muutosYlakoodi));
         return filters;
     }
 

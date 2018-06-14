@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.Maaraystyyppi;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.MaaraysService;
 import io.swagger.annotations.ApiOperation;
@@ -37,4 +38,13 @@ public class MaaraysController {
         final @RequestParam(value = "with", required = false) String with) {
         return async(() -> service.getByLupaAndKohde(lupaId, kohdeTunniste, options(with)));
     }
+
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value="/maaraystyypit")
+    @ApiOperation(notes = "Palauttaa kaikki määäykset", value = "")
+    public CompletableFuture<Collection<Maaraystyyppi>> getAllMaaraystyyppi() {
+        return async(service::getAllMaaraystyyppi);
+    }
+
 }

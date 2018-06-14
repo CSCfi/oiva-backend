@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos implements Serializable {
 
-    private static final long serialVersionUID = -315137032;
+    private static final long serialVersionUID = -197286781;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -46,6 +46,8 @@ public class Muutos implements Serializable {
     private Long      maaraysId;
     private String    tila;
     private UUID      uuid;
+    private String    paatosTila;
+    private String    muutosperustelukoodiarvo;
 
     public Muutos() {}
 
@@ -66,6 +68,8 @@ public class Muutos implements Serializable {
         this.maaraysId = value.maaraysId;
         this.tila = value.tila;
         this.uuid = value.uuid;
+        this.paatosTila = value.paatosTila;
+        this.muutosperustelukoodiarvo = value.muutosperustelukoodiarvo;
     }
 
     public Muutos(
@@ -84,7 +88,9 @@ public class Muutos implements Serializable {
         Timestamp paivityspvm,
         Long      maaraysId,
         String    tila,
-        UUID      uuid
+        UUID      uuid,
+        String    paatosTila,
+        String    muutosperustelukoodiarvo
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -102,6 +108,8 @@ public class Muutos implements Serializable {
         this.maaraysId = maaraysId;
         this.tila = tila;
         this.uuid = uuid;
+        this.paatosTila = paatosTila;
+        this.muutosperustelukoodiarvo = muutosperustelukoodiarvo;
     }
 
     public Long getId() {
@@ -239,6 +247,23 @@ public class Muutos implements Serializable {
         this.uuid = uuid;
     }
 
+    @Size(max = 20)
+    public String getPaatosTila() {
+        return this.paatosTila;
+    }
+
+    public void setPaatosTila(String paatosTila) {
+        this.paatosTila = paatosTila;
+    }
+
+    public String getMuutosperustelukoodiarvo() {
+        return this.muutosperustelukoodiarvo;
+    }
+
+    public void setMuutosperustelukoodiarvo(String muutosperustelukoodiarvo) {
+        this.muutosperustelukoodiarvo = muutosperustelukoodiarvo;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutos (");
@@ -259,6 +284,8 @@ public class Muutos implements Serializable {
         sb.append(", ").append(maaraysId);
         sb.append(", ").append(tila);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(paatosTila);
+        sb.append(", ").append(muutosperustelukoodiarvo);
 
         sb.append(")");
         return sb.toString();

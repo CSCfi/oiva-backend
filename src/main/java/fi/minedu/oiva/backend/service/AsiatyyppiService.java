@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.ASIATYYPPI;
 
@@ -30,5 +31,9 @@ public class AsiatyyppiService {
     public Optional<Asiatyyppi> forLupa(final Lupa lupa) {
         return Optional.ofNullable(null != lupa ?
             baseQuery().where(ASIATYYPPI.ID.eq(lupa.getAsiatyyppiId())).fetchOneInto(Asiatyyppi.class) : null);
+    }
+
+    public Optional<Long> idForUuid(final UUID uuid) {
+        return Optional.ofNullable(null != uuid ? dsl.select(ASIATYYPPI.ID).from(ASIATYYPPI).where(ASIATYYPPI.UUID.eq(uuid)).fetchOne().value1() : null);
     }
 }

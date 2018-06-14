@@ -25,10 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
-import static fi.minedu.oiva.backend.jooq.Tables.LUPA;
-import static fi.minedu.oiva.backend.jooq.Tables.LUPATILA;
-import static fi.minedu.oiva.backend.jooq.Tables.MAARAYS;
+import static fi.minedu.oiva.backend.jooq.Tables.*;
 
 @Service
 public class MaaraysService {
@@ -54,6 +51,10 @@ public class MaaraysService {
         return dsl.select(MAARAYS.fields()).from(LUPA)
             .leftOuterJoin(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
+    }
+
+    protected Optional<Maarays> getById(final Long id) {
+        return Optional.ofNullable(null != id ? dsl.select(MAARAYS.fields()).from(MAARAYS).where(MAARAYS.ID.eq(id)).fetchOneInto(Maarays.class) : null);
     }
 
     public Collection<Maarays> getByLupa(final Long lupaId, final String... with) {
@@ -123,4 +124,9 @@ public class MaaraysService {
         final Function<Class<?>, Boolean> hasOption = targetClass -> withOptions.contains(StringUtils.lowerCase(targetClass.getSimpleName())) || withOptions.contains(With.all);
         return hasOption.apply(clazz);
     }
+
+    public Collection<Maaraystyyppi> getAllMaaraystyyppi() {
+        return dsl.select(MAARAYSTYYPPI.fields()).from(MAARAYSTYYPPI).fetchInto(Maaraystyyppi.class);
+    }
+
 }

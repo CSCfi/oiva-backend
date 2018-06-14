@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import static fi.minedu.oiva.backend.jooq.Tables.*;
+import static fi.minedu.oiva.backend.jooq.tables.Lupa.LUPA;
 
 @Service
 public class LupaService {
@@ -61,6 +62,10 @@ public class LupaService {
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
     }
 
+    protected Optional<Lupa> getById(final Long id) {
+        return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id)).fetchOneInto(Lupa.class) : null);
+    }
+
     protected Optional<Condition> baseLupaFilter() {
         final OivaPermission accessPermission = authService.lupaAccessPermission();
         final Condition valmisLupaCondition = LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS);
@@ -82,12 +87,29 @@ public class LupaService {
             .collect(Collectors.toList());
     }
 
+    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) { // TODO: Implement filter
+        final SelectJoinStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        // filteröidään pois lisäkouluttajat
+        query.where(LUPA.JARJESTAJA_YTUNNUS.notIn("0763403-0","0986820-1","0108023-3","0188756-3","0950895-1",
+                "0206976-5","0151534-8","0112038-9","0201789-3","0210311-8","1524361-1","1099221-8","0215382-8",
+                "1041090-0","0195032-3","0773744-3"));
+        return query.fetchInto(Lupa.class).stream()
+                .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
     public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
+    }
+
+    public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
+        return get(baseLupaSelect().where(LUPA.UUID.equal(UUID.fromString(uuid))), withOptions);
     }
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
