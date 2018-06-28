@@ -8,9 +8,10 @@ import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonI
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 class KoulutusLupa(
-    var koulutukset: Collection[String]) extends fi.minedu.oiva.backend.jooq.tables.pojos.Lupa {
+    var koulutukset: Collection[String],
+    var laajaOppisopimuskoulutus: String) extends fi.minedu.oiva.backend.jooq.tables.pojos.Lupa {
 
-    def this() = this(null)
+    def this() = this(null,null)
 
     // exclude from json
     @JsonIgnore override def getId = super.getId
@@ -30,4 +31,8 @@ class KoulutusLupa(
 
     def getKoulutukset = koulutukset
     def setKoulutukset(koulutukset: Collection[String]): Unit = this.koulutukset = koulutukset
+
+    def getLaajaOppisopimuskoulutus = laajaOppisopimuskoulutus
+    def setLaajaOppisopimuskoulutus(laajaOppisopimuskoulutus: String): Unit = this.laajaOppisopimuskoulutus = laajaOppisopimuskoulutus
+
 }
