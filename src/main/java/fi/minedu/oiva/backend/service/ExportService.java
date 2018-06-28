@@ -14,11 +14,7 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -71,9 +67,21 @@ public class ExportService {
             .and(MAARAYS.KOODISTO.eq("koulutus"))
             .fetchInto(String.class);
 
+        final Function<Long, Optional<String>> oppisopimuskoulutus = (lupaId) -> dsl.select(MAARAYS.KOODIARVO).from(LUPA)
+                .leftOuterJoin(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
+                .leftOuterJoin(KOHDE).on(KOHDE.ID.eq(MAARAYS.KOHDE_ID))
+                .where(LUPA.ID.eq(lupaId))
+                .and(KOHDE.TUNNISTE.eq("muut"))
+                .and(MAARAYS.KOODISTO.eq("oivamuutoikeudetvelvollisuudetehdotjatehtavat"))
+                .and(MAARAYS.KOODIARVO.eq("1"))
+                .fetchOptionalInto(String.class);
+
         return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM, LUPA.LOPPUPVM).from(LUPA)
             .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM).fetchInto(KoulutusLupa.class).stream().map(koulutusLupa -> {
                 koulutusLupa.setKoulutukset(koulutusKoodiArvot.apply(koulutusLupa.getId()));
+                if(oppisopimuskoulutus.apply(koulutusLupa.getId()).isPresent()) {
+                    koulutusLupa.setLaajaOppisopimuskoulutus(oppisopimuskoulutus.apply(koulutusLupa.getId()).get());
+                }
                 return koulutusLupa;
             }).collect(Collectors.toList());
     }
