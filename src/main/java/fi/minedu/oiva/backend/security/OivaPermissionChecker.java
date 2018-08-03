@@ -21,16 +21,16 @@ import static org.hamcrest.Matchers.instanceOf;
  * <p>
  * example:
  * <pre>
- * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', 'APP_KOUTE_ESITTELIJA')")
+ * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', 'OIVA_APP_ESITTELIJA')")
  * void someMethod(Long hakemusId) { /* something... *&#47; }
  * // or with id, type and explicit oid extraction with oidsFor
- * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', oidsFor('APP_KOUTE_ESITTELIJA'))")
+ * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', oidsFor('OIVA_APP_ESITTELIJA'))")
  * </pre>
  * </p>
  * <p>
  * Other way to say same thing:
  * <pre>
- * {@literal @}PreAuthorize("@hakemusService.hasOid(#hakemusOsio.hakemusId, oidsFor('APP_KOUTE_ESITTELIJA'))")
+ * {@literal @}PreAuthorize("@hakemusService.hasOid(#hakemusOsio.hakemusId, oidsFor('OIVA_APP_ESITTELIJA'))")
  * </pre>
  * </p>
  */
