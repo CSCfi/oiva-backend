@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Options:
-#  n    do not use docker-compose setup
+#  c    use docker-compose database and nginx
+#  l    use local database
 #  d    debug mode
 #  r    jrebel mode
 #  o    mvn offline mode
