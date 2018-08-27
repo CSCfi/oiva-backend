@@ -100,6 +100,20 @@ tarvittavat resurssit.
 
 ## Tietokantarakenteen luonti, populointi ja puhdistus
 
+**HUOM!** Tietokannan kehityskäyttöönottoa on helpotettu, suositeltu tapa on käyttää docker-tietokantaa ja populoida tietokanta testidatalla ajamalla `docker-sh.sh`.
+
+Ts. käynnistä aluksi docker:
+
+    $ ./launch-dev-docker.sh
+    
+Luo ja populoi tietokanta:
+
+    $ ./docker-db.sh create
+    $ ./docker-db.sh populate
+
+Alla on tarkemmat ohjeet miten tietokannan luonti ja populointi suoritetaan:
+
+
 Tietokannan ajantasaisuudesta vastaa Flyway-migraatiotyökalu.
 
 ### Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
@@ -135,23 +149,17 @@ Tietojoukko sisältää alkuvaiheen realistista lupadataa. Huom! pohjadata on yk
 
 ## Aja kehitysversiota lokaali-Mavenilla
 
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -redis.host=$REDIS_IP spring-boot:run
+Käynnistä docker:
 
-Mikäli parametria ei syötetä, käyttää softa defaulttia joka on postgres. Tällöin koneen /etc/hosts:ssa pitää olla käsin 
-tehtynä postgres nimi, joka osoittaa oikeaan hostiin.
-  
-Kokeile:
-
-    http://localhost:8099/ -> swagger API docs
+    $ ./launch-dev-docker.sh
     
-    
-TODO: laita toimimaan tuotannossa/servereillä!
+Docker-compose luo neljä palvelua: backend, postgres, nginx ja redis. Näisä kolme viimeistä on tärkeät. Backend-palvelu luodaan integraatiotestejä varten, mutta sitä ei kannata käyttää kehityskäyttöön.
 
-Ajaminen omassa ympäristössä paketoituna:
+Backend-palvelun käynnistäminen kehityskäyttöön:
 
-    $ mvn package -P dev 
+    $ ./launch-dev-backend.sh -c
 
-    $ java -jar target/oiva-backend.jar --spring.profiles.active=dev --server.port=8099
+Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelulle niin luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `launch-dev-backend.sh` suoritetaan.
 
 
 ## PDF-exportin konfiguroiminen [TODO: UPDATE]

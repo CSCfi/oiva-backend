@@ -1,8 +1,20 @@
 #!/bin/sh
 
-# Developer
-userArg=$1
-shift
+# Options:
+#  c    use docker-compose database and nginx
+#  l    use local database
+#  d    debug mode
+#  r    jrebel mode
+#  o    mvn offline mode
+
+optionsArg=$@
+
+if [[ ! $optionsArg == *"c"* && ! $optionsArg == *"l"* ]]; then
+    echo "Usage: ./launch-dev-backend.sh [MODE] [OPTIONS]"
+    echo "MODE (required to use one of following):\n\tc\tUse docker-compose database and nginx (Recommended)\n\tl\tUse local database"
+    echo "OPTIONS (optional):\n\td\tUse Java remote debug\n\tr\tUse JRebel\n\to\tUse maven offline mode\n"
+    exit 1
+fi
 
 PATH_TO_BACKEND="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -11,19 +23,10 @@ OIVA_JAVA_JREBEL=""
 OIVA_DOCKER_HOST="0.0.0.0"
 
 # Developer specific setup
-
-if [[ $userArg == "aki" ]]; then
-    OIVA_JREBEL_AGENT=/Users/aheikkinen/jrebel6path/lib/libjrebel64.dylib
-
-elif [[ $userArg == "jari" ]]; then
-    OIVA_JREBEL_AGENT=/Users/jarisaarela/projects/jrebel2/lib/libjrebel64.dylib
-
-elif [[ $userArg == "samu" ]]; then
-    OIVA_JREBEL_AGENT=''
-else
-    echo "Usage: ./launch-dev-backend.sh [DEVNAME] [OPTIONS]"
-    echo "Options:\n\tc\tUse docker-compose databases\n\td\tUse Java remote debug\n\tr\tUse JRebel\n\to\tUse maven offline mode\n"
-    exit 1
+sUserArgsFile=./vars-`whoami`.sh
+echo "$sUserArgsFile"
+if [ -f $sUserArgsFile ]; then
+    source $sUserArgsFile
 fi
 
 OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -Pdev -Dspring.profiles.active=dev"
@@ -33,21 +36,15 @@ OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Dproject.path=$PATH_TO_BACKEND -noverify"
 OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Xms${OIVA_MEMORY} -Xmx${OIVA_MEMORY}"
 OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=20 -XX:ConcGCThreads=5 -XX:InitiatingHeapOccupancyPercent=70"
 
-
-echo "\nLaunching oiva-backend as $userArg using options:"
-
-# Options:
-#  c    docker-compose mode
-#  d    debug mode
-#  r    jrebel mode
-#  o    mvn offline mode
-
-optionsArg=$@
-
+echo "\nLaunching oiva-backend using options:"
 
 if [[ $optionsArg == *"c"* ]]; then
     echo "docker-compose setup"
     OIVA_JAVA_OPTS="${OIVA_JAVA_OPTS} -Doiva.dbhost=$OIVA_DOCKER_HOST -Doiva.dbport=6432 -Dredis.host=$OIVA_DOCKER_HOST -Dredis.port=7379"
+fi
+
+if [[ $optionsArg == *"l"* ]]; then
+    echo "local setup"
 fi
 
 if [[ $optionsArg == *"d"* ]]; then

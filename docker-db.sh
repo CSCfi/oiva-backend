@@ -7,6 +7,13 @@ DBNAME=oiva
 DBUSER=oiva
 DBPASSWORD=oiva
 
+# Developer specific setup
+sUserArgsFile=./vars-`whoami`.sh
+echo "$sUserArgsFile"
+if [ -f $sUserArgsFile ]; then
+    source $sUserArgsFile
+fi
+
 OIVA_MVN_OPTS="-Doiva.dbhost=${POSTGRES_IP} -Doiva.dbport=${POSTGRES_PORT} -Doiva.dbname=${DBNAME} -Doiva.dbusername=${DBUSER} -Doiva.dbpassword=${DBPASSWORD}"
 
 actionArg=$1
