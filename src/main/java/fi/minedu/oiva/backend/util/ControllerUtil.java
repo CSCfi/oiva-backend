@@ -103,6 +103,13 @@ public final class ControllerUtil {
         return (ResponseEntity<T>) new ResponseEntity<>(msgMap, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    public static <T> ResponseEntity<T> getHealthCheckStatus(final HttpStatus status, final String description) {
+        final Map<String, Object> message = new HashMap<>();
+        message.put("status", status.value());
+        message.put("description", description);
+        return (ResponseEntity<T>) new ResponseEntity<>(message, status);
+    }
+
     public static URI buildURI(String... fragments) {
         return URI.create(Arrays.asList(fragments).stream().collect(Collectors.joining("/")));
     }

@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.service;
 import com.princexml.Prince;
 import org.apache.pdfbox.util.PDFMergerUtility;
 import org.apache.tika.io.IOUtils;
+import org.apache.tika.io.NullOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,13 +87,26 @@ public class PrinceXMLService {
             return false;
         }
 
-        final Prince prince = new Prince(princeExecPath, (msg1, msg2, msg3) -> logger.info("Prince data " + msg1 + " -- " + msg2 + " --- " + msg3));
-
         try {
-            return prince.convert(IOUtils.toInputStream(html), output);
+            return getPrinceEngine().convert(IOUtils.toInputStream(html), output);
         } catch (IOException e) {
             logger.error("Failed to generate PDF from html");
             return false;
+        }
+    }
+
+    protected Prince getPrinceEngine() {
+        return new Prince(princeExecPath, (msg1, msg2, msg3) -> logger.info("Prince data " + msg1 + " -- " + msg2 + " --- " + msg3));
+    }
+
+    /**
+     *  Throws exception if princexml engine fails
+     */
+    protected void healthCheck() throws Exception {
+        try {
+            getPrinceEngine().convert(IOUtils.toInputStream("<html/>"), NullOutputStream.NULL_OUTPUT_STREAM);
+        } catch(Exception e) {
+            throw new IllegalStateException("PrinceXML failure");
         }
     }
 }

@@ -223,4 +223,15 @@ public class CacheService {
         logger.info("Koulutus cache refreshed in {}ms", duration);
         return duration;
     }
+
+    /**
+     * Throws exception if cannot connect to redis
+     */
+    protected void healthCheck() {
+        try {
+            redisTemplate.getClientList();
+        } catch(Exception e) {
+            throw new IllegalStateException("Redis failure");
+        }
+    }
 }
