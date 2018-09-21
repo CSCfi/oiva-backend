@@ -18,7 +18,7 @@ public class PostgresJSONJacksonBinding implements DefaultJsonBindings<JsonNode>
         private static final ObjectMapper mapper = new ObjectMapper();
 
         @Override
-        public JsonNode from(Object source) {
+        public JsonNode from(final Object source) {
             try {
                 return source == null ? mapper.createObjectNode() : mapper.readTree((String) source);
             } catch (IOException e) {
@@ -27,7 +27,7 @@ public class PostgresJSONJacksonBinding implements DefaultJsonBindings<JsonNode>
         }
 
         @Override
-        public Object to(JsonNode source) {
+        public Object to(final JsonNode source) {
             try {
                 return source == null || source.isNull() ? null : mapper.writeValueAsString(source);
             } catch (JsonProcessingException e) {

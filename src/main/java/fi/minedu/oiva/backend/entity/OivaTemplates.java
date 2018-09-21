@@ -21,8 +21,7 @@ public class OivaTemplates {
         tutkintoNimenMuutos,
         paatosKirje,
         hallintolakiKorjaus2017,
-        hallintolakiKorjaus2017v2
-        ;
+        hallintolakiKorjaus2017v2;
 
         public static AttachmentType convert(String str) {
             for (AttachmentType attachmentType : AttachmentType.values()) {
@@ -37,13 +36,12 @@ public class OivaTemplates {
     public static class Attachment {
         private AttachmentType type;
         private String path;
-        private String language;
 
         public String getPath() { return this.path; }
         public void setPath(String path) { this.path = path; }
 
         public AttachmentType getType() { return this.type; }
-        public void setType(AttachmentType type) { this.type = type; }
+        public void setType(final AttachmentType type) { this.type = type; }
     }
 
     public static class RenderOptions {

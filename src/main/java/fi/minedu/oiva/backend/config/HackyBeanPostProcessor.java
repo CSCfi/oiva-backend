@@ -19,20 +19,18 @@ import java.util.List;
 public class HackyBeanPostProcessor implements BeanPostProcessor {
 
     @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(final Object bean, final String beanName) throws BeansException {
         if (bean instanceof RequestMappingHandlerAdapter) {
-            RequestMappingHandlerAdapter adapter = (RequestMappingHandlerAdapter) bean;
-            final List<HandlerMethodReturnValueHandler> originalHandlers = new ArrayList<>(
-                adapter.getReturnValueHandlers());
+            final RequestMappingHandlerAdapter adapter = (RequestMappingHandlerAdapter) bean;
+            final List<HandlerMethodReturnValueHandler> originalHandlers = new ArrayList<>(adapter.getReturnValueHandlers());
             final int deferredPos = obtainValueHandlerPosition(originalHandlers, DeferredResultMethodReturnValueHandler.class);
-            // Add our handler directly after the deferred handler.
             originalHandlers.add(deferredPos + 1, new CompletionStageReturnValueHandler());
             adapter.setReturnValueHandlers(originalHandlers);
         }
         return bean;
     }
 
-    private int obtainValueHandlerPosition(final List<HandlerMethodReturnValueHandler> originalHandlers, Class<?> handlerClass) {
+    private int obtainValueHandlerPosition(final List<HandlerMethodReturnValueHandler> originalHandlers, final Class<?> handlerClass) {
         for (int i = 0; i < originalHandlers.size(); i++) {
             final HandlerMethodReturnValueHandler valueHandler = originalHandlers.get(i);
             if (handlerClass.isAssignableFrom(valueHandler.getClass())) {
@@ -43,7 +41,7 @@ public class HackyBeanPostProcessor implements BeanPostProcessor {
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessBeforeInitialization(final Object bean, final String beanName) throws BeansException {
         return bean;
     }
 }

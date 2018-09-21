@@ -20,14 +20,14 @@ public class DateUtils {
 
     public static Timestamp getFirstOrNullDate(final Stream<Timestamp> source) {
         final Optional<Optional<Timestamp>> opt = source
-            .sorted(Comparator.nullsLast((ok1, ok2) -> ok1.compareTo(ok2)))
+            .sorted(Comparator.nullsLast(Comparator.naturalOrder()))
             .map(Optional::ofNullable).findFirst();
         return opt.isPresent() ? opt.get().orElse(null) : null;
     }
 
     public static Timestamp getNullOrLastDate(final Stream<Timestamp> source) {
         final Optional<Optional<Timestamp>> opt = source
-            .sorted(Comparator.nullsFirst((ok1, ok2) -> ok2.compareTo(ok1)))
+            .sorted(Comparator.nullsFirst(Comparator.reverseOrder()))
             .map(Optional::ofNullable).findFirst();
         return opt.isPresent() ? opt.get().orElse(null) : null;
     }

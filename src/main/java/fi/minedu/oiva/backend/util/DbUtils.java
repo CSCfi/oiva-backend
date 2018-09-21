@@ -14,8 +14,9 @@ import java.util.function.Supplier;
  * Stuff to handle queries more easily
  */
 public class DbUtils {
-    public static Collection<Field<?>> combine(Field<?>[] fields1, Field<?>... fields2) {
-        Collection<Field<?>> searchFields = new ArrayList<>();
+
+    public static Collection<Field<?>> combine(final Field<?>[] fields1, final Field<?>... fields2) {
+        final Collection<Field<?>> searchFields = new ArrayList<>();
         Collections.addAll(searchFields, fields1);
         Collections.addAll(searchFields, fields2);
         return searchFields;
@@ -33,13 +34,12 @@ public class DbUtils {
 
         private List<Supplier<Condition>> conditionSuppliers = new ArrayList<>();
 
-        public Conditions add(boolean isPresent, Supplier<Condition> conditionSupplier) {
-            if (isPresent)
-                conditionSuppliers.add(conditionSupplier);
+        public Conditions add(final boolean isPresent, final Supplier<Condition> conditionSupplier) {
+            if (isPresent) conditionSuppliers.add(conditionSupplier);
             return this;
         }
 
-        public Conditions add(Supplier<Condition> conditionSupplier) {
+        public Conditions add(final Supplier<Condition> conditionSupplier) {
             conditionSuppliers.add(conditionSupplier);
             return this;
         }

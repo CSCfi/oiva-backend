@@ -13,8 +13,7 @@ import java.io.IOException;
 public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
     @Override
-    public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
-        final Authentication authentication) throws ServletException, IOException {
+    public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws ServletException, IOException {
         final HttpSession session = request.getSession();
         final String redirect = (String) session.getAttribute("redirect");
         if (StringUtils.isNotBlank(redirect)) {

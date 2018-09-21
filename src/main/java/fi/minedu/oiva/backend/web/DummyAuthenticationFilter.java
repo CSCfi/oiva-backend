@@ -23,8 +23,7 @@ import java.util.List;
  * the SecurityContext for the user without any login.
  *
  */
-public class DummyAuthenticationFilter extends
-    AbstractAuthenticationProcessingFilter {
+public class DummyAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
     static final List<GrantedAuthority> AUTHORITIES = new ArrayList<GrantedAuthority>();
 
@@ -41,9 +40,7 @@ public class DummyAuthenticationFilter extends
     }
 
     @Override
-    public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
-
+    public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         final Authentication result = new UsernamePasswordAuthenticationToken("testeruser", "testcredentials", AUTHORITIES);
         logger.info("Doing dummy authnetication ");
         return result;

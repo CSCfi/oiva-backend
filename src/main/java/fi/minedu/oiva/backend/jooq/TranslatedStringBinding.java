@@ -15,15 +15,15 @@ public class TranslatedStringBinding implements DefaultJsonBindings<TranslatedSt
             new TranslatedStringConverter());
     }
 
-    public static class TranslatedStringConverter
-        implements Converter<JsonNode, TranslatedString> {
+    public static class TranslatedStringConverter implements Converter<JsonNode, TranslatedString> {
+
         @Override
-        public TranslatedString from(JsonNode databaseObject) {
+        public TranslatedString from(final JsonNode databaseObject) {
             return TranslatedString.of(databaseObject);
         }
 
         @Override
-        public JsonNode to(TranslatedString userObject) {
+        public JsonNode to(final TranslatedString userObject) {
             return userObject.toJson();
         }
 

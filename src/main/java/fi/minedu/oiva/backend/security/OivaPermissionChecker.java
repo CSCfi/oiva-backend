@@ -53,7 +53,7 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Object targetDomainObject, final Object permission) {
         throw new UnsupportedOperationException("use hasPermission(Authentication authentication, " +
             "Serializable targetId, String targetType, Object permission)");
     }
@@ -94,8 +94,8 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
      * @param targetId
      * @return
      */
-    private boolean checkOidsOnCheckable(String beanName, Serializable targetId, List<String> oids) {
-        WithOidCheck hakemusService = (WithOidCheck) applicationContext.getBean(beanName);
+    private boolean checkOidsOnCheckable(final String beanName, Serializable targetId, final List<String> oids) {
+        final WithOidCheck hakemusService = (WithOidCheck) applicationContext.getBean(beanName);
         return hakemusService.hasOid((Long) targetId, oids);
     }
 }

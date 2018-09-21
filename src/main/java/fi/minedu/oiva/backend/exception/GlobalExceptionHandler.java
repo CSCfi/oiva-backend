@@ -14,7 +14,7 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public JsonNode handleNoTFound() {
-        ObjectNode node = new ObjectMapper().createObjectNode();
+        final ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("status", HttpStatus.NOT_FOUND.value());
         node.put("title", HttpStatus.NOT_FOUND.getReasonPhrase());
         return node;

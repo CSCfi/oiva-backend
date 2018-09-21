@@ -37,14 +37,13 @@ import java.util.concurrent.CompletionStage;
 public class CompletionStageReturnValueHandler implements HandlerMethodReturnValueHandler {
 
     @Override
-    public boolean supportsReturnType(MethodParameter returnType) {
+    public boolean supportsReturnType(final MethodParameter returnType) {
         return CompletionStage.class.isAssignableFrom(returnType.getParameterType());
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void handleReturnValue(Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest) throws Exception {
+    public void handleReturnValue(final Object returnValue, final MethodParameter returnType, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest) throws Exception {
         if (returnValue == null) {
             mavContainer.setRequestHandled(true);
             return;
@@ -53,7 +52,7 @@ public class CompletionStageReturnValueHandler implements HandlerMethodReturnVal
         final DeferredResult<Object> deferredResult = new DeferredResult<>();
         WebAsyncUtils.getAsyncManager(webRequest).startDeferredResultProcessing(deferredResult, mavContainer);
 
-        CompletionStage<?> future = (CompletionStage<?>) returnValue;
+        final CompletionStage<?> future = (CompletionStage<?>) returnValue;
         future.whenComplete((result, ex) -> {
             if (ex != null) {
                 deferredResult.setErrorResult(ex);
@@ -62,5 +61,4 @@ public class CompletionStageReturnValueHandler implements HandlerMethodReturnVal
             }
         });
     }
-
 }

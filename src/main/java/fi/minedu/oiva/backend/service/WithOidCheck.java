@@ -15,13 +15,12 @@ import java.util.Optional;
  * APP_HENKILONHALLINTA_CRUD), true is always returned.
  */
 public abstract class WithOidCheck {
-    public boolean hasOid(Long id, List<String> oids) {
+    public boolean hasOid(final Long id, final List<String> oids) {
         if (oids.contains(OIDs.ADMINISTRATOR)) {
             return true;
         } else {
             return getOid(id).map(oids::contains).orElse(false);
         }
     }
-
     abstract Optional<String> getOid(Long id);
 }

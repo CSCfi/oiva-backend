@@ -15,7 +15,7 @@ public class ValidationUtils {
 
     final static Logger logger = LoggerFactory.getLogger(ValidationUtils.class);
 
-    public static boolean isNotValid(ValidationUtils.Validation... validationEntries) {
+    public static boolean isNotValid(final ValidationUtils.Validation... validationEntries) {
         return !validate(validationEntries);
     }
 
@@ -23,7 +23,7 @@ public class ValidationUtils {
         return validate(ValidationUtils.validation(value, message));
     }
 
-    public static boolean validate(ValidationUtils.Validation... validationEntries) {
+    public static boolean validate(final ValidationUtils.Validation... validationEntries) {
 
         final Collection<String> validationErrors = new ArrayList<>();
 

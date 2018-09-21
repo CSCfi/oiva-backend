@@ -35,7 +35,7 @@ public class BuildCaches implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(final ContextRefreshedEvent contextRefreshedEvent) {
         final boolean isDevEnv = !Collections.disjoint(Arrays.asList(env.getActiveProfiles()), Arrays.asList("test", "dev"));
         if (!isDevEnv && refreshOnStartup) {
             refreshCaches();

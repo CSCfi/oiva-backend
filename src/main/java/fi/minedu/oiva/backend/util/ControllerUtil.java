@@ -11,41 +11,40 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class ControllerUtil {
-    private ControllerUtil() {
-    }
+
+    private ControllerUtil() {}
 
     public static <T> CompletableFuture<ResponseEntity> respondWith(final CompletableFuture<Optional<T>> itemOptFuture, final ResponseEntity success, final ResponseEntity failure) {
         return itemOptFuture.handle((itemOpt, throwable) -> (throwable == null) ? itemOpt.map(i -> success).orElse(failure) : get500());
     }
 
-    public static <T> HttpEntity<T> getOr404(Optional<T> itemOpt) {
+    public static <T> HttpEntity<T> getOr404(final Optional<T> itemOpt) {
         return itemOpt.map(item -> ok(item)).orElse(notFound());
     }
 
-    public static <T> HttpEntity<T> getOr400(Optional<T> itemOpt) {
+    public static <T> HttpEntity<T> getOr400(final Optional<T> itemOpt) {
         return itemOpt.map(item -> ok(item)).orElse(badRequest());
     }
 
-    public static <T> CompletableFuture<HttpEntity<T>> getOr404(CompletableFuture<Optional<T>> itemOptFuture) {
+    public static <T> CompletableFuture<HttpEntity<T>> getOr404(final CompletableFuture<Optional<T>> itemOptFuture) {
         return itemOptFuture.handle((itemOpt, throwable) ->
             (throwable == null) ? itemOpt.map(i -> ok(i)).orElse(notFound()) : notFound());
     }
 
-    public static <T, E> HttpEntity<E> getOr404(Optional<T> itemOpt, Function<T, HttpEntity<E>> transformer) {
+    public static <T, E> HttpEntity<E> getOr404(final Optional<T> itemOpt, final Function<T, HttpEntity<E>> transformer) {
         return itemOpt.map(transformer::apply).orElse(notFound());
     }
 
-    public static <T> HttpEntity<T> getOr404_(Optional<T> itemOpt, Function<T, T> transformer) {
+    public static <T> HttpEntity<T> getOr404_(final Optional<T> itemOpt, final Function<T, T> transformer) {
         return itemOpt.map(transformer::apply).map(item -> ok(item)).orElse(notFound());
     }
 
-    public static ResponseEntity<?> newOrBust(Optional<Long> newOpt, String pathTo, String strTpl) {
+    public static ResponseEntity<?> newOrBust(final Optional<Long> newOpt, final String pathTo, final String strTpl) {
         return newOpt.map(newId -> {
             String path = String.format(strTpl, pathTo, newId);
             HttpHeaders responseHeaders = new HttpHeaders();
@@ -54,11 +53,11 @@ public final class ControllerUtil {
         }).orElse(badRequest());
     }
 
-    public static ResponseEntity<?> newOrBust(Optional<Long> newOpt, String pathTo) {
+    public static ResponseEntity<?> newOrBust(final Optional<Long> newOpt, String pathTo) {
         return newOrBust(newOpt, pathTo, "%s/%d");
     }
 
-    public static ResponseEntity<?> deleteOrBust(Optional<Long> deletedOpt) {
+    public static ResponseEntity<?> deleteOrBust(final Optional<Long> deletedOpt) {
         return deletedOpt.map(deletedId -> noContent()).orElse(badRequest());
     }
 
@@ -95,7 +94,7 @@ public final class ControllerUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> ResponseEntity<T> get500(String code, String title) {
+    public static <T> ResponseEntity<T> get500(final String code, final String title) {
         Map<String, Object> msgMap = new HashMap<>();
         msgMap.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         msgMap.put("code", code);
@@ -110,7 +109,7 @@ public final class ControllerUtil {
         return (ResponseEntity<T>) new ResponseEntity<>(message, status);
     }
 
-    public static URI buildURI(String... fragments) {
+    public static URI buildURI(final String... fragments) {
         return URI.create(Arrays.asList(fragments).stream().collect(Collectors.joining("/")));
     }
 

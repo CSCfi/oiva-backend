@@ -79,17 +79,17 @@ public class DatabasesConfig implements EnvironmentAware {
 
 
     @Bean
-    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+    public DataSourceTransactionManager transactionManager(final DataSource dataSource) {
         return new DataSourceTransactionManager(dataSource);
     }
 
     @Bean
-    public DSLContext dsl(org.jooq.Configuration config) {
+    public DSLContext dsl(final org.jooq.Configuration config) {
         return new DefaultDSLContext(config);
     }
 
     @Bean
-    public ConnectionProvider connectionProvider(DataSource dataSource) {
+    public ConnectionProvider connectionProvider(final DataSource dataSource) {
         return new DataSourceConnectionProvider(new TransactionAwareDataSourceProxy(dataSource));
     }
 
@@ -100,7 +100,7 @@ public class DatabasesConfig implements EnvironmentAware {
 
     @Bean
     @Primary
-    public org.jooq.Configuration jooqConfig(ConnectionProvider connectionProvider, TransactionProvider transactionProvider) {
+    public org.jooq.Configuration jooqConfig(final ConnectionProvider connectionProvider, final TransactionProvider transactionProvider) {
         return new DefaultConfiguration()
             .derive(connectionProvider)
             .derive(transactionProvider)

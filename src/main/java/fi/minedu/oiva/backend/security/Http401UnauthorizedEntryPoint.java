@@ -17,6 +17,7 @@ import java.io.IOException;
 
 @Component
 public class Http401UnauthorizedEntryPoint implements AuthenticationEntryPoint {
+
     private static final Log logger = LogFactory.getLog(Http401UnauthorizedEntryPoint.class);
 
     @Autowired
