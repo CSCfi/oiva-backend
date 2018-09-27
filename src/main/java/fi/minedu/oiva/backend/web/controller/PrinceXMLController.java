@@ -99,7 +99,7 @@ public class PrinceXMLController {
     @OivaAccess_Public
     @RequestMapping(value = "/muutospyyntoObjToPdf", method = PUT)
     @ResponseBody
-    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
+    @ApiOperation(notes = "Tuottaa muutospyynnön PDF-muodossa", value = "")
     public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto,
                                   final HttpServletResponse response, final HttpServletRequest request) {
 

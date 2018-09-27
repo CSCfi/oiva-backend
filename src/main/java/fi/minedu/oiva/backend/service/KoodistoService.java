@@ -34,6 +34,13 @@ public class KoodistoService {
         return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
     }
 
+    @Value("${tutkintotyyppi.ammatillinen.koodiarvot}")
+    private String ammatillinenTutkintotyyppiKoodiArvot;
+
+    private List<String> getAmmatillinenTutkintotyyppiArvot() {
+        return StringUtils.isNotBlank(ammatillinenTutkintotyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenTutkintotyyppiKoodiArvot, ",")) : Collections.emptyList();
+    }
+
     /**
      * Hae koodisto koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
      *
@@ -233,5 +240,34 @@ public class KoodistoService {
         };
         getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
         return koulutukset;
+    }
+
+    @Cacheable(value = "KoodistoService:getTutkintotyypit", key = "''")
+    public List<KoodistoKoodi> getTutkintotyypit() {
+        return opintopolkuService.getTutkintotyyppiKoodit();
+    }
+
+    @Cacheable(value = "KoodistoService:getTutkintotyyppi", key = "#koodi")
+    public KoodistoKoodi getTutkintotyyppi(final String koodi) {
+        return opintopolkuService.getTutkintotyyppiKoodi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getTutkintotyyppiKoulutukset", key = "#koodi")
+    public List<KoodistoKoodi> getTutkintotyyppiKoulutukset(final String koodi) {
+        return opintopolkuService.getKoulutusKooditForTutkintotyyppi(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusToTutkintotyyppiRelation", key = "''")
+    public Map<String, String> getKoulutusToTutkintotyyppiRelation() {
+        final Map<String, String> map = new HashMap<>();
+        getTutkintotyypit().stream().forEach(tutkintotyyppiKoodi -> {
+                    getTutkintotyyppiKoulutukset(tutkintotyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi -> {
+                        if(getAmmatillinenTutkintotyyppiArvot().contains(tutkintotyyppiKoodi.koodiArvo())) {
+                        map.put(koulutusKoodi.koodiArvo(), tutkintotyyppiKoodi.koodiArvo());
+                        }
+                    });
+                }
+            );
+        return map;
     }
 }
