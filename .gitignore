@@ -13,3 +13,4 @@ pom.xml.releaseBackup
 
 logs
 oiva-backend.log*
+vars-*.sh

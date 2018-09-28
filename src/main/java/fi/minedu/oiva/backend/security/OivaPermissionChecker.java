@@ -21,16 +21,16 @@ import static org.hamcrest.Matchers.instanceOf;
  * <p>
  * example:
  * <pre>
- * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', 'APP_KOUTE_ESITTELIJA')")
+ * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', 'OIVA_APP_ESITTELIJA')")
  * void someMethod(Long hakemusId) { /* something... *&#47; }
  * // or with id, type and explicit oid extraction with oidsFor
- * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', oidsFor('APP_KOUTE_ESITTELIJA'))")
+ * {@literal @}PreAuthorize("hasPermission(#hakemusId, 'Hakemus', oidsFor('OIVA_APP_ESITTELIJA'))")
  * </pre>
  * </p>
  * <p>
  * Other way to say same thing:
  * <pre>
- * {@literal @}PreAuthorize("@hakemusService.hasOid(#hakemusOsio.hakemusId, oidsFor('APP_KOUTE_ESITTELIJA'))")
+ * {@literal @}PreAuthorize("@hakemusService.hasOid(#hakemusOsio.hakemusId, oidsFor('OIVA_APP_ESITTELIJA'))")
  * </pre>
  * </p>
  */
@@ -53,7 +53,7 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Object targetDomainObject, final Object permission) {
         throw new UnsupportedOperationException("use hasPermission(Authentication authentication, " +
             "Serializable targetId, String targetType, Object permission)");
     }
@@ -94,8 +94,8 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
      * @param targetId
      * @return
      */
-    private boolean checkOidsOnCheckable(String beanName, Serializable targetId, List<String> oids) {
-        WithOidCheck hakemusService = (WithOidCheck) applicationContext.getBean(beanName);
+    private boolean checkOidsOnCheckable(final String beanName, Serializable targetId, final List<String> oids) {
+        final WithOidCheck hakemusService = (WithOidCheck) applicationContext.getBean(beanName);
         return hakemusService.hasOid((Long) targetId, oids);
     }
 }

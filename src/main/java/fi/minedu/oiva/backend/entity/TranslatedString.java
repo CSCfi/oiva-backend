@@ -35,15 +35,15 @@ public class TranslatedString implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(TranslatedString.class);
     private Map<String, String> values;
 
-    private TranslatedString(Map<String, String> values) {
+    private TranslatedString(final Map<String, String> values) {
         this.values = values;
     }
 
-    public Optional<String> get(String lang) {
+    public Optional<String> get(final String lang) {
         return Optional.ofNullable(values.get(lang));
     }
 
-    public Optional<String> getOrFirst(String lang) {
+    public Optional<String> getOrFirst(final String lang) {
         return this.values.containsKey(lang) ? get(lang) : getFirst();
     }
 
@@ -70,7 +70,7 @@ public class TranslatedString implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public static TranslatedString of(JsonNode node) {
+    public static TranslatedString of(final JsonNode node) {
         try {
             return new TranslatedString(ObjectMapperSingleton.mapper.treeToValue(node, Map.class));
         } catch (IOException ioe) {
@@ -83,11 +83,11 @@ public class TranslatedString implements Serializable {
         return new TranslatedString(new HashMap<>());
     }
 
-    public static TranslatedString of(Map<String, String> map) {
+    public static TranslatedString of(final Map<String, String> map) {
         return new TranslatedString(map);
     }
 
-    public static TranslatedString of(Seq<Tuple2<String, String>> seqOfTuples) {
+    public static TranslatedString of(final Seq<Tuple2<String, String>> seqOfTuples) {
         return new TranslatedString(seqOfTuples.collect(CollectionUtils.tuples2Map()));
     }
 

@@ -12,11 +12,11 @@ import scala.collection.JavaConversions._
 import scala.beans.BeanProperty
 
 /*
- * APP_KOUTE
- * APP_KOUTE_YLLAPITAJA
- * APP_KOUTE_ESITTELIJA
- * APP_KOUTE_KAYTTAJA
- * APP_KOUTE_KAYTTAJA_111.222.333
+ * OIVA_APP
+ * OIVA_APP_YLLAPITAJA
+ * OIVA_APP_ESITTELIJA
+ * OIVA_APP_KAYTTAJA
+ * OIVA_APP_KAYTTAJA_111.222.333
 */
 
 @JsonIgnoreProperties(ignoreUnknown = true)

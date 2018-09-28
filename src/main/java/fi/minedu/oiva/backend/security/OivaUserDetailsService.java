@@ -1,7 +1,6 @@
 package fi.minedu.oiva.backend.security;
 
 import fi.minedu.oiva.backend.entity.opintopolku.KayttajaKayttooikeus;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.service.OpintopolkuService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

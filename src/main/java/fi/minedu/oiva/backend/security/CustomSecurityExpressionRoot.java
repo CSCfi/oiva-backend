@@ -16,7 +16,7 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
         super(auth);
     }
 
-    public void setFilterObject(Object filterObject) {
+    public void setFilterObject(final Object filterObject) {
         this.filterObject = filterObject;
     }
 
@@ -24,7 +24,7 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
         return filterObject;
     }
 
-    public void setReturnObject(Object returnObject) {
+    public void setReturnObject(final Object returnObject) {
         this.returnObject = returnObject;
     }
 
@@ -32,7 +32,7 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
         return returnObject;
     }
 
-    void setThis(Object target) {
+    void setThis(final Object target) {
         this.target = target;
     }
 

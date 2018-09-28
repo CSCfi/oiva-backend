@@ -24,14 +24,14 @@ public class AndProfileCondition implements Condition {
         if (context.getEnvironment() == null) {
             return true;
         }
-        MultiValueMap<String, Object> attrs = metadata.getAllAnnotationAttributes(Profile.class.getName());
+        final MultiValueMap<String, Object> attrs = metadata.getAllAnnotationAttributes(Profile.class.getName());
         if (attrs == null) {
             return true;
         }
-        String[] activeProfiles = context.getEnvironment().getActiveProfiles();
-        String[] definedProfiles = (String[]) attrs.getFirst(VALUE);
-        Set<String> allowedProfiles = new HashSet<>(1);
-        Set<String> restrictedProfiles = new HashSet<>(1);
+        final String[] activeProfiles = context.getEnvironment().getActiveProfiles();
+        final String[] definedProfiles = (String[]) attrs.getFirst(VALUE);
+        final Set<String> allowedProfiles = new HashSet<>(1);
+        final Set<String> restrictedProfiles = new HashSet<>(1);
         for (String nextDefinedProfile : definedProfiles) {
             if (!nextDefinedProfile.isEmpty() && nextDefinedProfile.charAt(0) == '!') {
                 restrictedProfiles.add(nextDefinedProfile.substring(1, nextDefinedProfile.length()));
@@ -44,12 +44,10 @@ public class AndProfileCondition implements Condition {
             if (DEFAULT_PROFILE.equals(nextActiveProfile) && allowedProfiles.isEmpty()) {
                 continue;
             }
-            if (!allowedProfiles.contains(nextActiveProfile) || restrictedProfiles.contains(nextActiveProfile)
-                || allowedProfiles.size() != activeProfiles.length) {
+            if (!allowedProfiles.contains(nextActiveProfile) || restrictedProfiles.contains(nextActiveProfile) || allowedProfiles.size() != activeProfiles.length) {
                 return false;
             }
         }
         return true;
     }
-
 }

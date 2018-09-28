@@ -5,7 +5,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
@@ -19,20 +23,21 @@ import static java.io.File.separator;
  * Kokoelma utiliteettimetodeita tiedostojen käsittelyyn
  */
 public final class FileUtils {
+
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     private FileUtils() {}
 
-    public static Path makeDir(String path) throws IOException {
+    public static Path makeDir(final String path) throws IOException {
         return Files.createDirectories(Paths.get(path));
     }
 
-    public static void deleteDirs(String rootPath, String path) throws IOException {
-        Path fullPath = Paths.get(pathify(rootPath, path));
-        DirectoryStream<Path> ds = Files.newDirectoryStream(fullPath);
+    public static void deleteDirs(final String rootPath, final String path) throws IOException {
+        final Path fullPath = Paths.get(pathify(rootPath, path));
+        final DirectoryStream<Path> ds = Files.newDirectoryStream(fullPath);
         if (!ds.iterator().hasNext()) {
             Files.delete(fullPath);
-            int index = path.lastIndexOf('/');
+            final int index = path.lastIndexOf('/');
             if (index > 0) {
                 String nextPath = path.substring(0, index);
                 deleteDirs(rootPath, nextPath);
@@ -43,20 +48,20 @@ public final class FileUtils {
     /**
      * Formatoi tiedostokoot ihmisten luettavaan muotoon
      */
-    public static String formatFileSize(long size) {
+    public static String formatFileSize(final long size) {
         if (size <= 0) return "0";
         final String[] units = new String[]{"B", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
-    public static String normalizeFileName(String fileName) {
+    public static String normalizeFileName(final String fileName) {
         return Normalizer
             .normalize(fileName, Normalizer.Form.NFD)
             .replaceAll("[^\\p{ASCII}]", "").replace(" ", "_");
     }
 
-    public static Optional<File> getFileOptFromPath(String path) {
+    public static Optional<File> getFileOptFromPath(final String path) {
         try {
             return Optional.of(Paths.get(path).toFile());
         } catch (InvalidPathException | UnsupportedOperationException e) {
@@ -77,8 +82,7 @@ public final class FileUtils {
     public static String generateUniqueFilePath() {
         final LocalDateTime now = LocalDateTime.now();
         final String uuid = UUID.randomUUID().toString();
-        return pathify(now.getYear(), now.getMonthValue(),
-            now.getDayOfMonth(), uuid);
+        return pathify(now.getYear(), now.getMonthValue(), now.getDayOfMonth(), uuid);
     }
 
     /**
@@ -105,11 +109,11 @@ public final class FileUtils {
          * @param pathComponents
          * @return String
          */
-        public static String pathify(Object... pathComponents) {
+        public static String pathify(final Object... pathComponents) {
             return new PathBuilder(pathComponents).build();
         }
 
-        public static PathBuilder createPath(Object... pathComponents) {
+        public static PathBuilder createPath(final Object... pathComponents) {
             return new PathBuilder(pathComponents);
         }
 
