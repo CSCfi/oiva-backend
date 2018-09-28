@@ -275,23 +275,3 @@ Tällöin asetukset ovat hardkoodattuina paketin sisällä, eikä ulkoista konfi
    Manuaalinen konffiesimerkki:
     
     java -jar oiva-backend.jar --server.port=8080 --oiva.dbhost=192.168.1.165 --oiva.dbpassword=oiva --redis.host=192.168.1.199  --spring.profiles.active=prod
-
-## Julkaisut
-
-Julkaisun tekemistä varten on luotu release.sh skripti joka tekee tarvittavat git-komennot sekä käyttää Maven release pluginia.
-Ilman parametreja skripti suorittaa dry-run tyyppisen ajon (testaamista varten). Mikäli virallinen julkaisu halutaan tehdä niin
-skriptille tulee syöttää argumentti: publish
-
-### Komennot
-
-Kokeile julkaisua (suorittaa dry-run ajon)
-
-    $ ./release.sh
-  
-Poista release pluginin tekemät tiedostot kokeilun jälkeen:
-
-    $ ./release.sh clean
-    
-Tee oikea julkaisu:
-
-    $ ./release.sh publish
