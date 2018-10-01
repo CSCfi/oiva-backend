@@ -52,6 +52,7 @@ class OpintopolkuService extends CacheAware {
     private lazy val oppilaitoksenOpetuskieliKoodiPath: String = "/oppilaitoksenopetuskieli/koodi"
     private lazy val koulutusalaKoodiPath: String = "/isced2011koulutusalataso1/koodi"
     private lazy val koulutustyyppiKoodiPath: String = "/koulutustyyppi/koodi"
+    private lazy val tutkintotyyppiKoodiPath: String = "/tutkintotyyppi/koodi"
 
     def koodistoKooditPath(koodistoUri: String) = s"/${koodistoUri}/koodi"
     def koodistoUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}"
@@ -64,6 +65,7 @@ class OpintopolkuService extends CacheAware {
     def kuntaKoodiUri(koodiArvo: String) = s"kunta_${koodiArvo}"
     def koulutusAlaOph2002KoodiUri(koodiArvo: String) = s"koulutusalaoph2002_${koodiArvo}"
     def koulutustyyppiKoodiUri(koodiArvo: String) = s"koulutustyyppi_${koodiArvo}"
+    def tutkintotyyppiKoodiUri(koodiArvo: String) = s"tutkintotyyppi_${koodiArvo}"
     def koulutusKoodiUri(koodiArvo: String) = s"koulutus_${koodiArvo}"
     def osaamisalaKoodiUri(koodiArvo: String) = s"osaamisala_${koodiArvo}"
     def kieliKoodiUri(koodiArvo: String) = s"kieli_${koodiArvo}"
@@ -196,12 +198,14 @@ class OpintopolkuService extends CacheAware {
 
     // koulutus
     def getKoulutustyyppiKoodiForKoulutus(koodiArvo: String): Optional[java.util.List[KoodistoKoodi]] =
-        Optional.ofNullable(getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava)
+        Optional.ofNullable(getKoulutusAlaKooditForKoulutustyyppi(koodiArvo).filter(_.isKoodisto("koulutustyyppi")).asJava)
 
     def getKoulutusalaKoodiForKoulutus(koodiArvo: String): Optional[KoodistoKoodi] = {
         val koulutusalaKoodit = getKoulutusAlaKoodit(koodiArvo).filter(_.isKoodisto("isced2011koulutusalataso1"))
         if(!koulutusalaKoodit.isEmpty) Optional.ofNullable(koulutusalaKoodit.head) else Optional.empty()
     }
+
+    def getKoulutusAlaKooditForKoulutustyyppi(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + koulutusKoodiUri(koodiArvo),null,true)
 
     def getKoulutusAlaKoodit(koodiArvo: String) = getKoodistoKooditList(relaatioAlakoodiPath + koulutusKoodiUri(koodiArvo))
 
@@ -211,9 +215,14 @@ class OpintopolkuService extends CacheAware {
     def getKoulutusKooditForKoulutusala(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + koulutusalaKoodiUri(koodiArvo))
 
     // koulutustyyppi
-    def getKoulutustyyppiKoodit = getKoodistoKooditList(koulutustyyppiKoodiPath)
+    def getKoulutustyyppiKoodit = getKoodistoKooditList(koulutustyyppiKoodiPath,null,true)
     def getKoulutustyyppiKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koodistoServiceUrl + koulutustyyppiKoodiPath, koulutustyyppiKoodiUri(koodiArvo))
     def getKoulutusKooditForKoulutustyyppi(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + koulutustyyppiKoodiUri(koodiArvo))
+
+    // tutkintotyyppi
+    def getTutkintotyyppiKoodit = getKoodistoKooditList(tutkintotyyppiKoodiPath)
+    def getTutkintotyyppiKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koodistoServiceUrl + tutkintotyyppiKoodiPath, tutkintotyyppiKoodiUri(koodiArvo))
+    def getKoulutusKooditForTutkintotyyppi(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + tutkintotyyppiKoodiUri(koodiArvo))
 
     /**
       * Get Koodisto. Use cache only if koodistoVersion is explicitely provided

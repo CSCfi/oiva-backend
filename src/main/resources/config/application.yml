@@ -36,6 +36,10 @@ koulutustyyppi:
   ammatillinen:
     koodiarvot: 1,11,12
 
+tutkintotyyppi:
+  ammatillinen:
+    koodiarvot: 02,19,20
+
 cas:
     baseUrl: override_this_in_local_application_yml
     url.prefix: /cas
