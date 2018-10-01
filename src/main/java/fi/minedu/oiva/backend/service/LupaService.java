@@ -17,6 +17,7 @@ import org.jooq.Record;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.SelectOnConditionStep;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,6 +82,8 @@ public class LupaService {
     public Collection<Lupa> getAll(final String... withOptions) { // TODO: Implement filter
         final SelectJoinStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
+        // filteröidään tulevat luvat (ja varmaan kohta vanhatkin)
+        query.where(LUPA.ALKUPVM.le(DSL.currentDate()));
         return query.fetchInto(Lupa.class).stream()
             .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
             .filter(Optional::isPresent).map(Optional::get)
@@ -105,7 +108,8 @@ public class LupaService {
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)), withOptions);
+        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus).
+                and(LUPA.ALKUPVM.le(DSL.currentDate()))), withOptions);
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
