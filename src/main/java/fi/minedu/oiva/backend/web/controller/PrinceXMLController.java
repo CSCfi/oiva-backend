@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 
 import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
@@ -76,7 +79,11 @@ public class PrinceXMLController {
 
                     });
 
-                    if (lupaService.hasTutkintoNimenMuutos(lupa)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
+                    // Tulostetaan nimenmuutosliite, mikäli luvassa on tutkintoja joiden nimi muuttuu.
+                    // Lisäksi päätöksen tulee olla tehty ennen lokakuuta 2018.
+                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+                    Date attachmentLastDate = df.parse("01/10/2018");
+                    if (lupaService.hasTutkintoNimenMuutos(lupa) && lupa.getPaatospvm().before(attachmentLastDate)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
 
                     response.setContentType(APPLICATION_PDF);
                     response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaariNumero, "/", "-") + ".pdf");
@@ -99,7 +106,7 @@ public class PrinceXMLController {
     @OivaAccess_Public
     @RequestMapping(value = "/muutospyyntoObjToPdf", method = PUT)
     @ResponseBody
-    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
+    @ApiOperation(notes = "Tuottaa muutospyynnön PDF-muodossa", value = "")
     public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto,
                                   final HttpServletResponse response, final HttpServletRequest request) {
 

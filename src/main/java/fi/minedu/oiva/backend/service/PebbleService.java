@@ -63,7 +63,7 @@ public class PebbleService {
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {
 
-        final String contextPath = "paatoskierros2017"; // TODO = lupa.paatoskierros().esitysmalli().getTemplatepath();
+        final String contextPath = lupa.paatoskierros().esitysmalli().getTemplatepath();
         final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
 
         logger.debug("Using base path: {}", pebble.getTemplateBasePath());
