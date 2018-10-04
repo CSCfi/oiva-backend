@@ -5,6 +5,7 @@ import java.util.{Collection, Optional}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio
+import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -42,4 +43,7 @@ class Lupa(
 
     def getMaaraykset = maaraykset
     def setMaaraykset(maaraykset: Collection[Maarays]): Unit = this.maaraykset = maaraykset
+
+    @JsonIgnore def getFilePath = StringUtils.replaceAll(getDiaarinumero, "/", "-")
+    @JsonIgnore def getFileName = "lupa-" + getFilePath + ".pdf"
 }
