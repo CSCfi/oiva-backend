@@ -2,15 +2,20 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.*;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.*;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,20 +24,23 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Date;
+import javax.ws.rs.Produces;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
-import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.util.ControllerUtil.*;
+import static fi.minedu.oiva.backend.entity.OivaTemplates.RenderOptions;
+import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
+import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
-@RequestMapping(
-    value = "${api.url.prefix}" + PrinceXMLController.path,
-    produces = { PrinceXMLController.APPLICATION_PDF })
+@RequestMapping(value = "${api.url.prefix}" + PrinceXMLController.path)
 public class PrinceXMLController {
 
     private static final Logger logger = LoggerFactory.getLogger(PrinceXMLController.class);
@@ -51,6 +59,12 @@ public class PrinceXMLController {
     private LupaService lupaService;
 
     @Autowired
+    private LupaRenderService lupaRenderService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
+
+    @Autowired
     private OrganisaatioService organisaatioService;
 
     @Autowired
@@ -58,39 +72,53 @@ public class PrinceXMLController {
 
     @OivaAccess_Public
     @RequestMapping(value = "/{diaarinumero}/**", method = GET)
-    @ResponseBody
-    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
-    public void renderPDF(final @PathVariable String diaarinumero,
-        final HttpServletResponse response, final HttpServletRequest request) {
-
-        final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
+    @ApiOperation(notes = "Tarjoaa luvan PDF-muodossa", value = "")
+    public ResponseEntity<Resource> providePdf(final @PathVariable String diaarinumero, final HttpServletRequest request) {
+        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
                 final Lupa lupa = lupaOpt.get();
-                final RenderOptions options = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
-                final Optional<String> htmlOpt = pebbleService.toHTML(lupa, options);
-                if (htmlOpt.isPresent()) {
+                final Path lupaPath = Paths.get(fileStorageService.getLupaFilePath(lupa).orElseThrow(IllegalArgumentException::new));
+                if(Files.exists(lupaPath)) {
+                    final ByteArrayResource lupaBar = new ByteArrayResource(Files.readAllBytes(lupaPath));
+                    return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .header("Content-Disposition", "inline; filename=" + lupa.getFileName())
+                        .contentLength(lupaBar.contentLength())
+                        .body(lupaBar);
+                } else {
+                    logger.error("No such Lupa PDF with diaarinumero " + diaariNumero);
+                    return ResponseEntity.notFound().build();
+                }
+            } else {
+                logger.error("No such Lupa with diaarinumero " + diaariNumero);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to provide Lupa PDF with diaarinumero {}", diaariNumero, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
-                    lupaService.getAttachments(lupa.getId()).stream().forEach(attachment -> {
-                        if(AttachmentType.convert(attachment.getTyyppi()) != null) {
-                            options.addAttachment(AttachmentType.convert(attachment.getTyyppi()), attachment.getPolku());
-                        }
-
-                    });
-
-                    // Tulostetaan nimenmuutosliite, mikäli luvassa on tutkintoja joiden nimi muuttuu.
-                    // Lisäksi päätöksen tulee olla tehty ennen lokakuuta 2018.
-                    SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-                    Date attachmentLastDate = df.parse("01/10/2018");
-                    if (lupaService.hasTutkintoNimenMuutos(lupa) && lupa.getPaatospvm().before(attachmentLastDate)) options.addAttachment(AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
-
-                    response.setContentType(APPLICATION_PDF);
-                    response.setHeader("Content-Disposition", "inline; filename=lupa-" + StringUtils.replaceAll(diaariNumero, "/", "-") + ".pdf");
-                    if (!princeXMLService.toPDF(htmlOpt.get(), response.getOutputStream(), options)) {
-                        response.setStatus(get500().getStatusCode().value());
-                        response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
-                    }
+    @OivaAccess_Esittelija
+    @RequestMapping(value = "/esikatsele/{diaarinumero}/**", method = GET)
+    @Produces({ PrinceXMLController.APPLICATION_PDF })
+    @ResponseBody
+    @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
+    public void previewPdf(final @PathVariable String diaarinumero, final HttpServletResponse response, final HttpServletRequest request) {
+        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+        try {
+            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
+            if(lupaOpt.isPresent()) {
+                final Lupa lupa = lupaOpt.get();
+                final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupa).orElseThrow(IllegalStateException::new);
+                final String lupaHtml = pebbleService.toHTML(lupa, renderOptions).orElseThrow(IllegalStateException::new);
+                response.setContentType(APPLICATION_PDF);
+                response.setHeader("Content-Disposition", "inline; filename=" + lupa.getFileName());
+                if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
+                    response.setStatus(get500().getStatusCode().value());
+                    response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
                 }
             } else {
                 response.setStatus(notFound().getStatusCode().value());
@@ -102,13 +130,40 @@ public class PrinceXMLController {
         }
     }
 
+    @OivaAccess_Esittelija
+    @RequestMapping(value = "/tallenna/{diaarinumero}/**", method = PUT)
+    @ApiOperation(notes = "Tuottaa ja tallentaa luvan PDF-muodossa", value = "")
+    public ResponseEntity savePDF(final @PathVariable String diaarinumero, final HttpServletRequest request) {
+        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+        try {
+            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
+            if(lupaOpt.isPresent()) {
+                final Lupa lupa = lupaOpt.get();
+                final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupa).orElseThrow(IllegalStateException::new);
+                final String lupaHtml = pebbleService.toHTML(lupa, renderOptions).orElseThrow(IllegalStateException::new);
+                final File file = fileStorageService.createLupaFile(lupa).orElseThrow(IllegalStateException::new);
+                final FileOutputStream fileOutputStream = new FileOutputStream(file);
+                if(princeXMLService.toPDF(lupaHtml, fileOutputStream, renderOptions)) {
+                    return ok();
+                } else {
+                    logger.error("Failed to generate Lupa with diaarinumero " + diaariNumero);
+                    return get500();
+                }
+            } else {
+                logger.error("No such Lupa with diaarinumero " + diaariNumero);
+                return notFound();
+            }
+        } catch (Exception e) {
+            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaariNumero, e);
+            return get500();
+        }
+    }
 
     @OivaAccess_Public
     @RequestMapping(value = "/muutospyyntoObjToPdf", method = PUT)
     @ResponseBody
     @ApiOperation(notes = "Tuottaa muutospyynnön PDF-muodossa", value = "")
-    public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto,
-                                  final HttpServletResponse response, final HttpServletRequest request) {
+    public void RenderMuutospyyntoPdf(@RequestBody Muutospyynto muutospyynto, final HttpServletResponse response, final HttpServletRequest request) {
 
         muutospyynto.setJarjestaja(organisaatioService.getWithLocation(muutospyynto.getJarjestajaOid()).get());
 
