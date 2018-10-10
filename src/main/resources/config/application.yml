@@ -86,6 +86,9 @@ templates:
 file.storage:
     base.path: /opt/oiva/filestorage
 
+support:
+    api.enabled: false
+
 logging:
     file: /var/log/oiva/oiva-backend.log
     level:

@@ -78,13 +78,12 @@ public class PrinceXMLController {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
-                final Lupa lupa = lupaOpt.get();
-                final Path lupaPath = Paths.get(fileStorageService.getLupaFilePath(lupa).orElseThrow(IllegalArgumentException::new));
+                final Path lupaPath = Paths.get(fileStorageService.getLupaFilePath(lupaOpt).orElseThrow(IllegalArgumentException::new));
                 if(Files.exists(lupaPath)) {
                     final ByteArrayResource lupaBar = new ByteArrayResource(Files.readAllBytes(lupaPath));
                     return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_PDF)
-                        .header("Content-Disposition", "inline; filename=" + lupa.getFileName())
+                        .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getFileName())
                         .contentLength(lupaBar.contentLength())
                         .body(lupaBar);
                 } else {
@@ -111,11 +110,10 @@ public class PrinceXMLController {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
-                final Lupa lupa = lupaOpt.get();
-                final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupa).orElseThrow(IllegalStateException::new);
-                final String lupaHtml = pebbleService.toHTML(lupa, renderOptions).orElseThrow(IllegalStateException::new);
+                final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
+                final String lupaHtml = pebbleService.toHTML(lupaOpt, renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(APPLICATION_PDF);
-                response.setHeader("Content-Disposition", "inline; filename=" + lupa.getFileName());
+                response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
                     response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
@@ -138,12 +136,8 @@ public class PrinceXMLController {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
-                final Lupa lupa = lupaOpt.get();
-                final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupa).orElseThrow(IllegalStateException::new);
-                final String lupaHtml = pebbleService.toHTML(lupa, renderOptions).orElseThrow(IllegalStateException::new);
-                final File file = fileStorageService.createLupaFile(lupa).orElseThrow(IllegalStateException::new);
-                final FileOutputStream fileOutputStream = new FileOutputStream(file);
-                if(princeXMLService.toPDF(lupaHtml, fileOutputStream, renderOptions)) {
+                final Optional<File> writtenFile = fileStorageService.writeLupaPDF(lupaOpt);
+                if(writtenFile.isPresent()) {
                     return ok();
                 } else {
                     logger.error("Failed to generate Lupa with diaarinumero " + diaariNumero);

@@ -21,9 +21,10 @@ public class LupaRenderService {
     @Autowired
     private LupaService lupaService;
 
-    public Optional<RenderOptions> getLupaRenderOptions(final Lupa lupa) {
-        if(null != lupa) {
+    public Optional<RenderOptions> getLupaRenderOptions(final Optional<Lupa> lupaOpt) {
+        if(lupaOpt.isPresent()) {
             try {
+                final Lupa lupa = lupaOpt.get();
                 final RenderOptions renderOptions = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
                 lupaService.getAttachments(lupa.getId()).stream().forEach(attachment ->
                     Optional.ofNullable(OivaTemplates.AttachmentType.convert(attachment.getTyyppi())).ifPresent(attachmentType ->
