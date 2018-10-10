@@ -59,7 +59,7 @@ public class FileStorageService {
 
     private Optional<File> createLupaFile(final Optional<Lupa> lupaOpt) {
         if(lupaOpt.isPresent()) {
-            final String filePath = getLupaFilePath(lupaOpt).get();
+            final String filePath = getLupaPDFFilePath(lupaOpt).get();
             final File file = new File(filePath);
             final File folder = file.getParentFile();
             if(folder.exists() || folder.mkdirs()) return Optional.ofNullable(file);
@@ -67,10 +67,10 @@ public class FileStorageService {
         } return Optional.empty();
     }
 
-    public Optional<String> getLupaFilePath(final Optional<Lupa> lupaOpt) {
+    public Optional<String> getLupaPDFFilePath(final Optional<Lupa> lupaOpt) {
         if(lupaOpt.isPresent()) {
             final Lupa lupa = lupaOpt.get();
-            return Optional.ofNullable(fileStorage.getFileStorageBasePath() + "/" + lupa.getFilePath() + "/" + lupa.getFileName());
+            return Optional.ofNullable(fileStorage.getLupaBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
         } else return Optional.empty();
     }
 

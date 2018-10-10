@@ -12,4 +12,8 @@ public class FileStorageConfig {
     public String getFileStorageBasePath() {
         return fileStorageBasePath;
     }
+
+    public String getLupaBasePath() {
+        return getFileStorageBasePath() + "/lupa";
+    }
 }

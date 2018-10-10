@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
 import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
 @RequestMapping(value = "${api.url.prefix}" + SupportController.path)
@@ -27,7 +27,7 @@ public class SupportController {
     private FileStorageService fileStorageService;
 
     @OivaAccess_Esittelija
-    @RequestMapping(value = "/tallenna/luvat", method = GET)
+    @RequestMapping(value = "/tallenna/luvat", method = PUT)
     @ApiOperation(notes = "Tuottaa ja tallentaa kaikki luvat PDF-muodossa", value = "", hidden = true)
     public ResponseEntity saveAllPDFs(final @RequestParam(value = "operation", required = false) String operation) {
         return supportApiEnabled ? ok(fileStorageService.writeAllLupaPDFs(operation)) : notFound();

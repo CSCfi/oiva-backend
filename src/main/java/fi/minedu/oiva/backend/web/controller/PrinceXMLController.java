@@ -26,7 +26,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,12 +77,12 @@ public class PrinceXMLController {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
             if(lupaOpt.isPresent()) {
-                final Path lupaPath = Paths.get(fileStorageService.getLupaFilePath(lupaOpt).orElseThrow(IllegalArgumentException::new));
+                final Path lupaPath = Paths.get(fileStorageService.getLupaPDFFilePath(lupaOpt).orElseThrow(IllegalArgumentException::new));
                 if(Files.exists(lupaPath)) {
                     final ByteArrayResource lupaBar = new ByteArrayResource(Files.readAllBytes(lupaPath));
                     return ResponseEntity.ok()
                         .contentType(MediaType.APPLICATION_PDF)
-                        .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getFileName())
+                        .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName())
                         .contentLength(lupaBar.contentLength())
                         .body(lupaBar);
                 } else {
@@ -113,7 +112,7 @@ public class PrinceXMLController {
                 final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt, renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(APPLICATION_PDF);
-                response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getFileName());
+                response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
                     response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
