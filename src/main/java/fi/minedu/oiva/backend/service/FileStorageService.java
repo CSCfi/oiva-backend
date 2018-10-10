@@ -61,9 +61,9 @@ public class FileStorageService {
         if(lupaOpt.isPresent()) {
             final String filePath = getLupaFilePath(lupaOpt).get();
             final File file = new File(filePath);
-            if(file.getParentFile().mkdirs()) {
-                return Optional.ofNullable(file);
-            } else logger.error("Failed to create file path: " + filePath);
+            final File folder = file.getParentFile();
+            if(folder.exists() || folder.mkdirs()) return Optional.ofNullable(file);
+            else logger.error("Failed to create file path: " + filePath);
         } return Optional.empty();
     }
 

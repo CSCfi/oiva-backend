@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.service.FileStorageService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class SupportController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @OivaAccess_Yllapitaja
+    @OivaAccess_Esittelija
     @RequestMapping(value = "/tallenna/luvat", method = GET)
     @ApiOperation(notes = "Tuottaa ja tallentaa kaikki luvat PDF-muodossa", value = "", hidden = true)
     public ResponseEntity saveAllPDFs(final @RequestParam(value = "operation", required = false) String operation) {
