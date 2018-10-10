@@ -103,7 +103,7 @@ public class PebbleService {
         context.put("template", template);
         context.put("output", options.getOutput().name());
         context.put("language", options.getLanguage().name());
-        context.put("states", options.getState().name());
+        context.put("state", options.getState().name());
         context.put("debug", options.isDebugMode());
         return context;
     }
