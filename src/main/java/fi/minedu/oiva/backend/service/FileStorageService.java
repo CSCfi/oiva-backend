@@ -70,7 +70,7 @@ public class FileStorageService {
     public Optional<String> getLupaPDFFilePath(final Optional<Lupa> lupaOpt) {
         if(lupaOpt.isPresent()) {
             final Lupa lupa = lupaOpt.get();
-            return Optional.ofNullable(fileStorage.getLupaBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
+            return Optional.ofNullable(fileStorage.getLuvatBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
         } else return Optional.empty();
     }
 
