@@ -21,7 +21,8 @@ public class OivaTemplates {
         tutkintoNimenMuutos,
         paatosKirje,
         hallintolakiKorjaus2017,
-        hallintolakiKorjaus2017v2;
+        hallintolakiKorjaus2017v2,
+        korjaukset2018;
 
         public static AttachmentType convert(String str) {
             for (AttachmentType attachmentType : AttachmentType.values()) {

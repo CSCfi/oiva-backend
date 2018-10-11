@@ -99,7 +99,8 @@ public class PrinceXMLController {
         }
     }
 
-    @OivaAccess_Esittelija
+   // @OivaAccess_Esittelija
+    @OivaAccess_Public
     @RequestMapping(value = "/esikatsele/{diaarinumero}/**", method = GET)
     @Produces({ PrinceXMLController.APPLICATION_PDF })
     @ResponseBody
