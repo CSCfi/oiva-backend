@@ -46,19 +46,22 @@ public class PebbleService {
         }
     }
 
-    public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
+    public Optional<String> toHTML(final Optional<Lupa> lupaOpt, final RenderOptions options) {
+        if(lupaOpt.isPresent()) {
+            final Lupa lupa = lupaOpt.get();
 
-        // Tulostetaan lupatilan mukainen esitysmalli
-        // HUOM! Toistaiseksi käytössä vain yksi malli, joka on paatos tilasta riippumatta
+            // Tulostetaan lupatilan mukainen esitysmalli
+            // HUOM! Toistaiseksi käytössä vain yksi malli, joka on paatos tilasta riippumatta
 
-        final LupatilaValue lupaTila = lupa.lupatila().getTunniste();
-        if(lupaTila == LupatilaValue.LUONNOS) options.setTemplateName("paatos/base");
-        if(lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
-        if(lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
-        if(lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
-        options.setTemplateName("paatos/base");
+            final LupatilaValue lupaTila = lupa.lupatila().getTunniste();
+            if (lupaTila == LupatilaValue.LUONNOS) options.setTemplateName("paatos/base");
+            if (lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
+            if (lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
+            if (lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
+            options.setTemplateName("paatos/base");
 
-        return generateHtml(lupa, options);
+            return generateHtml(lupa, options);
+        } else return Optional.empty();
     }
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {

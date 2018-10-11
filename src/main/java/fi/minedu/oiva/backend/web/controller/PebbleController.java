@@ -51,7 +51,7 @@ public class PebbleController {
         try {
             final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, With.all).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
-            return getOr404(service.toHTML(lupa, options));
+            return getOr404(service.toHTML(Optional.ofNullable(lupa), options));
 
         } catch (Exception e) {
             logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaariNumero, e);
