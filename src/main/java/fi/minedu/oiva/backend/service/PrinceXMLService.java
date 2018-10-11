@@ -47,12 +47,17 @@ public class PrinceXMLService {
         try {
             final PDFMergerUtility merger = new PDFMergerUtility();
 
+            // 4.10.2018 tulleet korjaukset
+            if(options.hasAttachment(AttachmentType.korjaukset2018)) {
+                merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.korjaukset2018).getPath());
+            }
+
             // 21.12.2017 tulleet hallintolakiin liittyvät korjaukset
             if(options.hasAttachment(AttachmentType.hallintolakiKorjaus2017v2)) {
                 merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017v2).getPath());
             }
 
-            // 1z2.12.2017 tulleet hallintolakiin liittyvät korjaukset
+            // 12.12.2017 tulleet hallintolakiin liittyvät korjaukset
             if(options.hasAttachment(AttachmentType.hallintolakiKorjaus2017)) {
                 merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017).getPath());
             }
