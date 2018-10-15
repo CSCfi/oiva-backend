@@ -81,10 +81,10 @@ prince:
     exec.path: /usr/bin/prince
 
 templates:
-    base.path: /opt/oiva/backend/templates
+    base.path: /opt/oiva/template
 
 file.storage:
-    base.path: /opt/oiva/filestorage
+    base.path: /opt/oiva/files
 
 support:
     api.enabled: false

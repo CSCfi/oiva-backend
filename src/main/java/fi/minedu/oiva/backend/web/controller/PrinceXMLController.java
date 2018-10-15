@@ -98,9 +98,8 @@ public class PrinceXMLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-   // @OivaAccess_Esittelija
-    @OivaAccess_Public
+    
+    @OivaAccess_Public // TODO: MAKE THIS @OivaAccess_Esittelija WHEN PDF READ IS FINISHED
     @RequestMapping(value = "/esikatsele/{diaarinumero}/**", method = GET)
     @Produces({ PrinceXMLController.APPLICATION_PDF })
     @ResponseBody

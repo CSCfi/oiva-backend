@@ -13,7 +13,11 @@ public class FileStorageConfig {
         return fileStorageBasePath;
     }
 
-    public String getLupaBasePath() {
-        return getFileStorageBasePath() + "/lupa";
+    public String getLuvatBasePath() {
+        return getFileStorageBasePath() + "/luvat";
+    }
+
+    public String getHakemuksetBasePath() {
+        return getFileStorageBasePath() + "/hakemukset";
     }
 }
