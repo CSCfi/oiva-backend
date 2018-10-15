@@ -1,14 +1,13 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.entity.Muutos;
+import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.entity.oiva.Muutos;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 
 import fi.minedu.oiva.backend.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +32,7 @@ import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotil
 @RequestMapping(
         value = "${api.url.prefix}" + MuutospyyntoController.path,
         produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Muutospyyntöjen hallinta")
 public class MuutospyyntoController {
 
     @Value("${templates.base.path}")

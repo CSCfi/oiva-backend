@@ -1,12 +1,15 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.*;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.*;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller
 @RequestMapping(value = "${api.url.prefix}" + PrinceXMLController.path)
+@Api(description = "Tietojen esittäminen PDF-muodossa")
 public class PrinceXMLController {
 
     private static final Logger logger = LoggerFactory.getLogger(PrinceXMLController.class);

@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.OivaTemplates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

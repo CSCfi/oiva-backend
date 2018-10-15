@@ -1,10 +1,12 @@
 package fi.minedu.oiva.backend.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import fi.minedu.oiva.backend.entity.*;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
+import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
+import fi.minedu.oiva.backend.entity.oiva.Muutos;
+import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
-import fi.minedu.oiva.backend.security.SecurityUtil;
 import fi.minedu.oiva.backend.util.ValidationUtils;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;

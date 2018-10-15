@@ -1,11 +1,11 @@
-package fi.minedu.oiva.backend.entity
+package fi.minedu.oiva.backend.entity.oiva
 
-import java.util.Collection
-import java.util.ArrayList
+import java.util.{ArrayList, Collection}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
-import fi.minedu.oiva.backend.entity.opintopolku.{KoodistoKoodi}
+import fi.minedu.oiva.backend.entity.MaaraystyyppiValue
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi
 import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)

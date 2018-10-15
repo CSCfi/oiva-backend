@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.template.extension;
 
-import fi.minedu.oiva.backend.entity.Lupa;
-import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import org.slf4j.Logger;

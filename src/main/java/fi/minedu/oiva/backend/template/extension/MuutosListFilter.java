@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.template.extension;
 
-import fi.minedu.oiva.backend.entity.Muutos;
+import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;

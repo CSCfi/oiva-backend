@@ -6,8 +6,6 @@ import javax.annotation.PostConstruct
 
 import fi.minedu.oiva.backend.cache.CacheAware
 import fi.minedu.oiva.backend.cas.CASClient
-import fi.minedu.oiva.backend.entity.Maarays
-import fi.minedu.oiva.backend.entity.Muutos
 import fi.minedu.oiva.backend.entity.json.ObjectMapperSingleton
 import fi.minedu.oiva.backend.entity.opintopolku._
 
@@ -15,6 +13,7 @@ import scala.collection.JavaConversions._
 import com.fasterxml.jackson.core.`type`.TypeReference
 import dispatch.Defaults._
 import dispatch._
+import fi.minedu.oiva.backend.entity.oiva.{Maarays, Muutos}
 import org.glassfish.jersey.client.rx.RxClient
 import org.glassfish.jersey.client.rx.java8.RxCompletionStageInvoker
 import org.springframework.beans.factory.annotation.{Autowired, Value}

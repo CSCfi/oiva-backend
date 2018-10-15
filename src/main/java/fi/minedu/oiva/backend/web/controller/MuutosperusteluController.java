@@ -1,33 +1,21 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Muutospyynto;
-import fi.minedu.oiva.backend.jooq.tables.pojos.Muutos;
-
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.MuutospyyntoService;
-import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController
 @RequestMapping(
         value = "${api.url.prefix}" + MuutosperusteluController.path,
         produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Muutosperustelujen hallinta")
 public class MuutosperusteluController {
 
     @Value("${templates.base.path}")
