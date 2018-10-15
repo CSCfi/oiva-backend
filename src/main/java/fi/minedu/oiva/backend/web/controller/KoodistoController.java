@@ -7,6 +7,7 @@ import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.KoodistoService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + KoodistoController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Opintopolun koodistot")
 public class KoodistoController {
 
     public static final String path = "/koodistot";

@@ -1,4 +1,4 @@
-package fi.minedu.oiva.backend.entity
+package fi.minedu.oiva.backend.entity.oiva
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}

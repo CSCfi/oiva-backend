@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.template.extension;
 
-import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;

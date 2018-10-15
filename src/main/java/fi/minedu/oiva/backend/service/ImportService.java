@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Lupa;
-import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.records.LupaRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MaaraysRecord;
 import org.jooq.DSLContext;

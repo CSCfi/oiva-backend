@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 
-import fi.minedu.oiva.backend.entity.Lupahistoria;
+import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

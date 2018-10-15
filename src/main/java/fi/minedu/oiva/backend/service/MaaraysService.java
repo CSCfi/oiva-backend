@@ -1,8 +1,8 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Kohde;
-import fi.minedu.oiva.backend.entity.Maarays;
-import fi.minedu.oiva.backend.entity.Maaraystyyppi;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.util.With;
 import org.apache.commons.lang3.StringUtils;

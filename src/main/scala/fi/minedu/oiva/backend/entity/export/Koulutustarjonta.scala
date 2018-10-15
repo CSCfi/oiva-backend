@@ -5,7 +5,7 @@ import java.util.Collection
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
-import fi.minedu.oiva.backend.entity.Maarays
+import fi.minedu.oiva.backend.entity.oiva.Maarays
 
 import scala.beans.BeanProperty
 

@@ -3,9 +3,10 @@ package fi.minedu.oiva.backend.web.controller;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.PebbleService;
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller
 @RequestMapping(value = "${api.url.prefix}" + PebbleController.path)
+@Api(description = "Tietojen esittäminen HTML-muodossa")
 public class PebbleController {
 
     private static final Logger logger = LoggerFactory.getLogger(PebbleController.class);

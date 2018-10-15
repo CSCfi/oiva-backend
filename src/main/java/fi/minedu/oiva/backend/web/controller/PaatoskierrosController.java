@@ -1,9 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Paatoskierros;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.PaatoskierrosService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + PaatoskierrosController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Päätöskierrosten hallinta")
 public class PaatoskierrosController {
 
     public static final String path = "/paatoskierrokset";

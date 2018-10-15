@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.HealthService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import static fi.minedu.oiva.backend.util.ControllerUtil.getHealthCheckStatus;
 
 @RestController
 @RequestMapping(value = "${api.url.prefix}" + HealthController.path)
+@Api(description = "Palvelun tilatarkastukset")
 public class HealthController {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthController.class);
