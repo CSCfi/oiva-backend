@@ -1,12 +1,11 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
 import fi.minedu.oiva.backend.entity.export.Koulutustarjonta;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.ExportService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + ExportController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Tietojen ulosvienti")
 public class ExportController {
 
     public static final String path = "/export";

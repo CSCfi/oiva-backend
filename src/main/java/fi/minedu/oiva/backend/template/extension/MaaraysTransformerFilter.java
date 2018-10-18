@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.template.extension;
 
-import fi.minedu.oiva.backend.entity.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

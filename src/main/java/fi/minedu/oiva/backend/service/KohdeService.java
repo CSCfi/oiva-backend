@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Kohde;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
 import org.apache.commons.lang.StringUtils;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,20 +1,21 @@
-package fi.minedu.oiva.backend.entity
+package fi.minedu.oiva.backend.entity.oiva
 
 import java.util.{ArrayList, Collection}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
+import fi.minedu.oiva.backend.entity.MaaraystyyppiValue
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi
 import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Muutos(    var kohde: Kohde,
-                 var koodi: KoodistoKoodi,
-                 var ylaKoodit: Array[KoodistoKoodi],
-                 var maaraystyyppi: Maaraystyyppi,
-                 var aliMaaraykset: Collection[Muutos],
-                 var muutos: Muutos) extends fi.minedu.oiva.backend.jooq.tables.pojos.Muutos  {
+class Muutos(var kohde: Kohde,
+             var koodi: KoodistoKoodi,
+             var ylaKoodit: Array[KoodistoKoodi],
+             var maaraystyyppi: Maaraystyyppi,
+             var aliMaaraykset: Collection[Muutos],
+             var muutos: Muutos) extends fi.minedu.oiva.backend.jooq.tables.pojos.Muutos  {
 
   def this() = this(null,null,null,null,null,null)
 

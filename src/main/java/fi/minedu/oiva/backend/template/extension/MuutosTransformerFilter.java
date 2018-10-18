@@ -1,8 +1,7 @@
 package fi.minedu.oiva.backend.template.extension;
 
-import fi.minedu.oiva.backend.entity.Muutos;
+import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +11,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 public class MuutosTransformerFilter extends OivaFilter {
 

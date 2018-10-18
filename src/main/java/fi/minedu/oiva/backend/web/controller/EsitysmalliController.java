@@ -1,8 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Esitysmalli;
+import fi.minedu.oiva.backend.entity.oiva.Esitysmalli;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.service.EsitysmalliService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + EsitysmalliController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Esitysmallien hallinta")
 public class EsitysmalliController {
 
     public static final String path = "/esitysmallit";

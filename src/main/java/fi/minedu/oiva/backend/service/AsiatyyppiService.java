@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Asiatyyppi;
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Asiatyyppi;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectJoinStep;

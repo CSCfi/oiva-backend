@@ -1,18 +1,15 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Lupa;
-import fi.minedu.oiva.backend.entity.opintopolku.Kunta;
-import fi.minedu.oiva.backend.entity.opintopolku.Maakunta;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
-import fi.minedu.oiva.backend.entity.Lupahistoria;
+import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
 
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.LupahistoriaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +32,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + LupaController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Lupien hallinta")
 public class LupaController {
 
     @Value("${templates.base.path}")

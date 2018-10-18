@@ -1,4 +1,4 @@
-package fi.minedu.oiva.backend.entity
+package fi.minedu.oiva.backend.entity.oiva
 
 import java.util.{Collection, Optional}
 

@@ -4,6 +4,7 @@ import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
 import fi.minedu.oiva.backend.service.CacheService;
 import fi.minedu.oiva.backend.util.RequestUtils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 @RequestMapping(
     value = "${api.url.prefix}" + CacheController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Välimuistin hallinta")
 public class CacheController {
 
     public static final String path = "/cache";

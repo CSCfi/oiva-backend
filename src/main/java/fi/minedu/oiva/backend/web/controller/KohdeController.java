@@ -1,9 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.Kohde;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.KohdeService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -20,6 +20,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(
     value = "${api.url.prefix}" + KohdeController.path,
     produces = { MediaType.APPLICATION_JSON_VALUE })
+@Api(description = "Kohteiden hallinta")
 public class KohdeController {
 
     public static final String path = "/kohteet";

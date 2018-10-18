@@ -1,10 +1,10 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.Kohde;
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
-import fi.minedu.oiva.backend.entity.Maarays;
-import fi.minedu.oiva.backend.entity.Maaraystyyppi;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.MaaraystyyppiValue;
 import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
 import fi.minedu.oiva.backend.entity.export.Koulutustarjonta;

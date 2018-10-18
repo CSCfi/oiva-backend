@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.config.FileStorageConfig;
-import fi.minedu.oiva.backend.entity.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.OivaTemplates;
 import fi.minedu.oiva.backend.util.ExecutorContext;
 import fi.minedu.oiva.backend.util.With;
@@ -70,7 +70,7 @@ public class FileStorageService {
     public Optional<String> getLupaPDFFilePath(final Optional<Lupa> lupaOpt) {
         if(lupaOpt.isPresent()) {
             final Lupa lupa = lupaOpt.get();
-            return Optional.ofNullable(fileStorage.getLupaBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
+            return Optional.ofNullable(fileStorage.getLuvatBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
         } else return Optional.empty();
     }
 
@@ -78,13 +78,14 @@ public class FileStorageService {
      * Support service
      */
     public Collection<String> writeAllLupaPDFs(final String operation) {
+        final String executorName = "Executor " + writeAllPDFs;
         final Optional<ExecutorContext> existingExecutorContext = asyncService.getContext(writeAllPDFs);
         if(StringUtils.equalsIgnoreCase(operation, "terminate")) {
             if(existingExecutorContext.isPresent()) {
                 asyncService.terminate(writeAllPDFs);
-                return Collections.singleton("Executor termination requested");
+                return Collections.singleton(executorName + " termination requested");
             } else {
-                return Collections.singleton("Executor does not exist");
+                return Collections.singleton(executorName + "does not exist");
             }
         } else {
             final Function<Lupa,Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), With.all);
@@ -93,7 +94,7 @@ public class FileStorageService {
                 return existingExecutorContext.get().reversedStates();
             } else if(StringUtils.equalsIgnoreCase(operation, "start")) {
                 logger.info("Starting to write all Lupa PDFs, it will take awhile");
-                final ExecutorContext executorContext = asyncService.create(writeAllPDFs, "Executor process started").execute(() -> {
+                final ExecutorContext executorContext = asyncService.create(writeAllPDFs, executorName + "process started").execute(() -> {
                     final long startTime = System.currentTimeMillis();
                     lupaService.getAll().stream().parallel().map(toLupa::apply).forEach(lupaOpt -> {
                         final String diaariNumero = lupaOpt.get().getDiaarinumero();
@@ -114,11 +115,11 @@ public class FileStorageService {
                         }
                     });
                     final long duration = System.currentTimeMillis() - startTime;
-                    addExecutorState.accept("Executor process finished in " + duration + "ms");
+                    addExecutorState.accept(executorName + " process finished in " + duration + "ms");
                     logger.info("Lupa PDF writing finished in {}ms", duration);
                 });
                 return executorContext.reversedStates();
-            } else return Collections.singleton("Executor does not exist");
+            } else return Collections.singleton(executorName + " does not exist");
         }
     }
 }
