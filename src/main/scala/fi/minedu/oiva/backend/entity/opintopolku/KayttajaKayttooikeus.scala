@@ -48,7 +48,7 @@ case class OrganisaatioKayttooikeus(
     def this() = this(null, null)
 
     @JsonIgnore def getOivaOikeudet = if(null == kayttooikeudet) Nil else {
-        val oikeudet = if(null == kayttooikeudet) Nil else kayttooikeudet.filter(_.isOivaOikeus).map(_.oivaOikeus)
+        val oikeudet = kayttooikeudet.filter(_.isOivaOikeus).map(_.oivaOikeus)
         oikeudet ++ (if(StringUtils.isNotBlank(organisaatioOid)) oikeudet.map(_ + "_" + organisaatioOid) else Nil)
     }
 }
