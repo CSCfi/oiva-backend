@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.FileStorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class SupportController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @OivaAccess_Yllapitaja
+    @OivaAccess_Public // TODO: MAKE THIS AVAIALBLE FOR @OivaAccess_Yllapitaja AFTERWARDS
     @RequestMapping(value = "/tallenna/luvat", method = PUT)
     @ApiOperation(notes = "Tuottaa ja tallentaa kaikki luvat PDF-muodossa", value = "", authorizations = @Authorization(value = "CAS"))
     public ResponseEntity saveAllPDFs(final HttpServletRequest request,
