@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 /*
  * OIVA_APP
- * OIVA_APP_YLLAPITAJA
+ * OIVA_APP_ADMIN
  * OIVA_APP_ESITTELIJA
  * OIVA_APP_KAYTTAJA
  * OIVA_APP_KAYTTAJA_111.222.333
@@ -21,7 +21,7 @@ public interface OivaAccess {
     Pattern Format_Role = Pattern.compile("^([A-Za-z_]+)(?:_((?:\\d+\\.?)+)?)?$");
 
     String Context_Oiva = "OIVA_APP";
-    String Context_Yllapitaja = "YLLAPITAJA";
+    String Context_Yllapitaja = "ADMIN";
     String Context_Esittelija = "ESITTELIJA";
     String Context_Kayttaja = "KAYTTAJA";
 
