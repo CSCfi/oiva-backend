@@ -118,7 +118,7 @@ Tietokannan ajantasaisuudesta vastaa Flyway-migraatiotyökalu.
 
 ### Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
 
-Maven Flyway plugin vie migraatioista löytyvät tietokantarakenteet (aluksi: ``resources/db/migration/V1__init.sql``) 
+Maven Flyway plugin vie migraatioista löytyvät tietokantarakenteet (aluksi: ``resources/db/migration/V1__Baseline.sql``) 
 käännöksen yhteydessä tietokantaan jos Mavenin generate-db -profiili enabloidaan.
 
 Projektissa käytössä oleva JOOQ generoi suoraan tietokannasta käytettäviä DAO- ja entiteettiluokkia. Jos 
