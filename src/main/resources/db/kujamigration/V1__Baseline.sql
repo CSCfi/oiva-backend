@@ -4,6 +4,9 @@ set search_path = kuja, pg_catalog;
 DROP SCHEMA IF EXISTS kuja CASCADE;
 CREATE SCHEMA kuja AUTHORIZATION kuja;
 
+-- uuid
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- sequence to automate diaarinumero
 CREATE SEQUENCE diaarinumero_seq;
 
