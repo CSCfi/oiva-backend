@@ -1,19 +1,32 @@
 version: "3"
 services:
-    backend:
+    amos-backend:
         build:
             context: .
-            dockerfile: ./Dockerfile-backend
+            dockerfile: ./Dockerfile-amos-backend
         ports:
             - "9099:8099"
         volumes:
             - ../oiva-template:/opt/oiva/template
         depends_on:
-            - "postgres"
-            - "redis"
+            - "amos-postgres"
+            - "amos-redis"
         networks:
             - vpnsafe
-    postgres:
+    yva-backend:
+        build:
+            context: .
+            dockerfile: ./Dockerfile-yva-backend
+        ports:
+            - "9100:8099"
+        volumes:
+            - ../oiva-template:/opt/oiva/template
+        depends_on:
+            - "yva-postgres"
+            - "yva-redis"
+        networks:
+            - vpnsafe
+    amos-postgres:
         image: postgres:9.6
         ports:
             - "6432:5432"
@@ -23,10 +36,26 @@ services:
             POSTGRES_DB: oiva
         networks:
             - vpnsafe
-    redis:
+    yva-postgres:
+        image: postgres:9.6
+        ports:
+            - "7432:5432"
+        environment:
+            POSTGRES_USER: kuja
+            POSTGRES_PASSWORD: kuja
+            POSTGRES_DB: kuja
+        networks:
+            - vpnsafe
+    amos-redis:
         image: redis
         ports:
             - "7379:6379"
+        networks:
+            - vpnsafe
+    yva-redis:
+        image: redis
+        ports:
+            - "8379:6379"
         networks:
             - vpnsafe
     nginx:

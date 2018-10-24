@@ -1,6 +1,6 @@
-application-dev.yml
-application-template.yml
-application-test.yml
+**/application-dev.yml
+**/application-template.yml
+**/application-test.yml
 
 target/*
 target
