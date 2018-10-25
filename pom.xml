@@ -12,7 +12,7 @@
     <name>Backend</name>
     <groupId>fi.minedu.oiva</groupId>
     <artifactId>oiva-backend</artifactId>
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.9.0</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -81,14 +81,6 @@
             <url>http://repo.comphenix.net/content/groups/public</url>
         </pluginRepository>
     </pluginRepositories>
-
-    <modules>
-        <module>oiva-core</module>
-        <module>amos-model</module>
-        <module>yva-model</module>
-        <module>amos-backend</module>
-        <module>yva-backend</module>
-    </modules>
 
     <build>
 	    <pluginManagement>
@@ -204,6 +196,40 @@
             	</plugin>
 	    	</plugins>
 	    </pluginManagement>
+<!--         <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <execution>             
+                  <id>copy-artifact</id>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>copy</goal>
+                  </goals>
+                  <configuration>
+                    <artifactItems>
+                        <artifactItem>
+                          <groupId>fi.minedu.oiva</groupId>
+                          <artifactId>amos-backend</artifactId>
+                          <version>1.9.0</version>
+                          <type>jar</type>
+                          <destFileName>oiva-backend.jar</destFileName>
+                        </artifactItem>
+                        <artifactItem>
+                          <groupId>fi.minedu.oiva</groupId>
+                          <artifactId>yva-backend</artifactId>
+                          <version>1.9.0</version>
+                          <type>jar</type>
+                          <destFileName>kuja-backend.jar</destFileName>
+                        </artifactItem>
+                    </artifactItems>
+                    <outputDirectory>target</outputDirectory>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+        </plugins> -->
    </build>
 
     <dependencyManagement>
@@ -237,4 +263,36 @@
 	        </dependency>
     	</dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>oiva-core</module>
+                <module>amos-model</module>
+                <module>yva-model</module>
+                <module>amos-backend</module>
+                <module>yva-backend</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>amos</id>
+            <modules>
+                <module>oiva-core</module>
+                <module>amos-model</module>
+                <module>amos-backend</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>yva</id>
+            <modules>
+                <module>oiva-core</module>
+                <module>yva-model</module>
+                <module>yva-backend</module>
+            </modules>
+        </profile>
+  </profiles>
 </project>
