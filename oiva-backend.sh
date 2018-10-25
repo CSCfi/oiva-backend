@@ -23,6 +23,7 @@ function showHelp() {
     echo -e "-l        Use local database"
     echo -e ""
     echo -e "ARGS options:"
+    echo -e "-b        Build dependency modules"
     echo -e "-d        Use Java remote debug"
     echo -e "-r        Use JRebel"
     echo -e "-o        Use maven offline mode"
@@ -43,11 +44,17 @@ if [[ $envArg == "amos" ]]; then
     OIVA_BACKEND_NAME="oiva-backend"
     POSTGRES_PORT=6432
     REDIS_PORT=7379
+    if [[ $optionsArg == *"-b"* ]]; then
+        mvn clean install -Pamos
+    fi
     cd amos-backend
 elif [[ $envArg == "yva" ]]; then
     OIVA_BACKEND_NAME="kuja-backend"
     POSTGRES_PORT=7432
     REDIS_PORT=8379
+    if [[ $optionsArg == *"-b"* ]]; then
+        mvn clean install -Pyva
+    fi
     cd yva-backend
 else
     abort

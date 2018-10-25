@@ -65,7 +65,9 @@ case class Kayttooikeus(
     @JsonIgnore def oivaOikeus = oikeus match {
         case OivaAccess.Context_Yllapitaja => OivaAccess.Role_Yllapitaja
         case OivaAccess.Context_Esittelija => OivaAccess.Role_Esittelija
+        case OivaAccess.Context_Nimenkirjoittaja => OivaAccess.Role_Nimenkirjoittaja
         case OivaAccess.Context_Kayttaja => OivaAccess.Role_Kayttaja
+        case OivaAccess.Context_Katselija => OivaAccess.Role_Katselija
         case _ => ""
     }
 }

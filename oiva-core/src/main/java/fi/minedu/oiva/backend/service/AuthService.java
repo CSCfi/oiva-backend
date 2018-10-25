@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Function;
 
 import static fi.minedu.oiva.backend.util.CollectionUtils.mapOf;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -23,14 +24,20 @@ public class AuthService {
     }
 
     public OivaPermission lupaAccessPermission() {
+        final Function<String, OivaPermission> organizationBasedAccess = role -> {
+            final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
+            SecurityUtil.roleOids(role).stream().forEach(access.oids::add);
+            return access;
+        };
+
         if(hasAnyRole(OivaAccess.Role_Esittelija)) {
             return new OivaPermission(Type.All);
-
+        } else if(hasAnyRole(OivaAccess.Role_Nimenkirjoittaja)) {
+            return organizationBasedAccess.apply(OivaAccess.Role_Nimenkirjoittaja);
         } else if(hasAnyRole(OivaAccess.Role_Kayttaja)) {
-            final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
-            SecurityUtil.roleOids(OivaAccess.Role_Kayttaja).stream().forEach(access.oids::add);
-            return access;
-
+            return organizationBasedAccess.apply(OivaAccess.Role_Kayttaja);
+        } else if(hasAnyRole(OivaAccess.Role_Katselija)) {
+            return organizationBasedAccess.apply(OivaAccess.Role_Katselija);
         } else {
             return new OivaPermission(Type.OnlyPublic);
         }
