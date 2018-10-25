@@ -6,328 +6,331 @@
         <groupId>fi.minedu.oiva</groupId>
         <artifactId>oiva-backend</artifactId>
         <version>1.9.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>Amos Model</name>
-    <artifactId>amos-model</artifactId>
     <groupId>fi.minedu.oiva</groupId>
+    <artifactId>amos-model</artifactId>
     <version>1.9.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-commons</artifactId>
-            <version>${spring.data.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>1.8.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-web</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.data</groupId>-->
+            <!--<artifactId>spring-data-commons</artifactId>-->
+            <!--<version>${spring.data.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.aspectj</groupId>-->
+            <!--<artifactId>aspectjweaver</artifactId>-->
+            <!--<version>1.8.5</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
             <artifactId>oiva-core</artifactId>
-            <version>1.9.0</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
+            <!--<version>1.9.0</version>-->
+            <!--<scope>compile</scope>-->
         </dependency>
 
         <!-- security dependencies -->
-        <dependency>
-            <groupId>org.springframework.session</groupId>
-            <artifactId>spring-session</artifactId>
-            <version>${spring.session.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-cas</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jasig.cas.client</groupId>
-            <artifactId>cas-client-core</artifactId>
-            <version>${cas.client.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.javacrumbs.future-converter</groupId>
-            <artifactId>future-converter-spring-java8</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.dozer</groupId>
-            <artifactId>dozer</artifactId>
-            <version>5.5.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.session</groupId>-->
+            <!--<artifactId>spring-session</artifactId>-->
+            <!--<version>${spring.session.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-security</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.security</groupId>-->
+            <!--<artifactId>spring-security-cas</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jasig.cas.client</groupId>-->
+            <!--<artifactId>cas-client-core</artifactId>-->
+            <!--<version>${cas.client.version}</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>net.javacrumbs.future-converter</groupId>-->
+            <!--<artifactId>future-converter-spring-java8</artifactId>-->
+            <!--<version>0.1.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>net.sf.dozer</groupId>-->
+            <!--<artifactId>dozer</artifactId>-->
+            <!--<version>5.5.1</version>-->
+        <!--</dependency>-->
 
         <!-- PDF report crunching .... NOTE THIS REQUIRES INSTALLATION OF LOCAL DEPENDENCIES !!!-->
         <!-- run install-prince.sh in the root -->
-        <dependency>
-            <groupId>com.princexml</groupId>
-            <artifactId>prince-java</artifactId>
-            <version>9</version>
-        </dependency>
-        <dependency>
-            <groupId>com.mitchellbosecke</groupId>
-            <artifactId>pebble-spring4</artifactId>
-            <version>${pebble.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>1.8.10</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.princexml</groupId>-->
+            <!--<artifactId>prince-java</artifactId>-->
+            <!--<version>9</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.mitchellbosecke</groupId>-->
+            <!--<artifactId>pebble-spring4</artifactId>-->
+            <!--<version>${pebble.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.pdfbox</groupId>-->
+            <!--<artifactId>pdfbox</artifactId>-->
+            <!--<version>1.8.10</version>-->
+        <!--</dependency>-->
 
-        <!-- database dependencies -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jdbc</artifactId>
-        </dependency>
+        <!--&lt;!&ndash; database dependencies &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-jdbc</artifactId>-->
+        <!--</dependency>-->
 
-        <!-- need Transient annotation -->
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <!--&lt;!&ndash; need Transient annotation &ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>javax.persistence</groupId>-->
+            <!--<artifactId>persistence-api</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
 
         <!--spring-boot-starter-redis needs velocity(??)-->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity</artifactId>
-            <version>1.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <version>${spring.data.redis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>${spring-boot-starter.data.redis.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.velocity</groupId>-->
+            <!--<artifactId>velocity</artifactId>-->
+            <!--<version>1.7</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.data</groupId>-->
+            <!--<artifactId>spring-data-redis</artifactId>-->
+            <!--<version>${spring.data.redis.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-data-redis</artifactId>-->
+            <!--<version>${spring-boot-starter.data.redis.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>${postgres.driver.version}</version>
+            <scope>provided</scope>
+            <!--<version>${postgres.driver.version}</version>-->
         </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq</artifactId>
-            <version>${org.jooq.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.modelmapper.extensions</groupId>
-            <artifactId>modelmapper-jooq</artifactId>
-            <version>${model.mapper.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jooq</groupId>-->
+            <!--<artifactId>jooq</artifactId>-->
+            <!--<version>${org.jooq.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.modelmapper.extensions</groupId>-->
+            <!--<artifactId>modelmapper-jooq</artifactId>-->
+            <!--<version>${model.mapper.version}</version>-->
+        <!--</dependency>-->
 
         <!-- helpers to process JSON, how many do we need? (3 already) -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20140107</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.google.code.gson</groupId>-->
+            <!--<artifactId>gson</artifactId>-->
+            <!--<version>${gson.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.json</groupId>-->
+            <!--<artifactId>json</artifactId>-->
+            <!--<version>20140107</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.httpcomponents</groupId>-->
+            <!--<artifactId>httpclient</artifactId>-->
+            <!--<version>4.3.5</version>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>org.glassfish.jersey.ext.rx</groupId>
-            <artifactId>jersey-rx-client-java8</artifactId>
-            <version>${jersey.client.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.client.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.glassfish.jersey.ext.rx</groupId>-->
+            <!--<artifactId>jersey-rx-client-java8</artifactId>-->
+            <!--<version>${jersey.client.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.glassfish.jersey.media</groupId>-->
+            <!--<artifactId>jersey-media-json-jackson</artifactId>-->
+            <!--<version>${jersey.client.version}</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                    <!--<artifactId>jackson-annotations</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${HikariCP.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.zaxxer</groupId>-->
+            <!--<artifactId>HikariCP</artifactId>-->
+            <!--<version>${HikariCP.version}</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.flywaydb</groupId>-->
+            <!--<artifactId>flyway-core</artifactId>-->
+            <!--<version>${flyway.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>io.springfox</groupId>-->
+            <!--<artifactId>springfox-swagger2</artifactId>-->
+            <!--<version>${swagger.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>io.springfox</groupId>-->
+            <!--<artifactId>springfox-swagger-ui</artifactId>-->
+            <!--<version>${swagger.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.commons</groupId>-->
+            <!--<artifactId>commons-lang3</artifactId>-->
+            <!--<version>3.5</version>-->
+        <!--</dependency>-->
         <!-- For file meta data and content type extraction -->
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-core</artifactId>
-            <version>${tika.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
-            <version>${tika.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.apache.tika</groupId>-->
+            <!--<artifactId>tika-core</artifactId>-->
+            <!--<version>${tika.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.tika</groupId>-->
+            <!--<artifactId>tika-parsers</artifactId>-->
+            <!--<version>${tika.version}</version>-->
+        <!--</dependency>-->
 
         <!-- helpers for better Java 8 -->
-        <dependency>
-            <groupId>com.javaslang</groupId>
-            <artifactId>javaslang</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jool</artifactId>
-            <version>0.9.12</version>
-        </dependency>
-        <dependency>
-            <groupId>com.aol.cyclops</groupId>
-            <artifactId>cyclops-pattern-matching</artifactId>
-            <version>7.3.1</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.javaslang</groupId>-->
+            <!--<artifactId>javaslang</artifactId>-->
+            <!--<version>1.2.3</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jooq</groupId>-->
+            <!--<artifactId>jool</artifactId>-->
+            <!--<version>0.9.12</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.aol.cyclops</groupId>-->
+            <!--<artifactId>cyclops-pattern-matching</artifactId>-->
+            <!--<version>7.3.1</version>-->
+        <!--</dependency>-->
 
         <!-- scala -->
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.scala-lang</groupId>-->
+            <!--<artifactId>scala-library</artifactId>-->
+            <!--<version>${scala.version}</version>-->
+        <!--</dependency>-->
 
         <!-- testing -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <version>${spring-security.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.security</groupId>-->
+            <!--<artifactId>spring-security-test</artifactId>-->
+            <!--<version>${spring-security.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.11</artifactId>
-            <version>${scalatest.version}</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-            </exclusions>
+            <!--<version>${scalatest.version}</version>-->
+            <!--<scope>test</scope>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.scala-lang</groupId>-->
+                    <!--<artifactId>scala-library</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.0.5-beta</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-scala_2.11</artifactId>
-            <version>2.4.5</version>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.fasterxml.jackson.core</groupId>
-                    <artifactId>jackson-annotations</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jsonSchema</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path-assert</artifactId>
-            <version>2.0.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.databinder.dispatch</groupId>
-            <artifactId>dispatch-core_2.11</artifactId>
-            <version>0.11.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang.modules</groupId>
-            <artifactId>scala-java8-compat_2.11</artifactId>
-            <version>0.5.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.flywaydb.flyway-test-extensions</groupId>
-            <artifactId>flyway-spring-test</artifactId>
-            <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-test</artifactId>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.mockito</groupId>-->
+            <!--<artifactId>mockito-core</artifactId>-->
+            <!--<version>2.0.5-beta</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.module</groupId>-->
+            <!--<artifactId>jackson-module-scala_2.11</artifactId>-->
+            <!--<version>2.4.5</version>-->
+            <!--<scope>test</scope>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.scala-lang</groupId>-->
+                    <!--<artifactId>scala-library</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+                    <!--<artifactId>jackson-annotations</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.core</groupId>-->
+            <!--<artifactId>jackson-annotations</artifactId>-->
+            <!--<version>${jackson.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.fasterxml.jackson.module</groupId>-->
+            <!--<artifactId>jackson-module-jsonSchema</artifactId>-->
+            <!--<version>${jackson.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>com.jayway.jsonpath</groupId>-->
+            <!--<artifactId>json-path-assert</artifactId>-->
+            <!--<version>2.0.0</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>net.databinder.dispatch</groupId>-->
+            <!--<artifactId>dispatch-core_2.11</artifactId>-->
+            <!--<version>0.11.3</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.scala-lang</groupId>-->
+                    <!--<artifactId>scala-library</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.scala-lang.modules</groupId>-->
+            <!--<artifactId>scala-java8-compat_2.11</artifactId>-->
+            <!--<version>0.5.0</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<groupId>org.scala-lang</groupId>-->
+                    <!--<artifactId>scala-library</artifactId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.flywaydb.flyway-test-extensions</groupId>-->
+            <!--<artifactId>flyway-spring-test</artifactId>-->
+            <!--<version>3.1</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.springframework.boot</groupId>-->
+            <!--<artifactId>spring-boot-starter-actuator</artifactId>-->
+        <!--</dependency>-->
     </dependencies>
 
     <build>
@@ -336,9 +339,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>logback.xml</include>
-                </includes>
+                <!--<includes>-->
+                    <!--<include>logback.xml</include>-->
+                <!--</includes>-->
             </resource>
         </resources>
         <testResources>
@@ -358,41 +361,41 @@
                     <!--</arguments>-->
                 <!--</configuration>-->
             <!--</plugin>-->
-            <plugin>
-                <groupId>com.comphenix.maven</groupId>
-                <artifactId>yaml-properties-plugin</artifactId>
-                <version>0.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-yaml-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <app>${basedir}/src/main/resources/config/application.yml</app>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>com.comphenix.maven</groupId>-->
+                <!--<artifactId>yaml-properties-plugin</artifactId>-->
+                <!--<version>0.1.0</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<phase>initialize</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>read-yaml-properties</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<files>-->
+                                <!--<app>${basedir}/src/main/resources/config/application.yml</app>-->
+                            <!--</files>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>sql-maven-plugin</artifactId>
-                <version>1.5</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>${postgres.driver.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>
-                    <username>${oiva.dbusername}</username>
-                    <password>${oiva.dbpassword}</password>
-                    <driver>${postgres.driver.name}</driver>
-                </configuration>
+                <!--<version>1.5</version>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.postgresql</groupId>-->
+                        <!--<artifactId>postgresql</artifactId>-->
+                        <!--<version>${postgres.driver.version}</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
+                <!--<configuration>-->
+                    <!--<url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>-->
+                    <!--<username>${oiva.dbusername}</username>-->
+                    <!--<password>${oiva.dbpassword}</password>-->
+                    <!--<driver>${postgres.driver.name}</driver>-->
+                <!--</configuration>-->
                 <executions>
                     <execution>
                         <id>clean-db</id>
@@ -423,7 +426,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>${maven-enforcer-plugin.version}</version>
+                <!--<version>${maven-enforcer-plugin.version}</version>-->
                 <executions>
                     <execution>
                         <id>enforce-versions</id>
@@ -432,34 +435,34 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <rules>
-                        <requireMavenVersion>
-                            <message>You are running an older version of Maven. Oiva Backend requires at least Maven 3.0</message>
-                            <version>[3.0.0,)</version>
-                        </requireMavenVersion>
-                        <requireJavaVersion>
-                            <message>You are running an older version of Java. Oiva Backend requires at least JDK ${java.version}</message>
-                            <version>[${java.version}.0,)</version>
-                        </requireJavaVersion>
-                    </rules>
-                </configuration>
+                <!--<configuration>-->
+                    <!--<rules>-->
+                        <!--<requireMavenVersion>-->
+                            <!--<message>You are running an older version of Maven. Oiva Backend requires at least Maven 3.0</message>-->
+                            <!--<version>[3.0.0,)</version>-->
+                        <!--</requireMavenVersion>-->
+                        <!--<requireJavaVersion>-->
+                            <!--<message>You are running an older version of Java. Oiva Backend requires at least JDK ${java.version}</message>-->
+                            <!--<version>[${java.version}.0,)</version>-->
+                        <!--</requireJavaVersion>-->
+                    <!--</rules>-->
+                <!--</configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
+                <!--<configuration>-->
+                    <!--<skipTests>true</skipTests>-->
+                <!--</configuration>-->
             </plugin>
             <plugin>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest-maven-plugin</artifactId>
-                <version>${scalatest.maven.version}</version>
-                <configuration>
-                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-                    <junitxml>.</junitxml>
-                </configuration>
+                <!--<version>${scalatest.maven.version}</version>-->
+                <!--<configuration>-->
+                    <!--<reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>-->
+                    <!--<junitxml>.</junitxml>-->
+                <!--</configuration>-->
                 <executions>
                     <execution>
                         <id>test</id>
@@ -470,22 +473,22 @@
                             <suffixes>Test</suffixes>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>integration-test</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <suffixes>IT</suffixes>
-                        </configuration>
-                    </execution>
+                    <!--<execution>-->
+                        <!--<id>integration-test</id>-->
+                        <!--<phase>integration-test</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>test</goal>-->
+                        <!--</goals>-->
+                        <!--<configuration>-->
+                            <!--<suffixes>IT</suffixes>-->
+                        <!--</configuration>-->
+                    <!--</execution>-->
                 </executions>
             </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>${scala.maven.version}</version>
+                <!--<version>${scala.maven.version}</version>-->
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -521,108 +524,78 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>${maven.release.version}</version>
-                <configuration>
-                    <tagNameFormat>@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-release-plugin</artifactId>-->
+                <!--<version>${maven.release.version}</version>-->
+                <!--<configuration>-->
+                    <!--<tagNameFormat>@{project.version}</tagNameFormat>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.version}</version>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
+                <!--<version>${maven.resources.version}</version>-->
+                <!--<configuration>-->
+                    <!--<nonFilteredFileExtensions>-->
+                        <!--<nonFilteredFileExtension>pdf</nonFilteredFileExtension>-->
+                    <!--</nonFilteredFileExtensions>-->
+                <!--</configuration>-->
             </plugin>
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>logs/</directory>
-                            <followSymlinks>false</followSymlinks>
-                        </fileset>
-                    </filesets>
-                </configuration>
+                <!--<version>3.0.0</version>-->
+                <!--<configuration>-->
+                    <!--<filesets>-->
+                        <!--<fileset>-->
+                            <!--<directory>logs/</directory>-->
+                            <!--<followSymlinks>false</followSymlinks>-->
+                        <!--</fileset>-->
+                    <!--</filesets>-->
+                <!--</configuration>-->
             </plugin>
         </plugins>
     </build>
 
     <profiles>
         <!-- hack for default variables -->
-        <profile>
-            <id>default-oiva-dbhost</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>!oiva.dbhost</name>
-                </property>
-            </activation>
-            <properties>
-                <oiva.dbhost>postgres</oiva.dbhost>
-            </properties>
-        </profile>
-        <profile>
-            <id>default-oiva-dbpassword</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <property>
-                    <name>!oiva.dbpassword</name>
-                </property>
-            </activation>
-            <properties>
-                <oiva.dbpassword>oiva</oiva.dbpassword>
-            </properties>
-        </profile>
         <!--<profile>-->
-            <!--<id>dev</id>-->
+            <!--<id>default-oiva-dbhost</id>-->
             <!--<activation>-->
-                <!--<activeByDefault>true</activeByDefault>-->
+                <!--<activeByDefault>false</activeByDefault>-->
+                <!--<property>-->
+                    <!--<name>!oiva.dbhost</name>-->
+                <!--</property>-->
             <!--</activation>-->
             <!--<properties>-->
-                <!--<logback.loglevel>DEBUG</logback.loglevel>-->
+                <!--<oiva.dbhost>postgres</oiva.dbhost>-->
             <!--</properties>-->
-            <!--<dependencies>-->
-            <!--</dependencies>-->
-            <!--<build>-->
-                <!--<resources>-->
-                    <!--<resource>-->
-                        <!--<directory>src/main/resources</directory>-->
-                        <!--<filtering>false</filtering>-->
-                    <!--</resource>-->
-                <!--</resources>-->
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.springframework.boot</groupId>-->
-                        <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-                        <!--<configuration>-->
-                            <!--<arguments>-->
-                                <!--<argument>&#45;&#45;spring.profiles.active=dev</argument>-->
-                            <!--</arguments>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            <!--</build>-->
+        <!--</profile>-->
+        <!--<profile>-->
+            <!--<id>default-oiva-dbpassword</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>false</activeByDefault>-->
+                <!--<property>-->
+                    <!--<name>!oiva.dbpassword</name>-->
+                <!--</property>-->
+            <!--</activation>-->
+            <!--<properties>-->
+                <!--<oiva.dbpassword>oiva</oiva.dbpassword>-->
+            <!--</properties>-->
         <!--</profile>-->
         <profile>
             <id>generate-db</id>
-            <properties>
-                <logback.loglevel>DEBUG</logback.loglevel>
-                <oiva.dbhost>postgres</oiva.dbhost>
-                <oiva.redishost>redis</oiva.redishost>
-            </properties>
+            <!--<properties>-->
+                <!--<logback.loglevel>DEBUG</logback.loglevel>-->
+                <!--<oiva.dbhost>postgres</oiva.dbhost>-->
+                <!--<oiva.redishost>redis</oiva.redishost>-->
+            <!--</properties>-->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.flywaydb</groupId>
                         <artifactId>flyway-maven-plugin</artifactId>
-                        <version>${flyway.version}</version>
+                        <!--<version>${flyway.version}</version>-->
                         <executions>
                             <execution>
                                 <phase>generate-sources</phase>
@@ -631,28 +604,28 @@
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>
-                            <user>${oiva.dbusername}</user>
-                            <password>${oiva.dbpassword}</password>
-                            <locations>
-                                <location>filesystem:src/main/resources/db/migration</location>
-                            </locations>
-                            <validateOnMigrate>false</validateOnMigrate>
-                            <baselineOnMigrate>true</baselineOnMigrate>
-                        </configuration>
+                        <!--<configuration>-->
+                            <!--<url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>-->
+                            <!--<user>${oiva.dbusername}</user>-->
+                            <!--<password>${oiva.dbpassword}</password>-->
+                            <!--<locations>-->
+                                <!--<location>filesystem:src/main/resources/db/migration</location>-->
+                            <!--</locations>-->
+                            <!--<validateOnMigrate>false</validateOnMigrate>-->
+                            <!--<baselineOnMigrate>true</baselineOnMigrate>-->
+                        <!--</configuration>-->
                     </plugin>
                     <plugin>
                         <groupId>org.jooq</groupId>
                         <artifactId>jooq-codegen-maven</artifactId>
-                        <version>${org.jooq.version}</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>org.postgresql</groupId>
-                                <artifactId>postgresql</artifactId>
-                                <version>${postgres.driver.version}</version>
-                            </dependency>
-                        </dependencies>
+                        <!--<version>${org.jooq.version}</version>-->
+                        <!--<dependencies>-->
+                            <!--<dependency>-->
+                                <!--<groupId>org.postgresql</groupId>-->
+                                <!--<artifactId>postgresql</artifactId>-->
+                                <!--<version>${postgres.driver.version}</version>-->
+                            <!--</dependency>-->
+                        <!--</dependencies>-->
                         <executions>
                             <execution>
                                 <id>generate-postgres</id>
@@ -709,11 +682,6 @@
                                                     <type>fi.minedu.oiva.backend.entity.LupatilaValue</type>
                                                     <converter>fi.minedu.oiva.backend.entity.LupatilaValue.Converter</converter>
                                                 </customType>
-                                                <customType>
-                                                    <name>TekstityyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.entity.TekstityyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.entity.TekstityyppiValue.Converter</converter>
-                                                </customType>
                                             </customTypes>
                                             <forcedTypes>
                                                 <forcedType>
@@ -742,10 +710,6 @@
                                                     <name>LupatilaValue</name>
                                                     <expression>.*lupatila.tunniste</expression>
                                                 </forcedType>
-                                                <forcedType>
-                                                    <name>TekstityyppiValue</name>
-                                                    <expression>.*tekstityyppi.tunniste</expression>
-                                                </forcedType>
                                             </forcedTypes>
                                         </database>
                                         <generate>
@@ -766,32 +730,5 @@
                 </plugins>
             </build>
         </profile>
-        <!--<profile>-->
-            <!--<id>prod</id>-->
-            <!--<properties>-->
-                <!--<logback.loglevel>INFO</logback.loglevel>-->
-            <!--</properties>-->
-            <!--<dependencies>-->
-            <!--</dependencies>-->
-            <!--<build>-->
-                <!--<resources>-->
-                    <!--<resource>-->
-                        <!--<directory>src/main/resources</directory>-->
-                        <!--<filtering>true</filtering>-->
-                    <!--</resource>-->
-                <!--</resources>-->
-                <!--<plugins>-->
-                    <!--<plugin>-->
-                        <!--<groupId>org.springframework.boot</groupId>-->
-                        <!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-                        <!--<configuration>-->
-                            <!--<arguments>-->
-                                <!--<argument>&#45;&#45;spring.profiles.active=prod</argument>-->
-                            <!--</arguments>-->
-                        <!--</configuration>-->
-                    <!--</plugin>-->
-                <!--</plugins>-->
-            <!--</build>-->
-        <!--</profile>-->
     </profiles>
 </project>

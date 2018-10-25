@@ -6,7 +6,8 @@ public enum LupatilaValue {
     LUONNOS,
     PASSIVOITU,
     VALMIS,
-    HYLATTY;
+    HYLATTY,
+    ARVIOITAVANA;
 
     public static class Converter extends EnumConverter<String, LupatilaValue> {
         public Converter() {

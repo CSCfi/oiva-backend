@@ -4,9 +4,6 @@ set search_path = oiva, pg_catalog;
 DROP SCHEMA IF EXISTS oiva CASCADE;
 CREATE SCHEMA oiva AUTHORIZATION oiva;
 
--- uuid
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- sequence to automate diaarinumero
 CREATE SEQUENCE diaarinumero_seq;
 

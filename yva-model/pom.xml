@@ -414,7 +414,7 @@
                         <configuration>
                             <autocommit>true</autocommit>
                             <srcFiles>
-                                <srcFile>../../oiva-deployment/database/oiva-data.sql</srcFile>
+                                <srcFile>../../oiva-deployment/database/kuja-data.sql</srcFile>
                             </srcFiles>
                         </configuration>
                     </execution>
@@ -577,7 +577,7 @@
                 </property>
             </activation>
             <properties>
-                <oiva.dbpassword>oiva</oiva.dbpassword>
+                <oiva.dbpassword>kuja</oiva.dbpassword>
             </properties>
         </profile>
         <!--<profile>-->
@@ -674,8 +674,8 @@
                                             <includes>.*</includes>
                                             <schemata>
                                                 <schema>
-                                                    <inputSchema>oiva</inputSchema>
-                                                    <outputSchema>oiva</outputSchema>
+                                                    <inputSchema>kuja</inputSchema>
+                                                    <outputSchema>kuja</outputSchema>
                                                 </schema>
                                             </schemata>
                                             <customTypes>
@@ -709,11 +709,6 @@
                                                     <type>fi.minedu.oiva.backend.entity.LupatilaValue</type>
                                                     <converter>fi.minedu.oiva.backend.entity.LupatilaValue.Converter</converter>
                                                 </customType>
-                                                <customType>
-                                                    <name>TekstityyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.entity.TekstityyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.entity.TekstityyppiValue.Converter</converter>
-                                                </customType>
                                             </customTypes>
                                             <forcedTypes>
                                                 <forcedType>
@@ -741,10 +736,6 @@
                                                 <forcedType>
                                                     <name>LupatilaValue</name>
                                                     <expression>.*lupatila.tunniste</expression>
-                                                </forcedType>
-                                                <forcedType>
-                                                    <name>TekstityyppiValue</name>
-                                                    <expression>.*tekstityyppi.tunniste</expression>
                                                 </forcedType>
                                             </forcedTypes>
                                         </database>

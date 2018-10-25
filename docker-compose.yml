@@ -27,7 +27,9 @@ services:
         networks:
             - vpnsafe
     amos-postgres:
-        image: postgres:9.6
+        build:
+            context: .
+            dockerfile: ./Dockerfile-postgres
         ports:
             - "6432:5432"
         environment:
@@ -37,7 +39,9 @@ services:
         networks:
             - vpnsafe
     yva-postgres:
-        image: postgres:9.6
+        build:
+            context: .
+            dockerfile: ./Dockerfile-postgres
         ports:
             - "7432:5432"
         environment:

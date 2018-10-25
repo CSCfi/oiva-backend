@@ -7,7 +7,7 @@ shift
 # user arguments
 userArgs=$@
 
-if [[ $cmdArg == "list" ]]; then
+if [[ $cmdArg == "ls" ]]; then
     docker ps --format "{{.Names}}" | grep oiva-backend
 elif [[ $cmdArg == "stop" ]]; then
     echo -e "Stopping all oiva-backend containers"
@@ -17,6 +17,18 @@ elif [[ $cmdArg == "stop" ]]; then
         docker ps -a --format "{{.Names}}" | grep oiva-backend | xargs docker rm
     fi
 elif [[ $cmdArg == "start" ]]; then
+    sServiceNames="amos-postgres yva-postgres amos-redis yva-redis"
+    if [[ $userArgs == *"--amos"* ]]; then
+        echo -e "Starting only amos containers"
+        sServiceNames="amos-postgres amos-redis"
+        userArgs=$(echo "$userArgs" | sed 's/--amos//g')
+    fi
+    if [[ $userArgs == *"--yva"* ]]; then
+        echo -e "Starting only yva containers"
+        sServiceNames="yva-postgres yva-redis"
+        userArgs=$(echo "$userArgs" | sed 's/--yva//g')
+    fi
+
     # host machine ip
     DEVICEID=$userArgs
     if [ ! -z $DEVICEID ]; then
@@ -39,16 +51,18 @@ elif [[ $cmdArg == "start" ]]; then
         echo "No ethernetdevice found. Try adding it as argument"
     else
         echo -e "Using hostmachine ip: $HOSTMACHINE_IP"
-        sed -e "s/HOSTIP/${HOSTMACHINE_IP}/g" docker-compose.yml | docker-compose --file - up amos-postgres yva-postgres amos-redis yva-redis nginx &
+        sed -e "s/HOSTIP/${HOSTMACHINE_IP}/g" docker-compose.yml | docker-compose --file - up $sServiceNames nginx &
     fi
 else
     echo "Usage: ./oiva-docker.sh CMD [args]"
     echo -e "CMD options:"
     echo -e "start     Start containers"
     echo -e "               [ip-address] = address to use"
+    echo -e "               --amos = start only amos containers"
+    echo -e "               --yva = start only yva containers"
     echo -e "stop      Stop containers"
     echo -e "               --destroy = remove images"
-    echo -e "list      List containers"
+    echo -e "ls        List containers"
     echo -e ""
     exit 1
 fi
