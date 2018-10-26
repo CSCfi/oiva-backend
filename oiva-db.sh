@@ -19,6 +19,7 @@ function showHelp() {
     echo -e "yva       Apply to yva database"
     echo -e ""
     echo -e "CMD options:"
+    echo -e "init      Initialize database and Jooq-entities"
     echo -e "drop      Remove database schema"
     echo -e "            --clean"
     echo -e "generate  Re-create database schema and Jooq-entities"
@@ -56,7 +57,7 @@ else
 fi
 
 case $cmdArg in
-    drop|generate|populate|connect) ;;
+    init|drop|generate|populate|connect) ;;
     *) abort ;;
 esac
 
@@ -68,6 +69,11 @@ if [ -f $sUserArgsFile ]; then
 fi
 
 OIVA_MVN_OPTS="-Doiva.dbhost=${POSTGRES_IP} -Doiva.dbport=${POSTGRES_PORT} -Doiva.dbname=${DBNAME} -Doiva.dbusername=${DBUSER} -Doiva.dbpassword=${DBPASSWORD}"
+
+function initDatabase() {
+    cd ..
+    mvn $OIVA_MVN_OPTS install -Pinit-${envArg},generate-db
+}
 
 function dropDatabase() {
     mvn $OIVA_MVN_OPTS initialize sql:execute@clean-db
@@ -95,7 +101,9 @@ if [[ $optionsArg == *"-o"* ]]; then
     OIVA_MVN_OPTS="${OIVA_MVN_OPTS} -o"
 fi
 
-if [[ $cmdArg == "drop" ]]; then
+if [[ $cmdArg == "init" ]]; then
+    initDatabase
+elif [[ $cmdArg == "drop" ]]; then
     dropDatabase
 elif [[ $cmdArg == "generate" ]]; then
     dropDatabase
@@ -105,4 +113,3 @@ elif [[ $cmdArg == "populate" ]]; then
 elif [[ $cmdArg == "connect" ]]; then
     connectDatabase
 fi
-

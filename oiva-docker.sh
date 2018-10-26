@@ -8,13 +8,14 @@ shift
 userArgs=$@
 
 if [[ $cmdArg == "ls" ]]; then
-    docker ps --format "{{.Names}}" | grep oiva-backend
+    docker ps --format "{{.Names}}" | grep oiva
 elif [[ $cmdArg == "stop" ]]; then
-    echo -e "Stopping all oiva-backend containers"
-    docker ps --format "{{.Names}}" | grep oiva-backend | xargs docker stop
+    echo -e "Stopping oiva-backend containers"
+    docker ps --format "{{.Names}} {{.ID}}" | grep oiva | cut -d' ' -f2 | xargs docker stop
     if [[ $1 == "--destroy" ]]; then
-        echo -e "Removing all oiva-backend containers"
-        docker ps -a --format "{{.Names}}" | grep oiva-backend | xargs docker rm
+        echo -e "Removing oiva-backend containers"
+        docker ps -a --format "{{.Names}} {{.ID}}" | grep oiva | cut -d' ' -f2 | xargs docker rm
+        docker images --format "{{.Repository}} {{.ID}}" | grep oiva | cut -d' ' -f2 | xargs docker rmi -f
     fi
 elif [[ $cmdArg == "start" ]]; then
     sServiceNames="amos-postgres yva-postgres amos-redis yva-redis"

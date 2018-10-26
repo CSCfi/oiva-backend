@@ -294,5 +294,19 @@
                 <module>yva-backend</module>
             </modules>
         </profile>
+        <profile>
+            <id>init-amos</id>
+            <modules>
+                <module>oiva-core</module>
+                <module>amos-model</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>init-yva</id>
+            <modules>
+                <module>oiva-core</module>
+                <module>yva-model</module>
+            </modules>
+        </profile>
   </profiles>
 </project>

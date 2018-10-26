@@ -105,8 +105,13 @@ tarvittavat resurssit.
 Ts. käynnistä aluksi docker:
 
     $ ./oiva-docker.sh start
+
+Alusta tietokannat
     
-Luo ja populoi tietokannat
+    $ ./oiva-db.sh amos init
+    $ ./oiva-db.sh yva init
+    
+Jatkossa voit luoda ja populoi tietokannat seuraavasti
 
     $ ./oiva-db.sh amos generate --clean --populate
     $ ./oiva-db.sh yva generate --clean --populate

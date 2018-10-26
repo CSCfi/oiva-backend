@@ -2,4 +2,4 @@ FROM postgres:9.6
 
 MAINTAINER Oiva dev <aki.heikkinen@valamis.com>
 
-RUN echo "CREATE EXTENSION IF NOT EXISTS 'uuid-ossp';" > /docker-entrypoint-initdb.d/init-db.sql
+RUN echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > /docker-entrypoint-initdb.d/init-db.sql

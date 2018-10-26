@@ -6,7 +6,8 @@ public enum AsiatyyppiValue {
     UUSI,
     MUUTOS,
     AK,
-    LUKIO;
+    LUKIO,
+    PERUUTUS;
 
     public static class Converter extends EnumConverter<String, AsiatyyppiValue> {
         public Converter() {
