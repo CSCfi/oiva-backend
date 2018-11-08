@@ -217,7 +217,7 @@ public class CacheService {
             koodistoService.getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo());
         });
 
-        koodistoService.getAmmatillinenKoulutukset();
+        koodistoService.getAmmatillinenTutkinnot();
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Koulutus cache refreshed in {}ms", duration);

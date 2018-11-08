@@ -52,6 +52,7 @@ class OpintopolkuService extends CacheAware {
     private lazy val koulutusalaKoodiPath: String = "/isced2011koulutusalataso1/koodi"
     private lazy val koulutustyyppiKoodiPath: String = "/koulutustyyppi/koodi"
     private lazy val tutkintotyyppiKoodiPath: String = "/tutkintotyyppi/koodi"
+    private lazy val osaamisalaKoodiPath: String = "/osaamisala/koodi"
 
     def koodistoKooditPath(koodistoUri: String) = s"/${koodistoUri}/koodi"
     def koodistoUrl(koodistoUri: String) = koodistoServiceUrl + s"/${koodistoUri}"
@@ -212,6 +213,11 @@ class OpintopolkuService extends CacheAware {
     def getKoulutusalaKoodit = getKoodistoKooditList(koulutusalaKoodiPath)
     def getKoulutusalaKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koodistoServiceUrl + koulutusalaKoodiPath, koulutusalaKoodiUri(koodiArvo))
     def getKoulutusKooditForKoulutusala(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + koulutusalaKoodiUri(koodiArvo))
+
+    // osaamisala
+    def getOsaamisalaKoodit = getKoodistoKooditList(osaamisalaKoodiPath,null)
+    def getOsaamisalaKoodi(koodiArvo: String) = getKoodistoKoodiBlocking(koodistoServiceUrl + osaamisalaKoodiPath, osaamisalaKoodiUri(koodiArvo))
+    def getKoulutusKooditForOsaamisala(koodiArvo: String) = getKoodistoKooditList(relaatioYlakoodiPath + osaamisalaKoodiUri(koodiArvo))
 
     // koulutustyyppi
     def getKoulutustyyppiKoodit = getKoodistoKooditList(koulutustyyppiKoodiPath,null,true)
