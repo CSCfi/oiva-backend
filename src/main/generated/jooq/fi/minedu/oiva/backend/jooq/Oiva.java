@@ -18,7 +18,6 @@ import fi.minedu.oiva.backend.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +44,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = -1539467228;
+    private static final long serialVersionUID = 2078375180;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -123,11 +122,6 @@ public class Oiva extends SchemaImpl {
     public final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.jooq.tables.Paatoskierros.PAATOSKIERROS;
 
     /**
-     * The table <code>oiva.tiedote</code>.
-     */
-    public final Tiedote TIEDOTE = fi.minedu.oiva.backend.jooq.tables.Tiedote.TIEDOTE;
-
-    /**
      * No further instances allowed
      */
     private Oiva() {
@@ -166,8 +160,7 @@ public class Oiva extends SchemaImpl {
             Sequences.MUUTOS_ID_SEQ,
             Sequences.MUUTOSLIITE_ID_SEQ,
             Sequences.MUUTOSPYYNTO_ID_SEQ,
-            Sequences.PAATOSKIERROS_ID_SEQ,
-            Sequences.TIEDOTE_ID_SEQ);
+            Sequences.PAATOSKIERROS_ID_SEQ);
     }
 
     @Override
@@ -192,7 +185,6 @@ public class Oiva extends SchemaImpl {
             Muutos.MUUTOS,
             Muutosliite.MUUTOSLIITE,
             Muutospyynto.MUUTOSPYYNTO,
-            Paatoskierros.PAATOSKIERROS,
-            Tiedote.TIEDOTE);
+            Paatoskierros.PAATOSKIERROS);
     }
 }
