@@ -18,7 +18,6 @@ import fi.minedu.oiva.backend.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 
 import javax.annotation.Generated;
 
@@ -105,9 +104,4 @@ public class Tables {
      * The table <code>oiva.paatoskierros</code>.
      */
     public static final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.jooq.tables.Paatoskierros.PAATOSKIERROS;
-
-    /**
-     * The table <code>oiva.tiedote</code>.
-     */
-    public static final Tiedote TIEDOTE = fi.minedu.oiva.backend.jooq.tables.Tiedote.TIEDOTE;
 }

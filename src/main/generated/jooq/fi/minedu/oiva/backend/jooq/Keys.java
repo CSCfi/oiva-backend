@@ -18,7 +18,6 @@ import fi.minedu.oiva.backend.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.jooq.tables.Tiedote;
 import fi.minedu.oiva.backend.jooq.tables.records.AsiatyyppiRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.EsitysmalliRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.KohdeRecord;
@@ -33,7 +32,6 @@ import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosliiteRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.PaatoskierrosRecord;
-import fi.minedu.oiva.backend.jooq.tables.records.TiedoteRecord;
 
 import javax.annotation.Generated;
 
@@ -75,7 +73,6 @@ public class Keys {
     public static final Identity<MuutosliiteRecord, Long> IDENTITY_MUUTOSLIITE = Identities0.IDENTITY_MUUTOSLIITE;
     public static final Identity<MuutospyyntoRecord, Long> IDENTITY_MUUTOSPYYNTO = Identities0.IDENTITY_MUUTOSPYYNTO;
     public static final Identity<PaatoskierrosRecord, Long> IDENTITY_PAATOSKIERROS = Identities0.IDENTITY_PAATOSKIERROS;
-    public static final Identity<TiedoteRecord, Long> IDENTITY_TIEDOTE = Identities0.IDENTITY_TIEDOTE;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -109,8 +106,6 @@ public class Keys {
     public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_UUID_KEY = UniqueKeys0.MUUTOSPYYNTO_UUID_KEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = UniqueKeys0.PAATOSKIERROS_PKEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = UniqueKeys0.PAATOSKIERROS_UUID_KEY;
-    public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = UniqueKeys0.TIEDOTE_PKEY;
-    public static final UniqueKey<TiedoteRecord> TIEDOTE_UUID_KEY = UniqueKeys0.TIEDOTE_UUID_KEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -151,7 +146,6 @@ public class Keys {
         public static Identity<MuutosliiteRecord, Long> IDENTITY_MUUTOSLIITE = createIdentity(Muutosliite.MUUTOSLIITE, Muutosliite.MUUTOSLIITE.ID);
         public static Identity<MuutospyyntoRecord, Long> IDENTITY_MUUTOSPYYNTO = createIdentity(Muutospyynto.MUUTOSPYYNTO, Muutospyynto.MUUTOSPYYNTO.ID);
         public static Identity<PaatoskierrosRecord, Long> IDENTITY_PAATOSKIERROS = createIdentity(Paatoskierros.PAATOSKIERROS, Paatoskierros.PAATOSKIERROS.ID);
-        public static Identity<TiedoteRecord, Long> IDENTITY_TIEDOTE = createIdentity(Tiedote.TIEDOTE, Tiedote.TIEDOTE.ID);
     }
 
     private static class UniqueKeys0 extends AbstractKeys {
@@ -183,8 +177,6 @@ public class Keys {
         public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_UUID_KEY = createUniqueKey(Muutospyynto.MUUTOSPYYNTO, "muutospyynto_uuid_key", Muutospyynto.MUUTOSPYYNTO.UUID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_pkey", Paatoskierros.PAATOSKIERROS.ID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_uuid_key", Paatoskierros.PAATOSKIERROS.UUID);
-        public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_pkey", Tiedote.TIEDOTE.ID);
-        public static final UniqueKey<TiedoteRecord> TIEDOTE_UUID_KEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_uuid_key", Tiedote.TIEDOTE.UUID);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {

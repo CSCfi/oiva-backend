@@ -226,9 +226,9 @@ public class KoodistoController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(value = "/ammatillinen/koulutukset", method = GET)
-    @ApiOperation(notes = "Palauttaa opintopolun ammatilliset koulutukset", value = "")
+    @RequestMapping(value = "/ammatillinen/tutkinnot", method = GET)
+    @ApiOperation(notes = "Palauttaa opintopolun ammatilliset tutkinnot ja osaamisalat", value = "")
     public CompletableFuture<Collection<KoulutusKoodi>> getAmmatillinenKoulutukset() {
-        return async(service::getAmmatillinenKoulutukset);
+        return async(service::getAmmatillinenTutkinnot);
     }
 }

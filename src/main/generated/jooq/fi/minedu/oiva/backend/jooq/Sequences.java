@@ -97,9 +97,4 @@ public class Sequences {
      * The sequence <code>oiva.paatoskierros_id_seq</code>
      */
     public static final Sequence<Long> PAATOSKIERROS_ID_SEQ = new SequenceImpl<Long>("paatoskierros_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-    /**
-     * The sequence <code>oiva.tiedote_id_seq</code>
-     */
-    public static final Sequence<Long> TIEDOTE_ID_SEQ = new SequenceImpl<Long>("tiedote_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }

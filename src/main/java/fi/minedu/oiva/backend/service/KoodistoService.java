@@ -216,14 +216,55 @@ public class KoodistoService {
         return map;
     }
 
-    @Cacheable(value = "KoodistoService:getAmmatillinenKoulutukset", key = "''")
-    public List<KoulutusKoodi> getAmmatillinenKoulutukset() {
+    @Cacheable(value = "KoodistoService:getOsaamisalat", key = "''")
+    public List<KoodistoKoodi> getOsaamisalat() {
+        final List<KoodistoKoodi> osaamisala = new ArrayList<>();
+        // Asetuksen mukaiset osaamisalat -> koodisto ei näitä erottele
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1728", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1531", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1617", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1588", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1505", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1647", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2332", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2315", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2316", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2317", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2318", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2283", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2227", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "3137", null));
+        return osaamisala;
+    }
+
+    @Cacheable(value = "KoodistoService:getOsaamisalaKoulutukset", key = "#koodi")
+    public List<KoodistoKoodi> getOsaamisalaKoulutukset(final String koodi) {
+        return opintopolkuService.getKoulutusKooditForOsaamisala(koodi);
+    }
+
+    @Cacheable(value = "KoodistoService:getKoulutusToOsaamisalaRelation", key = "''")
+    public Map<String, KoodistoKoodi> getKoulutusToOsaamisalaRelation() {
+        final Map<String, KoodistoKoodi> map = new HashMap<>();
+        getOsaamisalat().stream().forEach(osaamisalaKoodi -> {
+                getOsaamisalaKoulutukset(osaamisalaKoodi.getKoodiArvo()).stream().forEach(koulutusKoodi -> {
+                   map.put(koulutusKoodi.koodiArvo(), osaamisalaKoodi);
+                });
+            }
+        );
+        return map;
+    }
+
+    @Cacheable(value = "KoodistoService:getAmmatillinenTutkinnot", key = "''")
+    public List<KoulutusKoodi> getAmmatillinenTutkinnot() {
         final List<KoulutusKoodi> koulutukset = new ArrayList<>();
         final Map<String, String> koulutusToKoulutusala = getKoulutusToKoulutusalaRelation();
         final Map<String, String> koulutusToKoulutustyyppi = getKoulutusToKoulutustyyppiRelation();
+        final Map<String, KoodistoKoodi> koulutusToOsaamisala = getKoulutusToOsaamisalaRelation();
+
         final Consumer<KoodistoKoodi> includeKoulutus = koodistoKoodi -> {
             final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koodistoKoodi.koodiArvo(), null);
             final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koodistoKoodi.koodiArvo(), null);
+            final KoodistoKoodi osaamisala = koulutusToOsaamisala.getOrDefault(koodistoKoodi.koodiArvo(), null);
 
             // Voimassaolon päättyminen ja koodisto
             if(null == koodistoKoodi.voimassaLoppuPvm() && koodistoKoodi.koodisto().getKoodistoUri().equals("koulutus")) {
@@ -233,7 +274,8 @@ public class KoodistoService {
 
                     // Tarkistetaan versio-duplikaatit
                     if(null == koulutukset.stream().filter(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koodistoKoodi.getKoodiArvo())).findFirst().orElse(null)) {
-                        koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo));
+
+                        koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisala));
                     }
                 }
             }
