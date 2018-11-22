@@ -43,6 +43,10 @@ public class SortListFilter extends OivaFilter {
 
         final Comparator<Lupa> lupaSortByDiaarinumero = Comparator.comparing(lupa -> lupa.getDiaarinumero());
         final Comparator<Lupa> lupaSortByEsittelijaNimi = Comparator.comparing(lupa -> JsonFieldFilter.getString(lupa.getMeta(), "esittelija_nimi"));
+        final Comparator<Lupa> lupaSortByJarjestaja = Comparator.comparing(lupa -> {
+            final Organisaatio jarjestaja = lupa.jarjestaja();
+            return null != jarjestaja ? TranslateFilter.fromTranslatedString(jarjestaja.getNimi(), languageOpt) : "";
+        });
         final Function<KoodistoKoodi, String> koodistoKoodiNimi = koodi -> null != koodi ? TranslateFilter.fromTranslatedString(koodi.getNimi(), languageOpt) : "";
         final Comparator<Lupa> lupaSortByJarjestajaMaakunta = Comparator.comparing(lupa -> {
             final Organisaatio jarjestaja = lupa.jarjestaja();
@@ -54,6 +58,7 @@ public class SortListFilter extends OivaFilter {
         });
         final Function<String, Comparator> toLupaComparators = sortBy -> {
             if (equalsIgnoreCase(sortBy, "esittelija")) return lupaSortByEsittelijaNimi;
+            else if (equalsIgnoreCase(sortBy, "jarjestaja")) return lupaSortByJarjestaja;
             else if (equalsIgnoreCase(sortBy, "maakunta")) return lupaSortByJarjestajaMaakunta;
             else if (equalsIgnoreCase(sortBy, "kunta")) return lupaSortByJarjestajaKunta;
             else if (equalsIgnoreCase(sortBy, "diaarinumero")) return lupaSortByDiaarinumero;

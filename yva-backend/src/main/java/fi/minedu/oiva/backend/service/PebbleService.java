@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,6 +46,13 @@ public class PebbleService {
         }
     }
 
+    // TODO: REMOVE ME
+    public Optional<String> toListHTML(final List<Lupa> luvat) {
+        final Map<String, Object> context = defaultContext(RenderOptions.webOptions(RenderLanguage.fi), "", "/luvat");
+        context.put("luvat", luvat);
+        return writeHTML((String) context.get("template"), context);
+    }
+
     public Optional<String> toHTML(final Optional<Lupa> lupaOpt, final RenderOptions options) {
         if(lupaOpt.isPresent()) {
             final Lupa lupa = lupaOpt.get();
@@ -54,9 +62,10 @@ public class PebbleService {
 
             final LupatilaValue lupaTila = lupa.lupatila().getTunniste();
             if (lupaTila == LupatilaValue.LUONNOS) options.setTemplateName("paatos/base");
-            if (lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
             if (lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
+            if (lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
             if (lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
+            if (lupaTila == LupatilaValue.ARVIOITAVANA) options.setTemplateName("paatos/base");
             options.setTemplateName("paatos/base");
 
             return generateHtml(lupa, options);

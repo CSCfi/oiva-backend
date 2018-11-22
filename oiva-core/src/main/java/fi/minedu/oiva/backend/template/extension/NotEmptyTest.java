@@ -2,6 +2,8 @@ package fi.minedu.oiva.backend.template.extension;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,6 +23,8 @@ public class NotEmptyTest extends OivaTest {
 
         } else if(obj instanceof String) {
             return StringUtils.isNotBlank((String) obj);
+        } else if(obj instanceof JsonNode) {
+            return ((JsonNode) obj).size() > 0;
         }
 
         return true;
