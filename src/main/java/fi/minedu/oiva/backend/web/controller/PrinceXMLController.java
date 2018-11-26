@@ -194,7 +194,7 @@ public class PrinceXMLController {
             // TODO: kielivalinta koulutuksen järjestäjän mukaan
             final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
             final Optional<String> muutospyyntoHtml = pebbleService.muutospyyntoToHTML(muutospyynto, options);
-            
+
             if (!princeXMLService.toPDF(muutospyyntoHtml.get(), response.getOutputStream(), options)) {
                 response.setStatus(get500().getStatusCode().value());
                 response.getWriter().write("Failed to generate Muutospyynto with html " + muutospyyntoHtml.get());
