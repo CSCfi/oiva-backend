@@ -100,16 +100,21 @@ tarvittavat resurssit.
 
 ## Tietokantarakenteen luonti, populointi ja puhdistus
 
-**HUOM!** Tietokannan kehityskäyttöönottoa on helpotettu, suositeltu tapa on käyttää docker-tietokantaa ja populoida tietokanta testidatalla ajamalla `docker-sh.sh`.
+**HUOM!** Tietokannan kehityskäyttöönottoa on helpotettu, suositeltu tapa on käyttää docker-tietokantaa ja populoida tietokanta testidatalla ajamalla `oiva-db.sh`.
 
 Ts. käynnistä aluksi docker:
 
-    $ ./launch-dev-docker.sh
-    
-Luo ja populoi tietokanta:
+    $ ./oiva-docker.sh start
 
-    $ ./docker-db.sh create
-    $ ./docker-db.sh populate
+Alusta tietokannat
+    
+    $ ./oiva-db.sh amos init
+    $ ./oiva-db.sh yva init
+    
+Jatkossa voit luoda ja populoi tietokannat seuraavasti
+
+    $ ./oiva-db.sh amos generate --clean --populate
+    $ ./oiva-db.sh yva generate --clean --populate
 
 Alla on tarkemmat ohjeet miten tietokannan luonti ja populointi suoritetaan:
 
@@ -151,13 +156,14 @@ Tietojoukko sisältää alkuvaiheen realistista lupadataa. Huom! pohjadata on yk
 
 Käynnistä docker:
 
-    $ ./launch-dev-docker.sh
+    $ ./oiva-docker.sh start
     
-Docker-compose luo neljä palvelua: backend, postgres, nginx ja redis. Näisä kolme viimeistä on tärkeät. Backend-palvelu luodaan integraatiotestejä varten, mutta sitä ei kannata käyttää kehityskäyttöön.
+Docker-compose luo viisi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis ja nginx.
 
 Backend-palvelun käynnistäminen kehityskäyttöön:
 
-    $ ./launch-dev-backend.sh -c
+    $ ./oiva-backend.sh amos -c
+    $ ./oiva-backend.sh yva -c
 
 Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelulle niin luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `launch-dev-backend.sh` suoritetaan.
 
