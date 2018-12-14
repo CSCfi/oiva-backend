@@ -1,6 +1,6 @@
-application-dev.yml
-application-template.yml
-application-test.yml
+**/application-dev.yml
+**/application-template.yml
+**/application-test.yml
 
 target/*
 target
@@ -12,5 +12,6 @@ release.properties
 pom.xml.releaseBackup
 
 logs
-oiva-backend.log*
+**/oiva-backend.log*
+**/kuja-backend.log*
 vars-*.sh
