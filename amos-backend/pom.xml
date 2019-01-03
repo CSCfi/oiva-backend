@@ -10,7 +10,6 @@
     </parent>
 
     <name>Amos Backend</name>
-    <groupId>fi.minedu.oiva</groupId>
     <artifactId>amos-backend</artifactId>
     <version>1.9.0</version>
     <packaging>jar</packaging>
@@ -62,24 +61,6 @@
                         <argument>--spring.profiles.active=dev</argument>
                     </arguments>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.comphenix.maven</groupId>
-                <artifactId>yaml-properties-plugin</artifactId>
-                <version>0.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>read-yaml-properties</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <app>${basedir}/src/main/resources/config/application.yml</app>
-                            </files>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
