@@ -10,7 +10,6 @@
     </parent>
 
     <name>Oiva Core</name>
-    <groupId>fi.minedu.oiva</groupId>
     <artifactId>oiva-core</artifactId>
     <version>1.9.0</version>
     <packaging>jar</packaging>
@@ -83,6 +82,14 @@
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
             <version>${org.jooq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-library</artifactId>
         </dependency>
         <dependency>
             <groupId>org.modelmapper.extensions</groupId>

@@ -10,7 +10,6 @@
     </parent>
 
     <name>Amos Model</name>
-    <groupId>fi.minedu.oiva</groupId>
     <artifactId>amos-model</artifactId>
     <version>1.9.0</version>
     <packaging>jar</packaging>
