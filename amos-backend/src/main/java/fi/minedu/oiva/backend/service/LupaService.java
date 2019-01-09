@@ -83,7 +83,8 @@ public class LupaService {
         final SelectJoinStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
         // filteröidään tulevat luvat (ja varmaan kohta vanhatkin)
-        query.where(LUPA.ALKUPVM.le(DSL.currentDate()));
+        query.where(LUPA.ALKUPVM.le(DSL.currentDate()).
+                and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
         return query.fetchInto(Lupa.class).stream()
             .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
             .filter(Optional::isPresent).map(Optional::get)
@@ -109,6 +110,7 @@ public class LupaService {
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus).
+                and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))).
                 and(LUPA.ALKUPVM.le(DSL.currentDate()))), withOptions);
     }
 

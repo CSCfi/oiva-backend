@@ -220,7 +220,7 @@ public abstract class BaseKoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/ammatillinen/tutkinnot", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun ammatilliset tutkinnot ja osaamisalat", value = "")
-    public CompletableFuture<Collection<KoulutusKoodi>> getAmmatillinenKoulutukset() {
+    public CompletableFuture<Collection<KoulutusKoodi>> getAmmatillinenTutkinnot() {
         return async(service::getAmmatillinenTutkinnot);
     }
 }

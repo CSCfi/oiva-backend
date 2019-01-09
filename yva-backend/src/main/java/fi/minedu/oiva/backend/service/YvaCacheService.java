@@ -148,7 +148,7 @@ public class YvaCacheService extends CacheService {
                 cacheKey.accept("KoodistoService:getKoulutustyyppiKoulutukset", koulutustyyppi.koodiArvo());
             });
 
-            cacheKey.accept("KoodistoService:getAmmatillinenKoulutukset", "");
+            cacheKey.accept("KoodistoService:getAmmatillinenTutkinnot", "");
 
             // delete cache keys
             flushCacheKeys(cacheKeys);
@@ -167,7 +167,7 @@ public class YvaCacheService extends CacheService {
             koodistoService.getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo());
         });
 
-        koodistoService.getAmmatillinenKoulutukset();
+        koodistoService.getAmmatillinenTutkinnot();
 
         final long duration = System.currentTimeMillis() - startTime;
         logger.info("Koulutus cache refreshed in {}ms", duration);
