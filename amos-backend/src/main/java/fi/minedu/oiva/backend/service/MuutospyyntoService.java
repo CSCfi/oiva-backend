@@ -7,6 +7,7 @@ import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
+import fi.minedu.oiva.backend.security.SecurityUtil;
 import fi.minedu.oiva.backend.util.ValidationUtils;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ import static fi.minedu.oiva.backend.util.ValidationUtils.validation;
 
 @Service
 public class MuutospyyntoService {
+
+    // Dfault value for paatokierros
+    public static final Long paatoskierrosDefaultId = 19L;
 
     @Autowired
     private DSLContext dsl;
@@ -241,104 +245,64 @@ public class MuutospyyntoService {
     }
 
 
-    /// CRUD
-
-    public Optional<Long> create(final Muutospyynto muutospyynto) {
-
-        try {
-
-            muutospyynto.setId(null);
-            final MuutospyyntoRecord muutospyyntoRecord = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
-
-            //muutospyyntoRecord.setLuoja(SecurityUtil.userName().get());
-            muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()).get());
-            muutospyyntoRecord.setPaatoskierrosId(getPaatoskierrosId(muutospyynto.getPaatoskierros().getUuid()).get());
-            muutospyyntoRecord.store();
-
-            muutospyynto.getMuutokset().stream().forEach(muutos -> {
-                final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
-                //muutosRecord.setLuoja(SecurityUtil.userName().get());
-                muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
-                muutosRecord.setMuutospyyntoId(muutospyyntoRecord.getId());
-                muutosRecord.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).get());
-                muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).get());
-                muutosRecord.store();
-
-
-            });
-
-
-
-            return Optional.of(muutospyyntoRecord.getId());
-
-        } catch(Exception e) {
-            return Optional.empty();
+    private Long getPaatoskierrosId(Muutospyynto muutospyynto) {
+        if(muutospyynto.getPaatoskierros() == null) {
+            // use default
+            return paatoskierrosDefaultId;
         }
-    }
-
-    public Optional<Long> update(final Muutospyynto muutospyynto) {
-
-        try {
-            final MuutospyyntoRecord muutospyyntoRecord = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
-            //muutospyyntoRecord.setPaivittaja(SecurityUtil.userName().get());
-            muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
-            dsl.executeUpdate(muutospyyntoRecord);
-            return Optional.of(muutospyyntoRecord.getId());
-
-        } catch(Exception e) {
-            return Optional.empty();
-        }
+        return getPaatoskierrosId(muutospyynto.getPaatoskierros().getUuid()).get();
     }
 
 
-    // Luo muutoksen
-    public Optional<Long> createMuutos(final Muutos muutos) {
+    public Optional<UUID> save(final Muutospyynto muutospyynto) {
+
+        System.out.println("Muutospyyntö: " + muutospyynto.toString());
 
         try {
-            muutos.setId(null);
-            final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
-            //muutosRecord.setLuoja(SecurityUtil.userName().get());
-            muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutosRecord.store();
+            Long paatoskierrosId = getPaatoskierrosId(muutospyynto);
 
-            return Optional.of(muutosRecord.getId());
+            if(muutospyynto.getUuid() == null) {
 
-        } catch(Exception e) {
-            return Optional.empty();
-        }
-    }
+                // create
+                final Optional<MuutospyyntoRecord> muutospyyntoRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOSPYYNTO, muutospyynto));
 
-    // Päivittää muutosta
-    public Optional<Long> updateMuutos(final Muutos muutos) {
+                if(muutospyyntoRecordOpt.isPresent()) {
 
-        try {
-            final MuutosRecord muutosRecord = dsl.newRecord(MUUTOS, muutos);
-            //muutosRecord.setPaivittaja(SecurityUtil.userName().get());
-            muutosRecord.setPaivityspvm(Timestamp.from(Instant.now()));
-            dsl.executeUpdate(muutosRecord);
-            return Optional.of(muutosRecord.getId());
+                    MuutospyyntoRecord muutospyyntoRecord = muutospyyntoRecordOpt.get();
+                    System.out.println("create muutospyyntö: " + muutospyyntoRecord.toString());
+                    //muutospyyntoRecord.setLuoja(SecurityUtil.userName().get());
+                    muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+                    muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()).get());
+                    muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
+                    muutospyyntoRecord.store();
 
-        } catch(Exception e) {
-            return Optional.empty();
-        }
-    }
+                    saveMuutokset(muutospyynto, muutospyyntoRecord.getId());
 
-    // Passivoi muutospyynnön
-    public Optional<UUID> passivoi(final String uuid) {
+                    Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
+                    return Optional.ofNullable(ready.get().getUuid());
 
-        try {
+                }
 
-            final Optional<MuutospyyntoRecord> muutospyyntoOpt = Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
+            }
+            else {
 
-            if(muutospyyntoOpt.isPresent()) {
+                // update
+                final Optional<MuutospyyntoRecord> muutospyyntoRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOSPYYNTO, muutospyynto));
 
-                MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                mp.setTila(Muutospyyntotila.PASSIVOITU.name());
-                dsl.executeUpdate(mp);
+                if(muutospyyntoRecordOpt.isPresent()) {
 
-                return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
+                    Optional<Muutospyynto> updatethis = getByUuid(muutospyynto.getUuid().toString());
+                    MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO,updatethis.get());
+                    //muutospyyntoRecordUp.setPaivittaja(SecurityUtil.userName().get());
+                    muutospyyntoRecordUp.setPaivityspvm(Timestamp.from(Instant.now()));
+                    System.out.println("update muutospyyntö: " + muutospyyntoRecordUp.toString());
+                    dsl.executeUpdate(muutospyyntoRecordUp);
 
+                    saveMuutokset(muutospyynto, muutospyyntoRecordUp.getId());
+
+                    return Optional.ofNullable(muutospyynto.getUuid());
+
+                }
 
             }
 
@@ -347,7 +311,50 @@ public class MuutospyyntoService {
         } catch(Exception e) {
             return Optional.empty();
         }
+    }
 
+
+    public void saveMuutokset(Muutospyynto muutospyynto, Long id) {
+
+        muutospyynto.getMuutokset().stream().forEach(muutos -> {
+
+            if(muutos.getUuid() == null) {
+
+                // create
+                final Optional<MuutosRecord> muutosRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOS, muutos));
+
+                if (muutosRecordOpt.isPresent()) {
+
+                    MuutosRecord muutosRecord = muutosRecordOpt.get();
+                    //muutosRecord.setLuoja(SecurityUtil.userName().get());
+                    muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
+                    muutosRecord.setMuutospyyntoId(id);
+                    muutosRecord.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).get());
+                    muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).get());
+                    muutosRecord.store();
+                }
+
+            }
+            else {
+
+                // create
+                final Optional<MuutosRecord> muutosRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOS, muutos));
+
+                if (muutosRecordOpt.isPresent()) {
+
+                    Optional<Muutos> updatethis =getMuutosByUuId(muutos.getUuid().toString());
+                    MuutosRecord muutosRecordUp = dsl.newRecord(MUUTOS,updatethis.get());
+
+                     //muutosRecord.setLuoja(SecurityUtil.userName().get());
+                    muutosRecordUp.setLuontipvm(Timestamp.from(Instant.now()));
+                    muutosRecordUp.setMuutospyyntoId(id);
+                    muutosRecordUp.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).get());
+                    dsl.executeUpdate(muutosRecordUp);
+                }
+
+            }
+
+        });
     }
 
     // Vaihtaa muutospyynnön tilan

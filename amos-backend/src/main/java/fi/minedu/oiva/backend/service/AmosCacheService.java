@@ -148,7 +148,7 @@ public class AmosCacheService extends CacheService {
                 cacheKey.accept("KoodistoService:getKoulutustyyppiKoulutukset", koulutustyyppi.koodiArvo());
             });
 
-            cacheKey.accept("KoodistoService:getAmmatillinenKoulutukset", "");
+            cacheKey.accept("KoodistoService:getAmmatillinenTutkinnot", "");
 
             // delete cache keys
             flushCacheKeys(cacheKeys);
