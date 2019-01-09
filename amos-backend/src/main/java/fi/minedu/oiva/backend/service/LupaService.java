@@ -109,9 +109,10 @@ public class LupaService {
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus).
-                and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))).
-                and(LUPA.ALKUPVM.le(DSL.currentDate()))), withOptions);
+        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+                .and(LUPA.ALKUPVM.le(DSL.currentDate()))
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())))
+        ), withOptions);
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
