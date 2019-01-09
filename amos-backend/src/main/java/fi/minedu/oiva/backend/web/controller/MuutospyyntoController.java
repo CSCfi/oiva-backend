@@ -94,30 +94,11 @@ public class MuutospyyntoController {
         return async(() -> service.getByMuutospyyntoUuid(muutospyyntoUuid));
     }
 
-    // muokkaa muutospyyntöä
+    // tallentaa muutospyynnön
     @OivaAccess_Public
-    @ApiOperation(notes = "Muokkaa muutospyyntöä", value = "")
-    @RequestMapping(method = POST, value = "/update")
-    public HttpEntity<Long> update(@RequestBody Muutospyynto muutospyynto) {
-
-        if(null == muutospyynto) {
-            return badRequest();
-        }
-        else if(muutospyynto.getUuid().equals("")) {
-            return badRequest();
-        }
-        else if(!service.validate(muutospyynto)) {
-            return badRequest();
-        }
-
-        return getOr400(service.update(muutospyynto));
-    }
-
-    // tallentaa uuden muutospyynnön
-    @OivaAccess_Public
-    @ApiOperation(notes = "Tallentaa uuden muutospyynnön", value = "")
-    @RequestMapping(method = PUT, value = "/create")
-    public HttpEntity<Long> create(@RequestBody Muutospyynto muutospyynto) {
+    @ApiOperation(notes = "Tallentaa muutospyynnön", value = "")
+    @RequestMapping(method = PUT, value = "/tallenna")
+    public HttpEntity<UUID> save(@RequestBody Muutospyynto muutospyynto) {
 
         if(null == muutospyynto) {
             return badRequest();
@@ -127,7 +108,8 @@ public class MuutospyyntoController {
             return badRequest();
         }
 
-        return getOr400(service.create(muutospyynto));
+        System.out.println("create or update: " + muutospyynto.getUuid());
+        return getOr400(service.save(muutospyynto));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
@@ -138,49 +120,13 @@ public class MuutospyyntoController {
         return getOr404(async(() -> service.getMuutosByUuId(uuid)));
     }
 
-    // tallentaa uuden muutoksen (TARVITAANKO?)
-    @OivaAccess_Public
-    @ApiOperation(notes = "Tallentaa uuden muutoksen", value = "")
-    @RequestMapping(method = PUT, value = "/muutos/create")
-    public HttpEntity<Long> createMuutos(@RequestBody Muutos muutos) {
-
-        if(null == muutos) {
-            return badRequest();
-
-        }
-        else if(!service.validate(muutos)) {
-            return badRequest();
-        }
-
-        return getOr400(service.createMuutos(muutos));
-    }
-
-    // muokkaa muutosta (TARVITAANKO?)
-    @OivaAccess_Public
-    @ApiOperation(notes = "Muokkaa muutosta", value = "")
-    @RequestMapping(method = POST, value = "/muutos/update")
-    public HttpEntity<Long> updateMuutos(@RequestBody Muutos muutos) {
-
-        if(null == muutos) {
-            return badRequest();
-        }
-        else if(muutos.getUuid().equals("")) {
-            return badRequest();
-        }
-        else if(!service.validate(muutos)) {
-            return badRequest();
-        }
-
-        return getOr400(service.updateMuutos(muutos));
-    }
-
 
     // Vaihda muutospyynnön tilaa ->  passivoi
     @OivaAccess_Public
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
     @RequestMapping(method = POST, value = "/passivoi/{uuid}")
     public HttpEntity<UUID> passivoi(final @PathVariable String uuid) {
-        return getOr400(service.passivoi(uuid));
+        return getOr404(service.changeTila(uuid, Muutospyyntotila.PASSIVOITU));
     }
 
 
