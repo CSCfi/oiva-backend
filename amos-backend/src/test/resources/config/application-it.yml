@@ -1,0 +1,72 @@
+oiva:
+  dbhost: 192.168.99.103
+  dbport: 15432
+  dbname: oiva
+  dbusername: oiva
+  dbpassword: oiva
+  baseUrl: http://localhost
+
+opintopolku:
+  baseUrl:
+  apiCredentials:
+    username:
+    password:
+
+cas:
+  baseUrl:
+
+ldap:
+  url:
+  base-prefix: dc=opintopolku,dc=fi
+  user-search-base: ou=People
+  manager:
+    dn: uid=koute,ou=People,dc=opintopolku,dc=fi
+    password:
+  cas:
+    user-search-filter: (|(mail={0})(uid={0}))
+    group-search-base: ou=Groups
+    group-search-filter: (uniqueMember={0})
+    group-role-attribute: cn
+
+server:
+  port: 8099
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva
+  cache:
+    type: none
+
+redis:
+  host: localhost
+  port: 7379
+
+attachments:
+  upload.path: uploads
+
+prince:
+  exec.path:
+
+templates:
+  base.path:
+
+logging:
+  file: logs/spring.log
+  level:
+    fi.minedu.oiva: DEBUG
+    org.springframework.security: DEBUG
+    com.mitchellbosecke: DEBUG
+    springfox.documentation: ERROR
+    tRepository$SaveToSessionResponseWrapper: ERROR
+    org.springframework.security.web.: ERROR
+    org.springframework.security.web.FilterChainProxy: ERROR
+    org.springframework.security.web.util.matcher: ERROR
+    org.springframework.security.cas.web.CasAuthenticationFilter: ERROR
+
+koulutustyyppi:
+  ammatillinen.koodiarvot: 1,11,12
+
+api:
+  basicauth:
+    username: oiva
+    password: oiva
