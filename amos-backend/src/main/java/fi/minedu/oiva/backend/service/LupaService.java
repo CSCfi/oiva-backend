@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.service;
 
+import fi.minedu.oiva.backend.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.oiva.Maarays;
@@ -79,16 +80,19 @@ public class LupaService {
         } else return Optional.empty();
     }
 
-    public Collection<Lupa> getAll(final String... withOptions) { // TODO: Implement filter
-        final SelectJoinStep<Record> query = baseLupaSelect();
-        baseLupaFilter().ifPresent(query::where);
-        // filteröidään tulevat luvat (ja varmaan kohta vanhatkin)
-        query.where(LUPA.ALKUPVM.le(DSL.currentDate()).
-                and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
-        return query.fetchInto(Lupa.class).stream()
-            .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
-            .filter(Optional::isPresent).map(Optional::get)
-            .collect(Collectors.toList());
+    public Collection<Lupa> getAllWithJarjestaja(final String... options) {
+        final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
+        query.leftJoin(ASIATYYPPI).on(ASIATYYPPI.ID.eq(LUPA.ASIATYYPPI_ID));
+        return fetch(query, options);
+    }
+
+    public Collection<Lupa> getAll(final String... withOptions) {
+        return getAll(null, withOptions);
+    }
+
+    public Collection<Lupa> getAll(final Condition filter, final String... withOptions) {
+        final SelectJoinStep<Record> query = getAllQuery(filter);
+        return fetch(query, withOptions);
     }
 
     public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) {
@@ -103,10 +107,7 @@ public class LupaService {
         query.where(LUPA.JARJESTAJA_YTUNNUS.notIn("0763403-0","0986820-1","0108023-3","0188756-3","0950895-1",
                 "0206976-5","0151534-8","0112038-9","0201789-3","0210311-8","1524361-1","1099221-8","0215382-8",
                 "1041090-0","0195032-3","0773744-3"));
-        return query.fetchInto(Lupa.class).stream()
-                .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
-                .filter(Optional::isPresent).map(Optional::get)
-                .collect(Collectors.toList());
+        return fetch(query, withOptions);
     }
 
     public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
@@ -188,5 +189,22 @@ public class LupaService {
     public Collection<Liite> getAttachments(final long lupaId) { // TODO: Add baseLupaFilter here
        return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI).from(LIITE, LUPA_LIITE)
         .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(lupaId))).fetchInto(Liite.class);
+    }
+
+    private SelectJoinStep<Record> getAllQuery(Condition filter) {
+        final SelectJoinStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        Optional.ofNullable(filter).ifPresent(query::where);
+        // filteröidään tulevat luvat (ja varmaan kohta vanhatkin)
+        query.where(LUPA.ALKUPVM.le(DSL.currentDate()).
+                and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+        return query;
+    }
+
+    private List<Lupa> fetch(SelectJoinStep<Record> query, String[] withOptions) {
+        return query.fetchInto(Lupa.class).stream()
+                .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
     }
 }
