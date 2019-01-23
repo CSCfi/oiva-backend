@@ -84,17 +84,19 @@ public class MaaraysService {
         final Map<Long, Kohde> kohteet = kohdeService.mapAll();
         final Map<Long, Maaraystyyppi> maaraystyypit = maaraystyyppiService.mapAll();
 
-        maaraykset.values().stream().forEach(maarays -> {
+        maaraykset.values().forEach(maarays -> {
             maarays.setKohde(kohteet.getOrDefault(maarays.getKohdeId(), null));
             maarays.setMaaraystyyppi(maaraystyypit.getOrDefault(maarays.getMaaraystyyppiId(), null));
-        });
-
-        final Collection<Maarays> maaraysList = maaraykset.values().stream().filter(Maarays::isYlinMaarays).collect(Collectors.toList());
-        maaraysList.forEach(maarays -> {
-            maaraykset.values().stream().filter(maarays::isParentOf).forEach(maarays::addAliMaarays);
             with(Optional.of(maarays), with);
+            if (maarays.getParentId() != null) {
+                Maarays parent = maaraykset.get(maarays.getParentId());
+                if (parent != null) {
+                    parent.addAliMaarays(maarays);
+                }
+            }
         });
-        return maaraysList;
+        return maaraykset.values().stream().filter(Maarays::isYlinMaarays)
+                .collect(Collectors.toList());
     }
 
     protected Optional<Maarays> with(final Optional<Maarays> maaraysOpt, final String... with) {

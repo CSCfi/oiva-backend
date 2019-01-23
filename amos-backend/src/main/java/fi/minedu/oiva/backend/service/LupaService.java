@@ -91,9 +91,14 @@ public class LupaService {
             .collect(Collectors.toList());
     }
 
-    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) { // TODO: Implement filter
+    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) {
+        return getAllJarjestamisluvat(null, withOptions);
+    }
+
+    public Collection<Lupa> getAllJarjestamisluvat(final Condition filter, final String... withOptions) {
         final SelectJoinStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
+        Optional.ofNullable(filter).ifPresent(query::where);
         // filteröidään pois lisäkouluttajat
         query.where(LUPA.JARJESTAJA_YTUNNUS.notIn("0763403-0","0986820-1","0108023-3","0188756-3","0950895-1",
                 "0206976-5","0151534-8","0112038-9","0201789-3","0210311-8","1524361-1","1099221-8","0215382-8",
