@@ -1,20 +1,28 @@
 package fi.minedu.oiva.backend.service;
 
-import fi.minedu.oiva.backend.entity.oiva.Kohde;
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
-import fi.minedu.oiva.backend.entity.oiva.Maarays;
-import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.MaaraystyyppiValue;
 import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
 import fi.minedu.oiva.backend.entity.export.Koulutustarjonta;
 import fi.minedu.oiva.backend.entity.export.KoulutustarjontaKoulutus;
+import fi.minedu.oiva.backend.entity.oiva.Kohde;
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import org.apache.commons.lang3.StringUtils;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -50,6 +58,17 @@ public class ExportService {
      */
     public Collection<Lupa> getJarjestysluvat() {
         return lupaService.getAllJarjestamisluvat(options(Maarays.class));
+    }
+
+    /**
+     * Tarjoaa kustannustiedot kaikista luvista joiden alkupäivämäärä on annetulla aikavälillä.
+     * Käyttäjä: OPH
+     *
+     * @return Lista kaikista luvista
+     */
+    public Collection<Lupa> getKustannusTiedot(LocalDate start, LocalDate end) {
+        final Condition filter = LUPA.ALKUPVM.between(Date.valueOf(start), Date.valueOf(end));
+        return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class));
     }
 
     /**

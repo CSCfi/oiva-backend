@@ -10,6 +10,7 @@ import fi.minedu.oiva.backend.service.LupahistoriaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
+import static fi.minedu.oiva.backend.jooq.tables.Lupa.LUPA;
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
 import static fi.minedu.oiva.backend.util.ControllerUtil.options;
@@ -57,7 +59,7 @@ public class LupaController {
     @RequestMapping(method = GET, value = "/jarjestajilla")
     @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla", value = "")
     public CompletableFuture<Collection<Lupa>> getAllWithJarjestaja() {
-        return async(() -> service.getAll(options(Organisaatio.class)));
+        return async(() -> service.getAllWithJarjestaja(options(Organisaatio.class)));
     }
 
     @OivaAccess_Public
