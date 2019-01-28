@@ -52,7 +52,7 @@
 
         <!-- default oiva properties -->
         <oiva.dbhost>localhost</oiva.dbhost>
-        <oiva.dbport>15432</oiva.dbport>
+        <oiva.dbport>6432</oiva.dbport>
         <oiva.dbname>oiva</oiva.dbname>
         <oiva.dbusername>oiva</oiva.dbusername>
         <oiva.dbpassword>oiva</oiva.dbpassword>
