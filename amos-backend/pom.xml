@@ -121,6 +121,9 @@
                     <name>integration-test</name>
                 </property>
             </activation>
+            <properties>
+                <oiva.dbport>15432</oiva.dbport>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
