@@ -9,6 +9,7 @@ import fi.minedu.oiva.backend.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -68,7 +69,7 @@ public class ExportService {
      */
     public Collection<Lupa> getKustannusTiedot(LocalDate start, LocalDate end) {
         final Condition filter = LUPA.ALKUPVM.between(Date.valueOf(start), Date.valueOf(end));
-        return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class));
+        return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class, KoodistoKoodi.class));
     }
 
     /**
