@@ -84,11 +84,6 @@ public class Sequences {
     public static final Sequence<Long> MUUTOS_ID_SEQ = new SequenceImpl<Long>("muutos_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 
     /**
-     * The sequence <code>oiva.muutosliite_id_seq</code>
-     */
-    public static final Sequence<Long> MUUTOSLIITE_ID_SEQ = new SequenceImpl<Long>("muutosliite_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-    /**
      * The sequence <code>oiva.muutospyynto_id_seq</code>
      */
     public static final Sequence<Long> MUUTOSPYYNTO_ID_SEQ = new SequenceImpl<Long>("muutospyynto_id_seq", Oiva.OIVA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));

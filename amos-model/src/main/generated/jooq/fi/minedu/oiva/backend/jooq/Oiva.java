@@ -15,8 +15,9 @@ import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutos;
-import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
+import fi.minedu.oiva.backend.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
+import fi.minedu.oiva.backend.jooq.tables.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Oiva extends SchemaImpl {
 
-    private static final long serialVersionUID = 2078375180;
+    private static final long serialVersionUID = -1148763472;
 
     /**
      * The reference instance of <code>oiva</code>
@@ -107,14 +108,19 @@ public class Oiva extends SchemaImpl {
     public final Muutos MUUTOS = fi.minedu.oiva.backend.jooq.tables.Muutos.MUUTOS;
 
     /**
-     * The table <code>oiva.muutosliite</code>.
+     * The table <code>oiva.muutos_liite</code>.
      */
-    public final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
+    public final MuutosLiite MUUTOS_LIITE = fi.minedu.oiva.backend.jooq.tables.MuutosLiite.MUUTOS_LIITE;
 
     /**
      * The table <code>oiva.muutospyynto</code>.
      */
     public final Muutospyynto MUUTOSPYYNTO = fi.minedu.oiva.backend.jooq.tables.Muutospyynto.MUUTOSPYYNTO;
+
+    /**
+     * The table <code>oiva.muutospyynto_liite</code>.
+     */
+    public final MuutospyyntoLiite MUUTOSPYYNTO_LIITE = fi.minedu.oiva.backend.jooq.tables.MuutospyyntoLiite.MUUTOSPYYNTO_LIITE;
 
     /**
      * The table <code>oiva.paatoskierros</code>.
@@ -158,7 +164,6 @@ public class Oiva extends SchemaImpl {
             Sequences.MAARAYS_ID_SEQ,
             Sequences.MAARAYSTYYPPI_ID_SEQ,
             Sequences.MUUTOS_ID_SEQ,
-            Sequences.MUUTOSLIITE_ID_SEQ,
             Sequences.MUUTOSPYYNTO_ID_SEQ,
             Sequences.PAATOSKIERROS_ID_SEQ);
     }
@@ -183,8 +188,9 @@ public class Oiva extends SchemaImpl {
             Maarays.MAARAYS,
             Maaraystyyppi.MAARAYSTYYPPI,
             Muutos.MUUTOS,
-            Muutosliite.MUUTOSLIITE,
+            MuutosLiite.MUUTOS_LIITE,
             Muutospyynto.MUUTOSPYYNTO,
+            MuutospyyntoLiite.MUUTOSPYYNTO_LIITE,
             Paatoskierros.PAATOSKIERROS);
     }
 }

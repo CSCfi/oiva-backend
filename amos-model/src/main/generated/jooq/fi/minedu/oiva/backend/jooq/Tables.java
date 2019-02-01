@@ -15,8 +15,9 @@ import fi.minedu.oiva.backend.jooq.tables.Lupatila;
 import fi.minedu.oiva.backend.jooq.tables.Maarays;
 import fi.minedu.oiva.backend.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.jooq.tables.Muutos;
-import fi.minedu.oiva.backend.jooq.tables.Muutosliite;
+import fi.minedu.oiva.backend.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.jooq.tables.Muutospyynto;
+import fi.minedu.oiva.backend.jooq.tables.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.jooq.tables.Paatoskierros;
 
 import javax.annotation.Generated;
@@ -91,14 +92,19 @@ public class Tables {
     public static final Muutos MUUTOS = fi.minedu.oiva.backend.jooq.tables.Muutos.MUUTOS;
 
     /**
-     * The table <code>oiva.muutosliite</code>.
+     * The table <code>oiva.muutos_liite</code>.
      */
-    public static final Muutosliite MUUTOSLIITE = fi.minedu.oiva.backend.jooq.tables.Muutosliite.MUUTOSLIITE;
+    public static final MuutosLiite MUUTOS_LIITE = fi.minedu.oiva.backend.jooq.tables.MuutosLiite.MUUTOS_LIITE;
 
     /**
      * The table <code>oiva.muutospyynto</code>.
      */
     public static final Muutospyynto MUUTOSPYYNTO = fi.minedu.oiva.backend.jooq.tables.Muutospyynto.MUUTOSPYYNTO;
+
+    /**
+     * The table <code>oiva.muutospyynto_liite</code>.
+     */
+    public static final MuutospyyntoLiite MUUTOSPYYNTO_LIITE = fi.minedu.oiva.backend.jooq.tables.MuutospyyntoLiite.MUUTOSPYYNTO_LIITE;
 
     /**
      * The table <code>oiva.paatoskierros</code>.
