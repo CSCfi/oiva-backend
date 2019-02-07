@@ -70,7 +70,7 @@ public class FileStorageService {
     public Optional<String> getLupaPDFFilePath(final Optional<Lupa> lupaOpt) {
         if(lupaOpt.isPresent()) {
             final Lupa lupa = lupaOpt.get();
-            return Optional.ofNullable(fileStorage.getLuvatBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
+            return Optional.of(fileStorage.getLuvatBasePath() + "/" + lupa.getUUIDValue() + "/" + lupa.getPDFFileName());
         } else return Optional.empty();
     }
 
@@ -84,42 +84,42 @@ public class FileStorageService {
             if(existingExecutorContext.isPresent()) {
                 asyncService.terminate(writeAllPDFs);
                 return Collections.singleton(executorName + " termination requested");
-            } else {
-                return Collections.singleton(executorName + "does not exist");
             }
-        } else {
-            final Function<Lupa,Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), With.all);
-            final Consumer<String> addExecutorState = state -> asyncService.addState(writeAllPDFs, state);
-            if(existingExecutorContext.isPresent()) {
-                return existingExecutorContext.get().reversedStates();
-            } else if(StringUtils.equalsIgnoreCase(operation, "start")) {
-                logger.info("Starting to write all Lupa PDFs, it will take awhile");
-                final ExecutorContext executorContext = asyncService.create(writeAllPDFs, executorName + "process started").execute(() -> {
-                    final long startTime = System.currentTimeMillis();
-                    lupaService.getAll().stream().parallel().map(toLupa::apply).forEach(lupaOpt -> {
-                        final String diaariNumero = lupaOpt.get().getDiaarinumero();
-                        final String statePrefix = "Lupa " + diaariNumero;
-                        try {
-                            final Optional<File> writtenFile = writeLupaPDF(lupaOpt);
-                            if(writtenFile.isPresent()) {
-                                logger.info("Lupa {} PDF saved", diaariNumero);
-                                addExecutorState.accept(statePrefix + " --> Success: " + writtenFile.get().getAbsolutePath());
-                            }
-                            else {
-                                logger.error("Failed to save lupa {} PDF", diaariNumero);
-                                addExecutorState.accept(statePrefix + " --> Failed");
-                            }
-                        } catch (Exception e) {
-                            logger.error("Failed to save lupa (id=" + lupaOpt.get().getId() + ") PDF", e);
+            return Collections.singleton(executorName + "does not exist");
+        }
+
+        final Function<Lupa,Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), With.all);
+        final Consumer<String> addExecutorState = state -> asyncService.addState(writeAllPDFs, state);
+        if(existingExecutorContext.isPresent()) {
+            return existingExecutorContext.get().reversedStates();
+        } else if(StringUtils.equalsIgnoreCase(operation, "start")) {
+            logger.info("Starting to write all Lupa PDFs, it will take awhile");
+            final ExecutorContext executorContext = asyncService.create(writeAllPDFs, executorName + "process started").execute(() -> {
+                final long startTime = System.currentTimeMillis();
+                lupaService.getAll().stream().parallel().map(toLupa::apply).forEach(lupaOpt -> {
+                    final String diaariNumero = lupaOpt.get().getDiaarinumero();
+                    final String statePrefix = "Lupa " + diaariNumero;
+                    try {
+                        final Optional<File> writtenFile = writeLupaPDF(lupaOpt);
+                        if(writtenFile.isPresent()) {
+                            logger.info("Lupa {} PDF saved", diaariNumero);
+                            addExecutorState.accept(statePrefix + " --> Success: " + writtenFile.get().getAbsolutePath());
+                        }
+                        else {
+                            logger.error("Failed to save lupa {} PDF", diaariNumero);
                             addExecutorState.accept(statePrefix + " --> Failed");
                         }
-                    });
-                    final long duration = System.currentTimeMillis() - startTime;
-                    addExecutorState.accept(executorName + " process finished in " + duration + "ms");
-                    logger.info("Lupa PDF writing finished in {}ms", duration);
+                    } catch (Exception e) {
+                        logger.error("Failed to save lupa (id=" + lupaOpt.get().getId() + ") PDF", e);
+                        addExecutorState.accept(statePrefix + " --> Failed");
+                    }
                 });
-                return executorContext.reversedStates();
-            } else return Collections.singleton(executorName + " does not exist");
+                final long duration = System.currentTimeMillis() - startTime;
+                addExecutorState.accept(executorName + " process finished in " + duration + "ms");
+                logger.info("Lupa PDF writing finished in {}ms", duration);
+            });
+            return executorContext.reversedStates();
         }
+        return Collections.singleton(executorName + " does not exist");
     }
 }

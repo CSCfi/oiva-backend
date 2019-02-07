@@ -23,6 +23,15 @@ public class AuthService {
         );
     }
 
+    /**
+     * Get current username.
+     *
+     * @return Username or empty string if not logged in.
+     */
+    public String getUsername() {
+        return SecurityUtil.userName().orElse("");
+    }
+
     public OivaPermission lupaAccessPermission() {
         final Function<String, OivaPermission> organizationBasedAccess = role -> {
             final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
