@@ -1,10 +1,8 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.oiva.Muutos;
-
+import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-
 import fi.minedu.oiva.backend.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.Api;
@@ -13,25 +11,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.*;
+import static fi.minedu.oiva.backend.util.ControllerUtil.badRequest;
+import static fi.minedu.oiva.backend.util.ControllerUtil.getOr400;
+import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotila;
 
 
 @RestController
 @RequestMapping(
         value = "${api.url.prefix}" + MuutospyyntoController.path,
-        produces = { MediaType.APPLICATION_JSON_VALUE })
+        produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Muutospyyntöjen hallinta")
 public class MuutospyyntoController {
 
@@ -40,8 +43,12 @@ public class MuutospyyntoController {
 
     public static final String path = "/muutospyynnot";
 
+    private final MuutospyyntoService service;
+
     @Autowired
-    private MuutospyyntoService service;
+    public MuutospyyntoController(MuutospyyntoService service) {
+        this.service = service;
+    }
 
 
     // palauttaa kaikki järjestäjän muutospyynnöt
@@ -94,22 +101,18 @@ public class MuutospyyntoController {
         return async(() -> service.getByMuutospyyntoUuid(muutospyyntoUuid));
     }
 
-    // tallentaa muutospyynnön
     @OivaAccess_Public
     @ApiOperation(notes = "Tallentaa muutospyynnön", value = "")
-    @RequestMapping(method = PUT, value = "/tallenna")
-    public HttpEntity<UUID> save(@RequestBody Muutospyynto muutospyynto) {
-
-        if(null == muutospyynto) {
-            return badRequest();
-
-        }
-        else if(!service.validate(muutospyynto)) {
+    @RequestMapping(method = POST, value = "/tallenna", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public HttpEntity<UUID> save(@RequestPart(value = "muutospyynto") Muutospyynto muutospyynto,
+                                 MultipartHttpServletRequest request) {
+        if (inValid(muutospyynto)) {
             return badRequest();
         }
-
-        System.out.println("create or update: " + muutospyynto.getUuid());
-        return getOr400(service.save(muutospyynto));
+        if (muutospyynto.getUuid() != null) {
+            return getOr400(service.update(muutospyynto, request.getFileMap()));
+        }
+        return getOr400(service.save(muutospyynto, request.getFileMap()));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
@@ -160,6 +163,13 @@ public class MuutospyyntoController {
     @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
     public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
         return getOr404(service.changeTila(uuid, Muutospyyntotila.PAATETTY));
+    }
+
+    private boolean inValid(Muutospyynto muutospyynto) {
+        if (null == muutospyynto) {
+            return true;
+        }
+        return !service.validate(muutospyynto);
     }
 
 }
