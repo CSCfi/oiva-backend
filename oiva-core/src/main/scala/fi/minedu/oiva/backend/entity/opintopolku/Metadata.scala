@@ -10,7 +10,9 @@ import scala.beans.BeanProperty
 case class Metadata(
     @BeanProperty var kieli: String,
     @BeanProperty var nimi: String,
-    @BeanProperty var kuvaus: String) {
+    @BeanProperty var kuvaus: String,
+    @BeanProperty var kasite: String,
+    @BeanProperty var huomioitavaKoodi: String) {
 
-    def this() = this(null, null, null)
+    def this() = this(null, null, null, null, null)
 }
