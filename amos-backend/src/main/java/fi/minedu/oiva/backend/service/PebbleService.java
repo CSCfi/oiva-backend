@@ -32,47 +32,43 @@ public class PebbleService {
 
     private static final Logger logger = LoggerFactory.getLogger(PebbleService.class);
 
+    private final PebbleConfig pebble;
+
     @Autowired
-    private PebbleConfig pebble;
+    public PebbleService(PebbleConfig pebble) {
+        this.pebble = pebble;
+    }
 
     public Optional<ByteArrayResource> getResource(final String path) {
         final String resourcePath = pebble.getTemplateBasePath() + "/" + path;
         try {
-            return Optional.ofNullable(new ByteArrayResource(Files.readAllBytes(Paths.get(resourcePath))));
+            return Optional.of(new ByteArrayResource(Files.readAllBytes(Paths.get(resourcePath))));
         } catch (IOException ioe) {
             logger.error("No such pebble resource with path: " + resourcePath, ioe);
             return Optional.empty();
         }
     }
 
-    public Optional<String> toHTML(final Optional<Lupa> lupaOpt, final RenderOptions options) {
-        if(lupaOpt.isPresent()) {
-            final Lupa lupa = lupaOpt.get();
-
+    public Optional<String> toHTML(final Lupa lupa, final RenderOptions options) {
+        Optional<Lupa> lupaOpt = Optional.ofNullable(lupa);
+        return lupaOpt.map(l -> {
             // Tulostetaan lupatilan mukainen esitysmalli
             // HUOM! Toistaiseksi käytössä vain yksi malli, joka on paatos tilasta riippumatta
 
-            final LupatilaValue lupaTila = lupa.lupatila().getTunniste();
+            final LupatilaValue lupaTila = l.lupatila().getTunniste();
             if (lupaTila == LupatilaValue.LUONNOS) options.setTemplateName("paatos/base");
             if (lupaTila == LupatilaValue.VALMIS) options.setTemplateName("paatos/base");
             if (lupaTila == LupatilaValue.PASSIVOITU) options.setTemplateName("paatos/base");
             if (lupaTila == LupatilaValue.HYLATTY) options.setTemplateName("paatos/base");
             options.setTemplateName("paatos/base");
 
-            return generateHtml(lupa, options);
-        } else return Optional.empty();
+            return generateHtml(l, options).orElse(null);
+        });
     }
 
     private Optional<String> generateHtml(final Lupa lupa, final RenderOptions options) {
-
         final String contextPath = lupa.paatoskierros().esitysmalli().getTemplatepath();
-        final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
-
-        logger.debug("Using base path: {}", pebble.getTemplateBasePath());
-        logger.debug("Using context path: {}", contextPath);
-        logger.debug("Using template: {}", templateName);
-
-        final String templatePath = contextPath + templateName;
+        final String templatePath = createTemplatePath(options, contextPath);
         final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
         context.put("lupa", nonNullVersion(lupa));
         context.put("jarjestaja", lupa.jarjestaja());
@@ -80,7 +76,7 @@ public class PebbleService {
         return writeHTML(templatePath, context);
     }
 
-    protected Optional<String> writeHTML(final String templatePath, final Map<String, Object> context) {
+    private Optional<String> writeHTML(final String templatePath, final Map<String, Object> context) {
         try {
             final PebbleEngine engine = pebble.defaultEngine();
             final PebbleTemplate pebbleTemplate = engine.getTemplate(templatePath);
@@ -113,28 +109,29 @@ public class PebbleService {
         return lupa;
     }
 
-
     public Optional<String> muutospyyntoToHTML(final Muutospyynto muutospyynto, final RenderOptions options) {
         options.setTemplateName("hakemus/base");
         return generateMuutospyyntoHtml(muutospyynto, options);
     }
 
     private Optional<String> generateMuutospyyntoHtml(final Muutospyynto muutospyynto, final RenderOptions options) {
-
-        // TODO: tarvitaanko erilaisia hakemuspohjia?
         final String contextPath = "hakemukset2018";
-        final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
-
-        logger.debug("Using base path: {}", pebble.getTemplateBasePath());
-        logger.debug("Using context path: {}", contextPath);
-        logger.debug("Using template: {}", templateName);
-
-        final String templatePath = contextPath + templateName;
+        final String templatePath = createTemplatePath(options, contextPath);
         final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
         context.put("muutospyynto", nonNullVersionOfMuutospyynto(muutospyynto));
         context.put("jarjestaja", muutospyynto.getJarjestaja());
 
         return writeHTML(templatePath, context);
+    }
+
+    private String createTemplatePath(RenderOptions options, String contextPath) {
+        final String templateName = "/" + StringUtils.removeStart(options.getTemplateName(), "/");
+        final String templatePath = contextPath + templateName;
+
+        logger.debug("Using base path: {}", pebble.getTemplateBasePath());
+        logger.debug("Using context path: {}", contextPath);
+        logger.debug("Using template: {}", templateName);
+        return templatePath;
     }
 
     private Muutospyynto nonNullVersionOfMuutospyynto(final Muutospyynto muutospyynto) {

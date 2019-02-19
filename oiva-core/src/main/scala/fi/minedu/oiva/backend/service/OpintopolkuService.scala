@@ -164,8 +164,7 @@ class OpintopolkuService extends CacheAware {
     def getKoodisto(koodistoUri: String, koodistoVersio: Integer = null) = getKoodistoBlocking(koodistoUri, koodistoVersio)
 
     def getKoodit(koodistoUri: String, koodistoVersio: Integer) = getKoodistoKooditList(koodistoKooditPath(koodistoUri), koodistoVersio)
-
-    def getKoodi(koodistoUri: String, koodiArvo: String, koodistoVersio: Integer) =
+    def getKoodi(koodistoUri: String, koodiArvo: String, koodistoVersio: Integer = null): KoodistoKoodi =
         getKoodistoKoodiBlocking(koodistoKoodiUrl(koodistoUri), koodiUri(koodistoUri, koodiArvo), koodistoVersio)
 
     def getAlueHallintovirastoKoodit = getKoodistoKooditList(alueHallintovirastoKoodiPath)

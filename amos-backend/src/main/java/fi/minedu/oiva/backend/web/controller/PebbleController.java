@@ -38,11 +38,15 @@ public class PebbleController {
 
     public static final String path = "/pebble";
 
-    @Autowired
-    private PebbleService service;
+    private final PebbleService service;
+
+    private final LupaService lupaService;
 
     @Autowired
-    private LupaService lupaService;
+    public PebbleController(PebbleService service, LupaService lupaService) {
+        this.service = service;
+        this.lupaService = lupaService;
+    }
 
     @OivaAccess_Public
     @RequestMapping(value = "/{diaarinumero}/**", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
@@ -53,7 +57,7 @@ public class PebbleController {
         try {
             final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, With.all).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
-            return getOr404(service.toHTML(Optional.ofNullable(lupa), options));
+            return getOr404(service.toHTML(lupa, options));
 
         } catch (Exception e) {
             logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaariNumero, e);
