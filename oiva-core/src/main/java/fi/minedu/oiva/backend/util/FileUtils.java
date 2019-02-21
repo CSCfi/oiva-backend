@@ -65,9 +65,7 @@ public final class FileUtils {
         try {
             return Optional.of(Paths.get(path).toFile());
         } catch (InvalidPathException | UnsupportedOperationException e) {
-            if (logger.isDebugEnabled()) {
-                e.printStackTrace();
-            }
+            logger.error("Could not find file from path!", e);
             return Optional.empty();
         }
     }

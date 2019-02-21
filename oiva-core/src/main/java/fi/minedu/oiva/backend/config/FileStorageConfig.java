@@ -20,4 +20,8 @@ public class FileStorageConfig {
     public String getHakemuksetBasePath() {
         return getFileStorageBasePath() + "/hakemukset";
     }
+
+    public String getLiitteetBasePath() {
+        return getFileStorageBasePath() + "/liitteet";
+    }
 }
