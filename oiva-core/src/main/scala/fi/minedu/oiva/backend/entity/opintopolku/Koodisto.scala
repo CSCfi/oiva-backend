@@ -32,6 +32,6 @@ case class Koodisto(
 
 object Koodisto {
     @JsonIgnore def notFound(koodisto: String, koodistoVersio: Integer = null) = Koodisto(koodisto, koodistoVersio, Array(
-        Metadata("fi", s"Koodistoa $koodisto ei löydy", "",null,null),
-        Metadata("sv", s"Koodistoa $koodisto hittades inte", "",null,null)), null, null)
+        Metadata("fi", s"Koodistoa $koodisto ei löydy", "",null,null,null),
+        Metadata("sv", s"Koodistoa $koodisto hittades inte", "",null,null,null)), null, null)
 }

@@ -46,6 +46,6 @@ object KoodistoKoodi {
         def this() = this(null)
     }
     @JsonIgnore def notFound(koodi: String) = KoodistoKoodi(koodi, null, null, Array(
-        Metadata("fi", s"Koodia $koodi ei löydy", "",null,null),
-        Metadata("sv", s"Koda $koodi hittades inte", "",null,null)), null, null)
+        Metadata("fi", s"Koodia $koodi ei löydy", "",null,null,null),
+        Metadata("sv", s"Koda $koodi hittades inte", "",null,null,null)), null, null)
 }
