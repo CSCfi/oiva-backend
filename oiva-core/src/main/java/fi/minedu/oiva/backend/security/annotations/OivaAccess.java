@@ -23,14 +23,14 @@ public interface OivaAccess {
     Pattern Format_Role = Pattern.compile("^([A-Za-z_]+)(?:_((?:\\d+\\.?)+)?)?$");
 
     String Context_Oiva = "OIVA_APP";
-    String Context_Yllapitaja = "ADMIN";
-    String Context_Esittelija = "ESITTELIJA";
-    String Context_Kayttaja = "KAYTTAJA";
-    String Context_Katselija = "KATSELIJA";
-    String Context_Nimenkirjoittaja = "NIMENKIRJOITTAJA";
+    String Context_Yllapitaja = "OIVA_APP_ADMIN";
+    String Context_Esittelija = "AMMATILLINEN_ESITTELIJA";
+    String Context_Kayttaja = "AMMATILLINEN_MUOKKAAJA";
+    String Context_Katselija = "AMMATILLINEN_KATSELIJA";
+    String Context_Nimenkirjoittaja = "AMMATILLINEN_NIMENKIRJOITTAJA";
 
     String Role_Application = Context_Oiva;
-    String Role_Yllapitaja = Context_Oiva + "_" + Context_Yllapitaja;
+    String Role_Yllapitaja = Context_Yllapitaja;
     String Role_Esittelija = Context_Oiva + "_" + Context_Esittelija;
     String Role_Kayttaja = Context_Oiva + "_" + Context_Kayttaja;
     String Role_Katselija = Context_Oiva + "_" + Context_Katselija;
