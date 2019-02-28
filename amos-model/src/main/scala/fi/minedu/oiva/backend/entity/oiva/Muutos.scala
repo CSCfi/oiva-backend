@@ -36,6 +36,9 @@ class Muutos(var kohde: Kohde,
 
   @JsonIgnore def hasKoodistoAndKoodiArvo = StringUtils.isNotBlank(this.getKoodisto) && StringUtils.isNotBlank(this.getKoodiarvo)
 
+  @JsonIgnore def hasKoodiKasite(kasite: String): Boolean = Option.apply(this.koodi).map(k => k.metadata)
+    .getOrElse(Array.empty).toStream.exists(m => Option.apply(m.getKasite).getOrElse("").startsWith(kasite))
+
   def getKoodi = koodi
 
   def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi

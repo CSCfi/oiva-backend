@@ -6,6 +6,7 @@ import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutosLiite;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosLiiteRecord;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
@@ -56,14 +58,16 @@ public class MuutospyyntoService {
 
     private final OrganisaatioService organisaatioService;
     private final LiiteService liiteService;
+    private final OpintopolkuService opintopolkuService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
-                               LiiteService liiteService) {
+                               LiiteService liiteService, OpintopolkuService opintopolkuService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
         this.liiteService = liiteService;
+        this.opintopolkuService = opintopolkuService;
     }
 
     public enum Muutospyyntotila {
@@ -218,6 +222,7 @@ public class MuutospyyntoService {
             withMuutokset(muutospyynto);
             withPaatoskierros(muutospyynto);
             withLupaUuid(muutospyynto);
+            withOrganization(muutospyynto);
         }
         if (reqs.equals("esittelija")) {
             withLiitteet(muutospyynto);
@@ -317,7 +322,27 @@ public class MuutospyyntoService {
         withKohde(muutos);
         withMaaraystyyppi(muutos);
         withLiitteet(muutos);
+        withKoodisto(muutos);
         return Optional.ofNullable(muutos);
+    }
+
+    private void withKoodisto(final Muutos muutos) {
+        final Function<Muutos, Optional<KoodistoKoodi>> getKoodi = m ->
+                Optional.ofNullable(opintopolkuService.getKoodi(m.getKoodisto(), m.getKoodiarvo(), null));
+        Optional.ofNullable(muutos).ifPresent(m -> {
+            if (m.hasKoodistoAndKoodiArvo()) {
+                getKoodi.apply(m).ifPresent(koodi -> {
+                    m.setKoodi(koodi);
+                    if (koodi.isKoodisto("koulutus")) {
+                        final String koodiArvo = koodi.koodiArvo();
+                        opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo)
+                                .ifPresent(koulutustyyppiKoodit -> koulutustyyppiKoodit.forEach(m::addYlaKoodi));
+                        opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(m::addYlaKoodi);
+                    }
+                });
+            }
+            if(m.hasAliMaarays()) m.getAliMaaraykset().forEach(this::withKoodisto);
+        });
     }
 
     private void withLiitteet(Muutos muutos) {
