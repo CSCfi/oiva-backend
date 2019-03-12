@@ -8,9 +8,11 @@ import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.KoodistoService;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collection;
 import java.util.List;
@@ -44,15 +46,22 @@ public abstract class BaseKoodistoController {
     @OivaAccess_Public
     @RequestMapping(value = "/koodit/{koodistoUri}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun uusimmat koodiston koodit koodistoUrin perusteella", value = "")
-    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri) {
-        return async(() -> service.getKoodit(koodistoUri, null));
+    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri,
+                                                            final @ApiParam(value = "Sisällytä vanhentuneet koodit vastaukseen")
+                                                            @RequestParam(value = "vanhentuneet", defaultValue = "false", required = false)
+                                                                    Boolean includeExpired) {
+        return async(() -> service.getKoodit(koodistoUri, null, includeExpired));
     }
 
     @OivaAccess_Public
     @RequestMapping(value = "/koodit/{koodistoUri}/{koodistoVersio:[0-9]+}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun koodiston koodit koodistoUrin ja koodistoVersion perusteella", value = "")
-    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri, final @PathVariable Integer koodistoVersio) {
-        return async(() -> service.getKoodit(koodistoUri, koodistoVersio));
+    public CompletableFuture<List<KoodistoKoodi>> getKoodit(final @PathVariable String koodistoUri,
+                                                            final @PathVariable Integer koodistoVersio,
+                                                            final @ApiParam(value = "Sisällytä vanhentuneet koodit vastaukseen")
+                                                            @RequestParam(value = "vanhentuneet", defaultValue = "false", required = false)
+                                                                    Boolean includeExpired) {
+        return async(() -> service.getKoodit(koodistoUri, koodistoVersio, includeExpired));
     }
 
     @OivaAccess_Public
@@ -66,7 +75,7 @@ public abstract class BaseKoodistoController {
     @RequestMapping(value = "/koodi/{koodisto}/{koodi}/{koodistoVersio:[0-9]+}", method = GET)
     @ApiOperation(notes = "Palauttaa opintopolun koodin koodiston, kooriarvon ja version perusteella", value = "")
     public CompletableFuture<KoodistoKoodi> getKoodi(
-        final @PathVariable String koodisto, final @PathVariable String koodi, final @PathVariable Integer koodistoVersio) {
+            final @PathVariable String koodisto, final @PathVariable String koodi, final @PathVariable Integer koodistoVersio) {
         return async(() -> service.getKoodi(koodisto, koodi, koodistoVersio));
     }
 
