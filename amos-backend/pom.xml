@@ -166,7 +166,6 @@
                                     <alias>amos-test-db</alias>
                                     <build>
                                         <from>postgres:9.6</from>
-                                        <!-- filter>@</filter-->
                                         <runCmds>echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > /docker-entrypoint-initdb.d/init-db.sql</runCmds>
                                     </build>
                                     <run>
@@ -187,10 +186,15 @@
                         </configuration>
                         <executions>
                             <execution>
+                                <id>build</id>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+                            <execution>
                                 <id>start</id>
                                 <phase>pre-integration-test</phase>
                                 <goals>
-                                    <goal>build</goal>
                                     <goal>start</goal>
                                 </goals>
                             </execution>

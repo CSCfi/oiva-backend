@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite extends TableImpl<LiiteRecord> {
 
-    private static final long serialVersionUID = 981228213;
+    private static final long serialVersionUID = 1646454505;
 
     /**
      * The reference instance of <code>oiva.liite</code>
@@ -119,6 +119,11 @@ public class Liite extends TableImpl<LiiteRecord> {
      * The column <code>oiva.liite.uuid</code>.
      */
     public final TableField<LiiteRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
+     * The column <code>oiva.liite.salainen</code>.
+     */
+    public final TableField<LiiteRecord, Boolean> SALAINEN = createField("salainen", org.jooq.impl.SQLDataType.BOOLEAN.defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
      * Create a <code>oiva.liite</code> table reference
