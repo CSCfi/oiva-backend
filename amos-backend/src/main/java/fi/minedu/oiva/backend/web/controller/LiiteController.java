@@ -50,14 +50,14 @@ public class LiiteController {
     public void index() {
     }
 
-    @RequestMapping(value = "/{id}", produces = {MediaType.APPLICATION_JSON_VALUE, OivaMediaTypes.APPLICATION_VND_JSON_VALUE})
-    public HttpEntity<Liite> get(@PathVariable long id) {
-        return getOr404_(liiteService.get(id), item -> item.setLink(apiUrlPrefix + path + "/" + id + rawPath));
+    @RequestMapping(value = "/{uuid}", produces = {MediaType.APPLICATION_JSON_VALUE, OivaMediaTypes.APPLICATION_VND_JSON_VALUE})
+    public HttpEntity<Liite> get(@PathVariable String uuid) {
+        return getOr404_(liiteService.getByUuid(uuid), item -> item.setLink(apiUrlPrefix + path + "/" + uuid + rawPath));
     }
 
-    @RequestMapping(value = "/{id}" + rawPath)
-    public HttpEntity<Resource> getRawFile(@PathVariable long id) {
-        return getOr404(liiteService.get(id),
+    @RequestMapping(value = "/{uuid}" + rawPath)
+    public HttpEntity<Resource> getRawFile(@PathVariable String uuid) {
+        return getOr404(liiteService.getByUuid(uuid),
                 item -> liiteService.getFileFrom(item)
                         .map(f -> {
                             final HttpHeaders headers = new HttpHeaders();
