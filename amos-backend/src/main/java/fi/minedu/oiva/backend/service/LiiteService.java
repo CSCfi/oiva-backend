@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -74,10 +76,10 @@ public class LiiteService {
                 .fetchOneInto(Liite.class));
     }
 
-    public Optional<Liite> getByUuid(UUID id) {
+    public Optional<Liite> getByUuid(String uuid) {
         return Optional.ofNullable(dsl.select(LIITE.fields())
                 .from(LIITE)
-                .where(LIITE.UUID.eq(id))
+                .where(LIITE.UUID.eq(UUID.fromString(uuid)))
                 .fetchOneInto(Liite.class));
     }
 
@@ -111,6 +113,16 @@ public class LiiteService {
         return getFileOptFromPath(pathify(fileStorageConfig.getLiitteetBasePath(), path));
     }
 
+    public void update(Liite liite) {
+        getByUuid(liite.getUuid().toString()).ifPresent(l -> {
+            liite.setId(l.getId());
+            liite.setPaivittaja(authService.getUsername());
+            liite.setPaivityspvm(Timestamp.from(Instant.now()));
+            final LiiteRecord liiteRecord = dsl.newRecord(LIITE, liite);
+            dsl.executeUpdate(liiteRecord);
+        });
+    }
+
     public Optional<Liite> save(MultipartFile file, Liite liite) {
         Optional<Path> pathToFile = createFile(file, liite);
         return pathToFile.map(path -> createDbRecord(liite)
@@ -137,7 +149,7 @@ public class LiiteService {
     }
 
     public void delete(Liite liite) {
-        getByUuid(liite.getUuid()).ifPresent(l -> {
+        getByUuid(liite.getUuid().toString()).ifPresent(l -> {
             dsl.delete(LIITE).where(LIITE.UUID.eq(liite.getUuid())).execute();
             getFileFrom(l).ifPresent(file -> {
                 try {
@@ -230,6 +242,7 @@ public class LiiteService {
 
     private Optional<Long> createDbRecord(Liite liite) {
         liite.setLuoja(authService.getUsername());
+        liite.setLuontipvm(Timestamp.from(Instant.now()));
         LiiteRecord rcrd = dsl.newRecord(LIITE, liite);
         rcrd.store();
         return Optional.ofNullable(rcrd.getId());

@@ -104,7 +104,7 @@ public class MuutospyyntoController {
     @OivaAccess_Public
     @ApiOperation(notes = "Tallentaa muutospyynnön", value = "")
     @RequestMapping(method = POST, value = "/tallenna", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public HttpEntity<UUID> save(@RequestPart(value = "muutospyynto") Muutospyynto muutospyynto,
+    public HttpEntity<Muutospyynto> save(@RequestPart(value = "muutospyynto") Muutospyynto muutospyynto,
                                  MultipartHttpServletRequest request) {
         if (inValid(muutospyynto)) {
             return badRequest();
