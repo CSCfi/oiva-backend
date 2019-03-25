@@ -76,10 +76,10 @@ public class LiiteService {
                 .fetchOneInto(Liite.class));
     }
 
-    public Optional<Liite> getByUuid(String uuid) {
+    public Optional<Liite> getByUuid(UUID uuid) {
         return Optional.ofNullable(dsl.select(LIITE.fields())
                 .from(LIITE)
-                .where(LIITE.UUID.eq(UUID.fromString(uuid)))
+                .where(LIITE.UUID.eq(uuid))
                 .fetchOneInto(Liite.class));
     }
 
@@ -114,7 +114,7 @@ public class LiiteService {
     }
 
     public void update(Liite liite) {
-        getByUuid(liite.getUuid().toString()).ifPresent(l -> {
+        getByUuid(liite.getUuid()).ifPresent(l -> {
             liite.setId(l.getId());
             liite.setPaivittaja(authService.getUsername());
             liite.setPaivityspvm(Timestamp.from(Instant.now()));
@@ -149,7 +149,7 @@ public class LiiteService {
     }
 
     public void delete(Liite liite) {
-        getByUuid(liite.getUuid().toString()).ifPresent(l -> {
+        getByUuid(liite.getUuid()).ifPresent(l -> {
             dsl.delete(LIITE).where(LIITE.UUID.eq(liite.getUuid())).execute();
             getFileFrom(l).ifPresent(file -> {
                 try {
