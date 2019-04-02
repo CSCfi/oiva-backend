@@ -59,7 +59,7 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
     }
 
     /**
-     * Checks if oids are valid for given business object, called from SpEL of @PreAuthorize
+     * Checks if oid is valid for given business object, called from SpEL of @PreAuthorize
      *
      * Note: if you need to match against multiple role prefixes this not supporting that yet,
      * use: oidsFor({'ROLE1', 'ROLE2'}) in SpEL of @PreAuthorize.
@@ -77,12 +77,11 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
     @SuppressWarnings("unchecked")
     @Override
     public boolean hasPermission(final Authentication authentication, final Serializable targetId, final String targetType, final Object permission) { // TODO: NOT USED -- DO WE NEED THIS?
-        return Matching.whenIsType((String s) -> SecurityUtil.roleOids(authentication, s))
-            .whenAllMatch(instanceOf(List.class), hasItem(instanceOf(String.class))).thenApply(ignore -> (List<String>) permission)
-            .match(permission).map(oids -> Matching
-                .whenIsValue("Hakemus").thenApply(ignr -> checkOidsOnCheckable("hakemusService", targetId, oids))
-                .whenIsValue("Paatos").thenApply(ignr -> checkOidsOnCheckable("paatosService", targetId, oids))
-                .whenIsValue("Koulutustehtava").thenApply(ignr -> checkOidsOnCheckable("koulutustehtavaService", targetId, oids))
+        return Matching.whenIsType((String s) -> SecurityUtil.userOrganisationOid())
+            .match(permission).map(oid -> Matching
+                .whenIsValue("Hakemus").thenApply(ignr -> checkOidsOnCheckable("hakemusService", targetId, oid))
+                .whenIsValue("Paatos").thenApply(ignr -> checkOidsOnCheckable("paatosService", targetId, oid))
+                .whenIsValue("Koulutustehtava").thenApply(ignr -> checkOidsOnCheckable("koulutustehtavaService", targetId, oid))
                 .match(targetType).orElse(false)
             ).orElse(false);
     }
@@ -94,8 +93,8 @@ public class OivaPermissionChecker implements PermissionEvaluator, ApplicationCo
      * @param targetId
      * @return
      */
-    private boolean checkOidsOnCheckable(final String beanName, Serializable targetId, final List<String> oids) {
+    private boolean checkOidsOnCheckable(final String beanName, Serializable targetId, final String oid) {
         final WithOidCheck hakemusService = (WithOidCheck) applicationContext.getBean(beanName);
-        return hakemusService.hasOid((Long) targetId, oids);
+        return hakemusService.hasOid((Long) targetId, oid);
     }
 }

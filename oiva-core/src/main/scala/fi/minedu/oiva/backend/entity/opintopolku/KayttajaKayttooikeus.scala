@@ -33,7 +33,7 @@ case class KayttajaKayttooikeus(
 
     @JsonIgnore def getOivaOikeudet: Optional[java.util.List[String]] =
         if(null == organisaatiot) Optional.empty()
-        else organisaatiot.toList.map(_.getOivaOikeudet).flatten.distinct match {
+        else organisaatiot.toList.flatMap(_.getOivaOikeudet).distinct match {
             case Nil => Optional.empty()
             case list => Optional.of(OivaAccess.Role_Application :: list)
         }
@@ -48,8 +48,7 @@ case class OrganisaatioKayttooikeus(
     def this() = this(null, null)
 
     @JsonIgnore def getOivaOikeudet = if(null == kayttooikeudet) Nil else {
-        val oikeudet = kayttooikeudet.filter(_.isOivaOikeus).map(_.oivaOikeus)
-        oikeudet ++ (if(StringUtils.isNotBlank(organisaatioOid)) oikeudet.map(_ + "_" + organisaatioOid) else Nil)
+        kayttooikeudet.filter(_.isOivaOikeus).map(_.oivaOikeus)
     }
 }
 
