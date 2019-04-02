@@ -39,24 +39,4 @@ public class CustomSecurityExpressionRoot extends SecurityExpressionRoot impleme
     public Object getThis() {
         return target;
     }
-
-    /**
-     * Returns oids related to the given role
-     *
-     * @param role target role
-     * @return list of role related oids
-     */
-    public List<String> oidsFor(final String role) {
-        return SecurityUtil.roleOids(role);
-    }
-
-    /**
-     * Returns oids related to the given role
-     *
-     * @param roles Role prefixes
-     * @return list of OIDs for role prefix
-     */
-    public List<String> oidsFor(final List<String> roles) {
-        return SecurityUtil.roleOids(roles);
-    }
 }
