@@ -6,6 +6,7 @@ import java.util.{Collection, Optional}
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio
+import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -45,5 +46,5 @@ class Muutospyynto(
   def getJarjestaja: Organisaatio = jarjestaja
   def setJarjestaja(jarjestaja: Organisaatio): Unit = this.jarjestaja = jarjestaja
   @JsonIgnore def getJarjestajaOpt: java.util.Optional[Organisaatio] = Optional.ofNullable(jarjestaja)
-
+  @JsonIgnore def getPDFFileName = "muutospyynto-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
 }

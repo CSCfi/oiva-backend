@@ -1,0 +1,35 @@
+[
+  {
+    "oidHenkilo": "1.2.1.0",
+    "username": "@username@",
+    "kayttajaTyyppi": "VIRKAILIJA",
+    "organisaatiot": [
+      {
+        "organisaatioOid": "1.2.1.1",
+        "kayttooikeudet": [
+          {
+            "palvelu": "OIVA_APP",
+            "oikeus": "AMMATILLINEN_ESITTELIJA"
+          },
+          {
+            "palvelu": "KOUTE",
+            "oikeus": "ESITTELIJA"
+          }
+        ]
+      },
+      {
+        "organisaatioOid": "1.2.1.2",
+        "kayttooikeudet": [
+          {
+            "palvelu": "OIVA_APP",
+            "oikeus": "AMMATILLINEN_ESITTELIJA"
+          },
+          {
+            "palvelu": "KOUTE",
+            "oikeus": "ESITTELIJA"
+          }
+        ]
+      }
+    ]
+  }
+]

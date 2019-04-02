@@ -6,6 +6,7 @@ import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
+import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutosLiite;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosLiiteRecord;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.jooq.Tables.KOHDE;
@@ -56,14 +58,16 @@ public class MuutospyyntoService {
 
     private final OrganisaatioService organisaatioService;
     private final LiiteService liiteService;
+    private final OpintopolkuService opintopolkuService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
-                               LiiteService liiteService) {
+                               LiiteService liiteService, OpintopolkuService opintopolkuService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
         this.liiteService = liiteService;
+        this.opintopolkuService = opintopolkuService;
     }
 
     public enum Muutospyyntotila {
@@ -189,7 +193,7 @@ public class MuutospyyntoService {
     }
 
     @Transactional
-    public Optional<UUID> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+    public Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
         logger.debug("Save muutospyynto: {}", muutospyynto.toString());
         try {
             Long paatoskierrosId = getPaatoskierrosId(muutospyynto);
@@ -200,7 +204,7 @@ public class MuutospyyntoService {
     }
 
     @Transactional
-    public Optional<UUID> update(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+    public Optional<Muutospyynto> update(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
         logger.debug("Update muutospyynto: {}", muutospyynto.toString());
         try {
             return updateMuutospyynto(muutospyynto, fileMap);
@@ -218,6 +222,7 @@ public class MuutospyyntoService {
             withMuutokset(muutospyynto);
             withPaatoskierros(muutospyynto);
             withLupaUuid(muutospyynto);
+            withOrganization(muutospyynto);
         }
         if (reqs.equals("esittelija")) {
             withLiitteet(muutospyynto);
@@ -317,7 +322,27 @@ public class MuutospyyntoService {
         withKohde(muutos);
         withMaaraystyyppi(muutos);
         withLiitteet(muutos);
+        withKoodisto(muutos);
         return Optional.ofNullable(muutos);
+    }
+
+    private void withKoodisto(final Muutos muutos) {
+        final Function<Muutos, Optional<KoodistoKoodi>> getKoodi = m ->
+                Optional.ofNullable(opintopolkuService.getKoodi(m.getKoodisto(), m.getKoodiarvo(), null));
+        Optional.ofNullable(muutos).ifPresent(m -> {
+            if (m.hasKoodistoAndKoodiArvo()) {
+                getKoodi.apply(m).ifPresent(koodi -> {
+                    m.setKoodi(koodi);
+                    if (koodi.isKoodisto("koulutus")) {
+                        final String koodiArvo = koodi.koodiArvo();
+                        opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo)
+                                .ifPresent(koulutustyyppiKoodit -> koulutustyyppiKoodit.forEach(m::addYlaKoodi));
+                        opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(m::addYlaKoodi);
+                    }
+                });
+            }
+            if (m.hasAliMaarays()) m.getAliMaaraykset().forEach(this::withKoodisto);
+        });
     }
 
     private void withLiitteet(Muutos muutos) {
@@ -365,28 +390,23 @@ public class MuutospyyntoService {
                 .orElse(paatoskierrosDefaultId);
     }
 
-    private Optional<UUID> updateMuutospyynto(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
-        final Optional<MuutospyyntoRecord> muutospyyntoRecordOpt =
-                Optional.ofNullable(dsl.newRecord(MUUTOSPYYNTO, muutospyynto));
-        return muutospyyntoRecordOpt.map(muutospyyntoRecord -> {
-            Optional<Muutospyynto> updatethis = getByUuid(muutospyynto.getUuid().toString());
-            if (!updatethis.isPresent()) {
-                return null;
-            }
-            MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO, updatethis.get());
-            muutospyyntoRecordUp.setPaivittaja(authService.getUsername());
-            muutospyyntoRecordUp.setPaivityspvm(Timestamp.from(Instant.now()));
+    private Optional<Muutospyynto> updateMuutospyynto(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
+        return getByUuid(muutospyynto.getUuid().toString()).map(muutospyyntoRecord -> {
+            muutospyynto.setId(muutospyyntoRecord.getId());
+            muutospyynto.setPaivittaja(authService.getUsername());
+            muutospyynto.setPaivityspvm(Timestamp.from(Instant.now()));
+            MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
             dsl.executeUpdate(muutospyyntoRecordUp);
             deleteFromExisting(muutospyynto.getLiitteet());
-            createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecordUp.getId());
+            saveMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecordUp.getId());
             saveMuutokset(muutospyynto, muutospyyntoRecordUp.getId(), fileMap);
 
-            return muutospyynto.getUuid();
+            return muutospyynto;
         });
     }
 
-    private Optional<UUID> createMuutospyynto(Muutospyynto muutospyynto, Long paatoskierrosId,
-                                              Map<String, MultipartFile> fileMap) {
+    private Optional<Muutospyynto> createMuutospyynto(Muutospyynto muutospyynto, Long paatoskierrosId,
+                                                      Map<String, MultipartFile> fileMap) {
         final Optional<MuutospyyntoRecord> muutospyyntoRecordOpt =
                 Optional.ofNullable(dsl.newRecord(MUUTOSPYYNTO, muutospyynto));
         return muutospyyntoRecordOpt.map(muutospyyntoRecord -> {
@@ -396,31 +416,40 @@ public class MuutospyyntoService {
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();
-            createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
+            saveMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
             saveMuutokset(muutospyynto, muutospyyntoRecord.getId(), fileMap);
 
             Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
-            return ready.map(Muutospyynto::getUuid).orElse(null);
+            return ready.orElse(null);
         });
     }
 
-    private void createMuutospyyntoLiitteet(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap, Long muutospyyntoId) {
+    private void saveMuutospyyntoLiitteet(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap, Long muutospyyntoId) {
         Optional.ofNullable(muutospyynto.getLiitteet())
-                .ifPresent(liitteet -> liitteet.forEach(liite -> Optional.ofNullable(fileMap.get(liite.getTiedostoId()))
-                        .ifPresent(file -> {
-                            // Remove old if exists and replace it with new one
-                            liiteService.delete(liite);
-                            liiteService.save(file, liite)
-                                    .ifPresent(l -> {
-                                        final MuutospyyntoLiite link = new MuutospyyntoLiite();
-                                        link.setLiiteId(l.getId());
-                                        link.setMuutospyyntoId(muutospyyntoId);
-                                        final MuutospyyntoLiiteRecord muutospyyntoLiiteRecord =
-                                                dsl.newRecord(MUUTOSPYYNTO_LIITE, link);
-                                        muutospyyntoLiiteRecord.store();
-                                    });
-                        })
+                .ifPresent(liitteet -> liitteet.forEach(liite -> {
+                            final Optional<MultipartFile> file = Optional.ofNullable(fileMap.get(liite.getTiedostoId()));
+                            if (file.isPresent()) {
+                                createMuutospyyntoLiite(muutospyyntoId, liite, file.get());
+                            } else {
+                                // Only update liite information to database.
+                                liiteService.update(liite);
+                            }
+                        }
                 ));
+    }
+
+    private void createMuutospyyntoLiite(Long muutospyyntoId, Liite liite, MultipartFile file) {
+        // Remove old if exists and replace it with new one
+        liiteService.delete(liite);
+        liiteService.save(file, liite)
+                .ifPresent(l -> {
+                    final MuutospyyntoLiite link = new MuutospyyntoLiite();
+                    link.setLiiteId(l.getId());
+                    link.setMuutospyyntoId(muutospyyntoId);
+                    final MuutospyyntoLiiteRecord muutospyyntoLiiteRecord =
+                            dsl.newRecord(MUUTOSPYYNTO_LIITE, link);
+                    muutospyyntoLiiteRecord.store();
+                });
     }
 
     private void saveMuutokset(Muutospyynto muutospyynto, Long id, Map<String, MultipartFile> fileMap) {
@@ -434,21 +463,17 @@ public class MuutospyyntoService {
     }
 
     private void updateMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
-        final Optional<MuutosRecord> muutosRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOS, muutos));
-        if (muutosRecordOpt.isPresent()) {
-            Optional<Muutos> updatethis = getMuutosByUuId(muutos.getUuid().toString());
-            if (!updatethis.isPresent()) {
-                return;
-            }
-            MuutosRecord muutosRecordUp = dsl.newRecord(MUUTOS, updatethis.get());
-            muutosRecordUp.setLuoja(authService.getUsername());
-            muutosRecordUp.setPaivityspvm(Timestamp.from(Instant.now()));
-            muutosRecordUp.setMuutospyyntoId(muutosPyyntoId);
-            muutosRecordUp.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).orElse(null));
+        getMuutosByUuId(muutos.getUuid().toString()).ifPresent(m -> {
+            muutos.setId(m.getId());
+            muutos.setLuoja(authService.getUsername());
+            muutos.setPaivityspvm(Timestamp.from(Instant.now()));
+            muutos.setMuutospyyntoId(muutosPyyntoId);
+            muutos.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).orElse(null));
+            MuutosRecord muutosRecordUp = dsl.newRecord(MUUTOS, muutos);
             dsl.executeUpdate(muutosRecordUp);
             deleteFromExisting(muutos.getLiitteet());
             createMuutosLiitteet(muutos, fileMap, muutosRecordUp.getId());
-        }
+        });
     }
 
     private void createMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
@@ -466,25 +491,35 @@ public class MuutospyyntoService {
 
     private void createMuutosLiitteet(Muutos muutos, Map<String, MultipartFile> fileMap, Long muutosId) {
         Optional.ofNullable(muutos.getLiitteet())
-                .ifPresent(liitteet -> liitteet.forEach(liite -> Optional.ofNullable(fileMap.get(liite.getTiedostoId()))
-                        .ifPresent(file -> {
-                            // Remove old if exists and replace it with new one.
-                            liiteService.delete(liite);
-                            liiteService.save(file, liite)
-                                    .ifPresent(l -> {
-                                        final MuutosLiite link = new MuutosLiite();
-                                        link.setLiiteId(l.getId());
-                                        link.setMuutosId(muutosId);
-                                        final MuutosLiiteRecord muutosLiiteRecord = dsl.newRecord(MUUTOS_LIITE, link);
-                                        muutosLiiteRecord.store();
-                                    });
-                        })
+                .ifPresent(liitteet -> liitteet.forEach(liite -> {
+                            final Optional<MultipartFile> file = Optional.ofNullable(fileMap.get(liite.getTiedostoId()));
+                            if (file.isPresent()) {
+                                createMuutosLiite(muutosId, liite, file.get());
+                            } else {
+                                // Only update liite information to database.
+                                liiteService.update(liite);
+                            }
+                        }
                 ));
     }
 
+    private void createMuutosLiite(Long muutosId, Liite liite, MultipartFile file) {
+        // Remove old if exists and replace it with new one.
+        liiteService.delete(liite);
+        liiteService.save(file, liite)
+                .ifPresent(l -> {
+                    final MuutosLiite link = new MuutosLiite();
+                    link.setLiiteId(l.getId());
+                    link.setMuutosId(muutosId);
+                    final MuutosLiiteRecord muutosLiiteRecord = dsl.newRecord(MUUTOS_LIITE, link);
+                    muutosLiiteRecord.store();
+                });
+    }
+
     private void deleteFromExisting(Collection<Liite> liitteet) {
-        Optional.ofNullable(liitteet).ifPresent(list -> list.stream()
-                .filter(Liite::isRemoved)
-                .forEach(liiteService::delete));
+        Optional.ofNullable(liitteet).ifPresent(list -> {
+            list.stream().filter(Liite::isRemoved).forEach(liiteService::delete);
+            list.removeIf(Liite::isRemoved);
+        });
     }
 }

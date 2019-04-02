@@ -6,8 +6,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.entity.TranslatedString
 import java.util.Collection
-import scala.collection.JavaConversions._
 
+import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio.Yhteystieto
+
+import scala.collection.JavaConversions._
 import scala.beans.BeanProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,6 +33,17 @@ case class Organisaatio(
     @JsonIgnore def isKuntaKoodi(k: String) = kuntaKoodiArvo == k && null != k
     @JsonIgnore def getKuntaKoodiOpt: java.util.Optional[KoodistoKoodi] = Optional.ofNullable(kuntaKoodi)
     @JsonIgnore def getMaakuntaKoodiOpt: java.util.Optional[KoodistoKoodi] = Optional.ofNullable(maakuntaKoodi)
+
+    @JsonIgnore
+    def getMappedYhteystieto: Yhteystieto = {
+        val yhteystieto = Yhteystieto(null, null, null)
+        this.yhteystiedot.foreach(y => {
+            if (y.email != null) yhteystieto.email = y.email
+            if (y.numero != null) yhteystieto.numero = y.numero
+            if (y.www != null) yhteystieto.www = y.www
+        })
+        yhteystieto
+    }
 }
 
 object Organisaatio {

@@ -35,6 +35,7 @@ public class MuutosListFilter extends OivaFilter {
     private final BiFunction<Muutos, Object, Boolean> muutosKoodistoFilter = (muutos, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), muutos.isKoodisto(removeStart(value, "~"))));
     private final BiFunction<Muutos, Object, Boolean> muutosKoodiArvoFilter = (muutos, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), muutos.isKoodiArvo(removeStart(value, "~"))));
     private final BiFunction<Muutos, Object, Boolean> muutosYlaKoodiFilter = (muutos, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), muutos.hasYlaKoodi(removeStart(value, "~"))));
+    private final BiFunction<Muutos, Object, Boolean> muutosKoodiKasiteFilter = (muutos, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), muutos.hasKoodiKasite(removeStart(value, "~"))));
 
     private final BiFunction<Muutos, Object, Boolean> muutosArvoFilter = (muutos, filter) -> filterer.apply(filter, value -> {
         if (startsWith(value, ">") || startsWith(value, "<")) {
@@ -73,6 +74,7 @@ public class MuutosListFilter extends OivaFilter {
         else if(equalsIgnoreCase(filterType, "ylakoodi")) return muutosYlaKoodiFilter.apply(muutos, filterTarget);
         else if(equalsIgnoreCase(filterType, "arvo")) return muutosArvoFilter.apply(muutos, filterTarget);
         else if(equalsIgnoreCase(filterType, "alimaarays")) return alimaaraysChainFilter.apply(muutos, filterTarget);
+        else if(equalsIgnoreCase(filterType, "kasite")) return muutosKoodiKasiteFilter.apply(muutos, filterTarget);
         else return false;
     }
 

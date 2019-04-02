@@ -15,8 +15,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapter {
 
@@ -47,24 +51,26 @@ public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapt
     protected void configure(final HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.exceptionHandling()
-            .authenticationEntryPoint(http401UnauthorizedEntryPoint)
-            .and()
-            .addFilter(casAuthenticationFilter())
-            .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter.class);
+                .authenticationEntryPoint(http401UnauthorizedEntryPoint)
+                .and()
+                .addFilter(casAuthenticationFilter())
+                .addFilterBefore(singleSignOutFilter(), CasAuthenticationFilter.class);
 
         http.headers().frameOptions().disable();
 
         http.logout()
-            .logoutUrl(oivaApiPath + BaseAuthController.path + "/logout")
-            .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID", "SESSION")
-            .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
+                .logoutUrl(oivaApiPath + BaseAuthController.path + "/logout")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "SESSION")
+                .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
+
+        http.sessionManagement().maximumSessions(-1).sessionRegistry(sessionRegistry());
 
         SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
     @Override
-    public void configure(final WebSecurity web) throws Exception {
+    public void configure(final WebSecurity web) {
         web.ignoring().antMatchers("/swagger/**");
     }
 
@@ -73,6 +79,7 @@ public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapt
         final CasAuthenticationFilter casAuthenticationFilter = new CasAuthenticationFilter();
         casAuthenticationFilter.setAuthenticationManager(authenticationManager());
         casAuthenticationFilter.setAuthenticationSuccessHandler(new CustomSuccessHandler());
+        casAuthenticationFilter.setSessionAuthenticationStrategy(new RegisterSessionAuthenticationStrategy(sessionRegistry()));
         return casAuthenticationFilter;
     }
 
@@ -115,8 +122,18 @@ public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapt
         return new Cas20ServiceTicketValidator(casUrlPrefix);
     }
 
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
+    }
+
     @Autowired
-    public void configureGlobal(final AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(final AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(casAuthenticationProvider());
     }
 }

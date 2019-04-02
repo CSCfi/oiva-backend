@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite implements Serializable {
 
-    private static final long serialVersionUID = 315074742;
+    private static final long serialVersionUID = -624064087;
 
     private Long      id;
     private String    nimi;
@@ -43,6 +43,8 @@ public class Liite implements Serializable {
     private String    tyyppi;
     private String    kieli;
     private UUID      uuid;
+    private Boolean   salainen;
+    private String    paikka;
 
     public Liite() {}
 
@@ -60,6 +62,8 @@ public class Liite implements Serializable {
         this.tyyppi = value.tyyppi;
         this.kieli = value.kieli;
         this.uuid = value.uuid;
+        this.salainen = value.salainen;
+        this.paikka = value.paikka;
     }
 
     public Liite(
@@ -75,7 +79,9 @@ public class Liite implements Serializable {
         JsonNode  meta,
         String    tyyppi,
         String    kieli,
-        UUID      uuid
+        UUID      uuid,
+        Boolean   salainen,
+        String    paikka
     ) {
         this.id = id;
         this.nimi = nimi;
@@ -90,6 +96,8 @@ public class Liite implements Serializable {
         this.tyyppi = tyyppi;
         this.kieli = kieli;
         this.uuid = uuid;
+        this.salainen = salainen;
+        this.paikka = paikka;
     }
 
     public Long getId() {
@@ -205,6 +213,23 @@ public class Liite implements Serializable {
         this.uuid = uuid;
     }
 
+    public Boolean getSalainen() {
+        return this.salainen;
+    }
+
+    public void setSalainen(Boolean salainen) {
+        this.salainen = salainen;
+    }
+
+    @Size(max = 255)
+    public String getPaikka() {
+        return this.paikka;
+    }
+
+    public void setPaikka(String paikka) {
+        this.paikka = paikka;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Liite (");
@@ -222,6 +247,8 @@ public class Liite implements Serializable {
         sb.append(", ").append(tyyppi);
         sb.append(", ").append(kieli);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(salainen);
+        sb.append(", ").append(paikka);
 
         sb.append(")");
         return sb.toString();

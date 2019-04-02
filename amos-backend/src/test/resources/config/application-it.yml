@@ -1,5 +1,5 @@
 oiva:
-  dbhost: 192.168.99.103
+  dbhost: @env.MACHINE_IP@
   dbport: 15432
   dbname: oiva
   dbusername: oiva

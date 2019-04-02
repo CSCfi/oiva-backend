@@ -34,6 +34,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -74,10 +76,10 @@ public class LiiteService {
                 .fetchOneInto(Liite.class));
     }
 
-    public Optional<Liite> getByUuid(UUID id) {
+    public Optional<Liite> getByUuid(UUID uuid) {
         return Optional.ofNullable(dsl.select(LIITE.fields())
                 .from(LIITE)
-                .where(LIITE.UUID.eq(id))
+                .where(LIITE.UUID.eq(uuid))
                 .fetchOneInto(Liite.class));
     }
 
@@ -109,6 +111,16 @@ public class LiiteService {
 
     public Optional<File> getFileFor(String path) {
         return getFileOptFromPath(pathify(fileStorageConfig.getLiitteetBasePath(), path));
+    }
+
+    public void update(Liite liite) {
+        getByUuid(liite.getUuid()).ifPresent(l -> {
+            liite.setId(l.getId());
+            liite.setPaivittaja(authService.getUsername());
+            liite.setPaivityspvm(Timestamp.from(Instant.now()));
+            final LiiteRecord liiteRecord = dsl.newRecord(LIITE, liite);
+            dsl.executeUpdate(liiteRecord);
+        });
     }
 
     public Optional<Liite> save(MultipartFile file, Liite liite) {
@@ -230,6 +242,7 @@ public class LiiteService {
 
     private Optional<Long> createDbRecord(Liite liite) {
         liite.setLuoja(authService.getUsername());
+        liite.setLuontipvm(Timestamp.from(Instant.now()));
         LiiteRecord rcrd = dsl.newRecord(LIITE, liite);
         rcrd.store();
         return Optional.ofNullable(rcrd.getId());

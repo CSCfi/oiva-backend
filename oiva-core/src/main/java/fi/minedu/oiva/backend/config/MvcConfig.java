@@ -3,14 +3,12 @@ package fi.minedu.oiva.backend.config;
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicates;
 import fi.minedu.oiva.backend.spring.handler.CompletionStageReturnValueHandler;
-import fi.minedu.oiva.backend.spring.resolver.OIDArgumentResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -50,68 +48,59 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     }
 
     @Override
-    public void addViewControllers(final ViewControllerRegistry registry) {}
+    public void addViewControllers(final ViewControllerRegistry registry) {
+    }
 
     @Bean
     public Docket swaggerConfig() {
         return new Docket(DocumentationType.SWAGGER_2)
-            .groupName("oiva")
-            .apiInfo(apiInfo())
-            .select()
-            .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
-            .paths(PathSelectors.any())
-            .build()
-            .directModelSubstitute(Timestamp.class, Long.class)
-            .alternateTypeRules(buildTypeRules());
+                .groupName("oiva")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(Predicates.not(RequestHandlerSelectors.basePackage("org.springframework.boot")))
+                .paths(PathSelectors.any())
+                .build()
+                .directModelSubstitute(Timestamp.class, Long.class)
+                .alternateTypeRules(buildTypeRules());
     }
 
     private AlternateTypeRule[] buildTypeRules() {
         return new AlternateTypeRule[]{
-            newRule(typeResolver.resolve(CompletableFuture.class,
-                    typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
-                typeResolver.resolve(WildcardType.class)),
-            newRule(typeResolver.resolve(CompletableFuture.class,
-                    typeResolver.resolve(HttpEntity.class, WildcardType.class)),
-                typeResolver.resolve(WildcardType.class)),
-            newRule(typeResolver.resolve(CompletableFuture.class,
-                    typeResolver.resolve(Collection.class, WildcardType.class)),
-                typeResolver.resolve(List.class, WildcardType.class)),
-            newRule(typeResolver.resolve(CompletableFuture.class,
-                    typeResolver.resolve(Page.class, WildcardType.class)),
-                typeResolver.resolve(Page.class, WildcardType.class)),
-            newRule(typeResolver.resolve(CompletableFuture.class,
-                    typeResolver.resolve(WildcardType.class)),
-                typeResolver.resolve(WildcardType.class)),
-            newRule(typeResolver.resolve(CompletionStage.class,
-                    typeResolver.resolve(WildcardType.class)),
-                typeResolver.resolve(WildcardType.class))
+                newRule(typeResolver.resolve(CompletableFuture.class,
+                        typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class)),
+                newRule(typeResolver.resolve(CompletableFuture.class,
+                        typeResolver.resolve(HttpEntity.class, WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class)),
+                newRule(typeResolver.resolve(CompletableFuture.class,
+                        typeResolver.resolve(Collection.class, WildcardType.class)),
+                        typeResolver.resolve(List.class, WildcardType.class)),
+                newRule(typeResolver.resolve(CompletableFuture.class,
+                        typeResolver.resolve(Page.class, WildcardType.class)),
+                        typeResolver.resolve(Page.class, WildcardType.class)),
+                newRule(typeResolver.resolve(CompletableFuture.class,
+                        typeResolver.resolve(WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class)),
+                newRule(typeResolver.resolve(CompletionStage.class,
+                        typeResolver.resolve(WildcardType.class)),
+                        typeResolver.resolve(WildcardType.class))
         };
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfo(
-            "Oiva API",
-            "Opetushallinnon ohjaus- ja säätelypalvelun API",
-            "2.0",
-            "",
+                "Oiva API",
+                "Opetushallinnon ohjaus- ja säätelypalvelun API",
+                "2.0",
+                "",
                 new Contact("", "", ""),
-            "",
-            ""
+                "",
+                ""
         );
     }
 
     @Bean
     public HandlerMethodReturnValueHandler completionStageReturnValueHandler() {
         return new CompletionStageReturnValueHandler();
-    }
-
-    @Bean
-    public OIDArgumentResolver oidArgumentResolver() {
-        return new OIDArgumentResolver();
-    }
-
-    @Override
-    public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> argumentResolvers) {
-        argumentResolvers.add(oidArgumentResolver());
     }
 }

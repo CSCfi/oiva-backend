@@ -24,11 +24,15 @@ import java.util.stream.Collectors;
 @Service
 public class KoodistoService {
 
-    @Autowired
-    private OpintopolkuService opintopolkuService;
+    private final OpintopolkuService opintopolkuService;
 
     @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
     private String ammatillinenKoulutustyyppiKoodiArvot;
+
+    @Autowired
+    public KoodistoService(OpintopolkuService opintopolkuService) {
+        this.opintopolkuService = opintopolkuService;
+    }
 
     private List<String> getAmmatillinenKoulutustyyppiArvot() {
         return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
@@ -57,10 +61,11 @@ public class KoodistoService {
      *
      * @param koodistoUri koodisto uri
      * @param koodistoVersio koodisto versio
+     * @param includeExpired palautetaanko myös vanhentuneet koodit
      * @return Koodiston koodit
      */
-    public List<KoodistoKoodi> getKoodit(final String koodistoUri, final Integer koodistoVersio) {
-        return opintopolkuService.getKoodit(koodistoUri, koodistoVersio);
+    public List<KoodistoKoodi> getKoodit(final String koodistoUri, final Integer koodistoVersio, final Boolean includeExpired) {
+        return opintopolkuService.getKoodit(koodistoUri, koodistoVersio, includeExpired);
     }
 
     /**
