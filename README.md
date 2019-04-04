@@ -14,6 +14,37 @@
 
 Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista saada projekti nopeastikin käyntiin, mutta älä lannistu, jos koet vastoinkäymisiä asennuksia tehdessäsi. Ohjeita päivitetään tarpeen vaatiessa, mutta toisinaan paras apu kipakka, kehittäjien suunnattu, kysymys.
 
+- [Buildaus- ja kehitysympäristön asentaminen](#buildaus--ja-kehitysymp%C3%A4rist%C3%B6n-asentaminen)
+  - [Alkuvalmistelut](#alkuvalmistelut)
+  - [1. Docker](#1-docker)
+  - [2. Java](#2-java)
+  - [3. Maven](#3-maven)
+  - [4. PrinceXML](#4-princexml)
+  - [5. IDE](#5-ide)
+  - [6. Projektin kääntäminen](#6-projektin-k%C3%A4%C3%A4nt%C3%A4minen)
+  - [6.1 Huomioita](#61-huomioita)
+  - [7. Palveluiden käynnistäminen](#7-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.1 Oiva-puolen palveluiden käynnistäminen](#71-oiva-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.2 Kuja-puolen palveluiden käynnistäminen](#72-kuja-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.3 Huomioita](#73-huomioita)
+  - [8. Tietokanta](#8-tietokanta)
+    - [8.1 Tietokantojen alustaminen](#81-tietokantojen-alustaminen)
+      - [8.1.1 Amos](#811-amos)
+      - [8.1.2 Yva](#812-yva)
+- [Läpi käymättä olevat asennusohjeet](#l%C3%A4pi-k%C3%A4ym%C3%A4tt%C3%A4-olevat-asennusohjeet)
+  - [Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi](#flyway-migraatioiden-ajaminen-mavenilla-ja-jooq-tietokantaluokkien-generointi)
+  - [Tietokannan puhdistus ja populointi Maven SQL pluginilla](#tietokannan-puhdistus-ja-populointi-maven-sql-pluginilla)
+      - [Pudota flyway-migraatiokanta ja sovelluksen skeemat](#pudota-flyway-migraatiokanta-ja-sovelluksen-skeemat)
+      - [Entityjen luominen](#entityjen-luominen)
+      - [Populoi tietokanta alustavalla datasetillä](#populoi-tietokanta-alustavalla-datasetill%C3%A4)
+  - [Aja kehitysversiota lokaali-Mavenilla](#aja-kehitysversiota-lokaali-mavenilla)
+  - [PDF-exportin konfiguroiminen [TODO: UPDATE]](#pdf-exportin-konfiguroiminen-todo-update)
+  - [Sananen konfiguraatiosta](#sananen-konfiguraatiosta)
+  - [Testit](#testit)
+  - [Debug ja JRebel](#debug-ja-jrebel)
+  - [Paketointi serveriympäristöihin](#paketointi-serveriymp%C3%A4rist%C3%B6ihin)
+  - [Serverillä manuaalinen backendin käynnistys stagingissa:](#serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
+
 ## Alkuvalmistelut
 
 Asenna koneellesi seuraavat asiat. Tarkemmat ohjeet on kerrottu alempana, numeroiduin otsikoin:
@@ -50,19 +81,39 @@ Kun olet käynyt kaikki edellä listatut kohdat läpi ja asentanut tarvittavat a
 mvn clean package
 ```
 
-## 7. Oiva-puolen palveluiden käynnistäminen
-Projektin juurihakemistossa on tiedosto `oiva-docker.sh`. Siihen on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Eli Dockerin näkökulmasta riittää, että suoritat seuraavan komennon:
+## 6.1 Huomioita
+
+* Sovellusta käännettäessä täytyy konfiguraatioiden olla halutun profiilin mukaisessa, `application.yml` tai `application-dev.yml`, tiedostossa. Muuten konfiguraatiot luetaan projektin sisältä.
+* Pakettiin mukaan tuleviin resursseihin voi vaikuttaa käyttämällä joko Maven-profiilia -P dev tai -P prod. Oletusasetus on -P dev.
+
+## 7. Palveluiden käynnistäminen
+Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
+
+### 7.1 Oiva-puolen palveluiden käynnistäminen
+Suorita seuraava komento projektin juurihakemistossa:
 ```
 ./oiva-docker.sh start --amos
 ```
-*! Mikäli haluat käynnistää myös Kuja-puolen backend-palvelut, jätä lippu `--amos` pois yllä olevasta komennosta.*
+### 7.2 Kuja-puolen palveluiden käynnistäminen
+Suorita seuraava komento projektin juurihakemistossa:
+```
+./oiva-docker.sh start --yva
+```
 
-*! Sovellusta ajettaessa täytyy konfiguraatioiden olla halutun profiilin mukaisessa, `application.yml` tai `application-dev.yml`, tiedostossa. Muuten konfiguraatiot luetaan projektin sisältä. Käännettäessä sovellus, pitää aina muistaa valita myös maven profiili -P dev tai -P prod, jotta pakettiin tulevat mukaan tarvittavat resurssit.*
+### 7.3 Huomioita
+* Projektin juurihakemistossa sijaitsevaan `oiva-docker.sh`-tiedostoon on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Tyypillistä `docker-compose up` -komentoa ei siis tarvitse tässä projektissa käsin ajaa.
+* Mikäli haluat käynnistää myös sekä Oiva- että Kuja-puolen backend-palvelut samanaikaisesti, suorita komento `./oiva-docker.sh start` ilman yllä mainittuja lippuja.
 
-## 8. Tietokantarakenteen luonti, populointi ja puhdistus
-Alusta tietokannat:
-    
+## 8. Tietokanta
+Projektissa on käytössä [PostgreSQL](https://www.postgresql.org/)-tietokanta, joka pyörii Docker-kontissa, virtuaalikoneiden verkossa. Tietokantaa ei siis tarvitse asentaa omalle koneelle.
+
+### 8.1 Tietokantojen alustaminen
+Sinun ei tarvitse välttämättä suorittaa molempia alla olevista komennoista. Alustaminen toimii, mikäli olet kohdassa [7](#palveluiden-kaeynnistaeminen) käynnistänyt kyseisen puolen pavelut.
+
+#### 8.1.1 Amos
     $ ./oiva-db.sh amos init
+
+#### 8.1.2 Yva
     $ ./oiva-db.sh yva init
 
 Populoi tietokannat:
@@ -72,7 +123,9 @@ Populoi tietokannat:
 
 Tietokannan ajantasaisuudesta vastaa [Flyway](https://flywaydb.org/)-migraatiotyökalu. Sinun ei tarvitse asentaa työkalua.
 
-## 9. Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
+# Läpi käymättä olevat asennusohjeet
+
+## Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
 
 Maven Flyway plugin vie migraatioista löytyvät tietokantarakenteet (aluksi: ``resources/db/migration/V1__Baseline.sql``) 
 käännöksen yhteydessä tietokantaan jos Mavenin generate-db -profiili enabloidaan.
