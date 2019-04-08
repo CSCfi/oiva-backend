@@ -8,7 +8,7 @@
         "organisaatioOid": "1.2.1.1",
         "kayttooikeudet": [
           {
-            "palvelu": "OIVA_APP",
+            "palvelu": "TEST_APP",
             "oikeus": "AMMATILLINEN_ESITTELIJA"
           },
           {
@@ -23,6 +23,23 @@
           {
             "palvelu": "OIVA_APP",
             "oikeus": "AMMATILLINEN_ESITTELIJA"
+          },
+          {
+            "palvelu": "OIVA_APP",
+            "oikeus": "AMMATILLINEN_NIMENKIRJOITTAJA"
+          },
+          {
+            "palvelu": "KOUTE",
+            "oikeus": "ESITTELIJA"
+          }
+        ]
+      },
+      {
+        "organisaatioOid": "1.2.1.3",
+        "kayttooikeudet": [
+          {
+            "palvelu": "OIVA_APP",
+            "oikeus": "AMMATILLINEN_KAYTTAJA"
           },
           {
             "palvelu": "KOUTE",
