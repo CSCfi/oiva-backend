@@ -62,7 +62,7 @@ public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapt
                 .logoutUrl(oivaApiPath + BaseAuthController.path + "/logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "SESSION")
-                .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl);
+                .logoutSuccessUrl(casUrlPrefix + casUrlLogout + "?service=" + oivaBaseUrl + "/logout");
 
         http.sessionManagement().maximumSessions(-1).sessionRegistry(sessionRegistry());
 

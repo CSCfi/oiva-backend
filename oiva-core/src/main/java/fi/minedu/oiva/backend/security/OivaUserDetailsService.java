@@ -53,14 +53,13 @@ public class OivaUserDetailsService implements UserDetailsService {
         final KayttajaKayttooikeus kayttooikeudet = opintopolku.getKayttajaKayttooikeus(username)
                 .orElseThrow(() -> new UsernameNotFoundException("No such user: " + username));
 
-        List<String> oikeudet = kayttooikeudet.getOivaOikeudet()
+        final String oid = kayttooikeudet.getOivaOrganisaatioOid().orElse(null);
+        List<String> oikeudet = kayttooikeudet.getOivaOikeudet(oid)
                 .orElseThrow(() -> new InsufficientAuthenticationException("No Oiva permissions for user: " + username));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Authorities: {}", oikeudet);
         }
-        final String oid = kayttooikeudet.getOrganisaatioOids().orElse(Collections.emptyList())
-                .stream().findFirst().orElse(null);
 
         final boolean permissionsDecreased = organisationHasEditorLoggedIn(oid) &&
                 Stream.of(editorRoles).anyMatch(oikeudet::contains);

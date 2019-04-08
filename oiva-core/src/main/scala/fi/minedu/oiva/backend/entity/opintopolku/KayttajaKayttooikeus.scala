@@ -27,13 +27,24 @@ case class KayttajaKayttooikeus(
 
     def this() = this(null, null)
 
-    @JsonIgnore def getOrganisaatioOids: Optional[java.util.List[String]] =
+    /**
+      * Get oid from first organisation with permissions to OIVA_APP
+      * @return organisation oid
+      */
+    @JsonIgnore def getOivaOrganisaatioOid: Optional[String] =
         if(null == organisaatiot) Optional.empty()
-        else Optional.ofNullable(organisaatiot.toList.map(_.organisaatioOid))
+        else Optional.ofNullable(organisaatiot.toList.filter(_.getOivaOikeudet.nonEmpty)
+          .map(_.organisaatioOid).head)
 
-    @JsonIgnore def getOivaOikeudet: Optional[java.util.List[String]] =
-        if(null == organisaatiot) Optional.empty()
-        else organisaatiot.toList.flatMap(_.getOivaOikeudet).distinct match {
+    /**
+      * Get Oiva permissions for specific organisation.
+      * @param oid Organisation oid
+      * @return List of Oiva permissions
+      */
+    @JsonIgnore def getOivaOikeudet(oid: String): Optional[java.util.List[String]] =
+        if(null == oid || null == organisaatiot) Optional.empty()
+        else organisaatiot.toList.filter(o => o.organisaatioOid.equals(oid))
+          .flatMap(_.getOivaOikeudet).distinct match {
             case Nil => Optional.empty()
             case list => Optional.of(OivaAccess.Role_Application :: list)
         }
