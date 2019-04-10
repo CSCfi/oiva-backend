@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
  * OIVA_APP_NIMENKIRJOITTAJA
  * OIVA_APP_KAYTTAJA
  * OIVA_APP_KATSELIJA
- * OIVA_APP_KATSELIJA_111.222.333
 */
 
 public interface OivaAccess {
