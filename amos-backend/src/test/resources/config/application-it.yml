@@ -41,8 +41,8 @@ redis:
   host: localhost
   port: 7379
 
-attachments:
-  upload.path: uploads
+file.storage:
+  base.path: target/uploads
 
 prince:
   exec.path:
@@ -51,7 +51,7 @@ templates:
   base.path:
 
 logging:
-  file: logs/spring.log
+  file: target/logs/spring.log
   level:
     fi.minedu.oiva: DEBUG
     org.springframework.security: DEBUG
