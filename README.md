@@ -10,118 +10,122 @@
     | |_) | (_| | (__|   <  __/ | | | (_| |
     |____/ \__,_|\___|_|\_\___|_| |_|\__,_|
 
-# Buildaus ja kehitysympäristön asennus - How-to
+# Buildaus- ja kehitysympäristön asentaminen
 
-## Oiva 2.0 dependency version updates
-Dependency                      | New version
-------------------------------- | -------------
-spring-boot-starter-parent      | 1.5.1.RELEASE
-spring-boot-starter-data-redis  | 1.4.4.RELEASE
-postgresql                      | 42.1.4
-jooq                            | 3.9.1
-jool                            | 0.9.12
-jooq-codegen-maven              | 3.9.1
-modelmapper-jooq                | 0.7.7
-javaslang                       | 1.2.3
-jackson                         | 2.8.7
-flyway-core                     | 4.2.0
-spring-security-test            | 4.2.1.RELEASE
-spring-data-commons             | 1.13.0.RELEASE
-spring-session                  | 1.3.0.RELEASE
-jersey-rx-client-java8          | 2.25.1
-pebble                          | 2.3.0
-springfox-swagger2              | 2.6.1
-springfox-swagger-ui            | 2.6.1
+Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista saada projekti nopeastikin käyntiin, mutta älä lannistu, jos koet vastoinkäymisiä asennuksia tehdessäsi. Ohjeita päivitetään tarpeen vaatiessa, mutta toisinaan paras apu kipakka, kehittäjien suunnattu, kysymys.
+
+- [Buildaus- ja kehitysympäristön asentaminen](#buildaus--ja-kehitysymp%C3%A4rist%C3%B6n-asentaminen)
+  - [Alkuvalmistelut](#alkuvalmistelut)
+  - [1. Docker](#1-docker)
+  - [2. Java](#2-java)
+  - [3. Maven](#3-maven)
+  - [4. PrinceXML](#4-princexml)
+  - [5. IDE](#5-ide)
+  - [6. Projektin kääntäminen](#6-projektin-k%C3%A4%C3%A4nt%C3%A4minen)
+  - [6.1 Huomioita](#61-huomioita)
+  - [7. Palveluiden käynnistäminen](#7-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.1 Oiva-puolen palveluiden käynnistäminen](#71-oiva-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.2 Kuja-puolen palveluiden käynnistäminen](#72-kuja-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.3 Huomioita](#73-huomioita)
+  - [8. Tietokanta](#8-tietokanta)
+    - [8.1 Tietokantojen alustaminen](#81-tietokantojen-alustaminen)
+      - [8.1.1 Amos](#811-amos)
+      - [8.1.2 Yva](#812-yva)
+- [Läpi käymättä olevat asennusohjeet](#l%C3%A4pi-k%C3%A4ym%C3%A4tt%C3%A4-olevat-asennusohjeet)
+  - [Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi](#flyway-migraatioiden-ajaminen-mavenilla-ja-jooq-tietokantaluokkien-generointi)
+  - [Tietokannan puhdistus ja populointi Maven SQL pluginilla](#tietokannan-puhdistus-ja-populointi-maven-sql-pluginilla)
+      - [Pudota flyway-migraatiokanta ja sovelluksen skeemat](#pudota-flyway-migraatiokanta-ja-sovelluksen-skeemat)
+      - [Entityjen luominen](#entityjen-luominen)
+      - [Populoi tietokanta alustavalla datasetillä](#populoi-tietokanta-alustavalla-datasetill%C3%A4)
+  - [Aja kehitysversiota lokaali-Mavenilla](#aja-kehitysversiota-lokaali-mavenilla)
+  - [PDF-exportin konfiguroiminen [TODO: UPDATE]](#pdf-exportin-konfiguroiminen-todo-update)
+  - [Sananen konfiguraatiosta](#sananen-konfiguraatiosta)
+  - [Testit](#testit)
+  - [Debug ja JRebel](#debug-ja-jrebel)
+  - [Paketointi serveriympäristöihin](#paketointi-serveriymp%C3%A4rist%C3%B6ihin)
+  - [Serverillä manuaalinen backendin käynnistys stagingissa:](#serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
 
 ## Alkuvalmistelut
 
-Koneelle täytyy asentaa: 
-    
-* Java 8
-* Maven (3.3.1 tai uudempi)
- 
-Asenna myös Docker ja Docker Compose jos ympäristön pystytykseen halutaan käyttää Docker Composea. Ilman Dockeria 
-tietokannat (PostgreSQL ja Redis) täytyy asentaa käsin. 
+Asenna koneellesi seuraavat asiat. Tarkemmat ohjeet on kerrottu alempana, numeroiduin otsikoin:
+* [Docker](https://www.docker.com/).
+* [Java 8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html).
+* [Maven](http://maven.apache.org/) (3.3.1 tai uudempi).
+* [PrinceXML](https://www.princexml.com/).
+* IDE, kuten [VS Code](https://code.visualstudio.com/) tai [IntelliJ](https://www.jetbrains.com/idea/).
 
-### PrinceXML
+Mikäli käytät VS Code:a, kannattaa siihen asentaa hyödyllisiä lisäosia, kuten seuraavat:
+* Markdown All in One.
 
-PrinceXML-kirjastoa käytetään PDF:ien generointiin, se täytyy asentaa koneille erikseen.
+## 1. Docker
+Asenna Docker. Dockeria käytetään virtuaalikoneiden verkon luontiin. Verkon myötä kehittäjillä on käytössään yhtenevä kehitysympäristö. Tässä vaiheessa riittää, että saat Dockerin asennettua. Sen käyttöön palataan näissä ohjeissa myöhemmin.
 
-Lataa aluksi ympäristöösi oikea versio:
+## 2. Java
+Asenna Java. Mikäli sinulla on jo ennestään jokin toinen Java-versio asennettuna ja käytät Mac:ia, voit hallinnoida versioasennuksia [Jenv](http://www.jenv.be/):llä.
 
-HUOM! Projektissa käytetään PrinceXML:n versiota 10r2 (alla olevat url-osoitteet voivat olla vanhoja)
+## 3. Maven
+Asenna Maven. Mavenin suhteen ei tarvitse tehdä mitään erikoisia temppuja. Riittää, että siitä on asennettuna tarpeeksi tuore versio.
 
-Centos 64bit - esimerkki:
+## 4. PrinceXML
+Asenna PrinceXML. PrinceXML-kirjastoa käytetään PDF-tiedostojen generointiin. Projektissa on ollut tähän asti käytössä versio [Prince 10](https://www.princexml.com/releases/10/), mutta tuoreimman version käyttämiselle ei välttämättä ole esteitä. Asennuksen tehtyäsi varmista, että tiedoston `amos-backend/src/main/resources/config/application.yml` kohta `prince.exec.path` viittaa hakemistoon, johon PrinceXML on asennettu. Suorita tämän jälkeen seuraava komento:
+```
+./install-prince.sh
+```
 
-    $ wget http://www.princexml.com/download/prince-9.0-5.centos60.x86_64.rpm
-    $ rpm -i prince-9.0-5.centos60.x86_64.rpm
+## 5. IDE
+IDE:n suhteen ei ole sen kummempia vaatimuksia. VS Code ja IntelliJ ovat hyväksi todettuja vaihtoehtoja.
 
-YUM:
+## 6. Projektin kääntäminen
+Kun olet käynyt kaikki edellä listatut kohdat läpi ja asentanut tarvittavat asiat, voit kokeilla kääntää projektin koodin. Suorita seuraava komento projektin juurihakemistossa:
+```
+mvn clean package
+```
 
-    $ yum --nogpgcheck localinstall prince-9.0-5.centos60.x86_64.rpm
-    $ yum install libpng12
-    
-OSX:
-    - Lataa princeXML http://www.princexml.com/download/ sivustolta
-    - Ks. ohjeet http://www.princexml.com/doc/installing/#macos
-    - Tarkasta että projektin resources/config/application.yml tiedoston prince.exec.path viitta oikeaan paikkaan
+## 6.1 Huomioita
 
-Aja tämän jälkeen skripti, jotta princeXML löytyy lokaalisti:
-    $ sh installLocalDependencies.sh
+* Sovellusta käännettäessä täytyy konfiguraatioiden olla halutun profiilin mukaisessa, `application.yml` tai `application-dev.yml`, tiedostossa. Muuten konfiguraatiot luetaan projektin sisältä.
+* Pakettiin mukaan tuleviin resursseihin voi vaikuttaa käyttämällä joko Maven-profiilia -P dev tai -P prod. Oletusasetus on -P dev.
 
+## 7. Palveluiden käynnistäminen
+Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
 
-## Käynnistä PostgreSQL-tietokanta, Redis
+### 7.1 Oiva-puolen palveluiden käynnistäminen
+Suorita seuraava komento projektin juurihakemistossa:
+```
+./oiva-docker.sh start --amos
+```
+### 7.2 Kuja-puolen palveluiden käynnistäminen
+Suorita seuraava komento projektin juurihakemistossa:
+```
+./oiva-docker.sh start --yva
+```
 
-Aja joko lokaalisti tai dockerilla (suositeltu)
+### 7.3 Huomioita
+* Projektin juurihakemistossa sijaitsevaan `oiva-docker.sh`-tiedostoon on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Tyypillistä `docker-compose up` -komentoa ei siis tarvitse tässä projektissa käsin ajaa.
+* Mikäli haluat käynnistää myös sekä Oiva- että Kuja-puolen backend-palvelut samanaikaisesti, suorita komento `./oiva-docker.sh start` ilman yllä mainittuja lippuja.
 
-Docker-compose:
+## 8. Tietokanta
+Projektissa on käytössä [PostgreSQL](https://www.postgresql.org/)-tietokanta, joka pyörii Docker-kontissa, virtuaalikoneiden verkossa. Tietokantaa ei siis tarvitse asentaa omalle koneelle.
 
-    $ docker-compose up
+### 8.1 Tietokantojen alustaminen
+Sinun ei tarvitse välttämättä suorittaa molempia alla olevista komennoista. Alustaminen toimii, mikäli olet kohdassa [7](#palveluiden-kaeynnistaeminen) käynnistänyt kyseisen puolen pavelut.
 
-
-**HUOM!!! Paremetrien syöttö ei enää toimi Spring Boot-plugarin kanssa, kun pluginissa forkataan oma prosessi.**
-
-Sovellusta ajettaessa PITÄÄ konfiguraatiot olla halutun profiilin mukaisessa `application.yml` tai `application-dev.yml 
-tiedostossa, tai muuten konfiguraatiot luetaan projektin sisältä!
-
-Käännettäessä sovellus, pitää aina muistaa valita myös maven profiili -P dev tai -P prod, jotta pakettiin tulee mukaan 
-tarvittavat resurssit.
-
-                    
-### Lokaaliasennus (ilman Dockeria)
-
-    CREATE USER oiva WITH PASSWORD 'oiva' CREATEDB;
-
-    $ psql -U oiva -W template1 -h 127.0.0.1
-
-    CREATE DATABASE oiva ENCODING 'UTF-8'
-
-    CREATE DATABASE oiva-test ENCODING 'UTF-8'
-
-## Tietokantarakenteen luonti, populointi ja puhdistus
-
-**HUOM!** Tietokannan kehityskäyttöönottoa on helpotettu, suositeltu tapa on käyttää docker-tietokantaa ja populoida tietokanta testidatalla ajamalla `oiva-db.sh`.
-
-Ts. käynnistä aluksi docker:
-
-    $ ./oiva-docker.sh start
-
-Alusta tietokannat
-    
+#### 8.1.1 Amos
     $ ./oiva-db.sh amos init
+
+#### 8.1.2 Yva
     $ ./oiva-db.sh yva init
-    
-Jatkossa voit luoda ja populoi tietokannat seuraavasti
+
+Populoi tietokannat:
 
     $ ./oiva-db.sh amos generate --clean --populate
     $ ./oiva-db.sh yva generate --clean --populate
 
-Alla on tarkemmat ohjeet miten tietokannan luonti ja populointi suoritetaan:
+Tietokannan ajantasaisuudesta vastaa [Flyway](https://flywaydb.org/)-migraatiotyökalu. Sinun ei tarvitse asentaa työkalua.
 
+# Läpi käymättä olevat asennusohjeet
 
-Tietokannan ajantasaisuudesta vastaa Flyway-migraatiotyökalu.
-
-### Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
+## Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
 
 Maven Flyway plugin vie migraatioista löytyvät tietokantarakenteet (aluksi: ``resources/db/migration/V1__Baseline.sql``) 
 käännöksen yhteydessä tietokantaan jos Mavenin generate-db -profiili enabloidaan.
