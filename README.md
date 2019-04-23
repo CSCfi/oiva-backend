@@ -78,13 +78,19 @@ IDE:n suhteen ei ole sen kummempia vaatimuksia. VS Code ja IntelliJ ovat hyväks
 ## 6. Projektin kääntäminen
 Kun olet käynyt kaikki edellä listatut kohdat läpi ja asentanut tarvittavat asiat, voit kokeilla kääntää projektin koodin. Suorita seuraava komento projektin juurihakemistossa:
 ```
-mvn clean package
+mvn clean install
 ```
 
 ## 6.1 Huomioita
 
 * Sovellusta käännettäessä täytyy konfiguraatioiden olla halutun profiilin mukaisessa, `application.yml` tai `application-dev.yml`, tiedostossa. Muuten konfiguraatiot luetaan projektin sisältä.
 * Pakettiin mukaan tuleviin resursseihin voi vaikuttaa käyttämällä joko Maven-profiilia -P dev tai -P prod. Oletusasetus on -P dev.
+* Kun backendiin tehdään muutoksia, joudut todennäköisesti rakentamaan paketit uudestaan ja tyhjentämään Redisin
+````
+mvn clean install
+docker exec -it oiva-backend_amos-redis_1 redis-cli (avaa promptin)
+FLUSHALL
+```
 
 ## 7. Palveluiden käynnistäminen
 Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
