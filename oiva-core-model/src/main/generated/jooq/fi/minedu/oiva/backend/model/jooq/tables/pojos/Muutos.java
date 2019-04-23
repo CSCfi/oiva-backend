@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos implements Serializable {
 
-    private static final long serialVersionUID = 39019070;
+    private static final long serialVersionUID = 1648887773;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -48,6 +48,7 @@ public class Muutos implements Serializable {
     private UUID      uuid;
     private String    paatosTila;
     private String    muutosperustelukoodiarvo;
+    private String    orgOid;
 
     public Muutos() {}
 
@@ -70,6 +71,7 @@ public class Muutos implements Serializable {
         this.uuid = value.uuid;
         this.paatosTila = value.paatosTila;
         this.muutosperustelukoodiarvo = value.muutosperustelukoodiarvo;
+        this.orgOid = value.orgOid;
     }
 
     public Muutos(
@@ -90,7 +92,8 @@ public class Muutos implements Serializable {
         String    tila,
         UUID      uuid,
         String    paatosTila,
-        String    muutosperustelukoodiarvo
+        String    muutosperustelukoodiarvo,
+        String    orgOid
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -110,6 +113,7 @@ public class Muutos implements Serializable {
         this.uuid = uuid;
         this.paatosTila = paatosTila;
         this.muutosperustelukoodiarvo = muutosperustelukoodiarvo;
+        this.orgOid = orgOid;
     }
 
     public Long getId() {
@@ -264,6 +268,15 @@ public class Muutos implements Serializable {
         this.muutosperustelukoodiarvo = muutosperustelukoodiarvo;
     }
 
+    @Size(max = 255)
+    public String getOrgOid() {
+        return this.orgOid;
+    }
+
+    public void setOrgOid(String orgOid) {
+        this.orgOid = orgOid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutos (");
@@ -286,6 +299,7 @@ public class Muutos implements Serializable {
         sb.append(", ").append(uuid);
         sb.append(", ").append(paatosTila);
         sb.append(", ").append(muutosperustelukoodiarvo);
+        sb.append(", ").append(orgOid);
 
         sb.append(")");
         return sb.toString();

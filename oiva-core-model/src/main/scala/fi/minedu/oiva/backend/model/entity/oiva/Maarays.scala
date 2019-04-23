@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.model.jooq.tables._
 import fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue
-import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi
+import fi.minedu.oiva.backend.model.entity.opintopolku.{KoodistoKoodi, Organisaatio}
 import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,9 +16,10 @@ class Maarays(
                var maaraystyyppi: pojos.Maaraystyyppi,
                var koodi: KoodistoKoodi,
                var ylaKoodit: Array[KoodistoKoodi],
+               var organisaatio: Organisaatio,
                var aliMaaraykset: Collection[Maarays]) extends pojos.Maarays {
 
-  def this() = this(null, null, null, null, null)
+  def this() = this(null, null, null, null, null, null)
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
@@ -79,6 +80,8 @@ class Maarays(
 
   @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = null != ylaKoodit && ylaKoodit.exists(ylakoodi => ylakoodi.isKoodi(koodiUri))
 
+  def setOrganisaatio(organisaatio: Organisaatio) = this.organisaatio = organisaatio
+  def getOrganisaatio = organisaatio
   def getAliMaaraykset = aliMaaraykset
 
   @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if (null != maarays && getId != maarays.getId) {
