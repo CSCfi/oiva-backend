@@ -13,14 +13,20 @@ import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.oiva.Paatoskierros;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.exception.ResourceNotFoundException;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutosLiite;
 import fi.minedu.oiva.backend.jooq.tables.pojos.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosLiiteRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoLiiteRecord;
 import fi.minedu.oiva.backend.jooq.tables.records.MuutospyyntoRecord;
+import fi.minedu.oiva.backend.security.OivaPermission;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.util.ValidationUtils;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectOnConditionStep;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +43,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -99,15 +106,9 @@ public class MuutospyyntoService {
 
     // Muutospyyntölistaus (hakemukset) esittelijälle
     public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
-
-        return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
-                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
-                MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
-                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID,
-                LUPA.JARJESTAJA_OID, LUPA.UUID.as("lupa_uuid"))
-                .from(MUUTOSPYYNTO, LUPA)
-                .where((MUUTOSPYYNTO.TILA.eq(tila.toString())))
-                .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
+        return getBaseSelect()
+                .where(baseFilter())
+                .and(MUUTOSPYYNTO.TILA.eq(tila.toString()))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))
@@ -117,15 +118,9 @@ public class MuutospyyntoService {
 
     // Muutospyyntölistaus (hakemukset) koulutuksen järjestäjälle
     public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
-
-        return dsl.select(MUUTOSPYYNTO.HAKUPVM, MUUTOSPYYNTO.VOIMASSALOPPUPVM, MUUTOSPYYNTO.VOIMASSAALKUPVM,
-                MUUTOSPYYNTO.PAATOSKIERROS_ID, MUUTOSPYYNTO.TILA, MUUTOSPYYNTO.UUID,
-                MUUTOSPYYNTO.JARJESTAJA_YTUNNUS, MUUTOSPYYNTO.LUOJA, MUUTOSPYYNTO.LUONTIPVM,
-                MUUTOSPYYNTO.PAIVITTAJA, MUUTOSPYYNTO.PAIVITYSPVM, LUPA.DIAARINUMERO, MUUTOSPYYNTO.ID,
-                LUPA.UUID.as("lupa_uuid"))
-                .from(MUUTOSPYYNTO, LUPA)
-                .where(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
-                .and(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID))
+        return getBaseSelect()
+                .where(baseFilter())
+                .and(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "listaus"))
@@ -161,33 +156,21 @@ public class MuutospyyntoService {
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true);
     }
 
-    private boolean validate(Muutos muutos) {
-        return ValidationUtils.validate(
-                validation(muutos.getKoodiarvo(), "Muutos: koodiarvo is missing"),
-                validation(muutos.getKoodisto(), "Muutos: koodisto is missing")
-        ) && Optional.ofNullable(muutos.getLiitteet()).map(liitteet -> liitteet.stream().allMatch(this::validate))
-                .orElse(true);
-    }
-
-    private boolean validate(Liite liite) {
-        return ValidationUtils.validate(
-                validation(liite.getTyyppi(), "Liite: tyyppi is missing"),
-                validation(liite.getKieli(), "Liite: kieli is missing")
-        );
-    }
-
     // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
     public Optional<Muutospyynto> getByUuid(String uuid) {
-        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
-                .where(MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))).fetchOptionalInto(Muutospyynto.class)
+        return getBaseSelect()
+                .where(baseFilter())
+                .and(MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid)))
+                .fetchOptionalInto(Muutospyynto.class)
                 .map(muutospyynto -> with(muutospyynto, "yksi"))
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
     // Hakee muutospyyntöön liittyvät muutokset
     public Collection<Muutos> getByMuutospyyntoUuid(String muutospyynto_uuid) {
-        Optional<Muutospyynto> muutospyyntoOpt = dsl.select(MUUTOSPYYNTO.ID).from(MUUTOSPYYNTO)
-                .where(MUUTOSPYYNTO.UUID.equal(UUID.fromString(muutospyynto_uuid)))
+        Optional<Muutospyynto> muutospyyntoOpt = getBaseSelect()
+                .where(baseFilter())
+                .and(MUUTOSPYYNTO.UUID.equal(UUID.fromString(muutospyynto_uuid)))
                 .fetchOptionalInto(Muutospyynto.class);
         if (!muutospyyntoOpt.isPresent()) {
             return Collections.emptyList();
@@ -236,10 +219,41 @@ public class MuutospyyntoService {
         if (reqs.equals("esittelija")) {
             withLiitteet(muutospyynto);
             withMuutokset(muutospyynto);
+            withLupaUuid(muutospyynto);
             withPaatoskierros(muutospyynto);
             withOrganization(muutospyynto);
         }
         return Optional.ofNullable(muutospyynto);
+    }
+
+    private SelectOnConditionStep<Record> getBaseSelect() {
+        return dsl.select(MUUTOSPYYNTO.fields())
+                .from(MUUTOSPYYNTO)
+                .leftJoin(LUPA).on(MUUTOSPYYNTO.LUPA_ID.eq(LUPA.ID));
+    }
+
+    private Condition baseFilter() {
+        final OivaPermission accessPermission = authService.accessPermission();
+        final Condition lupaCondition = LUPA.JARJESTAJA_OID.in(accessPermission.oids);
+        if (accessPermission.is(OivaAccess.Type.All)) {
+            return null;
+        }
+        return lupaCondition;
+    }
+
+    private boolean validate(Muutos muutos) {
+        return ValidationUtils.validate(
+                validation(muutos.getKoodiarvo(), "Muutos: koodiarvo is missing"),
+                validation(muutos.getKoodisto(), "Muutos: koodisto is missing")
+        ) && Optional.ofNullable(muutos.getLiitteet()).map(liitteet -> liitteet.stream().allMatch(this::validate))
+                .orElse(true);
+    }
+
+    private boolean validate(Liite liite) {
+        return ValidationUtils.validate(
+                validation(liite.getTyyppi(), "Liite: tyyppi is missing"),
+                validation(liite.getKieli(), "Liite: kieli is missing")
+        );
     }
 
     private void withLiitteet(Muutospyynto muutospyynto) {
@@ -282,9 +296,11 @@ public class MuutospyyntoService {
                 .where(PAATOSKIERROS.UUID.equal(uuid)).fetchOptionalInto(Long.class);
     }
 
-    private Optional<Long> getLupaId(String uuid) {
+    private Long getLupaId(String uuid) {
         return dsl.select(LUPA.ID).from(LUPA)
-                .where(LUPA.UUID.equal(UUID.fromString(uuid))).fetchOptionalInto(Long.class);
+                .where(LUPA.UUID.eq(UUID.fromString(uuid)))
+                .and(baseFilter()).fetchOptional(LUPA.ID)
+                .orElseThrow(ResourceNotFoundException::new);
     }
 
     private Optional<Long> getMaaraystyyppiId(UUID uuid) {
@@ -425,7 +441,7 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()).orElse(null));
+            muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()));
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();
@@ -561,12 +577,15 @@ public class MuutospyyntoService {
                     if (file.isPresent()) {
                         liiteService.save(file.get(), l);
                         return mapper.valueToTree(liiteService.get(l.getId()).orElse(null));
+                    } else if (l.getUuid() != null) {
+                        // Only update liite information to database.
+                        liiteService.update(l);
+                        return (JsonNode) mapper.valueToTree(liiteService.get(l.getId()).orElse(null));
                     }
-                    // Only update liite information to database.
-                    liiteService.update(l);
-                    return (JsonNode) mapper.valueToTree(liiteService.get(l.getId()).orElse(null));
-                }).collect(Collectors.toList());
-        ((ObjectNode)meta).putArray("liitteet").addAll(liitteet);
+                    // This is not valid meta liite.
+                    return null;
+                }).filter(Objects::nonNull).collect(Collectors.toList());
+        ((ObjectNode) meta).putArray("liitteet").addAll(liitteet);
     }
 
     private ArrayList<Liite> getMetaLiitteet(JsonNode meta) {

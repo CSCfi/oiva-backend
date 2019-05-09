@@ -76,12 +76,13 @@ public class OivaUserDetailsService implements UserDetailsService {
     }
 
     private boolean organisationHasEditorLoggedIn(String oid) {
+        final List<String> roleList = Arrays.asList(editorRoles);
         return sessionRegistry.getAllPrincipals().stream()
                 .filter(o -> o instanceof OivaUserDetails)
                 .map(o -> (OivaUserDetails) o)
                 .filter(u -> u.getOrganisationOid().equals(oid))
                 .flatMap(u -> u.getAuthorities().stream())
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(s -> Arrays.asList(editorRoles).contains(s));
+                .anyMatch(roleList::contains);
     }
 }

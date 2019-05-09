@@ -65,11 +65,12 @@ public class LupaService {
     }
 
     protected Optional<Lupa> getById(final Long id) {
-        return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id)).fetchOneInto(Lupa.class) : null);
+        return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id))
+                .fetchOneInto(Lupa.class) : null);
     }
 
     protected Optional<Condition> baseLupaFilter() {
-        final OivaPermission accessPermission = authService.lupaAccessPermission();
+        final OivaPermission accessPermission = authService.accessPermission();
         final Condition valmisLupaCondition = LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS);
         if(accessPermission.is(OivaAccess.Type.OnlyPublic)) {
             return Optional.of(valmisLupaCondition);

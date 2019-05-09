@@ -2,7 +2,7 @@ package fi.minedu.oiva.backend.web.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import fi.minedu.oiva.backend.entity.AsiatyyppiValue;
-import fi.minedu.oiva.backend.test.BaseIT;
+import fi.minedu.oiva.backend.it.BaseIT;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +11,12 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class LupaControllerIT extends BaseIT {
 
     @Test
     public void getAll() {
-        ResponseEntity<String> response = request("/api/luvat", HttpStatus.OK);
+        ResponseEntity<String> response = makeRequest("/api/luvat", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         log.info(doc.jsonString());
         assertEquals(5, doc.read("$.length()", Integer.class).intValue());
@@ -25,7 +24,7 @@ public class LupaControllerIT extends BaseIT {
 
     @Test
     public void getAllWithJarjestaja() {
-        final ResponseEntity<String> response = request("/api/luvat/jarjestajilla", HttpStatus.OK);
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestajilla", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         log.info(doc.jsonString());
         assertEquals(4, doc.read("$.length()", Integer.class).intValue());

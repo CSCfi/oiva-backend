@@ -1,7 +1,5 @@
 package fi.minedu.oiva.backend.security.annotations;
 
-import java.util.regex.Pattern;
-
 /*
  * OIVA_APP
  * OIVA_APP_ADMIN
@@ -9,7 +7,7 @@ import java.util.regex.Pattern;
  * OIVA_APP_NIMENKIRJOITTAJA
  * OIVA_APP_KAYTTAJA
  * OIVA_APP_KATSELIJA
-*/
+ */
 
 public interface OivaAccess {
 
@@ -18,8 +16,6 @@ public interface OivaAccess {
         OrganizationAndPublic,
         OnlyPublic
     }
-
-    Pattern Format_Role = Pattern.compile("^([A-Za-z_]+)(?:_((?:\\d+\\.?)+)?)?$");
 
     String Context_Oiva = "OIVA_APP";
     String Context_Yllapitaja = "OIVA_APP_ADMIN";
@@ -38,7 +34,8 @@ public interface OivaAccess {
     String Application = "hasAuthority('" + Role_Application + "')";
     String Yllapitaja = Application + " and hasAuthority('" + Role_Yllapitaja + "')";
     String Esittelija = Application + " and hasAuthority('" + Role_Esittelija + "')";
-    String Kayttaja = Application + " and hasAuthority('" + Role_Kayttaja + "')";
-    String Katselija = Application + " and hasAuthority('" + Role_Katselija + "')";
     String Nimenkirjoittaja = Application + " and hasAuthority('" + Role_Nimenkirjoittaja + "')";
+    String Kayttaja = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "')";
+    String Katselija = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "," +
+            Role_Katselija + "')";
 }
