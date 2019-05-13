@@ -86,6 +86,7 @@ public class OpintopolkuCasWebSecurityAdapter extends WebSecurityConfigurerAdapt
     @Bean
     public SingleSignOutFilter singleSignOutFilter() {
         final SingleSignOutFilter singleSignOutFilter = new SingleSignOutFilter();
+        singleSignOutFilter.setIgnoreInitConfiguration(true);
         singleSignOutFilter.setCasServerUrlPrefix(casUrlPrefix);
         return singleSignOutFilter;
     }

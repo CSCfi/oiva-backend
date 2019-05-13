@@ -28,11 +28,12 @@
         <postgres.driver.version>42.1.4</postgres.driver.version>
         <postgres.driver.name>org.postgresql.Driver</postgres.driver.name>
 
-        <cas.client.version>3.3.3</cas.client.version>
+        <commons-lang3.version>3.9</commons-lang3.version>
         <HikariCP.version>2.3.8</HikariCP.version>
         <flyway.version>4.2.0</flyway.version>
         <pebble.version>2.3.0</pebble.version>
         <jackson.version>2.8.7</jackson.version>
+        <pdfbox.version>1.8.16</pdfbox.version>
 
         <scala.version>2.11.7</scala.version>
         <scala.maven.version>3.2.0</scala.maven.version>
