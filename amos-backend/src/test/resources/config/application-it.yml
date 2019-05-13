@@ -39,7 +39,7 @@ spring:
 
 redis:
   host: localhost
-  port: 7379
+  port: 8889
 
 file.storage:
   base.path: target/uploads
