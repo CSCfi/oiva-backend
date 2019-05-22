@@ -8,7 +8,7 @@ import fi.minedu.oiva.backend.config.PebbleConfig;
 import fi.minedu.oiva.backend.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.entity.LupatilaValue;
 import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

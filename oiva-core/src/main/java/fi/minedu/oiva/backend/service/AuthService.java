@@ -37,27 +37,22 @@ public class AuthService {
         return SecurityUtil.userName().orElse("");
     }
 
-    public OivaPermission lupaAccessPermission() {
-        final Function<String, OivaPermission> organizationBasedAccess = role -> {
-            final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
-            access.oids.add(SecurityUtil.userOrganisationOid());
-            return access;
-        };
-
+    public OivaPermission accessPermission() {
         if (hasAnyRole(OivaAccess.Role_Esittelija)) {
             return new OivaPermission(Type.All);
-        } else if (hasAnyRole(OivaAccess.Role_Nimenkirjoittaja)) {
-            return organizationBasedAccess.apply(OivaAccess.Role_Nimenkirjoittaja);
-        } else if (hasAnyRole(OivaAccess.Role_Kayttaja)) {
-            return organizationBasedAccess.apply(OivaAccess.Role_Kayttaja);
-        } else if (hasAnyRole(OivaAccess.Role_Katselija)) {
-            return organizationBasedAccess.apply(OivaAccess.Role_Katselija);
-        } else {
-            return new OivaPermission(Type.OnlyPublic);
+        } else if (hasAnyRole(OivaAccess.Role_Nimenkirjoittaja, OivaAccess.Role_Kayttaja, OivaAccess.Role_Katselija)) {
+            return getOrganizationBasedAccess();
         }
+        return new OivaPermission(Type.OnlyPublic);
     }
 
-    public boolean hasAnyRole(final String... roles) {
+    private boolean hasAnyRole(final String... roles) {
         return SecurityUtil.userRoles().stream().anyMatch(s -> Arrays.asList(roles).contains(s));
+    }
+
+    private OivaPermission getOrganizationBasedAccess() {
+        final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
+        access.oids.add(SecurityUtil.userOrganisationOid());
+        return access;
     }
 }

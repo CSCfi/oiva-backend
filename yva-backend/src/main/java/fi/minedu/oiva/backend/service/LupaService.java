@@ -68,7 +68,7 @@ public class LupaService {
     }
 
     protected Optional<Condition> baseLupaFilter() {
-        final OivaPermission accessPermission = authService.lupaAccessPermission();
+        final OivaPermission accessPermission = authService.accessPermission();
         final Condition valmisLupaCondition = LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS);
         if(accessPermission.is(OivaAccess.Type.OnlyPublic)) {
             return Optional.of(valmisLupaCondition);
