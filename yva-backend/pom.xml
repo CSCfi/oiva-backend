@@ -18,13 +18,13 @@
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
             <artifactId>oiva-core</artifactId>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
-            <artifactId>yva-model</artifactId>
+            <artifactId>oiva-core-model</artifactId>
             <version>1.9.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
@@ -32,6 +32,11 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

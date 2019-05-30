@@ -64,7 +64,7 @@ management:
 spring:
     datasource:
         dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
-        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}
+        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}?currentSchema=kuja
         username: ${oiva.dbusername}
         password: ${oiva.dbpassword}
         platform: postgresql

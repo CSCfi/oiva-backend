@@ -19,6 +19,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <jvm.fork.arguments></jvm.fork.arguments>
         <maven.release.version>2.5.2</maven.release.version>
         <maven.resources.version>3.1.0</maven.resources.version>
         <maven-enforcer-plugin.version>1.3.1</maven-enforcer-plugin.version>
@@ -52,11 +53,6 @@
         <jersey.client.version>2.25.1</jersey.client.version>
 
         <!-- default oiva properties -->
-        <oiva.dbhost>localhost</oiva.dbhost>
-        <oiva.dbport>6432</oiva.dbport>
-        <oiva.dbname>oiva</oiva.dbname>
-        <oiva.dbusername>oiva</oiva.dbusername>
-        <oiva.dbpassword>oiva</oiva.dbpassword>
         <oiva.upload.path>${project.build.outputDirectory}</oiva.upload.path>
     </properties>
 
@@ -103,12 +99,6 @@
 		                    <version>${postgres.driver.version}</version>
 		                </dependency>
 		            </dependencies>
-		            <configuration>
-		                <url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>
-		                <username>${oiva.dbusername}</username>
-		                <password>${oiva.dbpassword}</password>
-		                <driver>${postgres.driver.name}</driver>
-		            </configuration>
 	           	</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -179,21 +169,6 @@
 	                </configuration>
 	            </plugin>
                 <plugin>
-                    <groupId>org.flywaydb</groupId>
-                    <artifactId>flyway-maven-plugin</artifactId>
-                    <version>${flyway.version}</version>
-                    <configuration>
-                        <url>jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}</url>
-                        <user>${oiva.dbusername}</user>
-                        <password>${oiva.dbpassword}</password>
-                        <locations>
-                            <location>filesystem:src/main/resources/db/migration</location>
-                        </locations>
-                        <validateOnMigrate>false</validateOnMigrate>
-                        <baselineOnMigrate>true</baselineOnMigrate>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <groupId>org.jooq</groupId>
                     <artifactId>jooq-codegen-maven</artifactId>
                     <version>${org.jooq.version}</version>
@@ -249,8 +224,7 @@
             </activation>
             <modules>
                 <module>oiva-core</module>
-                <module>amos-model</module>
-                <module>yva-model</module>
+                <module>oiva-core-model</module>
                 <module>amos-backend</module>
                 <module>yva-backend</module>
             </modules>
@@ -259,30 +233,36 @@
             <id>amos</id>
             <modules>
                 <module>oiva-core</module>
-                <module>amos-model</module>
+                <module>oiva-core-model</module>
                 <module>amos-backend</module>
             </modules>
         </profile>
         <profile>
             <id>yva</id>
+            <properties>
+                <yva-db>true</yva-db>
+            </properties>
             <modules>
                 <module>oiva-core</module>
-                <module>yva-model</module>
+                <module>oiva-core-model</module>
                 <module>yva-backend</module>
             </modules>
         </profile>
         <profile>
             <id>init-amos</id>
+            <properties>
+                <amos-db>true</amos-db>
+            </properties>
             <modules>
                 <module>oiva-core</module>
-                <module>amos-model</module>
+                <module>oiva-core-model</module>
             </modules>
         </profile>
         <profile>
             <id>init-yva</id>
             <modules>
                 <module>oiva-core</module>
-                <module>yva-model</module>
+                <module>oiva-core-model</module>
             </modules>
         </profile>
   </profiles>
