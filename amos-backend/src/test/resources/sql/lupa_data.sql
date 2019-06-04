@@ -1,4 +1,4 @@
-INSERT INTO oiva.lupa (id, edellinen_lupa_id, paatoskierros_id, lupatila_id, asiatyyppi_id, diaarinumero,
+INSERT INTO lupa (id, edellinen_lupa_id, paatoskierros_id, lupatila_id, asiatyyppi_id, diaarinumero,
                        jarjestaja_ytunnus, jarjestaja_oid, alkupvm, loppupvm, paatospvm, meta, maksu, luoja, luontipvm,
                        paivittaja, paivityspvm, uuid)
 VALUES (1, null, 1, 3, 1, '11/111/2019', '1111111-1', '1.1.111.111.11.11111111111', '2019-01-01', null, '2018-12-31',

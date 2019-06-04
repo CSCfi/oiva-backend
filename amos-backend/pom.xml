@@ -14,14 +14,24 @@
     <version>1.9.0</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <oiva.dbhost>localhost</oiva.dbhost>
+        <oiva.schema>oiva</oiva.schema>
+        <oiva.dbport>6432</oiva.dbport>
+        <oiva.dbname>oiva</oiva.dbname>
+        <oiva.dbusername>oiva</oiva.dbusername>
+        <oiva.dbpassword>oiva</oiva.dbpassword>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
             <artifactId>oiva-core</artifactId>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
-            <artifactId>amos-model</artifactId>
+            <artifactId>oiva-core-model</artifactId>
             <version>1.9.0</version>
         </dependency>
         <dependency>

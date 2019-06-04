@@ -45,13 +45,15 @@ if [[ $envArg == "amos" ]]; then
     DBNAME=oiva
     DBUSER=oiva
     DBPASSWORD=oiva
-    cd amos-model
+    DBSCHEMA=oiva
+    cd oiva-core-model
 elif [[ $envArg == "yva" ]]; then
     POSTGRES_PORT=7432
     DBNAME=kuja
     DBUSER=kuja
     DBPASSWORD=kuja
-    cd yva-model
+    DBSCHEMA=kuja
+    cd oiva-core-model
 else
     abort
 fi
@@ -68,7 +70,7 @@ if [ -f $sUserArgsFile ]; then
     source $sUserArgsFile
 fi
 
-OIVA_MVN_OPTS="-Doiva.dbhost=${POSTGRES_IP} -Doiva.dbport=${POSTGRES_PORT} -Doiva.dbname=${DBNAME} -Doiva.dbusername=${DBUSER} -Doiva.dbpassword=${DBPASSWORD}"
+OIVA_MVN_OPTS="-Doiva.dbhost=${POSTGRES_IP} -Doiva.dbport=${POSTGRES_PORT} -Doiva.dbname=${DBNAME} -Doiva.dbusername=${DBUSER} -Doiva.dbpassword=${DBPASSWORD} -Doiva.schema=${DBSCHEMA}"
 
 function initDatabase() {
     cd ..
