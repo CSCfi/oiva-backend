@@ -14,6 +14,7 @@ import fi.minedu.oiva.backend.entity.opintopolku.OrganisaatioKayttooikeus;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.service.OpintopolkuService;
 import fi.minedu.oiva.backend.task.BuildCaches;
+import org.apache.commons.codec.binary.Base64;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,6 +41,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -108,7 +110,12 @@ abstract public class BaseIT {
     }
 
     protected ResponseEntity<String> makeRequest(String uri, HttpStatus status) {
-        HttpEntity<String> entity = new HttpEntity<>(null, new HttpHeaders());
+        return makeRequest(uri, status, null);
+    }
+
+    protected ResponseEntity<String> makeRequest(String uri, HttpStatus status, HttpHeaders headers) {
+        HttpEntity<String> entity = new HttpEntity<>(null, Optional.ofNullable(headers).
+                orElse(new HttpHeaders()));
         final ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort(uri),
                 HttpMethod.GET, entity, String.class);
@@ -131,6 +138,16 @@ abstract public class BaseIT {
         assertEquals("Login should success!", HttpStatus.FOUND, loginResponse.getStatusCode());
         // Follow ticket validation
         restTemplate.getForEntity(loginResponse.getHeaders().getLocation(), String.class);
+    }
+
+    protected HttpHeaders getBasicAuthHeaders(String username, String password) {
+        final HttpHeaders httpHeaders = new HttpHeaders();
+        String auth = username + ":" + password;
+        byte[] encodedAuth = Base64.encodeBase64(
+                auth.getBytes(Charset.forName("US-ASCII")) );
+        String authHeader = "Basic " + new String( encodedAuth );
+        httpHeaders.set("Authorization", authHeader);
+        return httpHeaders;
     }
 
     private void mockLogin(String username, String orgOid, String... roles) {
