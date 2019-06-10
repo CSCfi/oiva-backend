@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Yllapitaja;
-import fi.minedu.oiva.backend.service.FileStorageService;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Yllapitaja;
+import fi.minedu.oiva.backend.core.service.FileStorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
-import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @Controller

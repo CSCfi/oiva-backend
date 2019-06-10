@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.web.controller;
 
+import fi.minedu.oiva.backend.core.web.controller.BaseLocalizationController;
 import io.swagger.annotations.Api;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;

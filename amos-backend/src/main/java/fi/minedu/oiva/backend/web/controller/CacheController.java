@@ -1,8 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Application;
-import fi.minedu.oiva.backend.service.AmosCacheService;
-import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.core.web.controller.BaseCacheController;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Application;
+import fi.minedu.oiva.backend.core.service.OivaCacheService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController
@@ -27,7 +28,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 public class CacheController extends BaseCacheController {
 
     @Autowired
-    private AmosCacheService cacheService;
+    private OivaCacheService cacheService;
 
     @OivaAccess_Application
     @RequestMapping(value="/refresh/lupa/{diaarinumero}/**", method = PUT)

@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.MuutospyyntoService;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -3,7 +3,7 @@ package fi.minedu.oiva.backend.web.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.it.BaseIT;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess;
+import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

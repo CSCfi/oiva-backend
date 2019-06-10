@@ -1,10 +1,11 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.export.KoulutusLupa;
-import fi.minedu.oiva.backend.entity.export.Koulutustarjonta;
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.service.ExportService;
+import fi.minedu.oiva.backend.core.web.controller.BaseExportController;
+import fi.minedu.oiva.backend.model.entity.export.KoulutusLupa;
+import fi.minedu.oiva.backend.model.entity.export.Koulutustarjonta;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
+import fi.minedu.oiva.backend.core.service.ExportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -23,7 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController

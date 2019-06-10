@@ -1,12 +1,12 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
-import fi.minedu.oiva.backend.entity.oiva.Muutos;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 
-import fi.minedu.oiva.backend.service.MuutospyyntoService;
-import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,12 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.*;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
-import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotila;
+import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 
 
 @RestController
@@ -98,7 +98,7 @@ public class MuutospyyntoController {
     @OivaAccess_Public
     @ApiOperation(notes = "Muokkaa muutospyyntöä", value = "")
     @RequestMapping(method = POST, value = "/update")
-    public HttpEntity<Long> update(@RequestBody Muutospyynto muutospyynto) {
+    public HttpEntity<Muutospyynto> update(@RequestBody Muutospyynto muutospyynto) {
 
         if(null == muutospyynto) {
             return badRequest();
@@ -110,14 +110,14 @@ public class MuutospyyntoController {
             return badRequest();
         }
 
-        return getOr400(service.update(muutospyynto));
+        return getOr400(service.update(muutospyynto, null));
     }
 
     // tallentaa uuden muutospyynnön
     @OivaAccess_Public
     @ApiOperation(notes = "Tallentaa uuden muutospyynnön", value = "")
     @RequestMapping(method = PUT, value = "/create")
-    public HttpEntity<Long> create(@RequestBody Muutospyynto muutospyynto) {
+    public HttpEntity<Muutospyynto> create(@RequestBody Muutospyynto muutospyynto) {
 
         if(null == muutospyynto) {
             return badRequest();
@@ -127,7 +127,7 @@ public class MuutospyyntoController {
             return badRequest();
         }
 
-        return getOr400(service.create(muutospyynto));
+        return getOr400(service.save(muutospyynto, null));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
@@ -138,49 +138,12 @@ public class MuutospyyntoController {
         return getOr404(async(() -> service.getMuutosByUuId(uuid)));
     }
 
-    // tallentaa uuden muutoksen (TARVITAANKO?)
-    @OivaAccess_Public
-    @ApiOperation(notes = "Tallentaa uuden muutoksen", value = "")
-    @RequestMapping(method = PUT, value = "/muutos/create")
-    public HttpEntity<Long> createMuutos(@RequestBody Muutos muutos) {
-
-        if(null == muutos) {
-            return badRequest();
-
-        }
-        else if(!service.validate(muutos)) {
-            return badRequest();
-        }
-
-        return getOr400(service.createMuutos(muutos));
-    }
-
-    // muokkaa muutosta (TARVITAANKO?)
-    @OivaAccess_Public
-    @ApiOperation(notes = "Muokkaa muutosta", value = "")
-    @RequestMapping(method = POST, value = "/muutos/update")
-    public HttpEntity<Long> updateMuutos(@RequestBody Muutos muutos) {
-
-        if(null == muutos) {
-            return badRequest();
-        }
-        else if(muutos.getUuid().equals("")) {
-            return badRequest();
-        }
-        else if(!service.validate(muutos)) {
-            return badRequest();
-        }
-
-        return getOr400(service.updateMuutos(muutos));
-    }
-
-
     // Vaihda muutospyynnön tilaa ->  passivoi
     @OivaAccess_Public
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
     @RequestMapping(method = POST, value = "/passivoi/{uuid}")
     public HttpEntity<UUID> passivoi(final @PathVariable String uuid) {
-        return getOr400(service.passivoi(uuid));
+        return getOr400(service.changeTila(uuid, Muutospyyntotila.PASSIVOITU));
     }
 
 
