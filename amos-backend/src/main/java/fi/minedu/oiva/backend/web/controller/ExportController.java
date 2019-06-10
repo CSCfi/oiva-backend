@@ -59,7 +59,7 @@ public class ExportController extends BaseExportController {
 
     @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/kustannustiedot")
-    @ApiOperation(notes = "Tarjoaa kustannustiedot kaikista luvista joiden alkupäivämäärä on annetulla aikavälillä.", value = "",
+    @ApiOperation(notes = "Tarjoaa kustannustiedot kaikista luvista jotka ovat olleet / ovat voimassa annetulla aikavälillä.", value = "",
             authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<ResponseEntity<Collection<Lupa>>> getKustannustiedot(
             @ApiParam(value = "Aloituspäivämäärä ISO formaatissa. Esim. 2018-01-01")
