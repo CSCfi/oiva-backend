@@ -62,13 +62,14 @@ public class ExportService {
     }
 
     /**
-     * Tarjoaa kustannustiedot kaikista luvista joiden alkupäivämäärä on annetulla aikavälillä.
+     * Tarjoaa kustannustiedot kaikista luvista jotka ovat olleet / ovat voimassa annetulla aikavälillä.
      * Käyttäjä: OPH
      *
      * @return Lista kaikista luvista
      */
     public Collection<Lupa> getKustannusTiedot(LocalDate start, LocalDate end) {
-        final Condition filter = LUPA.ALKUPVM.between(Date.valueOf(start), Date.valueOf(end));
+        final Condition filter = LUPA.ALKUPVM.lessOrEqual(Date.valueOf(end))
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.greaterThan(Date.valueOf(start))));
         return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class, KoodistoKoodi.class));
     }
 
