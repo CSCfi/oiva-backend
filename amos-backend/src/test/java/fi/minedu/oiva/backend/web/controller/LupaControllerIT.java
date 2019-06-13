@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import com.jayway.jsonpath.DocumentContext;
-import fi.minedu.oiva.backend.entity.AsiatyyppiValue;
+import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.it.BaseIT;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;

@@ -181,7 +181,7 @@ Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelul
 ## PDF-exportin konfiguroiminen [TODO: UPDATE]
 
 PrinceXML tuottaa PDF-tiedostoja HTML-lähteistä jotka on muodostettu Pebble-frameworkillä (http://www.mitchellbosecke.com/pebble).
-- Pebblen kontekstit muodostetaan fi.minedu.oiva.backend.service.TemplateRenderingService luokassa.
+- Pebblen kontekstit muodostetaan fi.minedu.oiva.backend.core.service.TemplateRenderingService luokassa.
 - Pebblen templatet ja resurssit on määritetty omassa git-respositoryssa (/oiva/template). Hanki templatet koneelle jolla ajat backendiä
 
 Pebble-templateihin viitataan absoluuttisilla poluilla, esimerkiksi:

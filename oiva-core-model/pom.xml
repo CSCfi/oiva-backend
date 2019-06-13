@@ -26,9 +26,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>fi.minedu.oiva</groupId>
-            <artifactId>oiva-core</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -36,8 +35,53 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_2.11</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang3.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jsonSchema</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+            <version>${jersey.client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>${org.jooq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.modelmapper.extensions</groupId>
+            <artifactId>modelmapper-jooq</artifactId>
+            <version>${model.mapper.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aol.cyclops</groupId>
+            <artifactId>cyclops-pattern-matching</artifactId>
+            <version>7.3.1</version>
         </dependency>
     </dependencies>
 
@@ -248,7 +292,7 @@
                                                 <customType>
                                                     <name>JsonNode</name>
                                                     <type>com.fasterxml.jackson.databind.JsonNode</type>
-                                                    <binding>fi.minedu.oiva.backend.jooq.PostgresJSONJacksonBinding</binding>
+                                                    <binding>fi.minedu.oiva.backend.model.jooq.PostgresJSONJacksonBinding</binding>
                                                 </customType>
                                                 <customType>
                                                     <name>Timestamp</name>
@@ -257,23 +301,23 @@
                                                 </customType>
                                                 <customType>
                                                     <name>TranslatedString</name>
-                                                    <type>fi.minedu.oiva.backend.entity.TranslatedString</type>
-                                                    <binding>fi.minedu.oiva.backend.jooq.TranslatedStringBinding</binding>
+                                                    <type>fi.minedu.oiva.backend.model.entity.TranslatedString</type>
+                                                    <binding>fi.minedu.oiva.backend.model.jooq.TranslatedStringBinding</binding>
                                                 </customType>
                                                 <customType>
                                                     <name>AsiatyyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.entity.AsiatyyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.entity.AsiatyyppiValue.Converter</converter>
+                                                    <type>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue</type>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue.Converter</converter>
                                                 </customType>
                                                 <customType>
                                                     <name>MaaraystyyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.entity.MaaraystyyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.entity.MaaraystyyppiValue.Converter</converter>
+                                                    <type>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue</type>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue.Converter</converter>
                                                 </customType>
                                                 <customType>
                                                     <name>LupatilaValue</name>
-                                                    <type>fi.minedu.oiva.backend.entity.LupatilaValue</type>
-                                                    <converter>fi.minedu.oiva.backend.entity.LupatilaValue.Converter</converter>
+                                                    <type>fi.minedu.oiva.backend.model.entity.LupatilaValue</type>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.LupatilaValue.Converter</converter>
                                                 </customType>
                                             </customTypes>
                                             <forcedTypes>
@@ -312,7 +356,7 @@
                                             <validationAnnotations>true</validationAnnotations>
                                         </generate>
                                         <target>
-                                            <packageName>fi.minedu.oiva.backend.jooq</packageName>
+                                            <packageName>fi.minedu.oiva.backend.model.jooq</packageName>
                                             <directory>src/main/generated/jooq</directory>
                                         </target>
                                     </generator>

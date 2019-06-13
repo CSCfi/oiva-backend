@@ -1,9 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Maarays;
-import fi.minedu.oiva.backend.entity.oiva.Maaraystyyppi;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.MaaraysService;
+import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.model.entity.oiva.Maaraystyyppi;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.MaaraysService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.options;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController

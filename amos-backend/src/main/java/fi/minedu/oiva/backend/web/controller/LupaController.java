@@ -1,16 +1,15 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
-import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupahistoria;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.LupaService;
-import fi.minedu.oiva.backend.service.LupahistoriaService;
-import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.LupahistoriaService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,10 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.jooq.tables.Lupa.LUPA;
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
-import static fi.minedu.oiva.backend.util.ControllerUtil.options;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController

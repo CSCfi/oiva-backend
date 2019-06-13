@@ -1,16 +1,21 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.*;
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.oiva.Maarays;
-import fi.minedu.oiva.backend.entity.oiva.Muutos;
-import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
-import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.*;
-import fi.minedu.oiva.backend.util.RequestUtils;
-import fi.minedu.oiva.backend.util.With;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.model.entity.OivaTemplates;
+import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.FileStorageService;
+import fi.minedu.oiva.backend.core.service.LupaRenderService;
+import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.OpintopolkuService;
+import fi.minedu.oiva.backend.core.service.OrganisaatioService;
+import fi.minedu.oiva.backend.core.service.PebbleService;
+import fi.minedu.oiva.backend.core.service.PrinceXMLService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.core.util.With;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -37,10 +42,10 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static fi.minedu.oiva.backend.entity.OivaTemplates.RenderOptions;
-import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
-import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
-import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderOptions;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.get500;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
@@ -83,15 +88,15 @@ public class PrinceXMLController {
         final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
-            if(lupaOpt.isPresent()) {
-                final Path lupaPath = Paths.get(fileStorageService.getLupaPDFFilePath(lupaOpt).orElseThrow(IllegalArgumentException::new));
-                if(Files.exists(lupaPath)) {
+            if (lupaOpt.isPresent()) {
+                final Path lupaPath = Paths.get(fileStorageService.getLupaPDFFilePath(lupaOpt.get()).orElseThrow(IllegalArgumentException::new));
+                if (Files.exists(lupaPath)) {
                     final ByteArrayResource lupaBar = new ByteArrayResource(Files.readAllBytes(lupaPath));
                     return ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_PDF)
-                        .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName())
-                        .contentLength(lupaBar.contentLength())
-                        .body(lupaBar);
+                            .contentType(MediaType.APPLICATION_PDF)
+                            .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName())
+                            .contentLength(lupaBar.contentLength())
+                            .body(lupaBar);
                 } else {
                     logger.error("No such Lupa PDF with diaarinumero " + diaariNumero);
                     return ResponseEntity.notFound().build();
@@ -105,19 +110,19 @@ public class PrinceXMLController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-    
+
     @OivaAccess_Esittelija
     @RequestMapping(value = "/esikatsele/{diaarinumero}/**", method = GET)
-    @Produces({ PrinceXMLController.APPLICATION_PDF })
+    @Produces({PrinceXMLController.APPLICATION_PDF})
     @ResponseBody
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
     public void previewPdf(final @PathVariable String diaarinumero, final HttpServletResponse response, final HttpServletRequest request) {
         final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
-            if(lupaOpt.isPresent()) {
+            if (lupaOpt.isPresent()) {
                 final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
-                final String lupaHtml = pebbleService.toHTML(lupaOpt, renderOptions).orElseThrow(IllegalStateException::new);
+                final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(APPLICATION_PDF);
                 response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
@@ -141,9 +146,9 @@ public class PrinceXMLController {
         final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
-            if(lupaOpt.isPresent()) {
-                final Optional<File> writtenFile = fileStorageService.writeLupaPDF(lupaOpt);
-                if(writtenFile.isPresent()) {
+            if (lupaOpt.isPresent()) {
+                final Optional<File> writtenFile = fileStorageService.writeLupaPDF(lupaOpt.get());
+                if (writtenFile.isPresent()) {
                     return ok();
                 } else {
                     logger.error("Failed to generate Lupa with diaarinumero " + diaariNumero);
@@ -170,15 +175,15 @@ public class PrinceXMLController {
         System.out.println("meta: " + muutospyynto.getMeta());
 
         final Function<Muutos, Optional<KoodistoKoodi>> getKoodi = muutos ->
-            Optional.ofNullable(opintopolkuService.getKoodi(muutos.getKoodisto(), muutos.getKoodiarvo(), null));
+                Optional.ofNullable(opintopolkuService.getKoodi(muutos.getKoodisto(), muutos.getKoodiarvo(), null));
 
         muutospyynto.getMuutokset().stream().forEach(muutos -> {
 
             // jos lisätään tutkintokieliä: (TODO: UUID)
-            if(null != muutos.getParentId()) {
+            if (null != muutos.getParentId()) {
 
-                KoodistoKoodi koodi = opintopolkuService.getKoodi("koulutus", muutos.getParentId().toString(),null);
-                if(null!=koodi) {
+                KoodistoKoodi koodi = opintopolkuService.getKoodi("koulutus", muutos.getParentId().toString(), null);
+                if (null != koodi) {
                     muutos.setKoodi(koodi);
                     System.out.println("kielikoodin tutkinto" + koodi.getNimi().toJson().asText());
                 }
@@ -200,7 +205,7 @@ public class PrinceXMLController {
             // TODO: kielivalinta koulutuksen järjestäjän mukaan
             final RenderOptions options = RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
             final Optional<String> muutospyyntoHtml = pebbleService.muutospyyntoToHTML(muutospyynto, options);
-            
+
             if (!princeXMLService.toPDF(muutospyyntoHtml.get(), response.getOutputStream(), options)) {
                 response.setStatus(get500().getStatusCode().value());
                 response.getWriter().write("Failed to generate Muutospyynto with html " + muutospyyntoHtml.get());

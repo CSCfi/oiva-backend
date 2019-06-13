@@ -1,9 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import fi.minedu.oiva.backend.config.OivaMediaTypes;
-import fi.minedu.oiva.backend.entity.oiva.Liite;
-import fi.minedu.oiva.backend.service.LiiteService;
+import fi.minedu.oiva.backend.core.config.OivaMediaTypes;
+import fi.minedu.oiva.backend.model.entity.oiva.Liite;
+import fi.minedu.oiva.backend.core.service.LiiteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +23,9 @@ import javax.activation.MimetypesFileTypeMap;
 
 import java.util.UUID;
 
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404_;
-import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404_;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.notFound;
 
 @RestController
 @RequestMapping(value = "${api.url.prefix}" + LiiteController.path, produces = {

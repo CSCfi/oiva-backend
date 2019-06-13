@@ -1,11 +1,11 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Muutos;
-import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Kayttaja;
-import fi.minedu.oiva.backend.service.MuutospyyntoService;
-import fi.minedu.oiva.backend.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Kayttaja;
+import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.service.MuutospyyntoService.Muutospyyntotila;
-import static fi.minedu.oiva.backend.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.util.ControllerUtil.badRequest;
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr400;
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
+import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.badRequest;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr400;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 

@@ -1,8 +1,9 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.service.ImportService;
+import fi.minedu.oiva.backend.core.web.controller.BaseImportController;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
+import fi.minedu.oiva.backend.core.service.ImportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -15,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static fi.minedu.oiva.backend.util.ControllerUtil.badRequest;
-import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.badRequest;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 
 @RestController

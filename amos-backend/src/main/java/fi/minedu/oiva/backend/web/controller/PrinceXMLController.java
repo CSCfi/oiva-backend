@@ -1,18 +1,18 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.OivaTemplates;
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.FileStorageService;
-import fi.minedu.oiva.backend.service.LupaRenderService;
-import fi.minedu.oiva.backend.service.LupaService;
-import fi.minedu.oiva.backend.service.MuutospyyntoService;
-import fi.minedu.oiva.backend.service.PebbleService;
-import fi.minedu.oiva.backend.service.PrinceXMLService;
-import fi.minedu.oiva.backend.util.RequestUtils;
-import fi.minedu.oiva.backend.util.With;
+import fi.minedu.oiva.backend.model.entity.OivaTemplates;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.FileStorageService;
+import fi.minedu.oiva.backend.core.service.LupaRenderService;
+import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
+import fi.minedu.oiva.backend.core.service.PebbleService;
+import fi.minedu.oiva.backend.core.service.PrinceXMLService;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.core.util.With;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -39,10 +39,10 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static fi.minedu.oiva.backend.entity.OivaTemplates.RenderOptions;
-import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
-import static fi.minedu.oiva.backend.util.ControllerUtil.notFound;
-import static fi.minedu.oiva.backend.util.ControllerUtil.ok;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderOptions;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.get500;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.notFound;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.ok;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 

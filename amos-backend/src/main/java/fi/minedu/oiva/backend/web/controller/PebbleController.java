@@ -1,11 +1,11 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
-import fi.minedu.oiva.backend.service.LupaService;
-import fi.minedu.oiva.backend.service.PebbleService;
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.util.RequestUtils;
-import fi.minedu.oiva.backend.util.With;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
+import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.PebbleService;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.core.util.With;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
@@ -24,9 +24,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.Optional;
 
-import static fi.minedu.oiva.backend.entity.OivaTemplates.*;
-import static fi.minedu.oiva.backend.util.ControllerUtil.get500;
-import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.*;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.get500;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 @Controller

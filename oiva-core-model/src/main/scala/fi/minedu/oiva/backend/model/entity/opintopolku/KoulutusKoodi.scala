@@ -1,0 +1,36 @@
+package fi.minedu.oiva.backend.model.entity.opintopolku
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.{JsonIgnoreProperties, JsonInclude}
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(Include.NON_NULL)
+class KoulutusKoodi(
+    var koulutustyyppiKoodiArvo: String,
+    var koulutusalaKoodiArvo: String,
+    var osaamisala: KoodistoKoodi) extends KoodistoKoodi  {
+
+    def this() = this(null, null, null)
+    def this(koodistoKoodi: KoodistoKoodi, koulutusalaKoodiArvo: String, koulutustyyppiKoodiArvo: String, osaamisala: KoodistoKoodi) = {
+        this()
+        this.koodiArvo = koodistoKoodi.koodiArvo
+        this.koodisto = koodistoKoodi.koodisto
+        this.versio = koodistoKoodi.versio
+        this.metadata = koodistoKoodi.metadata
+        this.voimassaAlkuPvm = koodistoKoodi.voimassaAlkuPvm
+        this.voimassaLoppuPvm = koodistoKoodi.voimassaLoppuPvm
+        this.koulutusalaKoodiArvo = koulutusalaKoodiArvo
+        this.koulutustyyppiKoodiArvo = koulutustyyppiKoodiArvo
+        this.osaamisala = osaamisala
+    }
+
+    def getKoulutustyyppiKoodiArvo = koulutustyyppiKoodiArvo
+    def setKoulutustyyppiKoodiArvo(koulutustyyppiKoodiArvo: String): Unit = this.koulutustyyppiKoodiArvo = koulutustyyppiKoodiArvo
+
+    def getKoulutusalaKoodiArvo = koulutusalaKoodiArvo
+    def setKoulutusalaKoodiArvo(koulutusalaKoodiArvo: String): Unit = this.koulutusalaKoodiArvo = koulutusalaKoodiArvo
+
+    def getOsaamisala = osaamisala
+    def setOsaamisala(getOsaamisala: KoodistoKoodi): Unit = this.osaamisala = getOsaamisala
+
+}
