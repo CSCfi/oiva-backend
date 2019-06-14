@@ -42,7 +42,7 @@
         <scalatest.maven.version>1.0</scalatest.maven.version>
 
         <!-- overrides spring boot version -->
-        <swagger.version>2.6.1</swagger.version>
+        <swagger.version>2.9.2</swagger.version>
         <tika.version>1.7</tika.version>
         <spring.data.redis.version>1.8.0.RELEASE</spring.data.redis.version>
         <spring-boot-starter.data.redis.version>1.5.1.RELEASE</spring-boot-starter.data.redis.version>
@@ -54,6 +54,14 @@
 
         <!-- default oiva properties -->
         <oiva.upload.path>${project.build.outputDirectory}</oiva.upload.path>
+
+        <!-- default db settings -->
+        <oiva.dbhost>localhost</oiva.dbhost>
+        <oiva.schema>oiva</oiva.schema>
+        <oiva.dbport>6432</oiva.dbport>
+        <oiva.dbname>oiva</oiva.dbname>
+        <oiva.dbusername>oiva</oiva.dbusername>
+        <oiva.dbpassword>oiva</oiva.dbpassword>
     </properties>
 
     <scm>
@@ -125,6 +133,7 @@
 	                </configuration>
 	            </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.0.0-M3</version>
                 </plugin>
@@ -180,6 +189,88 @@
                         </dependency>
                     </dependencies>
             	</plugin>
+                <!-- Integration test plugins -->
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <classesDirectory>target/classes</classesDirectory>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>verify</id>
+                            <goals>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>io.fabric8</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>0.28.0</version>
+                    <configuration>
+                        <imagePullPolicy>IfNotPresent</imagePullPolicy>
+                        <showLogs>true</showLogs>
+                        <logStdout>true</logStdout>
+                        <verbose>true</verbose>
+                        <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
+                        <machine>
+                            <name>test-db-machine</name>
+                            <autoCreate>true</autoCreate>
+                        </machine>
+                        <images>
+                            <image>
+                                <name>oiva-backend-test-db</name>
+                                <alias>oiva-test-db</alias>
+                                <build>
+                                    <from>postgres:9.6</from>
+                                    <runCmds>echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > /docker-entrypoint-initdb.d/init-db.sql</runCmds>
+                                </build>
+                                <run>
+                                    <network>
+                                        <mode>bridge</mode>
+                                    </network>
+                                    <ports>
+                                        <port>15432:5432</port>
+                                    </ports>
+                                    <env>
+                                        <POSTGRES_USER>${oiva.dbusername}</POSTGRES_USER>
+                                        <POSTGRES_PASSWORD>${oiva.dbpassword}</POSTGRES_PASSWORD>
+                                        <POSTGRES_DB>${oiva.dbname}</POSTGRES_DB>
+                                    </env>
+                                </run>
+                            </image>
+                        </images>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>build</id>
+                            <goals>
+                                <goal>build</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>start</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 	    	</plugins>
 	    </pluginManagement>
    </build>
@@ -212,6 +303,24 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot-test.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>it.ozimov</groupId>
+                <artifactId>embedded-redis</artifactId>
+                <version>0.7.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-netty</artifactId>
+                <version>5.5.1</version>
+                <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-lang3</artifactId>
+                        <groupId>org.apache.commons</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
     	</dependencies>
     </dependencyManagement>

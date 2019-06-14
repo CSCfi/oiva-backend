@@ -32,7 +32,7 @@ public class FileStorageService {
 
     private final LupaRenderService lupaRenderService;
 
-    private final PebbleService pebbleService;
+    private final BasePebbleService pebbleService;
 
     private final PrinceXMLService princeXMLService;
 
@@ -40,7 +40,7 @@ public class FileStorageService {
 
     @Autowired
     public FileStorageService(FileStorageConfig fileStorage, LupaService lupaService,
-                              LupaRenderService lupaRenderService, PebbleService pebbleService,
+                              LupaRenderService lupaRenderService, BasePebbleService pebbleService,
                               PrinceXMLService princeXMLService, AsyncService asyncService) {
         this.fileStorage = fileStorage;
         this.lupaService = lupaService;

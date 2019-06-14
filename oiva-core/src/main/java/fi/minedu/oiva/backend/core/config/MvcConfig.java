@@ -25,6 +25,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -95,7 +96,8 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 "",
                 new Contact("", "", ""),
                 "",
-                ""
+                "",
+                Collections.EMPTY_LIST
         );
     }
 
