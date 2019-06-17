@@ -2,7 +2,6 @@ package fi.minedu.oiva.backend.core.security
 
 import java.util.{Collections, Optional}
 
-import com.google.common.collect.Lists
 import fi.minedu.oiva.backend.BaseSuite
 import fi.minedu.oiva.backend.model.entity.opintopolku.{KayttajaKayttooikeus, Kayttooikeus, OrganisaatioKayttooikeus}
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess
@@ -74,7 +73,6 @@ class OivaUserDetailsServiceTest extends BaseSuite {
     val orgOid = "1.1.1.1111"
     val mockOpintopolku = mockOpintopolkuService(username, orgOid)
     val mockRegistry = mock[SessionRegistry]
-
 
     val list = List(new OivaUserDetails(username, "",
       Collections.singleton(new SimpleGrantedAuthority(OivaAccess.Role_Esittelija)), orgOid, false).asInstanceOf[AnyRef],
