@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.security
 
 import java.util.{Collections, Optional}
 
+import com.google.common.collect.Lists
 import fi.minedu.oiva.backend.BaseSuite
 import fi.minedu.oiva.backend.model.entity.opintopolku.{KayttajaKayttooikeus, Kayttooikeus, OrganisaatioKayttooikeus}
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess
@@ -66,6 +67,29 @@ class OivaUserDetailsServiceTest extends BaseSuite {
       oivaUser.getAuthorities.asScala.map(a => a.getAuthority)
     }
     assert(oivaUser.isPermissionsDecreased, "Permission decreased flag should be true")
+  }
+
+  test("Case when organisation has already _same_ user logged in.") {
+    val username = "test"
+    val orgOid = "1.1.1.1111"
+    val mockOpintopolku = mockOpintopolkuService(username, orgOid)
+    val mockRegistry = mock[SessionRegistry]
+
+
+    val list = List(new OivaUserDetails(username, "",
+      Collections.singleton(new SimpleGrantedAuthority(OivaAccess.Role_Esittelija)), orgOid, false).asInstanceOf[AnyRef],
+      new OivaUserDetails(username + "_another", "",
+        Collections.singleton(new SimpleGrantedAuthority(OivaAccess.Role_Katselija)), orgOid, false).asInstanceOf[AnyRef])
+
+    when(mockRegistry.getAllPrincipals).thenReturn(list.asJava)
+
+    val service = new OivaUserDetailsService(mockOpintopolku, mockRegistry)
+    val oivaUser = service.loadUserByUsername(username).asInstanceOf[OivaUserDetails]
+    // Role should not be decreased
+    assertResult(Seq(OivaAccess.Role_Application, OivaAccess.Role_Esittelija)) {
+      oivaUser.getAuthorities.asScala.map(a => a.getAuthority)
+    }
+    assert(!oivaUser.isPermissionsDecreased, "Permission decreased flag should be true")
   }
 
   private def mockOpintopolkuService(username: String, orgOid: String) = {

@@ -60,7 +60,7 @@ public class OivaUserDetailsService implements UserDetailsService {
             logger.debug("Authorities: {}", oikeudet);
         }
 
-        final boolean permissionsDecreased = organisationHasEditorLoggedIn(oid) &&
+        final boolean permissionsDecreased = organisationHasOtherEditorLoggedIn(oid, username) &&
                 Stream.of(editorRoles).anyMatch(oikeudet::contains);
 
         if (permissionsDecreased) {
@@ -74,12 +74,13 @@ public class OivaUserDetailsService implements UserDetailsService {
         return new OivaUserDetails(username, "", grantedAuthorities, oid, permissionsDecreased);
     }
 
-    private boolean organisationHasEditorLoggedIn(String oid) {
+    private boolean organisationHasOtherEditorLoggedIn(String oid, final String username) {
         final List<String> roleList = Arrays.asList(editorRoles);
         return sessionRegistry.getAllPrincipals().stream()
                 .filter(o -> o instanceof OivaUserDetails)
                 .map(o -> (OivaUserDetails) o)
                 .filter(u -> u.getOrganisationOid().equals(oid))
+                .filter(u -> !u.getUsername().equals(username))
                 .flatMap(u -> u.getAuthorities().stream())
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(roleList::contains);
