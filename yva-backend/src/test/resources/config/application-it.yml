@@ -1,9 +1,9 @@
 oiva:
   dbhost: @env.MACHINE_IP@
   dbport: 15432
-  dbname: oiva
-  dbusername: oiva
-  dbpassword: oiva
+  dbname: kuja
+  dbusername: kuja
+  dbpassword: kuja
   baseUrl: http://localhost
 
 opintopolku:
@@ -33,11 +33,11 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva?currentSchema=oiva
+    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/kuja?currentSchema=kuja
   cache:
     type: none
   profiles:
-    include: amos
+    include: yva
 
 redis:
   host: localhost
