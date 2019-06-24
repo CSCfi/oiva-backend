@@ -158,6 +158,14 @@
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <dependenciesToScan>
+                                <dependency>fi.minedu.oiva:oiva-core</dependency>
+                            </dependenciesToScan>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>

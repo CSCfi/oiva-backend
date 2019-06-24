@@ -1,8 +1,8 @@
 package fi.minedu.oiva.backend.core.security;
 
+import fi.minedu.oiva.backend.core.service.OpintopolkuService;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KayttajaKayttooikeus;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
-import fi.minedu.oiva.backend.core.service.OpintopolkuService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
