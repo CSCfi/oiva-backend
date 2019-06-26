@@ -1,8 +1,8 @@
 package fi.minedu.oiva.backend.core.security;
 
+import fi.minedu.oiva.backend.core.service.OpintopolkuService;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KayttajaKayttooikeus;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
-import fi.minedu.oiva.backend.core.service.OpintopolkuService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ public class OivaUserDetailsService implements UserDetailsService {
             logger.debug("Authorities: {}", oikeudet);
         }
 
-        final boolean permissionsDecreased = organisationHasEditorLoggedIn(oid) &&
+        final boolean permissionsDecreased = organisationHasOtherEditorLoggedIn(oid, username) &&
                 Stream.of(editorRoles).anyMatch(oikeudet::contains);
 
         if (permissionsDecreased) {
@@ -74,12 +74,13 @@ public class OivaUserDetailsService implements UserDetailsService {
         return new OivaUserDetails(username, "", grantedAuthorities, oid, permissionsDecreased);
     }
 
-    private boolean organisationHasEditorLoggedIn(String oid) {
+    private boolean organisationHasOtherEditorLoggedIn(String oid, final String username) {
         final List<String> roleList = Arrays.asList(editorRoles);
         return sessionRegistry.getAllPrincipals().stream()
                 .filter(o -> o instanceof OivaUserDetails)
                 .map(o -> (OivaUserDetails) o)
                 .filter(u -> u.getOrganisationOid().equals(oid))
+                .filter(u -> !u.getUsername().equals(username))
                 .flatMap(u -> u.getAuthorities().stream())
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(roleList::contains);

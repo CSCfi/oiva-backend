@@ -68,6 +68,28 @@ class OivaUserDetailsServiceTest extends BaseSuite {
     assert(oivaUser.isPermissionsDecreased, "Permission decreased flag should be true")
   }
 
+  test("Case when organisation has already _same_ user logged in.") {
+    val username = "test"
+    val orgOid = "1.1.1.1111"
+    val mockOpintopolku = mockOpintopolkuService(username, orgOid)
+    val mockRegistry = mock[SessionRegistry]
+
+    val list = List(new OivaUserDetails(username, "",
+      Collections.singleton(new SimpleGrantedAuthority(OivaAccess.Role_Esittelija)), orgOid, false).asInstanceOf[AnyRef],
+      new OivaUserDetails(username + "_another", "",
+        Collections.singleton(new SimpleGrantedAuthority(OivaAccess.Role_Katselija)), orgOid, false).asInstanceOf[AnyRef])
+
+    when(mockRegistry.getAllPrincipals).thenReturn(list.asJava)
+
+    val service = new OivaUserDetailsService(mockOpintopolku, mockRegistry)
+    val oivaUser = service.loadUserByUsername(username).asInstanceOf[OivaUserDetails]
+    // Role should not be decreased
+    assertResult(Seq(OivaAccess.Role_Application, OivaAccess.Role_Esittelija)) {
+      oivaUser.getAuthorities.asScala.map(a => a.getAuthority)
+    }
+    assert(!oivaUser.isPermissionsDecreased, "Permission decreased flag should be true")
+  }
+
   private def mockOpintopolkuService(username: String, orgOid: String) = {
     val mockOpintopolku = mock[OpintopolkuService]
     var orgKayttooikeusList: ArrayBuffer[OrganisaatioKayttooikeus] = ArrayBuffer()

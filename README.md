@@ -90,7 +90,7 @@ mvn clean install
 mvn clean install
 docker exec -it oiva-backend_amos-redis_1 redis-cli (avaa promptin)
 FLUSHALL
-```
+````
 
 ## 7. Palveluiden käynnistäminen
 Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.

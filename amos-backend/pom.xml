@@ -153,6 +153,11 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
+                        <configuration>
+                            <dependenciesToScan>
+                                <dependency>fi.minedu.oiva:oiva-core</dependency>
+                            </dependenciesToScan>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>

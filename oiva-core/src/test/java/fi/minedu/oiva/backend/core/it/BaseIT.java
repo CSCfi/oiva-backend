@@ -88,8 +88,7 @@ abstract public class BaseIT {
 
     @Before
     public void setUp() {
-        // Enable cookies for rest template (Authentication needs this).
-        restTemplate = new TestRestTemplate(TestRestTemplate.HttpClientOption.ENABLE_COOKIES);
+        restTemplate = createRestTemplate();
         // Setup database
         setUpDb("sql/asiatyyppi_data.sql", "sql/esitysmalli_data.sql", "sql/lupatila_data.sql",
                 "sql/paatoskierros_data.sql", "sql/kohde_data.sql", "sql/maaraystyyppi_data.sql");
@@ -98,6 +97,15 @@ abstract public class BaseIT {
         // Setup JsonPath
         setupJsonPath();
         beforeTest();
+    }
+
+    protected TestRestTemplate createRestTemplate() {
+        // Enable cookies for rest template (Authentication needs this).
+        return new TestRestTemplate(TestRestTemplate.HttpClientOption.ENABLE_COOKIES);
+    }
+
+    protected void resetRestTemplate() {
+        restTemplate = createRestTemplate();
     }
 
     /**
@@ -165,7 +173,7 @@ abstract public class BaseIT {
 
     private void mockCAS(String username) {
         final String casTicket = "ST-59710-PDKr53jQ3HGF-4CyKl5IbD-8Gqg68ea1e16ad92";
-        final MockServerClient mockClient = mockServerRule.getClient();
+        final MockServerClient mockClient = mockServerRule.getClient().reset();
         // Login mock response
         mockClient.when(request().withMethod("POST").withPath("/mock-cas/cas/login.*"))
                 .respond(response().withStatusCode(HttpStatus.FOUND.value())
