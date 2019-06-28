@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays extends TableImpl<MaaraysRecord> {
 
-    private static final long serialVersionUID = 883628712;
+    private static final long serialVersionUID = -488135776;
 
     /**
      * The reference instance of <code>maarays</code>
@@ -130,6 +130,11 @@ public class Maarays extends TableImpl<MaaraysRecord> {
      * The column <code>maarays.uuid</code>.
      */
     public final TableField<MaaraysRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
+     * The column <code>maarays.org_oid</code>.
+     */
+    public final TableField<MaaraysRecord, String> ORG_OID = createField("org_oid", org.jooq.impl.SQLDataType.VARCHAR.length(255).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>maarays</code> table reference

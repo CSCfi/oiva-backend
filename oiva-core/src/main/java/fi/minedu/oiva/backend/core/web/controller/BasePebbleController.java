@@ -3,9 +3,9 @@ package fi.minedu.oiva.backend.core.web.controller;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.BasePebbleService;
 import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.OrganisaatioService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
 import fi.minedu.oiva.backend.core.util.With;
-import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
@@ -40,9 +40,12 @@ public abstract class BasePebbleController<T extends BasePebbleService> {
 
     protected final LupaService lupaService;
 
-    public BasePebbleController(T service, LupaService lupaService) {
+    protected final OrganisaatioService organisaatioService;
+
+    public BasePebbleController(T service, LupaService lupaService, OrganisaatioService organisaatioService) {
         this.service = service;
         this.lupaService = lupaService;
+        this.organisaatioService = organisaatioService;
     }
 
     @OivaAccess_Public

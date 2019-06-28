@@ -11,32 +11,37 @@ import java.util.Optional;
 @Service
 public class OrganisaatioService {
 
+    private final OpintopolkuService opintopolkuService;
+
     @Autowired
-    private OpintopolkuService opintopolkuService;
+    public OrganisaatioService(OpintopolkuService opintopolkuService) {
+        this.opintopolkuService = opintopolkuService;
+    }
 
-    @Cacheable(value = {"OrganisaatioService:getWithLocation"}, key = "#oid")
+    @Cacheable(value = {"OrganisaatioService:getWithLocation"}, condition = "#oid != null", key = "#oid")
     public Optional<Organisaatio> getWithLocation(final String oid) {
-        final Optional<Organisaatio> organisaatioOpt = Optional.ofNullable(opintopolkuService.getBlockingOrganisaatio(oid));
-        withKunta(organisaatioOpt);
-        withMaakunta(organisaatioOpt);
-        return organisaatioOpt;
+        return Optional.ofNullable(oid).map(o -> {
+            final Organisaatio organisaatio = opintopolkuService.getBlockingOrganisaatio(o);
+            withKunta(organisaatio);
+            withMaakunta(organisaatio);
+            return organisaatio;
+        });
     }
 
-    protected Optional<Organisaatio> withKunta(final Optional<Organisaatio> organisaatioOpt) {
-        organisaatioOpt.ifPresent(organisaatio -> {
-            if(StringUtils.isNotBlank(organisaatio.kuntaKoodiArvo())) {
-                opintopolkuService.getKuntaKoodi(organisaatio.kuntaKoodiArvo()).ifPresent(organisaatio::setKuntaKoodi);
+    private void withKunta(final Organisaatio organisaatio) {
+        Optional.ofNullable(organisaatio).ifPresent(o -> {
+            if(StringUtils.isNotBlank(o.kuntaKoodiArvo())) {
+                opintopolkuService.getKuntaKoodi(o.kuntaKoodiArvo()).ifPresent(o::setKuntaKoodi);
             }
         });
-        return organisaatioOpt;
     }
 
-    protected Optional<Organisaatio> withMaakunta(final Optional<Organisaatio> organisaatioOpt) {
-        organisaatioOpt.ifPresent(jarjestaja -> {
-            if(null != jarjestaja.kuntaKoodi()) {
-                opintopolkuService.getMaakuntaKoodiForKunta(jarjestaja.kuntaKoodiArvo()).ifPresent(jarjestaja::setMaakuntaKoodi);
+    private void withMaakunta(final Organisaatio organisaatio) {
+        Optional.ofNullable(organisaatio).ifPresent(o -> {
+            if(null != o.kuntaKoodi()) {
+                opintopolkuService.getMaakuntaKoodiForKunta(o.kuntaKoodiArvo())
+                        .ifPresent(o::setMaakuntaKoodi);
             }
         });
-        return organisaatioOpt;
     }
 }

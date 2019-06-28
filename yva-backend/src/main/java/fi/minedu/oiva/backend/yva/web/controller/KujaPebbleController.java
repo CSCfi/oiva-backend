@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.yva.web.controller;
 
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.LupaService;
+import fi.minedu.oiva.backend.core.service.OrganisaatioService;
 import fi.minedu.oiva.backend.core.util.With;
 import fi.minedu.oiva.backend.core.web.controller.BasePebbleController;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
@@ -25,8 +26,9 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 public class KujaPebbleController extends BasePebbleController<KujaPebbleService> {
 
     @Autowired
-    public KujaPebbleController(KujaPebbleService service, LupaService lupaService) {
-        super(service, lupaService);
+    public KujaPebbleController(KujaPebbleService service, LupaService lupaService,
+                                OrganisaatioService organisaatioService) {
+        super(service, lupaService, organisaatioService);
     }
 
     // TODO: REMOVE ME

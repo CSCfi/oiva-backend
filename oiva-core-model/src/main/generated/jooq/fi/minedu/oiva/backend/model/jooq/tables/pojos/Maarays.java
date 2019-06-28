@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Maarays implements Serializable {
 
-    private static final long serialVersionUID = -1523678080;
+    private static final long serialVersionUID = -1054669113;
 
     private Long      id;
     private Long      parentId;
@@ -45,6 +45,7 @@ public class Maarays implements Serializable {
     private Timestamp paivityspvm;
     private Integer   koodistoversio;
     private UUID      uuid;
+    private String    orgOid;
 
     public Maarays() {}
 
@@ -64,6 +65,7 @@ public class Maarays implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.koodistoversio = value.koodistoversio;
         this.uuid = value.uuid;
+        this.orgOid = value.orgOid;
     }
 
     public Maarays(
@@ -81,7 +83,8 @@ public class Maarays implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         Integer   koodistoversio,
-        UUID      uuid
+        UUID      uuid,
+        String    orgOid
     ) {
         this.id = id;
         this.parentId = parentId;
@@ -98,6 +101,7 @@ public class Maarays implements Serializable {
         this.paivityspvm = paivityspvm;
         this.koodistoversio = koodistoversio;
         this.uuid = uuid;
+        this.orgOid = orgOid;
     }
 
     public Long getId() {
@@ -226,6 +230,15 @@ public class Maarays implements Serializable {
         this.uuid = uuid;
     }
 
+    @Size(max = 255)
+    public String getOrgOid() {
+        return this.orgOid;
+    }
+
+    public void setOrgOid(String orgOid) {
+        this.orgOid = orgOid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Maarays (");
@@ -245,6 +258,7 @@ public class Maarays implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(koodistoversio);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(orgOid);
 
         sb.append(")");
         return sb.toString();
