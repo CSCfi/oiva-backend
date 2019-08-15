@@ -118,6 +118,39 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Muutos liite 4 name should be match!", changeName, names.get(0));
     }
 
+    @Test
+    public void updateWithoutMuutokset() throws IOException {
+        loginAs("testuser", lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+
+        // Create new
+        ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
+                readFileToString("json/muutospyynto.json"),
+                "file0", "file1", "file2", "file3", "file4", "file5"));
+        assertEquals("Response status should match", HttpStatus.OK, createResponse.getStatusCode());
+        DocumentContext doc = jsonPath.parse(createResponse.getBody());
+        log.info("Muutospyynto createResponse: {}", doc.jsonString());
+        final String uuid = doc.read("$.uuid", String.class);
+        assertNotNull("Muutospyynto uuid should not be null", uuid);
+
+        // Remove all changes from update
+        doc.set("$.muutokset", Collections.EMPTY_LIST);
+
+        final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()));
+        assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
+
+        assertEquals("Liite table count should match!", 2,
+                JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
+
+        // Load updated muutospyynto
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
+        assertEquals("Get response status should match!", HttpStatus.OK, getResponse.getStatusCode());
+
+        assertEquals("Update response and get response should match!", updateResponse.getBody(),
+                getResponse.getBody());
+    }
+
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
         return restTemplate
                 .postForEntity(createURLWithPort("/api/muutospyynnot/tallenna"), requestEntity, String.class);

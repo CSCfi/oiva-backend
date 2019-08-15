@@ -426,7 +426,7 @@ public class MuutospyyntoService {
             deleteFromExistingMetaLiitteet(muutospyynto.getMeta());
             deleteFromExistingLiitteet(muutospyynto.getLiitteet());
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecordUp.getId());
-            saveMuutokset(muutospyynto, muutospyyntoRecordUp.getId(), fileMap);
+            saveMuutokset(muutospyynto, fileMap);
 
             return muutospyynto;
         });
@@ -445,9 +445,10 @@ public class MuutospyyntoService {
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();
+            muutospyynto.setId(muutospyyntoRecord.getId());
 
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
-            saveMuutokset(muutospyynto, muutospyyntoRecord.getId(), fileMap);
+            saveMuutokset(muutospyynto, fileMap);
 
             Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
             return ready.orElse(null);
@@ -482,14 +483,30 @@ public class MuutospyyntoService {
                 });
     }
 
-    private void saveMuutokset(Muutospyynto muutospyynto, Long id, Map<String, MultipartFile> fileMap) {
+    private void saveMuutokset(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
+        clearNonExistingMuutokset(muutospyynto);
         for (Muutos muutos : muutospyynto.getMuutokset()) {
             if (muutos.getUuid() == null) {
-                createMuutos(id, muutos, fileMap);
+                createMuutos(muutospyynto.getId(), muutos, fileMap);
                 continue;
             }
-            updateMuutos(id, muutos, fileMap);
+            updateMuutos(muutospyynto.getId(), muutos, fileMap);
         }
+    }
+
+    /**
+     * Clear old muutokset which are in db but not in request.
+     * @param muutospyynto Muutospyynto from request
+     */
+    private void clearNonExistingMuutokset(Muutospyynto muutospyynto) {
+        getByMuutospyyntoId(muutospyynto.getId()).stream().filter(m ->
+                muutospyynto.getMuutokset().stream().noneMatch(m2 ->
+                        m.getUuid().equals(m2.getUuid()))).forEach(m -> {
+            deleteFromExistingLiitteet(m.getLiitteet(), true);
+            deleteFromExistingMetaLiitteet(m.getMeta(), true);
+            dsl.deleteFrom(MUUTOS).where(MUUTOS.ID.eq(m.getId()))
+                    .execute();
+        });
     }
 
     private void updateMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
@@ -508,9 +525,13 @@ public class MuutospyyntoService {
     }
 
     private void deleteFromExistingMetaLiitteet(JsonNode meta) {
+        deleteFromExistingMetaLiitteet(meta, false);
+    }
+
+    private void deleteFromExistingMetaLiitteet(JsonNode meta, boolean forceDelete) {
         ObjectMapper mapper = ObjectMapperSingleton.mapper;
         final ArrayList<Liite> liitteet = getMetaLiitteet(meta);
-        final List<Liite> removed = liitteet.stream().filter(Liite::isRemoved)
+        final List<Liite> removed = liitteet.stream().filter(l -> l.isRemoved() || forceDelete)
                 .peek(liiteService::delete)
                 .collect(Collectors.toList());
         liitteet.removeAll(removed);
@@ -563,8 +584,12 @@ public class MuutospyyntoService {
     }
 
     private void deleteFromExistingLiitteet(Collection<Liite> liitteet) {
+        deleteFromExistingLiitteet(liitteet, false);
+    }
+
+    private void deleteFromExistingLiitteet(Collection<Liite> liitteet, boolean forceDelete) {
         Optional.ofNullable(liitteet).ifPresent(list -> {
-            list.stream().filter(Liite::isRemoved).forEach(liiteService::delete);
+            list.stream().filter(l -> l.isRemoved() || forceDelete).forEach(liiteService::delete);
             list.removeIf(Liite::isRemoved);
         });
     }
