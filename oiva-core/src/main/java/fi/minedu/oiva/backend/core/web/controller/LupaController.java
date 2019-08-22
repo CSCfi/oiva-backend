@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupahistoria;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Produces;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -94,5 +96,12 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.getByUuid(uuid, options(with))));
+    }
+
+    @OivaAccess_BasicAuth
+    @RequestMapping(method = GET, value = "/listaus.csv", produces = "text/csv; charset=utf-8")
+    @ApiOperation(notes = "Palauttaa ajantasaisen listauksen järjestelmälupien tutkinnoista, osamisalarajoituksista ja tutkintokielistä", value = "")
+    public CompletableFuture<String> getListaus() {
+        return async(() -> service.getReport());
     }
 }

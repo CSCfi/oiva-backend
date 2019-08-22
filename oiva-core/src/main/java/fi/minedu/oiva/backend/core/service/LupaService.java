@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.extension.MaaraysListFilter;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.core.security.OivaUserDetailsService;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
@@ -11,31 +12,43 @@ import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.SelectOnConditionStep;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static fi.minedu.oiva.backend.model.jooq.Tables.ASIATYYPPI;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPATILA;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA_LIITE;
+import static fi.minedu.oiva.backend.model.jooq.Tables.MAARAYS;
 
 @Service
 public class LupaService extends BaseService {
+
+    private final static Logger logger = LoggerFactory.getLogger(OivaUserDetailsService.class);
 
     @Autowired
     private DSLContext dsl;
@@ -60,6 +73,12 @@ public class LupaService extends BaseService {
 
     @Autowired
     private AuthService authService;
+
+    @Autowired
+    private KoodistoService koodistoservice;
+
+    @Autowired
+    private OpintopolkuService opintopolkuService;
 
     protected SelectOnConditionStep<Record> baseLupaSelect() {
         return dsl.select(LUPA.fields()).from(LUPA)
@@ -205,5 +224,121 @@ public class LupaService extends BaseService {
                 .map(lupa -> with(Optional.ofNullable(lupa), withOptions))
                 .filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Ammattilisten tutkintojen ja koulutuksen järjestämisluvissa määrätyt tutkinnot, osaamisalarajoitukset sekä opetuskielet koulutuksen järjestäjän mukaan
+     * @return csv file of query result
+     */
+    public String getReport() {
+        // All except TELMA and VALMA
+        List<String> except = Arrays.asList("999901", "999903");
+
+        SelectConditionStep<Record> query = dsl.select(ArrayUtils.addAll(LUPA.fields(), MAARAYS.fields()))
+                .from(LUPA)
+                .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
+                .where(MAARAYS.KOODISTO.eq("koulutus")
+                        .and(MAARAYS.KOODIARVO.in(except)).not()
+                        .and(LUPA.LOPPUPVM.isNull()));
+
+        logger.debug(query.getSQL());
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("Y-tunnus;Koulutuksen järjestäjä;Järjestäjän toiminta-alue;Opetuskieli tai -kielet;tutkintotyyppi;tutkintokoodi;tutkinnon nimi;tutkintokieli lisäksi;lisätiedot;\n");
+
+        Collector<KoodistoKoodi, ?, Map<String, KoodistoKoodi>> toKoodistoMap = Collectors.toMap(KoodistoKoodi::getKoodiArvo, v -> v);
+
+        final Map<String, KoodistoKoodi> koulutukset = koodistoservice.getAmmatillinenTutkinnot().stream().collect(toKoodistoMap);
+        // Combine osaamisalakielet (e.g. "1", "2") and kielet (e.g. "fi", "sv")
+        final Map<String, KoodistoKoodi> kielet = Stream.concat(
+                koodistoservice.getOpetuskielet().stream(),
+                koodistoservice.getKielet().stream()).collect(toKoodistoMap);
+        final Map<String, KoodistoKoodi> osaamisalat = koodistoservice.getOsaamisalat().stream().collect(toKoodistoMap);
+
+        Result<Record> result = dsl.fetch(query);
+        result.stream().collect(Collectors.groupingBy(r -> r.get(LUPA.JARJESTAJA_YTUNNUS)))
+                .entrySet().stream()
+                .flatMap(entry -> generateRows(koulutukset, kielet, osaamisalat, entry))
+                .forEach(r -> builder.append(r).append("\n"));
+
+        return builder.toString();
+    }
+
+    private String getNimi(Map<String, KoodistoKoodi> koodisto, String koodiarvo) {
+        return Optional.ofNullable(koodisto.get(koodiarvo))
+                .map(k -> k.getNimi().getFirstOfOrEmpty("fi", "sv"))
+                .orElse("");
+    }
+
+    private Stream<String> generateRows(Map<String, KoodistoKoodi> koulutukset, Map<String, KoodistoKoodi> kielet, Map<String, KoodistoKoodi> osaamisalat, Map.Entry<String, List<Record>> orgRecord) {
+        String ytunnus = orgRecord.getKey();
+        List<Record> values = orgRecord.getValue();
+
+        final Organisaatio organisaatio = opintopolkuService.getBlockingOrganisaatio(values.get(0).get(LUPA.JARJESTAJA_OID));
+
+        String kielinimet = values.stream()
+                .filter(v -> "oppilaitoksenopetuskieli".equals(v.get(MAARAYS.KOODISTO)) && v.get(MAARAYS.PARENT_ID) == null)
+                .map(k -> k.get(MAARAYS.KOODIARVO))
+                .map(k -> getNimi(kielet, k))
+                .collect(Collectors.joining(","));
+
+        String maakuntanimi = opintopolkuService.getMaakuntaKoodiForKunta(organisaatio.kuntaKoodiArvo())
+                .map(k -> k.getNimi().getFirstOfOrEmpty("fi", "sv")).orElse("");
+
+        final Map<String, String> tutkintolyhenteet = new HashMap<>();
+        tutkintolyhenteet.put("erikoisammattitutkinto", "EAT");
+        tutkintolyhenteet.put("perustutkinto", "PT");
+        tutkintolyhenteet.put("ammattitutkinto", "AT");
+        tutkintolyhenteet.put("specialyrkesexamen", "EAT");
+        tutkintolyhenteet.put("grundexamen", "PT");
+        tutkintolyhenteet.put("yrkesexamen", "AT");
+
+        // Loop through koulutukset
+        return values.stream()
+                .filter(v -> "koulutus".equals(v.get(MAARAYS.KOODISTO)) && koulutukset.get(v.get(MAARAYS.KOODIARVO)) != null && v.get(MAARAYS.PARENT_ID) == null)
+                .map(r -> {
+                    Optional<KoodistoKoodi> koulutusKoodi = Optional.ofNullable(koulutukset.get(r.get(MAARAYS.KOODIARVO)));
+                    String koulutus = koulutusKoodi.map(k -> k.getNimi().getFirstOfOrEmpty("fi", "sv")).orElse("");
+
+                    if (koulutus.length() == 0) {
+                        logger.warn("Koulutuksella ei ole nimeä. id=" + r.get(MAARAYS.KOODIARVO) + ", koodi=" + koulutusKoodi);
+                    }
+
+                    String tutkintolyhenne = tutkintolyhenteet.entrySet().stream()
+                            .filter(entry -> koulutus.contains(entry.getKey()))
+                            .findFirst()
+                            .map(Map.Entry::getValue)
+                            .orElse("");
+
+                    // extra info
+                    List<Record> lisatiedot = values.stream().filter(v -> r.get(MAARAYS.ID).equals(v.get(MAARAYS.PARENT_ID))).collect(Collectors.toList());
+
+                    String lisakielet = lisatiedot.stream()
+                            .filter(v -> "kieli".equals(v.get(MAARAYS.KOODISTO)))
+                            .map(k -> k.get(MAARAYS.KOODIARVO).toUpperCase())
+                            .map(k -> getNimi(kielet, k))
+                            .collect(Collectors.joining(","));
+
+                    String lukuunottamatta = lisatiedot.stream()
+                            .filter(v -> "osaamisala".equals(v.get(MAARAYS.KOODISTO)))
+                            .map(k -> k.get(MAARAYS.KOODIARVO))
+                            .map(k -> k + " " + getNimi(osaamisalat, k))
+                            .collect(Collectors.joining(", "));
+
+                    if (lukuunottamatta.length() > 0) {
+                        lukuunottamatta = "lukuun ottamatta: " + lukuunottamatta;
+                    }
+
+                    return String.join(";",
+                            ytunnus,
+                            organisaatio.getNimi().getFirstOfOrEmpty("fi", "sv"),
+                            maakuntanimi,
+                            kielinimet,
+                            tutkintolyhenne,
+                            r.get(MAARAYS.KOODIARVO),
+                            koulutus,
+                            lukuunottamatta,
+                            lisakielet);
+                });
     }
 }
