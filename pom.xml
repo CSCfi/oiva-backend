@@ -287,6 +287,12 @@
 	            <groupId>org.scalatest</groupId>
 	            <artifactId>scalatest_2.11</artifactId>
 	            <version>${scalatest.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.scala-lang</groupId>
+                        <artifactId>scala-library</artifactId>
+                    </exclusion>
+                </exclusions>
 	            <scope>test</scope>
 	        </dependency>
             <dependency>
