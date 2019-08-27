@@ -4,7 +4,6 @@ import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupahistoria;
-
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.LupaService;
 import fi.minedu.oiva.backend.core.service.LupahistoriaService;
@@ -21,10 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Produces;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
-
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;

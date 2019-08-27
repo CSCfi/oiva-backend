@@ -48,7 +48,7 @@ import static fi.minedu.oiva.backend.model.jooq.Tables.MAARAYS;
 @Service
 public class LupaService extends BaseService {
 
-    private final static Logger logger = LoggerFactory.getLogger(OivaUserDetailsService.class);
+    private final static Logger logger = LoggerFactory.getLogger(LupaService.class);
 
     @Autowired
     private DSLContext dsl;
@@ -244,7 +244,7 @@ public class LupaService extends BaseService {
         logger.debug(query.getSQL());
 
         StringBuilder builder = new StringBuilder();
-        builder.append("Y-tunnus;Koulutuksen järjestäjä;Järjestäjän toiminta-alue;Opetuskieli tai -kielet;tutkintotyyppi;tutkintokoodi;tutkinnon nimi;tutkintokieli lisäksi;lisätiedot;\n");
+        builder.append("Y-tunnus;Koulutuksen järjestäjä;Järjestäjän toiminta-alue;Opetuskieli tai -kielet;tutkintotyyppi;tutkintokoodi;tutkinnon nimi;lisätiedot;tutkintokieli lisäksi;\n");
 
         Collector<KoodistoKoodi, ?, Map<String, KoodistoKoodi>> toKoodistoMap = Collectors.toMap(KoodistoKoodi::getKoodiArvo, v -> v);
 
