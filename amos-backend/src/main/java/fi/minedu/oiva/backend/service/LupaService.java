@@ -243,7 +243,7 @@ public class LupaService {
         logger.debug(query.getSQL());
 
         StringBuilder builder = new StringBuilder();
-        builder.append("Y-tunnus;Koulutuksen järjestäjä;Järjestäjän toiminta-alue;Opetuskieli tai -kielet;tutkintotyyppi;tutkintokoodi;tutkinnon nimi;tutkintokieli lisäksi;lisätiedot;\n");
+        builder.append("Y-tunnus;Koulutuksen järjestäjä;Järjestäjän toiminta-alue;Opetuskieli tai -kielet;tutkintotyyppi;tutkintokoodi;tutkinnon nimi;lisätiedot;tutkintokieli lisäksi;\n");
 
         Collector<KoodistoKoodi, ?, Map<String, KoodistoKoodi>> toKoodistoMap = Collectors.toMap(KoodistoKoodi::getKoodiArvo, v -> v);
 
