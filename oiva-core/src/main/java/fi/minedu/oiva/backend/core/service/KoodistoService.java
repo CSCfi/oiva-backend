@@ -7,6 +7,8 @@ import fi.minedu.oiva.backend.model.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +25,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class KoodistoService {
+
+
+    private final static Logger logger = LoggerFactory.getLogger(KoodistoService.class);
 
     private final OpintopolkuService opintopolkuService;
 
@@ -186,8 +191,8 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutusalat().stream().forEach(koulutusalaKoodi ->
-            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
+        getKoulutusalat().forEach(koulutusalaKoodi ->
+            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).forEach(koulutusKoodi ->
                 map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
         );
         return map;
@@ -247,15 +252,17 @@ public class KoodistoService {
         return opintopolkuService.getKoulutusKooditForOsaamisala(koodi);
     }
 
-    @Cacheable(value = "KoodistoService:getKoulutusToOsaamisalaRelation", key = "''")
-    public Map<String, KoodistoKoodi> getKoulutusToOsaamisalaRelation() {
+    private Map<String, KoodistoKoodi> getKoulutusToOsaamisalaRelation() {
         final Map<String, KoodistoKoodi> map = new HashMap<>();
-        getOsaamisalat().stream().forEach(osaamisalaKoodi -> {
-                getOsaamisalaKoulutukset(osaamisalaKoodi.getKoodiArvo()).stream().forEach(koulutusKoodi -> {
-                   map.put(koulutusKoodi.koodiArvo(), osaamisalaKoodi);
-                });
-            }
-        );
+        getOsaamisalat().forEach(osaamisalaKoodi ->
+                getOsaamisalaKoulutukset(osaamisalaKoodi.getKoodiArvo())
+                        .forEach(koulutusKoodi -> {
+                            KoodistoKoodi original = map.get(koulutusKoodi.koodiArvo());
+                            if (original != null) {
+                                logger.warn("Koulutuskoodille {} on jo osaamisala. {} ylikirjoitettiin arvolla {}", koulutusKoodi.koodiArvo(), original, osaamisalaKoodi);
+                            }
+                            map.put(koulutusKoodi.koodiArvo(), osaamisalaKoodi);
+                        }));
         return map;
     }
 
@@ -278,14 +285,15 @@ public class KoodistoService {
                 if(!(koodistoKoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
 
                     // Tarkistetaan versio-duplikaatit
-                    if(null == koulutukset.stream().filter(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koodistoKoodi.getKoodiArvo())).findFirst().orElse(null)) {
+                    if(koulutukset.stream().noneMatch(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koodistoKoodi.getKoodiArvo()))) {
 
                         koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisala));
                     }
                 }
             }
         };
-        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
+
+        getAmmatillinenKoulutustyyppiArvot().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus));
         return koulutukset;
     }
 
