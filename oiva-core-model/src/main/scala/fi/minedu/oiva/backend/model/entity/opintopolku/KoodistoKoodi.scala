@@ -36,6 +36,9 @@ case class KoodistoKoodi(
 
     @JsonIgnore def isValidDate = voimassaLoppuPvm == null ||
         (try { LocalDate.parse(voimassaLoppuPvm).isAfter(LocalDate.now()) } catch { case e: DateTimeParseException => true })
+
+    override def toString: String = koodiArvo + " " + getNimi.getFirstOfOrEmpty("fi", "sv")
+
 }
 
 object KoodistoKoodi {

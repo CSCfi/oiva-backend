@@ -49,7 +49,7 @@ public class DatabasesConfig implements EnvironmentAware {
 
     @Primary
     @Profile("!test")
-    @Bean(destroyMethod = "shutdown")
+    @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         log.debug("Configuring Datasource");
         if (dataSourcePropertyResolver.getProperty("url") == null && dataSourcePropertyResolver.getProperty("databaseName") == null) {

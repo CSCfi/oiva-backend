@@ -5,7 +5,6 @@ import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -186,8 +187,8 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutusalat().stream().forEach(koulutusalaKoodi ->
-            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).stream().forEach(koulutusKoodi ->
+        getKoulutusalat().forEach(koulutusalaKoodi ->
+            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).forEach(koulutusKoodi ->
                 map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
         );
         return map;
@@ -247,15 +248,18 @@ public class KoodistoService {
         return opintopolkuService.getKoulutusKooditForOsaamisala(koodi);
     }
 
-    @Cacheable(value = "KoodistoService:getKoulutusToOsaamisalaRelation", key = "''")
-    public Map<String, KoodistoKoodi> getKoulutusToOsaamisalaRelation() {
-        final Map<String, KoodistoKoodi> map = new HashMap<>();
-        getOsaamisalat().stream().forEach(osaamisalaKoodi -> {
-                getOsaamisalaKoulutukset(osaamisalaKoodi.getKoodiArvo()).stream().forEach(koulutusKoodi -> {
-                   map.put(koulutusKoodi.koodiArvo(), osaamisalaKoodi);
-                });
-            }
-        );
+    private Map<String, Set<KoodistoKoodi>> getKoulutusToOsaamisalatRelation() {
+        final Map<String, Set<KoodistoKoodi>> map = new HashMap<>();
+        getOsaamisalat().forEach(osaamisalaKoodi ->
+                getOsaamisalaKoulutukset(osaamisalaKoodi.getKoodiArvo())
+                        .forEach(koulutusKoodi -> {
+                            Set<KoodistoKoodi> osaamisalat = map.get(koulutusKoodi.koodiArvo());
+                            if (osaamisalat == null) {
+                                osaamisalat = new HashSet<>();
+                            }
+                            osaamisalat.add(osaamisalaKoodi);
+                            map.put(koulutusKoodi.koodiArvo(), osaamisalat);
+                        }));
         return map;
     }
 
@@ -264,28 +268,28 @@ public class KoodistoService {
         final List<KoulutusKoodi> koulutukset = new ArrayList<>();
         final Map<String, String> koulutusToKoulutusala = getKoulutusToKoulutusalaRelation();
         final Map<String, String> koulutusToKoulutustyyppi = getKoulutusToKoulutustyyppiRelation();
-        final Map<String, KoodistoKoodi> koulutusToOsaamisala = getKoulutusToOsaamisalaRelation();
+        final Map<String, Set<KoodistoKoodi>> koulutusToOsaamisala = getKoulutusToOsaamisalatRelation();
 
-        final Consumer<KoodistoKoodi> includeKoulutus = koodistoKoodi -> {
-            final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koodistoKoodi.koodiArvo(), null);
-            final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koodistoKoodi.koodiArvo(), null);
-            final KoodistoKoodi osaamisala = koulutusToOsaamisala.getOrDefault(koodistoKoodi.koodiArvo(), null);
+        final Consumer<KoodistoKoodi> includeKoulutus = koulutuskoodi -> {
+            final String koulutusalaKoodiArvo = koulutusToKoulutusala.getOrDefault(koulutuskoodi.koodiArvo(), null);
+            final String koulutustyyppiKoodiArvo = koulutusToKoulutustyyppi.getOrDefault(koulutuskoodi.koodiArvo(), null);
+            final Set<KoodistoKoodi> osaamisalat = koulutusToOsaamisala.getOrDefault(koulutuskoodi.koodiArvo(), new HashSet<>());
 
             // Voimassaolon päättyminen ja koodisto
-            if(null == koodistoKoodi.voimassaLoppuPvm() && koodistoKoodi.koodisto().getKoodistoUri().equals("koulutus")) {
+            if(null == koulutuskoodi.voimassaLoppuPvm() && koulutuskoodi.koodisto().getKoodistoUri().equals("koulutus")) {
 
                 // Erikoisammattitutkinnoilta kolmosalkuiset pois
-                if(!(koodistoKoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
+                if(!(koulutuskoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
 
                     // Tarkistetaan versio-duplikaatit
-                    if(null == koulutukset.stream().filter(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koodistoKoodi.getKoodiArvo())).findFirst().orElse(null)) {
-
-                        koulutukset.add(new KoulutusKoodi(koodistoKoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisala));
+                    if(koulutukset.stream().noneMatch(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koulutuskoodi.getKoodiArvo()))) {
+                        koulutukset.add(new KoulutusKoodi(koulutuskoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisalat));
                     }
                 }
             }
         };
-        getAmmatillinenKoulutustyyppiArvot().stream().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus::accept));
+
+        getAmmatillinenKoulutustyyppiArvot().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus));
         return koulutukset;
     }
 
