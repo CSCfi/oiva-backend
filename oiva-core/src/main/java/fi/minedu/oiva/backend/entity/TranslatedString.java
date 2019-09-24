@@ -52,6 +52,17 @@ public class TranslatedString implements Serializable {
         return (values.isEmpty()) ? Optional.empty() : values.entrySet().stream().map(Map.Entry::getValue).findFirst();
     }
 
+    public String getFirstOfOrEmpty(final String... langs) {
+        for (String lang : langs) {
+            Optional<String> s = get(lang);
+            if(s.isPresent()) {
+                return s.get();
+            }
+        }
+
+        return "";
+    }
+
     public Stream<Map.Entry<String, String>> stream() {
         return values.entrySet().stream();
     }

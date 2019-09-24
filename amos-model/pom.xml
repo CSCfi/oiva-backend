@@ -169,6 +169,9 @@
                                 <goals>
                                     <goal>migrate</goal>
                                 </goals>
+                                <configuration>
+                                    <target>2</target>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

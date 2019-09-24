@@ -1,16 +1,16 @@
 package fi.minedu.oiva.backend.web.controller;
 
-import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
-import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
 
+import fi.minedu.oiva.backend.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
+import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.security.annotations.OivaAccess_BasicAuth;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.LupahistoriaService;
 import fi.minedu.oiva.backend.util.RequestUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.jooq.Condition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import static fi.minedu.oiva.backend.jooq.tables.Lupa.LUPA;
 import static fi.minedu.oiva.backend.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.util.ControllerUtil.getOr404;
 import static fi.minedu.oiva.backend.util.ControllerUtil.options;
@@ -96,5 +95,12 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.getByUuid(uuid, options(with))));
+    }
+
+    @OivaAccess_BasicAuth
+    @RequestMapping(method = GET, value = "/listaus.csv", produces = "text/csv; charset=utf-8")
+    @ApiOperation(notes = "Palauttaa ajantasaisen listauksen järjestelmälupien tutkinnoista, osamisalarajoituksista ja tutkintokielistä", value = "")
+    public CompletableFuture<String> getListaus() {
+        return async(() -> service.getReport());
     }
 }
