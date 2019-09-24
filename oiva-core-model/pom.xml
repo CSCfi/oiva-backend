@@ -253,6 +253,7 @@
                             </locations>
                             <validateOnMigrate>false</validateOnMigrate>
                             <baselineOnMigrate>true</baselineOnMigrate>
+                            <target>2</target>
                         </configuration>
                         <executions>
                             <execution>
