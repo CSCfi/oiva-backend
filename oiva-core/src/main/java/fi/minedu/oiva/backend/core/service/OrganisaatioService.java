@@ -23,14 +23,24 @@ public class OrganisaatioService {
         return Optional.ofNullable(oid).map(o -> {
             final Organisaatio organisaatio = opintopolkuService.getBlockingOrganisaatio(o);
             withKunta(organisaatio);
+            withMuutKunnat(organisaatio);
             withMaakunta(organisaatio);
             return organisaatio;
         });
     }
 
+    private void withMuutKunnat(Organisaatio organisaatio) {
+        Optional.ofNullable(organisaatio).map(Organisaatio::muutKotipaikatUris)
+                .ifPresent(muut -> muut.stream().map(organisaatio::parseKuntaKoodi)
+                        .filter(StringUtils::isNotBlank)
+                        .forEach(kunta -> opintopolkuService.getKuntaKoodi(kunta)
+                                .ifPresent(organisaatio::addMuutKuntaKoodi))
+                );
+    }
+
     private void withKunta(final Organisaatio organisaatio) {
         Optional.ofNullable(organisaatio).ifPresent(o -> {
-            if(StringUtils.isNotBlank(o.kuntaKoodiArvo())) {
+            if (StringUtils.isNotBlank(o.kuntaKoodiArvo())) {
                 opintopolkuService.getKuntaKoodi(o.kuntaKoodiArvo()).ifPresent(o::setKuntaKoodi);
             }
         });
@@ -38,7 +48,7 @@ public class OrganisaatioService {
 
     private void withMaakunta(final Organisaatio organisaatio) {
         Optional.ofNullable(organisaatio).ifPresent(o -> {
-            if(null != o.kuntaKoodi()) {
+            if (null != o.kuntaKoodi()) {
                 opintopolkuService.getMaakuntaKoodiForKunta(o.kuntaKoodiArvo())
                         .ifPresent(o::setMaakuntaKoodi);
             }
