@@ -167,3 +167,7 @@ UPDATE maarays set koodiarvo='743' WHERE koodiarvo='975' AND koodisto='kunta';
 UPDATE maarays set koodiarvo='405' WHERE koodiarvo='978' AND koodisto='kunta';
 UPDATE maarays set koodiarvo='636' WHERE koodiarvo='979' AND koodisto='kunta';
 UPDATE maarays set koodiarvo='790' WHERE koodiarvo='988' AND koodisto='kunta';
+
+-- Remove obsolete kieli maarays 'svenska' from Folkhälsan Utbildning Ab
+DELETE FROM maarays m USING lupa l
+WHERE m.lupa_id = l.id AND l.diaarinumero = '23/532/2011' AND koodisto = 'kieli' AND koodiarvo = 'svenska';
