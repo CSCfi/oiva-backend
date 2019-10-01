@@ -80,6 +80,12 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Liite table count should match!", 6,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
 
+        // Muutos with koodiarvo 334113 should have two aliMaarays
+        List alimaaraykset = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset", List.class);
+        assertEquals(1, alimaaraykset.size());
+        alimaaraykset = (List) alimaaraykset.get(0);
+        assertEquals(2, alimaaraykset.size());
+
         // Load created
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
