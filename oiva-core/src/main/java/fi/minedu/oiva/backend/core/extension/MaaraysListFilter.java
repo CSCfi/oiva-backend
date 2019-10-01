@@ -33,6 +33,11 @@ public class MaaraysListFilter extends OivaFilter {
     };
     private final BiFunction<Maarays, Object, Boolean> maaraysTyyppiFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isMaaraystyyppi(removeStart(value, "~"))));
     private final BiFunction<Maarays, Object, Boolean> maaraysKohdeFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKohde(removeStart(value, "~"))));
+    private final BiFunction<Maarays, Object, Boolean> maaraysMetaFilter = (maarays, filter) -> filterer.apply(filter, value -> {
+        final String[] split = value.split("=");
+        if (split.length < 2) return false;
+        return xor(startsWith(value, "~"), maarays.hasMetaValue(split[0], split[1]));
+    });
     private final BiFunction<Maarays, Object, Boolean> maaraysKoodistoFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKoodisto(removeStart(value, "~"))));
     private final BiFunction<Maarays, Object, Boolean> maaraysKoodiArvoFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.isKoodiArvo(removeStart(value, "~"))));
     private final BiFunction<Maarays, Object, Boolean> maaraysYlaKoodiFilter = (maarays, filter) -> filterer.apply(filter, value -> xor(startsWith(value, "~"), maarays.hasYlaKoodi(removeStart(value, "~"))));
@@ -72,6 +77,7 @@ public class MaaraysListFilter extends OivaFilter {
         else if(equalsIgnoreCase(filterType, "ylakoodi")) return maaraysYlaKoodiFilter.apply(maarays, filterTarget);
         else if(equalsIgnoreCase(filterType, "arvo")) return maaraysArvoFilter.apply(maarays, filterTarget);
         else if(equalsIgnoreCase(filterType, "alimaarays")) return alimaaraysChainFilter.apply(maarays, filterTarget);
+        else if(equalsIgnoreCase(filterType, "meta")) return maaraysMetaFilter.apply(maarays, filterTarget);
         else return false;
     }
 
