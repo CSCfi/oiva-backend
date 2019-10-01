@@ -4,9 +4,9 @@ import java.util.{ArrayList, Collection}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
-import fi.minedu.oiva.backend.model.jooq.tables._
 import fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue
 import fi.minedu.oiva.backend.model.entity.opintopolku.{KoodistoKoodi, Organisaatio}
+import fi.minedu.oiva.backend.model.jooq.tables._
 import org.apache.commons.lang3.StringUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -48,6 +48,8 @@ class Maarays(
 
   @JsonIgnore def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
+  @JsonIgnore def hasMetaValue(key: String, value: String) = null != getMeta && getMeta.has(key) && getMeta.get(key).asText("").equals(value)
+
   @JsonIgnore def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
 
   @JsonIgnore def isKoodiArvo(koodiArvo: String) = null != getKoodiarvo && StringUtils.equalsIgnoreCase(getKoodiarvo, koodiArvo)
@@ -81,7 +83,9 @@ class Maarays(
   @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = null != ylaKoodit && ylaKoodit.exists(ylakoodi => ylakoodi.isKoodi(koodiUri))
 
   def setOrganisaatio(organisaatio: Organisaatio) = this.organisaatio = organisaatio
+
   def getOrganisaatio = organisaatio
+
   def getAliMaaraykset = aliMaaraykset
 
   @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if (null != maarays && getId != maarays.getId) {
