@@ -116,7 +116,26 @@
           "muutosperustelukoodiarvo": "01",
           "indeksi": 0,
           "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
-          "tila": "LISAYS"
+          "tila": "LISAYS",
+          "aliMaaraykset": [
+            {
+              "koodiarvo": "1531_1_1",
+              "koodisto": "osaamisala",
+              "isInLupa": false,
+              "kohde": {
+                "tunniste": "tutkinnotjakoulutukset",
+                "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+              },
+              "maaraystyyppi": {
+                "tunniste": "OIKEUS",
+                "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+              },
+              "type": "addition",
+              "muutosperustelukoodiarvo": "01",
+              "indeksi": 0,
+              "tila": "LISAYS"
+            }
+          ]
         },
         {
           "koodiarvo": "1531_2",

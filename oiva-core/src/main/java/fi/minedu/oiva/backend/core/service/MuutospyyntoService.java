@@ -41,15 +41,15 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static fi.minedu.oiva.backend.core.util.ValidationUtils.validation;
 import static fi.minedu.oiva.backend.model.jooq.Tables.KOHDE;
@@ -323,26 +323,27 @@ public class MuutospyyntoService {
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
+    private Collection<Muutos> constructMuutosTree(Collection<Muutos> allMuutokset, Long parentId) {
+
+        // Find children related to parent id
+        Map<Long, Muutos> children = allMuutokset.stream()
+                .filter(m -> Objects.equals(m.getParentId(), parentId))
+                .collect(Collectors.toMap(Muutos::getId, Function.identity()));
+
+        // Remove children leaving uknown descendants
+        allMuutokset.removeAll(children.values());
+
+        // Try to find children's children
+        for (Muutos child : children.values()) {
+            child.setAliMaaraykset(constructMuutosTree(allMuutokset, child.getId()));
+        }
+
+        return children.values();
+    }
+
     private void withMuutokset(final Muutospyynto muutospyynto) {
         Optional.ofNullable(muutospyynto)
-                .ifPresent(m -> {
-                    Map<Long, Muutos> muutokset = new HashMap<>();
-                    List<Muutos> aliMuutokset = new LinkedList<>();
-                    getByMuutospyyntoId(m.getId()).forEach(muutos -> {
-                        if (muutos.getParentId() == null) {
-                            muutokset.put(muutos.getId(), muutos);
-                        }
-                        else {
-                            aliMuutokset.add(muutos);
-                        }
-                    });
-
-                    for (Muutos alimuutos : aliMuutokset) {
-                        muutokset.get(alimuutos.getParentId()).addAliMaarays(alimuutos);
-                    }
-
-                    m.setMuutokset(muutokset.values());
-                });
+                .ifPresent(m -> m.setMuutokset(constructMuutosTree(getByMuutospyyntoId(m.getId()), null)));
     }
 
     private void withOrganization(final Muutospyynto muutospyynto) {
@@ -445,7 +446,8 @@ public class MuutospyyntoService {
             deleteFromExistingMetaLiitteet(muutospyynto.getMeta());
             deleteFromExistingLiitteet(muutospyynto.getLiitteet());
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecordUp.getId());
-            saveMuutokset(muutospyynto, fileMap);
+            clearNonExistingMuutokset(muutospyynto);
+            saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);
 
             return muutospyynto;
         });
@@ -467,7 +469,7 @@ public class MuutospyyntoService {
             muutospyynto.setId(muutospyyntoRecord.getId());
 
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
-            saveMuutokset(muutospyynto, fileMap);
+            saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);
 
             Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
             return ready.orElse(null);
@@ -502,32 +504,35 @@ public class MuutospyyntoService {
                 });
     }
 
-    private void saveMuutokset(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
-        clearNonExistingMuutokset(muutospyynto);
-        for (Muutos muutos : muutospyynto.getMuutokset()) {
-            final Long parentId;
+    private void saveMuutokset(Muutospyynto muutospyynto, Long parentId, Collection<Muutos> muutokset, Map<String, MultipartFile> fileMap) {
+        for (Muutos muutos : muutokset) {
+            muutos.setParentId(parentId);
+            final Long muutosId;
             if (muutos.getUuid() == null) {
-                parentId = createMuutos(muutospyynto.getId(), muutos, fileMap);
+                muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
             }
             else {
-                parentId = updateMuutos(muutospyynto.getId(), muutos, fileMap);
+                muutosId = updateMuutos(muutospyynto.getId(), muutos, fileMap);
             }
-            if (muutos.getAliMaaraykset() != null) {
-                for (Muutos alimuutos : muutos.getAliMaaraykset()) {
-                    if (alimuutos.getAliMaaraykset() != null && alimuutos.getAliMaaraykset().size() > 0) {
-                        throw new RuntimeException("Not yet supported. Implementation should be converted to recursive implementation");
-                    }
 
-                    alimuutos.setParentId(parentId);
-                    if (alimuutos.getUuid() == null) {
-                        createMuutos(muutospyynto.getId(), alimuutos, fileMap);
-                    }
-                    else {
-                        updateMuutos(muutospyynto.getId(), alimuutos, fileMap);
-                    }
-                }
+            if(muutos.getAliMaaraykset() != null) {
+                saveMuutokset(muutospyynto, muutosId, muutos.getAliMaaraykset(), fileMap);
             }
         }
+    }
+
+    /**
+     *  Get all muutokset, alimuutokset, ali-alimuutokset etc.
+     */
+    private Stream<Muutos> getMuutoksetRecursively(Collection<Muutos> muutokset) {
+        return Stream.concat(
+                muutokset.stream(),
+                muutokset.stream().flatMap(parent -> {
+                    if (parent.getAliMaaraykset() != null) {
+                        return getMuutoksetRecursively(parent.getAliMaaraykset());
+                    }
+                    return Stream.empty();
+                }));
     }
 
     /**
@@ -535,14 +540,17 @@ public class MuutospyyntoService {
      * @param muutospyynto Muutospyynto from request
      */
     private void clearNonExistingMuutokset(Muutospyynto muutospyynto) {
-        getByMuutospyyntoId(muutospyynto.getId()).stream().filter(m ->
-                muutospyynto.getMuutokset().stream().noneMatch(m2 ->
-                        m.getUuid().equals(m2.getUuid()))).forEach(m -> {
-            deleteFromExistingLiitteet(m.getLiitteet(), true);
-            deleteFromExistingMetaLiitteet(m.getMeta(), true);
-            dsl.deleteFrom(MUUTOS).where(MUUTOS.ID.eq(m.getId()))
-                    .execute();
-        });
+        Set<UUID> muutosIds = getMuutoksetRecursively(muutospyynto.getMuutokset())
+                .map(Muutos::getUuid)
+                .collect(Collectors.toSet());
+
+        getByMuutospyyntoId(muutospyynto.getId()).stream()
+                .filter(orig -> !muutosIds.contains(orig.getUuid()))
+                .forEach(poistettava -> {
+                    deleteFromExistingLiitteet(poistettava.getLiitteet(), true);
+                    deleteFromExistingMetaLiitteet(poistettava.getMeta(), true);
+                    dsl.deleteFrom(MUUTOS).where(MUUTOS.ID.eq(poistettava.getId())).execute();
+                });
     }
 
     private Long updateMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
