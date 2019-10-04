@@ -213,3 +213,16 @@ FROM lupa l
 WHERE l.id = m.lupa_id
   AND m.koodisto = 'lukioerityinenkoulutustehtava'
   AND TRIM(m.meta ->> 'erityinenkoulutustehtävämääräys-0') = 'International Baccalaureate';
+
+-- Change lukio luvat to use koulutuksenjarjestamismuoto koodisto
+UPDATE maarays m SET koodisto = 'koulutuksenjarjestamismuoto',
+                     koodiarvo = CASE WHEN m.meta ->> 'urn:muumääräys-0' = 'Sisäoppilaitosmuotoinen'
+                         THEN '1' ELSE '2' END
+FROM lupa l
+WHERE l.id = m.lupa_id
+  AND m.koodisto = 'kujamuutoikeudetmaarayksetjarajoitukset'
+  AND (m.meta ->> 'urn:muumääräys-0' = 'Sisäoppilaitosmuotoinen' OR m.meta ->> 'urn:muumääräys-0' = 'Osittain sisäoppilaitosmuotoinen')
+  AND l.id IN (
+    SELECT DISTINCT l.id FROM lupa l LEFT JOIN maarays m2 on l.id = m2.lupa_id
+    WHERE m2.koodisto = 'koulutusmuoto' AND m2.koodiarvo = '2'
+    );
