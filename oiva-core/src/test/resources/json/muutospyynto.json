@@ -87,12 +87,90 @@
       "muutosperustelukoodiarvo": "01",
       "indeksi": 0,
       "aakkostusNimi": "Tieto- ja kirjastopalvelujen ammattitutkinto",
-      "tila": "LISAYS"
+      "tila": "LISAYS",
+      "aliMaaraykset": [
+        {
+          "koodiarvo": "1531_1",
+          "koodisto": "osaamisala",
+          "nimi": "Kuljetuspalvelujen osaamisala",
+          "kuvaus": "Kuljetuspalvelujen osaamisala",
+          "isInLupa": false,
+          "kohde": {
+            "tunniste": "tutkinnotjakoulutukset",
+            "meta": {
+              "otsikko": {
+                "fi": "Tutkinnot ja koulutukset",
+                "sv": "på svenska"
+              }
+            },
+            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+          },
+          "maaraystyyppi": {
+            "tunniste": "OIKEUS",
+            "selite": {
+              "fi": "Oikeus"
+            },
+            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+          },
+          "type": "addition",
+          "muutosperustelukoodiarvo": "01",
+          "indeksi": 0,
+          "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
+          "tila": "LISAYS",
+          "aliMaaraykset": [
+            {
+              "koodiarvo": "1531_1_1",
+              "koodisto": "osaamisala",
+              "isInLupa": false,
+              "kohde": {
+                "tunniste": "tutkinnotjakoulutukset",
+                "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+              },
+              "maaraystyyppi": {
+                "tunniste": "OIKEUS",
+                "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+              },
+              "type": "addition",
+              "muutosperustelukoodiarvo": "01",
+              "indeksi": 0,
+              "tila": "LISAYS"
+            }
+          ]
+        },
+        {
+          "koodiarvo": "1531_2",
+          "koodisto": "osaamisala",
+          "nimi": "Kuljetuspalvelujen osaamisala_2",
+          "kuvaus": "Kuljetuspalvelujen osaamisala_2",
+          "isInLupa": false,
+          "kohde": {
+            "tunniste": "tutkinnotjakoulutukset",
+            "meta": {
+              "otsikko": {
+                "fi": "Tutkinnot ja koulutukset",
+                "sv": "på svenska"
+              }
+            },
+            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+          },
+          "maaraystyyppi": {
+            "tunniste": "OIKEUS",
+            "selite": {
+              "fi": "Oikeus"
+            },
+            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+          },
+          "type": "addition",
+          "muutosperustelukoodiarvo": "01",
+          "indeksi": 0,
+          "aakkostusNimi": "Kuljetuspalvelujen osaamisala_2",
+          "tila": "LISAYS"
+        }
+      ]
     },
     {
       "koodiarvo": "2283",
       "koodisto": "osaamisala",
-      "parentId": "334113",
       "nimi": "Kirjastoautopalvelujen osaamisala",
       "kuvaus": "Kirjastoautopalvelujen osaamisala.\nVoimaan 1.1.2018.",
       "isInLupa": false,

@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -80,6 +81,19 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Liite table count should match!", 6,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
 
+        // Muutos with koodiarvo 334113 should have two aliMaarays
+        List alimaaraykset = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset", List.class);
+        assertEquals(1, alimaaraykset.size());
+        alimaaraykset = (List) alimaaraykset.get(0);
+        assertEquals(2, alimaaraykset.size());
+
+        // First alimaarays has its own alimaarays
+        List<Map<String, Object>> dbcontent = jdbcTemplate.queryForList("select * from muutos where koodiarvo='1531_1_1';");
+        assertEquals("Ali-alimaarays is not saved to database correctly. DB-content: " + dbcontent, 1, dbcontent.size());
+        List aliali = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset[0].aliMaaraykset[0].koodiarvo", List.class);
+        assertEquals("There should be one ali-alimaarays with koodiarvo 1531_1_1, was " + aliali,
+                Collections.singletonList("1531_1_1"), aliali);
+
         // Load created
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
@@ -116,6 +130,17 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final List<String> names = doc.read("$..meta.liitteet[0].nimi", stringRef);
         assertEquals("Muutos liite 4 name should be match!", changeName, names.get(0));
+
+        // Muutos with koodiarvo 334113 should have two aliMaarays after some muutos have been changed
+        alimaaraykset = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset", List.class);
+        assertEquals(1, alimaaraykset.size());
+        alimaaraykset = (List) alimaaraykset.get(0);
+        assertEquals(2, alimaaraykset.size());
+
+        // First alimaarays has 1 alimaarays
+        aliali = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset[0].aliMaaraykset[0].koodiarvo", List.class);
+        assertEquals("There should be one ali-alimaarays with koodiarvo 1531_1_1, was " + aliali,
+                Collections.singletonList("1531_1_1"), aliali);
     }
 
     @Test

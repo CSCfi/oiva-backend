@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.model.entity.oiva
 
+import java.util
 import java.util.{ArrayList, Collection}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
@@ -9,14 +10,16 @@ import fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi
 import org.apache.commons.lang3.StringUtils
 
+import scala.beans.BeanProperty
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 class Muutos(var kohde: pojos.Kohde,
              var koodi: KoodistoKoodi,
              var ylaKoodit: Array[KoodistoKoodi],
              var maaraystyyppi: pojos.Maaraystyyppi,
-             var aliMaaraykset: Collection[Muutos],
-             var liitteet: Collection[Liite],
+             @BeanProperty var aliMaaraykset: util.Collection[Muutos],
+             var liitteet: util.Collection[Liite],
              var muutos: Muutos) extends pojos.Muutos {
 
   def this() = this(null, null, null, null, null, null, null)
@@ -63,8 +66,6 @@ class Muutos(var kohde: pojos.Kohde,
   @JsonIgnore def isMaaraystyyppi(tyyppi: MaaraystyyppiValue) = maaraystyyppiValue == tyyppi
 
   @JsonIgnore def tyyppi = if (null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
-
-  def getAliMaaraykset = aliMaaraykset
 
   @JsonIgnore def addAliMaarays(muutos: Muutos): Unit = if (null != muutos && getId != muutos.getId) {
     if (null == this.aliMaaraykset) this.aliMaaraykset = new ArrayList()

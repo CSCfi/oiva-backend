@@ -5,12 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutosLiite;
-import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutospyyntoLiite;
-import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosLiiteRecord;
-import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
-import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
-import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
+import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
+import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.core.util.ValidationUtils;
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton;
 import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
@@ -19,10 +16,13 @@ import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.oiva.Paatoskierros;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
-import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
-import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutosLiite;
+import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutospyyntoLiite;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosLiiteRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
-import fi.minedu.oiva.backend.core.util.ValidationUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -45,10 +45,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static fi.minedu.oiva.backend.core.util.ValidationUtils.validation;
 import static fi.minedu.oiva.backend.model.jooq.Tables.KOHDE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA;
@@ -58,7 +61,6 @@ import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO_LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOS_LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.PAATOSKIERROS;
-import static fi.minedu.oiva.backend.core.util.ValidationUtils.validation;
 
 @Service
 public class MuutospyyntoService {
@@ -321,9 +323,27 @@ public class MuutospyyntoService {
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
+    private Collection<Muutos> constructMuutosTree(Collection<Muutos> allMuutokset, Long parentId) {
+
+        // Find children related to parent id
+        Map<Long, Muutos> children = allMuutokset.stream()
+                .filter(m -> Objects.equals(m.getParentId(), parentId))
+                .collect(Collectors.toMap(Muutos::getId, Function.identity()));
+
+        // Remove children leaving uknown descendants
+        allMuutokset.removeAll(children.values());
+
+        // Try to find children's children
+        for (Muutos child : children.values()) {
+            child.setAliMaaraykset(constructMuutosTree(allMuutokset, child.getId()));
+        }
+
+        return children.values();
+    }
+
     private void withMuutokset(final Muutospyynto muutospyynto) {
         Optional.ofNullable(muutospyynto)
-                .ifPresent(m -> m.setMuutokset(getByMuutospyyntoId(m.getId())));
+                .ifPresent(m -> m.setMuutokset(constructMuutosTree(getByMuutospyyntoId(m.getId()), null)));
     }
 
     private void withOrganization(final Muutospyynto muutospyynto) {
@@ -426,7 +446,8 @@ public class MuutospyyntoService {
             deleteFromExistingMetaLiitteet(muutospyynto.getMeta());
             deleteFromExistingLiitteet(muutospyynto.getLiitteet());
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecordUp.getId());
-            saveMuutokset(muutospyynto, fileMap);
+            clearNonExistingMuutokset(muutospyynto);
+            saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);
 
             return muutospyynto;
         });
@@ -448,7 +469,7 @@ public class MuutospyyntoService {
             muutospyynto.setId(muutospyyntoRecord.getId());
 
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
-            saveMuutokset(muutospyynto, fileMap);
+            saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);
 
             Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
             return ready.orElse(null);
@@ -483,15 +504,35 @@ public class MuutospyyntoService {
                 });
     }
 
-    private void saveMuutokset(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
-        clearNonExistingMuutokset(muutospyynto);
-        for (Muutos muutos : muutospyynto.getMuutokset()) {
+    private void saveMuutokset(Muutospyynto muutospyynto, Long parentId, Collection<Muutos> muutokset, Map<String, MultipartFile> fileMap) {
+        for (Muutos muutos : muutokset) {
+            muutos.setParentId(parentId);
+            final Long muutosId;
             if (muutos.getUuid() == null) {
-                createMuutos(muutospyynto.getId(), muutos, fileMap);
-                continue;
+                muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
             }
-            updateMuutos(muutospyynto.getId(), muutos, fileMap);
+            else {
+                muutosId = updateMuutos(muutospyynto.getId(), muutos, fileMap);
+            }
+
+            if(muutos.getAliMaaraykset() != null) {
+                saveMuutokset(muutospyynto, muutosId, muutos.getAliMaaraykset(), fileMap);
+            }
         }
+    }
+
+    /**
+     *  Get all muutokset, alimuutokset, ali-alimuutokset etc.
+     */
+    private Stream<Muutos> getMuutoksetRecursively(Collection<Muutos> muutokset) {
+        return Stream.concat(
+                muutokset.stream(),
+                muutokset.stream().flatMap(parent -> {
+                    if (parent.getAliMaaraykset() != null) {
+                        return getMuutoksetRecursively(parent.getAliMaaraykset());
+                    }
+                    return Stream.empty();
+                }));
     }
 
     /**
@@ -499,18 +540,22 @@ public class MuutospyyntoService {
      * @param muutospyynto Muutospyynto from request
      */
     private void clearNonExistingMuutokset(Muutospyynto muutospyynto) {
-        getByMuutospyyntoId(muutospyynto.getId()).stream().filter(m ->
-                muutospyynto.getMuutokset().stream().noneMatch(m2 ->
-                        m.getUuid().equals(m2.getUuid()))).forEach(m -> {
-            deleteFromExistingLiitteet(m.getLiitteet(), true);
-            deleteFromExistingMetaLiitteet(m.getMeta(), true);
-            dsl.deleteFrom(MUUTOS).where(MUUTOS.ID.eq(m.getId()))
-                    .execute();
-        });
+        Set<UUID> muutosIds = getMuutoksetRecursively(muutospyynto.getMuutokset())
+                .map(Muutos::getUuid)
+                .collect(Collectors.toSet());
+
+        getByMuutospyyntoId(muutospyynto.getId()).stream()
+                .filter(orig -> !muutosIds.contains(orig.getUuid()))
+                .forEach(poistettava -> {
+                    deleteFromExistingLiitteet(poistettava.getLiitteet(), true);
+                    deleteFromExistingMetaLiitteet(poistettava.getMeta(), true);
+                    dsl.deleteFrom(MUUTOS).where(MUUTOS.ID.eq(poistettava.getId())).execute();
+                });
     }
 
-    private void updateMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
-        getMuutosByUuId(muutos.getUuid().toString()).ifPresent(m -> {
+    private Long updateMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
+        Optional<Muutos> mu = getMuutosByUuId(muutos.getUuid().toString());
+        mu.ifPresent(m -> {
             muutos.setId(m.getId());
             muutos.setLuoja(authService.getUsername());
             muutos.setPaivityspvm(Timestamp.from(Instant.now()));
@@ -522,6 +567,7 @@ public class MuutospyyntoService {
             deleteFromExistingMetaLiitteet(muutos.getMeta());
             createMuutosLiitteet(muutos, fileMap, muutosRecordUp.getId());
         });
+        return mu.map(Muutos::getId).orElse(null);
     }
 
     private void deleteFromExistingMetaLiitteet(JsonNode meta) {
@@ -540,11 +586,12 @@ public class MuutospyyntoService {
                 .forEach(liiteArray::add);
     }
 
-    private void createMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
+    private Long createMuutos(Long muutosPyyntoId, Muutos muutos, Map<String, MultipartFile> fileMap) {
         final Optional<MuutosRecord> muutosRecordOpt = Optional.ofNullable(dsl.newRecord(MUUTOS, muutos));
         muutosRecordOpt.ifPresent(muutosRecord -> {
-            createMetaLiitteet(muutos.getMeta(), fileMap);
-
+            if (muutos.getMeta() != null) {
+                createMetaLiitteet(muutos.getMeta(), fileMap);
+            }
             muutosRecord.setLuoja(authService.getUsername());
             muutosRecord.setLuontipvm(Timestamp.from(Instant.now()));
             muutosRecord.setMuutospyyntoId(muutosPyyntoId);
@@ -554,6 +601,7 @@ public class MuutospyyntoService {
 
             createMuutosLiitteet(muutos, fileMap, muutosRecord.getId());
         });
+        return muutosRecordOpt.map(MuutosRecord::getId).orElse(null);
     }
 
     private void createMuutosLiitteet(Muutos muutos, Map<String, MultipartFile> fileMap, Long muutosId) {
