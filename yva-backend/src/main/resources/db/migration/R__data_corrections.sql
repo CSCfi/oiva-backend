@@ -181,3 +181,35 @@ WHERE l.id = m.lupa_id
 
 -- Change koodiarvo 'saame' to correct 'se'
 UPDATE maarays SET koodiarvo = 'se' WHERE koodisto = 'kieli' AND koodiarvo = 'saame';
+
+-- Update lukio lupa koodisto erityinenkoulutustehtava -> lukioerityinenkoulutustehtava
+UPDATE maarays m
+SET koodisto = 'lukioerityinenkoulutustehtava'
+FROM lupa l
+WHERE l.id = m.lupa_id
+  AND m.koodisto = 'erityinenkoulutustehtava'
+  AND l.diaarinumero IN
+      ('55/530/2017', '49/530/2017', '19/530/2017', '21/530/2018', '43/530/2017', '31/530/2017', '46/530/2017',
+       '26/530/2017', '8/530/2016', '85/530/2017', '78/530/2017', '21/530/2017', '42/530/2017', '25/530/2017',
+       '28/530/2017', '58/530/2017', '65/530/2017', '7/530/2018', '41/530/2015', '78/530/2015', '81/530/2017',
+       '66/530/2017', '82/530/2017', '56/530/2017', '105/530/2017', '71/530/2017', '45/530/2017', '32/530/2017',
+       '79/530/2016', '80/530/2017', '48/530/2017', '37/530/2017', '54/530/2017', '61/530/2017', '16/530/2017',
+       '40/530/2017', '53/530/2017', '69/530/2017', '75/530/2017', '20/530/2017', '39/530/2017', '38/530/2017',
+       '76/530/2017', '29/530/2017', '67/530/2017', '70/530/2017', '52/530/2017');
+
+-- Update lukioerityinenkoulutustehtava koodiarvo values
+UPDATE maarays m
+SET koodiarvo = 2
+FROM lupa l
+WHERE l.id = m.lupa_id
+  AND m.koodisto = 'lukioerityinenkoulutustehtava'
+  AND TRIM(m.meta ->> 'erityinenkoulutustehtävämääräys-0') IN
+      ('Musiikkipainotteinen opetus', 'Musiikki- ja tanssipainotteinen opetus', 'Kuvataidepainotteinen opetus',
+       'Urheilupainotteinen opetus', 'Idrottsinriktad undervisning', 'Bildkonst', 'Musik', 'Idrottsinrikrad undervisning');
+
+UPDATE maarays m
+SET koodiarvo = 3
+FROM lupa l
+WHERE l.id = m.lupa_id
+  AND m.koodisto = 'lukioerityinenkoulutustehtava'
+  AND TRIM(m.meta ->> 'erityinenkoulutustehtävämääräys-0') = 'International Baccalaureate';
