@@ -1,11 +1,11 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
-import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
-import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -110,10 +111,14 @@ public class MuutospyyntoController {
         if (inValid(muutospyynto)) {
             return badRequest();
         }
+        Optional<Muutospyynto> result;
         if (muutospyynto.getUuid() != null) {
-            return getOr400(service.update(muutospyynto, request.getFileMap()));
+            result = service.update(muutospyynto, request.getFileMap());
+        } else {
+            result = service.save(muutospyynto, request.getFileMap());
         }
-        return getOr400(service.save(muutospyynto, request.getFileMap()));
+        // Load response freshly from the db
+        return getOr400(service.getById(result.map(Muutospyynto::getId).orElse(null)));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)

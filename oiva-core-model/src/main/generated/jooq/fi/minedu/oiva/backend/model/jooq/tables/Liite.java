@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite extends TableImpl<LiiteRecord> {
 
-    private static final long serialVersionUID = -1241043619;
+    private static final long serialVersionUID = -1285531193;
 
     /**
      * The reference instance of <code>liite</code>
@@ -129,6 +129,11 @@ public class Liite extends TableImpl<LiiteRecord> {
      * The column <code>liite.paikka</code>.
      */
     public final TableField<LiiteRecord, String> PAIKKA = createField("paikka", org.jooq.impl.SQLDataType.VARCHAR.length(255).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>liite.tiedosto_id</code>.
+     */
+    public final TableField<LiiteRecord, String> TIEDOSTO_ID = createField("tiedosto_id", org.jooq.impl.SQLDataType.VARCHAR.length(255).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>liite</code> table reference

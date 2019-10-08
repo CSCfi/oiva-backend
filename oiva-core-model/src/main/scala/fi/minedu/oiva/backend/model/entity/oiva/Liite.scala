@@ -24,10 +24,6 @@ class Liite() extends pojos.Liite  {
     @JsonIgnore override def getPaivityspvm: Timestamp = super.getPaivityspvm
 
     private var links: JsonNode = _
-    /**
-      * Unique name part for mapping multipart form files to Json data.
-      */
-    private var tiedostoId: String = ""
     private var removed: Boolean = false
 
     def getLinks: JsonNode = {
@@ -42,8 +38,6 @@ class Liite() extends pojos.Liite  {
         this
     }
 
-    def getTiedostoId: String = this.tiedostoId
-    def setTiedostoId(tiedostoId: String): Unit = this.tiedostoId = tiedostoId
     def isRemoved: Boolean = this.removed
     def setRemoved(removed: Boolean): Unit = this.removed = removed
 

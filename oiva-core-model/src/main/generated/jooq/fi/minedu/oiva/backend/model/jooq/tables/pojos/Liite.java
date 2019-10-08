@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Liite implements Serializable {
 
-    private static final long serialVersionUID = -2074687538;
+    private static final long serialVersionUID = -67664477;
 
     private Long      id;
     private String    nimi;
@@ -45,6 +45,7 @@ public class Liite implements Serializable {
     private UUID      uuid;
     private Boolean   salainen;
     private String    paikka;
+    private String    tiedostoId;
 
     public Liite() {}
 
@@ -64,6 +65,7 @@ public class Liite implements Serializable {
         this.uuid = value.uuid;
         this.salainen = value.salainen;
         this.paikka = value.paikka;
+        this.tiedostoId = value.tiedostoId;
     }
 
     public Liite(
@@ -81,7 +83,8 @@ public class Liite implements Serializable {
         String    kieli,
         UUID      uuid,
         Boolean   salainen,
-        String    paikka
+        String    paikka,
+        String    tiedostoId
     ) {
         this.id = id;
         this.nimi = nimi;
@@ -98,6 +101,7 @@ public class Liite implements Serializable {
         this.uuid = uuid;
         this.salainen = salainen;
         this.paikka = paikka;
+        this.tiedostoId = tiedostoId;
     }
 
     public Long getId() {
@@ -230,6 +234,15 @@ public class Liite implements Serializable {
         this.paikka = paikka;
     }
 
+    @Size(max = 255)
+    public String getTiedostoId() {
+        return this.tiedostoId;
+    }
+
+    public void setTiedostoId(String tiedostoId) {
+        this.tiedostoId = tiedostoId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Liite (");
@@ -249,6 +262,7 @@ public class Liite implements Serializable {
         sb.append(", ").append(uuid);
         sb.append(", ").append(salainen);
         sb.append(", ").append(paikka);
+        sb.append(", ").append(tiedostoId);
 
         sb.append(")");
         return sb.toString();

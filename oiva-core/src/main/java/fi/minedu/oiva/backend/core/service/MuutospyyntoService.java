@@ -106,6 +106,14 @@ public class MuutospyyntoService {
         PASSIVOITU;         // Muutos on muusta syystä poistettu
     }
 
+    // hakee yksittäinen muutospyynnön perusteluineen
+    public Optional<Muutospyynto> getById(Long id) {
+        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
+                .where(MUUTOSPYYNTO.ID.eq(id)).fetchOptionalInto(Muutospyynto.class)
+                .map(muutospyynto -> with(muutospyynto, "yksi"))
+                .filter(Optional::isPresent).map(Optional::get);
+    }
+
     // Muutospyyntölistaus (hakemukset) esittelijälle
     public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
         return getBaseSelect()
@@ -315,14 +323,6 @@ public class MuutospyyntoService {
                 .where(PAATOSKIERROS.ID.eq(id)).fetchOptionalInto(Paatoskierros.class);
     }
 
-    // hakee yksittäinen muutospyynnön perusteluineen
-    private Optional<Muutospyynto> getById(long id) {
-        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
-                .where(MUUTOSPYYNTO.ID.eq(id)).fetchOptionalInto(Muutospyynto.class)
-                .map(muutospyynto -> with(muutospyynto, "yksi"))
-                .filter(Optional::isPresent).map(Optional::get);
-    }
-
     private Collection<Muutos> constructMuutosTree(Collection<Muutos> allMuutokset, Long parentId) {
 
         // Find children related to parent id
@@ -471,8 +471,7 @@ public class MuutospyyntoService {
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
             saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);
 
-            Optional<Muutospyynto> ready = getById(muutospyyntoRecord.getId());
-            return ready.orElse(null);
+            return muutospyynto;
         });
     }
 
@@ -562,10 +561,10 @@ public class MuutospyyntoService {
             muutos.setMuutospyyntoId(muutosPyyntoId);
             muutos.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).orElse(null));
             MuutosRecord muutosRecordUp = dsl.newRecord(MUUTOS, muutos);
-            dsl.executeUpdate(muutosRecordUp);
             deleteFromExistingLiitteet(muutos.getLiitteet());
             deleteFromExistingMetaLiitteet(muutos.getMeta());
             createMuutosLiitteet(muutos, fileMap, muutosRecordUp.getId());
+            dsl.executeUpdate(muutosRecordUp);
         });
         return mu.map(Muutos::getId).orElse(null);
     }
