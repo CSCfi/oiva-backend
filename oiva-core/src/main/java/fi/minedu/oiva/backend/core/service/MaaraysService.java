@@ -13,6 +13,7 @@ import org.jooq.SelectJoinStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -48,7 +49,8 @@ public class MaaraysService extends BaseService {
     @Autowired
     public MaaraysService(DSLContext dsl, KohdeService kohdeService,
                           MaaraystyyppiService maaraystyyppiService,
-                          OpintopolkuService opintopolkuService, LupaService lupaService,
+                          OpintopolkuService opintopolkuService,
+                          @Lazy LupaService lupaService,
                           OrganisaatioService organisaatioService) {
         this.dsl = dsl;
         this.kohdeService = kohdeService;

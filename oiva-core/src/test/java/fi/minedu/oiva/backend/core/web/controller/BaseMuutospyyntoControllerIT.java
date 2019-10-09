@@ -66,6 +66,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     @Test
     public void save() throws IOException {
+        final TypeRef<List<String>> stringRef = new TypeRef<List<String>>() {
+        };
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
 
@@ -80,6 +82,14 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertNotNull("Muutospyynto uuid should not be null", uuid);
         assertEquals("Liite table count should match!", 6,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
+
+        // Check that liitteet has uuid in response
+        List<String> liiteUuids = doc.read("$..liitteet[*].uuid", stringRef);
+        assertEquals("Every saved liite should have uuid!", 6, liiteUuids.size());
+
+        // Check that liitteet has tiedostoId in response
+        List<String> tiedostoIds = doc.read("$..liitteet[*].tiedostoId", stringRef);
+        assertEquals("Every saved liite should have tiedostoId!", 6, tiedostoIds.size());
 
         // Muutos with koodiarvo 334113 should have two aliMaarays
         List alimaaraykset = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset", List.class);
@@ -101,7 +111,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Create response and get response should match!", createResponse.getBody(),
                 getResponse.getBody());
 
-        // Update existing
+        // ----- UPDATE EXISTING -----
 
         // Mark muutospyynto_liite to be removed
         doc.set("$.liitteet[?(@.nimi == 'muutospyynto_liite')].removed", true);
@@ -125,11 +135,17 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final List<Boolean> list = doc.read("$.liitteet[?(@.nimi == 'muutospyynto_liite2')].salainen", boolRef);
         assertTrue("Muutospyynto liite 2 should be secret!", list.get(0));
-
-        final TypeRef<List<String>> stringRef = new TypeRef<List<String>>() {
-        };
-        final List<String> names = doc.read("$..meta.liitteet[0].nimi", stringRef);
+        
+        final List<String> names = doc.read("$..meta.liitteet[?(@.nimi == '" + changeName + "')].nimi", stringRef);
         assertEquals("Muutos liite 4 name should be match!", changeName, names.get(0));
+
+        // Check that liitteet has uuid in response
+        liiteUuids = doc.read("$..liitteet[*].uuid", stringRef);
+        assertEquals("Every saved liite should have uuid!", 4, liiteUuids.size());
+
+        // Check that liitteet has tiedostoId in response
+        tiedostoIds = doc.read("$..liitteet[*].tiedostoId", stringRef);
+        assertEquals("Every saved liite should have tiedostoId!", 4, tiedostoIds.size());
 
         // Muutos with koodiarvo 334113 should have two aliMaarays after some muutos have been changed
         alimaaraykset = doc.read("$.muutokset[?(@.koodiarvo == 334113)].aliMaaraykset", List.class);
