@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -144,4 +145,7 @@ public class MaaraysService extends BaseService {
         return dsl.select(MAARAYSTYYPPI.fields()).from(MAARAYSTYYPPI).fetchInto(Maaraystyyppi.class);
     }
 
+    public Optional<Maarays> getByUuid(String maaraysUuid) {
+        return Optional.ofNullable(dsl.select(MAARAYS.fields()).from(MAARAYS).where(MAARAYS.UUID.eq(UUID.fromString(maaraysUuid))).fetchOneInto(Maarays.class));
+    }
 }

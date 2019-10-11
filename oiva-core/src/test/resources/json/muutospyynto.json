@@ -77,61 +77,62 @@
       "indeksi": 0,
       "aakkostusNimi": "Tieto- ja kirjastopalvelujen ammattitutkinto",
       "tila": "LISAYS",
-      "aliMaaraykset": [
-        {
-          "koodiarvo": "1531_1",
-          "koodisto": "osaamisala",
-          "nimi": "Kuljetuspalvelujen osaamisala",
-          "kuvaus": "Kuljetuspalvelujen osaamisala",
-          "isInLupa": false,
-          "kohde": {
-            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "maaraystyyppi": {
-            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "type": "addition",
-          "muutosperustelukoodiarvo": "01",
-          "indeksi": 0,
-          "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
-          "tila": "LISAYS",
-          "aliMaaraykset": [
-            {
-              "koodiarvo": "1531_1_1",
-              "koodisto": "osaamisala",
-              "isInLupa": false,
-              "kohde": {
-                "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-              },
-              "maaraystyyppi": {
-                "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-              },
-              "type": "addition",
-              "muutosperustelukoodiarvo": "01",
-              "indeksi": 0,
-              "tila": "LISAYS"
-            }
-          ]
-        },
-        {
-          "koodiarvo": "1531_2",
-          "koodisto": "osaamisala",
-          "nimi": "Kuljetuspalvelujen osaamisala_2",
-          "kuvaus": "Kuljetuspalvelujen osaamisala_2",
-          "isInLupa": false,
-          "kohde": {
-            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "maaraystyyppi": {
-            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "type": "addition",
-          "muutosperustelukoodiarvo": "01",
-          "indeksi": 0,
-          "aakkostusNimi": "Kuljetuspalvelujen osaamisala_2",
-          "tila": "LISAYS"
-        }
-      ]
+      "generatedId": "ankkuri_A"
+    },
+    {
+      "koodiarvo": "1531_1",
+      "koodisto": "osaamisala",
+      "parent": "ankkuri_A",
+      "generatedId": "ankkuri_A_1",
+      "nimi": "Kuljetuspalvelujen osaamisala",
+      "kuvaus": "Kuljetuspalvelujen osaamisala",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
+      "tila": "LISAYS"
+    },
+    {
+      "koodiarvo": "1531_2",
+      "koodisto": "osaamisala",
+      "nimi": "Kuljetuspalvelujen osaamisala_2",
+      "kuvaus": "Kuljetuspalvelujen osaamisala_2",
+      "parent": "ankkuri_A",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "aakkostusNimi": "Kuljetuspalvelujen osaamisala_2",
+      "tila": "LISAYS"
+    },
+    {
+      "koodiarvo": "1531_1_1",
+      "koodisto": "osaamisala",
+      "parent": "ankkuri_A_1",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "tila": "LISAYS"
     },
     {
       "koodiarvo": "2283",

@@ -21,9 +21,10 @@ class Muutos(@BeanProperty var kohde: pojos.Kohde,
              @BeanProperty var liitteet: util.Collection[Liite],
              var muutos: Muutos,
              var maarays: Maarays,
-             @BeanProperty var parent: String,
-             @BeanProperty var maaraysUuid: String,
-             @BeanProperty var generatedId: String) extends pojos.Muutos {
+             @BeanProperty var generatedId: String, // generated id
+             @BeanProperty var parent: String, // reference to parents generated id
+             @BeanProperty var maaraysUuid: String // reference to (parent) maarays
+            ) extends pojos.Muutos {
 
   def this() = this(null, null, null, null, null, null, null, null, null, null, null)
 
@@ -72,5 +73,11 @@ class Muutos(@BeanProperty var kohde: pojos.Kohde,
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
+
+  @JsonIgnore def hasNoParents = parent == null && getParentId == null
+
+  @JsonIgnore def isChildTo(parentCandidate: Muutos) =
+    !hasNoParents &&
+      (parentCandidate.generatedId == parent || parentCandidate.getId == getParentId)
 
 }
