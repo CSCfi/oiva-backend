@@ -506,9 +506,9 @@ public class MuutospyyntoService {
 
     private void saveMuutokset(Muutospyynto muutospyynto, Long parentId, Collection<Muutos> muutokset, Map<String, MultipartFile> fileMap) {
         for (Muutos muutos : muutokset) {
-            muutos.setParentId(parentId);
             final Long muutosId;
             if (muutos.getUuid() == null) {
+                muutos.setParentId(parentId);
                 muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
             }
             else {

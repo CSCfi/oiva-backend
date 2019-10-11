@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.model.entity.oiva
 
-import java.lang
+import java.{lang, util}
 import java.util.{Collection, Optional}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
@@ -15,8 +15,8 @@ class Muutospyynto(
                     var diaarinumero: String,
                     var jarjestaja_oid: String,
                     var lupa_uuid: String,
-                    var muutokset: Collection[Muutos],
-                    var liitteet: Collection[Liite],
+                    var muutokset: util.Collection[Muutos],
+                    var liitteet: util.Collection[Liite],
                     var paatoskierros: Paatoskierros,
                     var jarjestaja: Organisaatio,
                     var muutospyynto: Muutospyynto) extends pojos.Muutospyynto  {
@@ -35,11 +35,11 @@ class Muutospyynto(
   def getDiaarinumero: String = diaarinumero
   def setDiaarinumero(diaarinumero: String): Unit = this.diaarinumero = diaarinumero
 
-  def getMuutokset: Collection[Muutos] = muutokset
-  def setMuutokset(muutokset: Collection[Muutos]): Unit = this.muutokset = muutokset
+  def getMuutokset: util.Collection[Muutos] = muutokset
+  def setMuutokset(muutokset: util.Collection[Muutos]): Unit = this.muutokset = muutokset
 
-  def getLiitteet: Collection[Liite] = liitteet
-  def setLiitteet(liitteet: Collection[Liite]): Unit = this.liitteet = liitteet
+  def getLiitteet: util.Collection[Liite] = liitteet
+  def setLiitteet(liitteet: util.Collection[Liite]): Unit = this.liitteet = liitteet
 
   def getPaatoskierros: Paatoskierros = paatoskierros
   def setPaatoskierros(paatoskierros: Paatoskierros): Unit = this.paatoskierros = paatoskierros
@@ -47,5 +47,5 @@ class Muutospyynto(
   def getJarjestaja: Organisaatio = jarjestaja
   def setJarjestaja(jarjestaja: Organisaatio): Unit = this.jarjestaja = jarjestaja
   @JsonIgnore def getJarjestajaOpt: java.util.Optional[Organisaatio] = Optional.ofNullable(jarjestaja)
-  @JsonIgnore def getPDFFileName = "muutospyynto-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
+  @JsonIgnore def getPDFFileName: String = "muutospyynto-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
 }
