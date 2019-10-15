@@ -62,20 +62,9 @@
         }
       ],
       "kohde": {
-        "tunniste": "tutkinnotjakoulutukset",
-        "meta": {
-          "otsikko": {
-            "fi": "Tutkinnot ja koulutukset",
-            "sv": "på svenska"
-          }
-        },
         "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
       },
       "maaraystyyppi": {
-        "tunniste": "OIKEUS",
-        "selite": {
-          "fi": "Oikeus"
-        },
         "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
       },
       "type": "addition",
@@ -88,85 +77,62 @@
       "indeksi": 0,
       "aakkostusNimi": "Tieto- ja kirjastopalvelujen ammattitutkinto",
       "tila": "LISAYS",
-      "aliMaaraykset": [
-        {
-          "koodiarvo": "1531_1",
-          "koodisto": "osaamisala",
-          "nimi": "Kuljetuspalvelujen osaamisala",
-          "kuvaus": "Kuljetuspalvelujen osaamisala",
-          "isInLupa": false,
-          "kohde": {
-            "tunniste": "tutkinnotjakoulutukset",
-            "meta": {
-              "otsikko": {
-                "fi": "Tutkinnot ja koulutukset",
-                "sv": "på svenska"
-              }
-            },
-            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "maaraystyyppi": {
-            "tunniste": "OIKEUS",
-            "selite": {
-              "fi": "Oikeus"
-            },
-            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "type": "addition",
-          "muutosperustelukoodiarvo": "01",
-          "indeksi": 0,
-          "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
-          "tila": "LISAYS",
-          "aliMaaraykset": [
-            {
-              "koodiarvo": "1531_1_1",
-              "koodisto": "osaamisala",
-              "isInLupa": false,
-              "kohde": {
-                "tunniste": "tutkinnotjakoulutukset",
-                "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-              },
-              "maaraystyyppi": {
-                "tunniste": "OIKEUS",
-                "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-              },
-              "type": "addition",
-              "muutosperustelukoodiarvo": "01",
-              "indeksi": 0,
-              "tila": "LISAYS"
-            }
-          ]
-        },
-        {
-          "koodiarvo": "1531_2",
-          "koodisto": "osaamisala",
-          "nimi": "Kuljetuspalvelujen osaamisala_2",
-          "kuvaus": "Kuljetuspalvelujen osaamisala_2",
-          "isInLupa": false,
-          "kohde": {
-            "tunniste": "tutkinnotjakoulutukset",
-            "meta": {
-              "otsikko": {
-                "fi": "Tutkinnot ja koulutukset",
-                "sv": "på svenska"
-              }
-            },
-            "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "maaraystyyppi": {
-            "tunniste": "OIKEUS",
-            "selite": {
-              "fi": "Oikeus"
-            },
-            "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
-          },
-          "type": "addition",
-          "muutosperustelukoodiarvo": "01",
-          "indeksi": 0,
-          "aakkostusNimi": "Kuljetuspalvelujen osaamisala_2",
-          "tila": "LISAYS"
-        }
-      ]
+      "generatedId": "ankkuri_A"
+    },
+    {
+      "koodiarvo": "1531_1",
+      "koodisto": "osaamisala",
+      "parent": "ankkuri_A",
+      "generatedId": "ankkuri_A_1",
+      "nimi": "Kuljetuspalvelujen osaamisala",
+      "kuvaus": "Kuljetuspalvelujen osaamisala",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "aakkostusNimi": "Kuljetuspalvelujen osaamisala",
+      "tila": "LISAYS"
+    },
+    {
+      "koodiarvo": "1531_2",
+      "koodisto": "osaamisala",
+      "nimi": "Kuljetuspalvelujen osaamisala_2",
+      "kuvaus": "Kuljetuspalvelujen osaamisala_2",
+      "parent": "ankkuri_A",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "aakkostusNimi": "Kuljetuspalvelujen osaamisala_2",
+      "tila": "LISAYS"
+    },
+    {
+      "koodiarvo": "1531_1_1",
+      "koodisto": "osaamisala",
+      "parent": "ankkuri_A_1",
+      "isInLupa": false,
+      "kohde": {
+        "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "type": "addition",
+      "muutosperustelukoodiarvo": "01",
+      "indeksi": 0,
+      "tila": "LISAYS"
     },
     {
       "koodiarvo": "2283",
@@ -175,20 +141,9 @@
       "kuvaus": "Kirjastoautopalvelujen osaamisala.\nVoimaan 1.1.2018.",
       "isInLupa": false,
       "kohde": {
-        "tunniste": "tutkinnotjakoulutukset",
-        "meta": {
-          "otsikko": {
-            "fi": "Tutkinnot ja koulutukset",
-            "sv": "på svenska"
-          }
-        },
         "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
       },
       "maaraystyyppi": {
-        "tunniste": "RAJOITE",
-        "selite": {
-          "fi": "Rajoite"
-        },
         "uuid": "cc652632-43b6-11e8-b2ef-005056aa0e66"
       },
       "type": "addition",
@@ -208,20 +163,9 @@
       "nimi": "Ammatilliseen koulutukseen valmentava koulutus (VALMA)",
       "isInLupa": false,
       "kohde": {
-        "tunniste": "tutkinnotjakoulutukset",
-        "meta": {
-          "otsikko": {
-            "fi": "Tutkinnot ja koulutukset",
-            "sv": "på svenska"
-          }
-        },
         "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
       },
       "maaraystyyppi": {
-        "tunniste": "OIKEUS",
-        "selite": {
-          "fi": "Oikeus"
-        },
         "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
       },
       "type": "addition",
@@ -237,20 +181,9 @@
       "koodisto": "kieli",
       "nimi": "Liikenneopettajan erikoisammattitutkinto",
       "kohde": {
-        "tunniste": "tutkinnotjakoulutukset",
-        "meta": {
-          "otsikko": {
-            "fi": "Tutkinnot ja koulutukset",
-            "sv": "på svenska"
-          }
-        },
         "uuid": "cc35f9d4-43b6-11e8-b2ef-005056aa0e66"
       },
       "maaraystyyppi": {
-        "tunniste": "OIKEUS",
-        "selite": {
-          "fi": "Oikeus"
-        },
         "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
       },
       "value": "SV",
@@ -275,20 +208,9 @@
       "kuvaus": "Koulutuksen järjestäjällä on velvollisuus huolehtia erityisen tuen kehittämis-, ohjaus- ja tukitehtävistä.",
       "isInLupa": false,
       "kohde": {
-        "tunniste": "muut",
-        "meta": {
-          "otsikko": {
-            "fi": "Muut oikeudet, velvollisuudet, ehdot ja tehtävät",
-            "sv": "på svenska"
-          }
-        },
         "uuid": "cc35ffa6-43b6-11e8-b2ef-005056aa0e66"
       },
       "maaraystyyppi": {
-        "tunniste": "VELVOITE",
-        "selite": {
-          "fi": "Velvoite"
-        },
         "uuid": "cc652722-43b6-11e8-b2ef-005056aa0e66"
       },
       "type": "addition",

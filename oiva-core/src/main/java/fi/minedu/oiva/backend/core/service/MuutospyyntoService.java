@@ -77,15 +77,17 @@ public class MuutospyyntoService {
     private final OrganisaatioService organisaatioService;
     private final LiiteService liiteService;
     private final OpintopolkuService opintopolkuService;
+    private final MaaraysService maaraysService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
-                               LiiteService liiteService, OpintopolkuService opintopolkuService) {
+                               LiiteService liiteService, OpintopolkuService opintopolkuService, MaaraysService maaraysService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
         this.liiteService = liiteService;
         this.opintopolkuService = opintopolkuService;
+        this.maaraysService = maaraysService;
     }
 
     public enum Muutospyyntotila {
@@ -192,6 +194,11 @@ public class MuutospyyntoService {
     public Optional<Muutos> getMuutosByUuId(String uuid) {
         return dsl.select(MUUTOS.fields()).from(MUUTOS)
                 .where(MUUTOS.UUID.eq(UUID.fromString(uuid))).fetchOptionalInto(Muutos.class);
+    }
+
+    public Optional<Muutos> getMuutosById(Long id) {
+        return dsl.select(MUUTOS.fields()).from(MUUTOS)
+                .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
     }
 
     @Transactional
@@ -503,20 +510,30 @@ public class MuutospyyntoService {
                 });
     }
 
-    private void saveMuutokset(Muutospyynto muutospyynto, Long parentId, Collection<Muutos> muutokset, Map<String, MultipartFile> fileMap) {
-        for (Muutos muutos : muutokset) {
-            muutos.setParentId(parentId);
-            final Long muutosId;
-            if (muutos.getUuid() == null) {
-                muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
-            }
-            else {
-                muutosId = updateMuutos(muutospyynto.getId(), muutos, fileMap);
-            }
+    private void saveMuutokset(Muutospyynto muutospyynto, Muutos parentMuutos, Collection<Muutos> muutokset, Map<String, MultipartFile> fileMap) {
 
-            if(muutos.getAliMaaraykset() != null) {
-                saveMuutokset(muutospyynto, muutosId, muutos.getAliMaaraykset(), fileMap);
-            }
+        // key TRUE => parents, FALSE => possible children
+        Map<Boolean, List<Muutos>> muutosGroups = muutokset.stream().collect(Collectors.groupingBy(muutos ->
+                parentMuutos == null && muutos.hasNoParents() || parentMuutos != null && muutos.isChildTo(parentMuutos)));
+
+        List<Muutos> directChildren = muutosGroups.get(Boolean.TRUE);
+        List<Muutos> descendats = muutosGroups.get(Boolean.FALSE);
+
+        if (directChildren != null) {
+            directChildren.forEach(muutos -> {
+                muutos.setParentId(parentMuutos !=null ? parentMuutos.getId() : null);
+                Long muutosId;
+                if (muutos.getUuid() == null) {
+                    muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
+                } else {
+                    muutosId = updateMuutos(muutospyynto.getId(), muutos, fileMap);
+                }
+                muutos.setId(muutosId);
+                // save children for parent muutos
+                if (descendats != null) {
+                    saveMuutokset(muutospyynto, muutos, descendats, fileMap);
+                }
+            });
         }
     }
 
@@ -596,6 +613,10 @@ public class MuutospyyntoService {
             muutosRecord.setMuutospyyntoId(muutosPyyntoId);
             muutosRecord.setKohdeId(getKohdeId(muutos.getKohde().getUuid()).orElse(null));
             muutosRecord.setMaaraystyyppiId(getMaaraystyyppiId(muutos.getMaaraystyyppi().getUuid()).orElse(null));
+            muutosRecord.setParentId(muutos.getParentId());
+            if (muutos.getMaaraysUuid() != null) {
+                maaraysService.getByUuid(muutos.getMaaraysUuid()).ifPresent(m -> muutosRecord.setMaaraysId(m.getId()));
+            }
             muutosRecord.store();
 
             createMuutosLiitteet(muutos, fileMap, muutosRecord.getId());

@@ -1,7 +1,6 @@
 package fi.minedu.oiva.backend.model.entity.oiva
 
 import java.util
-import java.util.{ArrayList, Collection}
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
@@ -14,19 +13,20 @@ import scala.beans.BeanProperty
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Muutos(var kohde: pojos.Kohde,
-             var koodi: KoodistoKoodi,
+class Muutos(@BeanProperty var kohde: pojos.Kohde,
+             @BeanProperty var koodi: KoodistoKoodi,
              var ylaKoodit: Array[KoodistoKoodi],
-             var maaraystyyppi: pojos.Maaraystyyppi,
+             @BeanProperty var maaraystyyppi: pojos.Maaraystyyppi,
              @BeanProperty var aliMaaraykset: util.Collection[Muutos],
-             var liitteet: util.Collection[Liite],
-             var muutos: Muutos) extends pojos.Muutos {
+             @BeanProperty var liitteet: util.Collection[Liite],
+             var muutos: Muutos,
+             var maarays: Maarays,
+             @BeanProperty var generatedId: String, // generated id
+             @BeanProperty var parent: String, // reference to parents generated id
+             @BeanProperty var maaraysUuid: String // reference to (parent) maarays
+            ) extends pojos.Muutos {
 
-  def this() = this(null, null, null, null, null, null, null)
-
-  def getKohde = kohde
-
-  def setKohde(kohde: pojos.Kohde): Unit = this.kohde = kohde
+  def this() = this(null, null, null, null, null, null, null, null, null, null, null)
 
   @JsonIgnore def kohdeValue = if (null != kohde) kohde.getTunniste else null
 
@@ -43,9 +43,6 @@ class Muutos(var kohde: pojos.Kohde,
   @JsonIgnore def hasKoodiKasite(kasite: String): Boolean = Option.apply(this.koodi).map(k => k.metadata)
     .getOrElse(Array.empty).toStream.exists(m => Option.apply(m.getKasite).getOrElse("").startsWith(kasite))
 
-  def getKoodi = koodi
-
-  def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
 
   def getYlaKoodit = ylaKoodit
 
@@ -54,10 +51,6 @@ class Muutos(var kohde: pojos.Kohde,
     else this.ylaKoodit = this.ylaKoodit :+ koodi
 
   @JsonIgnore def hasYlaKoodi(koodiUri: String = ""): Boolean = null != ylaKoodit && ylaKoodit.exists(ylakoodi => ylakoodi.isKoodi(koodiUri))
-
-  def getMaaraystyyppi = maaraystyyppi
-
-  def setMaaraystyyppi(maaraystyyppi: pojos.Maaraystyyppi): Unit = this.maaraystyyppi = maaraystyyppi
 
   @JsonIgnore def maaraystyyppiValue = if (null != maaraystyyppi) maaraystyyppi.getTunniste else null
 
@@ -68,13 +61,9 @@ class Muutos(var kohde: pojos.Kohde,
   @JsonIgnore def tyyppi = if (null != maaraystyyppiValue) StringUtils.lowerCase(maaraystyyppiValue.name()) else ""
 
   @JsonIgnore def addAliMaarays(muutos: Muutos): Unit = if (null != muutos && getId != muutos.getId) {
-    if (null == this.aliMaaraykset) this.aliMaaraykset = new ArrayList()
+    if (null == this.aliMaaraykset) this.aliMaaraykset = new util.ArrayList()
     this.aliMaaraykset.add(muutos)
   }
-
-  def getLiitteet: Collection[Liite] = liitteet
-
-  def setLiitteet(liitteet: Collection[Liite]): Unit = this.liitteet = liitteet
 
   @JsonIgnore def hasAliMaarays = null != aliMaaraykset && !aliMaaraykset.isEmpty
 
@@ -84,5 +73,11 @@ class Muutos(var kohde: pojos.Kohde,
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
+
+  @JsonIgnore def hasNoParents = parent == null && getParentId == null
+
+  @JsonIgnore def isChildTo(parentCandidate: Muutos) =
+    !hasNoParents &&
+      (parentCandidate.generatedId == parent || parentCandidate.getId == getParentId)
 
 }
