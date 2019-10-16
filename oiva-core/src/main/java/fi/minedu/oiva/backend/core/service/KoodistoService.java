@@ -49,7 +49,7 @@ public class KoodistoService {
     /**
      * Hae koodisto koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
      *
-     * @param koodistoUri koodisto uri
+     * @param koodistoUri    koodisto uri
      * @param koodistoVersio koodisto versio
      * @return koodisto
      */
@@ -60,7 +60,7 @@ public class KoodistoService {
     /**
      * Hae kaikki koodiston koodit koodistoUrin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
      *
-     * @param koodistoUri koodisto uri
+     * @param koodistoUri    koodisto uri
      * @param koodistoVersio koodisto versio
      * @param includeExpired palautetaanko myös vanhentuneet koodit
      * @return Koodiston koodit
@@ -72,8 +72,8 @@ public class KoodistoService {
     /**
      * Hae koodi koodistoUrin, koodin ja koodistoVersion perusteella. Välimuistitetaan OpintopolkuService -palvelussa
      *
-     * @param koodistoUri koodisto uri
-     * @param koodiArvo koodiarvo
+     * @param koodistoUri    koodisto uri
+     * @param koodiArvo      koodiarvo
      * @param koodistoVersio koodisto versio
      * @return Koodi
      */
@@ -125,7 +125,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKunta")
     public KoodistoKoodi getKunta(final String koodi) {
-        return opintopolkuService.getKuntaKoodi(koodi).orElseGet(null);
+        return opintopolkuService.getKuntaKoodi(koodi).orElse(null);
     }
 
     @Cacheable(value = {"KoodistoService:getKieli"})
@@ -133,7 +133,7 @@ public class KoodistoService {
         final KoodistoKoodi kieliKoodisto = opintopolkuService.getKieliKoodi(koodi);
 
         // AM-308 fix usable until koodisto is fixed
-        if(StringUtils.equalsIgnoreCase(kieliKoodisto.koodiArvo(), "SE")) {
+        if (StringUtils.equalsIgnoreCase(kieliKoodisto.koodiArvo(), "SE")) {
             kieliKoodisto.getMetadataList().forEach(m -> m.setNimi("saame"));
         }
         return kieliKoodisto;
@@ -141,31 +141,31 @@ public class KoodistoService {
 
     /**
      * Käytetään vain seuraavia opetuskieliä
-     *  - suomi (koodiArvo: 1)
-     *  - ruotsi (koodiArvo: 2)
-     *  - saame (koodiArvi: 5)
+     * - suomi (koodiArvo: 1)
+     * - ruotsi (koodiArvo: 2)
+     * - saame (koodiArvi: 5)
      */
     @Cacheable(value = "KoodistoService:getOpetuskielet", key = "''")
     public List<KoodistoKoodi> getOpetuskielet() {
         return opintopolkuService.getOppilaitoksenOpetuskieliKoodit().stream()
-            .filter(koodistoItem -> Arrays.asList("1", "2", "5").contains(koodistoItem.koodiArvo())).collect(Collectors.toList());
+                .filter(koodistoItem -> Arrays.asList("1", "2", "5").contains(koodistoItem.koodiArvo())).collect(Collectors.toList());
     }
 
     @Cacheable(value = "KoodistoService:getAluehallintovirastoKuntaMap", key = "''")
     public Map<String, KoodistoKoodi> getKuntaAluehallintovirastoMap() { // TODO: NOT USED, REMOVE?
         final Map<String, KoodistoKoodi> map = new HashMap<>();
-        opintopolkuService.getAlueHallintovirastoKoodit().stream().forEach(
-            avi -> opintopolkuService.getKuntaKooditForAlueHallintovirasto(avi.koodiArvo()).stream().forEach(
-            kunta -> map.put(kunta.koodiArvo(), avi)));
+        opintopolkuService.getAlueHallintovirastoKoodit().forEach(
+                avi -> opintopolkuService.getKuntaKooditForAlueHallintovirasto(avi.koodiArvo()).forEach(
+                        kunta -> map.put(kunta.koodiArvo(), avi)));
         return map;
     }
 
     @Cacheable(value = "KoodistoService:getKuntaMaakuntaMap", key = "''")
     public Map<String, KoodistoKoodi> getKuntaMaakuntaMap() { // TODO: NOT USED, REMOVE?
         final Map<String, KoodistoKoodi> map = new HashMap<>();
-        opintopolkuService.getMaakuntaKoodit().stream().forEach(
-            maakunta -> opintopolkuService.getKuntaKooditForMaakunta(maakunta.koodiArvo()).stream().forEach(
-            kunta -> map.put(kunta.koodiArvo(), maakunta)));
+        opintopolkuService.getMaakuntaKoodit().forEach(
+                maakunta -> opintopolkuService.getKuntaKooditForMaakunta(maakunta.koodiArvo()).forEach(
+                        kunta -> map.put(kunta.koodiArvo(), maakunta)));
         return map;
     }
 
@@ -188,8 +188,8 @@ public class KoodistoService {
     public Map<String, String> getKoulutusToKoulutusalaRelation() {
         final Map<String, String> map = new HashMap<>();
         getKoulutusalat().forEach(koulutusalaKoodi ->
-            getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).forEach(koulutusKoodi ->
-                map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
+                getKoulutusalaKoulutukset(koulutusalaKoodi.koodiArvo()).forEach(koulutusKoodi ->
+                        map.put(koulutusKoodi.koodiArvo(), koulutusalaKoodi.koodiArvo()))
         );
         return map;
     }
@@ -212,12 +212,12 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutustyypit().stream().forEach(koulutustyyppiKoodi ->
-            getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi -> {
-                if(getAmmatillinenKoulutustyyppiArvot().contains(koulutustyyppiKoodi.koodiArvo())) {
-                    map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo());
-                }
-            })
+        getKoulutustyypit().forEach(koulutustyyppiKoodi ->
+                getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
+                    if (getAmmatillinenKoulutustyyppiArvot().contains(koulutustyyppiKoodi.koodiArvo())) {
+                        map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo());
+                    }
+                })
         );
         return map;
     }
@@ -227,18 +227,23 @@ public class KoodistoService {
         final List<KoodistoKoodi> osaamisala = new ArrayList<>();
         // Asetuksen mukaiset osaamisalat -> koodisto ei näitä erottele
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1728", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1531", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1617", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1588", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1505", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1647", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2332", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1733", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1734", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1758", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1762", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "1773", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2283", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2309", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2311", null));
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2315", null));
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2316", null));
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2317", null));
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2318", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2283", null));
-        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2227", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2332", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2387", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2347", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "2423", null));
+        osaamisala.add(opintopolkuService.getKoodi("osaamisala", "3123", null));
         osaamisala.add(opintopolkuService.getKoodi("osaamisala", "3137", null));
         return osaamisala;
     }
@@ -276,13 +281,13 @@ public class KoodistoService {
             final Set<KoodistoKoodi> osaamisalat = koulutusToOsaamisala.getOrDefault(koulutuskoodi.koodiArvo(), new HashSet<>());
 
             // Voimassaolon päättyminen ja koodisto
-            if(null == koulutuskoodi.voimassaLoppuPvm() && koulutuskoodi.koodisto().getKoodistoUri().equals("koulutus")) {
+            if (null == koulutuskoodi.voimassaLoppuPvm() && koulutuskoodi.koodisto().getKoodistoUri().equals("koulutus")) {
 
                 // Erikoisammattitutkinnoilta kolmosalkuiset pois
-                if(!(koulutuskoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
+                if (!(koulutuskoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
 
                     // Tarkistetaan versio-duplikaatit
-                    if(koulutukset.stream().noneMatch(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koulutuskoodi.getKoodiArvo()))) {
+                    if (koulutukset.stream().noneMatch(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koulutuskoodi.getKoodiArvo()))) {
                         koulutukset.add(new KoulutusKoodi(koulutuskoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisalat));
                     }
                 }
@@ -311,13 +316,12 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToTutkintotyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToTutkintotyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getTutkintotyypit().stream().forEach(tutkintotyyppiKoodi -> {
-                getTutkintotyyppiKoulutukset(tutkintotyyppiKoodi.koodiArvo()).stream().forEach(koulutusKoodi -> {
-                    if(getAmmatillinenTutkintotyyppiArvot().contains(tutkintotyyppiKoodi.koodiArvo())) {
-                    map.put(koulutusKoodi.koodiArvo(), tutkintotyyppiKoodi.koodiArvo());
+        getTutkintotyypit().forEach(tutkintotyyppiKoodi ->
+                getTutkintotyyppiKoulutukset(tutkintotyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
+                    if (getAmmatillinenTutkintotyyppiArvot().contains(tutkintotyyppiKoodi.koodiArvo())) {
+                        map.put(koulutusKoodi.koodiArvo(), tutkintotyyppiKoodi.koodiArvo());
                     }
-                });
-            }
+                })
         );
         return map;
     }
