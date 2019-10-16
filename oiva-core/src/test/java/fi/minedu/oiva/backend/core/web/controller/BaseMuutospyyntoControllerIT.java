@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.core.web.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.core.it.BaseIT;
+import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
 import org.springframework.http.HttpEntity;
@@ -192,9 +193,29 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 getResponse.getBody());
     }
 
+    @Test
+    public void getMuutospyyntoLiitteet() {
+        setUpDb("sql/liite_data.sql", "sql/muutospyynto_data.sql", "sql/muutos_data.sql",
+                "sql/muutospyynto_liite_data.sql", "sql/muutos_liite_data.sql");
+        loginAs("testuser", lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+        final ResponseEntity<String> liiteResponse = requestLiitteet("2b02c730-ebef-11e9-8d25-0242ac110023");
+        assertEquals("Response status should match!", liiteResponse.getStatusCode(), HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(liiteResponse.getBody());
+        final TypeRef<List<Liite>> liiteRef = new TypeRef<List<Liite>>() {
+        };
+        final List<Liite> liiteList = doc.read("$.*", liiteRef);
+        assertEquals("Liite count should match!", 8, liiteList.size());
+    }
+
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
         return restTemplate
                 .postForEntity(createURLWithPort("/api/muutospyynnot/tallenna"), requestEntity, String.class);
+    }
+
+    private ResponseEntity<String> requestLiitteet(String uuid) {
+        return restTemplate
+                .getForEntity(createURLWithPort("/api/muutospyynnot/" + uuid + "/liitteet/"), String.class);
     }
 
     private HttpEntity<MultiValueMap<String, Object>> prepareMultipartEntity(String json, String... fileIds) {

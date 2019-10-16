@@ -140,6 +140,28 @@ public class MuutospyyntoService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Return all liite objects which are related to requested muutospyynto.
+     *
+     * @param muutospyyntoUuid UUID of muutospyynto
+     * @return Collection of liite objects.
+     */
+    public Optional<Collection<Liite>> getLiitteetByUuid(String muutospyyntoUuid) {
+        return getByUuid(muutospyyntoUuid).map(m -> {
+            final List<Liite> liiteList = new ArrayList<>(m.getLiitteet());
+            liiteList.addAll(m.getMuutokset().stream()
+                    .flatMap(this::getAlimaaraykset)
+                    .flatMap(muutos -> Stream.concat(muutos.getLiitteet().stream(),
+                            getMetaLiitteet(muutos.getMeta()).stream()))
+                    .collect(Collectors.toList()));
+            return liiteList;
+        });
+    }
+
+    private Stream<Muutos> getAlimaaraykset(Muutos muutos) {
+        return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
+    }
+
     // Vaihtaa muutospyynnön tilan
     public Optional<UUID> changeTila(final String uuid, Muutospyyntotila tila) {
         try {
@@ -538,7 +560,7 @@ public class MuutospyyntoService {
     }
 
     /**
-     *  Get all muutokset, alimuutokset, ali-alimuutokset etc.
+     * Get all muutokset, alimuutokset, ali-alimuutokset etc.
      */
     private Stream<Muutos> getMuutoksetRecursively(Collection<Muutos> muutokset) {
         return Stream.concat(
@@ -553,6 +575,7 @@ public class MuutospyyntoService {
 
     /**
      * Clear old muutokset which are in db but not in request.
+     *
      * @param muutospyynto Muutospyynto from request
      */
     private void clearNonExistingMuutokset(Muutospyynto muutospyynto) {

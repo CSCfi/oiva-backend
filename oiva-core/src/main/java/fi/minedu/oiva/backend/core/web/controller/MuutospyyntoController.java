@@ -4,6 +4,7 @@ import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import io.swagger.annotations.Api;
@@ -119,6 +120,13 @@ public class MuutospyyntoController {
         }
         // Load response freshly from the db
         return getOr400(service.getById(result.map(Muutospyynto::getId).orElse(null)));
+    }
+
+    @OivaAccess_Kayttaja
+    @RequestMapping(method = GET, value = "{muutospyyntoUuid}/liitteet/")
+    @ApiOperation(notes = "Palauttaa kaikki muutospyynnön liitteet", value = "")
+    public CompletableFuture<HttpEntity<Collection<Liite>>> getLiitteetByMuutospyyntoUuid(final @PathVariable String muutospyyntoUuid) {
+        return getOr404(async(() -> service.getLiitteetByUuid(muutospyyntoUuid)));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
