@@ -1,6 +1,5 @@
 package fi.minedu.oiva.backend.core.security;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
@@ -15,11 +14,9 @@ public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccess
     @Override
     public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws ServletException, IOException {
         final HttpSession session = request.getSession();
-        final String redirect = (String) session.getAttribute("redirect");
-        if (StringUtils.isNotBlank(redirect)) {
-            this.setDefaultTargetUrl((String) session.getAttribute("redirect"));
-            session.removeAttribute("redirect");
-        }
+        session.removeAttribute("redirect");
+        session.removeAttribute("SPRING_SECURITY_SAVED_REQUEST");
+
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }
