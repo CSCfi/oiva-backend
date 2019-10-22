@@ -2,7 +2,6 @@ package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.extension.MaaraysListFilter;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
-import fi.minedu.oiva.backend.core.security.OivaUserDetailsService;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
@@ -26,7 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -234,12 +235,14 @@ public class LupaService extends BaseService {
         // All except TELMA and VALMA
         List<String> except = Arrays.asList("999901", "999903");
 
+        Date currentDate = new Date(Calendar.getInstance().getTime().getTime());
         SelectConditionStep<Record> query = dsl.select(ArrayUtils.addAll(LUPA.fields(), MAARAYS.fields()))
                 .from(LUPA)
                 .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
                 .where(MAARAYS.KOODISTO.eq("koulutus")
                         .and(MAARAYS.KOODIARVO.in(except)).not()
-                        .and(LUPA.LOPPUPVM.isNull()));
+                        .and(LUPA.ALKUPVM.lessOrEqual(currentDate).or(LUPA.ALKUPVM.isNull()))
+                        .and(LUPA.LOPPUPVM.greaterOrEqual(currentDate).or(LUPA.LOPPUPVM.isNull())));
 
         logger.debug(query.getSQL());
 
