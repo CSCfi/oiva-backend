@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
+import fi.minedu.oiva.backend.core.security.CustomSuccessHandler;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.AuthService;
@@ -43,7 +44,7 @@ public abstract class BaseAuthController {
     @RequestMapping(value = "/login", method = GET)
     @ApiOperation(notes = "CAS-sisäänkirjautuminen", value = "")
     public void login(final HttpServletRequest request, final HttpServletResponse response, final @RequestParam String redirect) throws IOException {
-        request.getSession().setAttribute("redirect", redirect);
+        request.getSession().setAttribute(CustomSuccessHandler.REDIRECT_ATTRIBUTE, redirect);
         response.sendRedirect(casLoginUrl + "?service=" + casServiceUrl);
     }
 }

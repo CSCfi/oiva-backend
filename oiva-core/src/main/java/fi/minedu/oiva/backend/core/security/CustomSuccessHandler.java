@@ -12,13 +12,16 @@ import java.io.IOException;
 
 public class CustomSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
+    public static final String REDIRECT_ATTRIBUTE = "redirect";
+
     @Override
     public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response, final Authentication authentication) throws ServletException, IOException {
         final HttpSession session = request.getSession();
-        final String redirect = (String) session.getAttribute("redirect");
-        if (StringUtils.isNotBlank(redirect)) {
-            this.setDefaultTargetUrl((String) session.getAttribute("redirect"));
-            session.removeAttribute("redirect");
+        final Object redirect = session.getAttribute(REDIRECT_ATTRIBUTE);
+        if (redirect instanceof String && StringUtils.isNotBlank((String) redirect)) {
+            this.setDefaultTargetUrl((String) redirect);
+            this.setAlwaysUseDefaultTargetUrl(true);
+            session.removeAttribute(REDIRECT_ATTRIBUTE);
         }
         super.onAuthenticationSuccess(request, response, authentication);
     }
