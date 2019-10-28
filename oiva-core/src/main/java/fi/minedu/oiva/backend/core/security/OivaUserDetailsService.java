@@ -34,8 +34,7 @@ public class OivaUserDetailsService implements UserDetailsService {
     private final OpintopolkuService opintopolku;
     private final SessionRegistry sessionRegistry;
 
-    private final String[] editorRoles = {OivaAccess.Role_Esittelija, OivaAccess.Role_Nimenkirjoittaja,
-            OivaAccess.Role_Kayttaja};
+    private final String[] editorRoles = {OivaAccess.Role_Nimenkirjoittaja, OivaAccess.Role_Kayttaja};
 
     @Autowired
     public OivaUserDetailsService(OpintopolkuService opintopolku, SessionRegistry sessionRegistry) {
