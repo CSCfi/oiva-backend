@@ -335,3 +335,7 @@ WHERE l.diaarinumero = o.diaari
   AND TEXT(m.meta) LIKE '%' || o.nimi || '%';
 
 DROP TABLE temp_oid;
+
+-- Remove Kesäylisopiston koulutustehtävä from meta property koulutustehtävämääräys-0
+UPDATE maarays SET meta = meta - 'koulutustehtävämääräys-0'
+WHERE meta ->> 'koulutustehtävämääräys-0' = 'Kesäyliopiston koulutustehtävä';
