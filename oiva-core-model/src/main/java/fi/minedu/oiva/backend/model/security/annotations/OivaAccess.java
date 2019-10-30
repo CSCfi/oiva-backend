@@ -19,10 +19,10 @@ public interface OivaAccess {
 
     String Context_Oiva = "OIVA_APP";
     String Context_Yllapitaja = "OIVA_APP_ADMIN";
-    String Context_Esittelija = "AMMATILLINEN_ESITTELIJA";
-    String Context_Kayttaja = "AMMATILLINEN_MUOKKAAJA";
-    String Context_Katselija = "AMMATILLINEN_KATSELIJA";
-    String Context_Nimenkirjoittaja = "AMMATILLINEN_NIMENKIRJOITTAJA";
+    String Context_Esittelija = "ESITTELIJA";
+    String Context_Kayttaja = "KAYTTAJA";
+    String Context_Katselija = "KATSELIJA";
+    String Context_Nimenkirjoittaja = "NIMENKIRJOITTAJA";
 
     String Role_Application = Context_Oiva;
     String Role_Yllapitaja = Context_Yllapitaja;
