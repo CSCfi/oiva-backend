@@ -339,3 +339,8 @@ DROP TABLE temp_oid;
 -- Remove Kesäylisopiston koulutustehtävä from meta property koulutustehtävämääräys-0
 UPDATE maarays SET meta = meta - 'koulutustehtävämääräys-0'
 WHERE meta ->> 'koulutustehtävämääräys-0' = 'Kesäyliopiston koulutustehtävä';
+
+-- Update esi- ja perusopetus luvat use correct esitysmalli.
+UPDATE lupa SET paatoskierros_id = 2
+WHERE id IN (SELECT l.id FROM lupa l LEFT JOIN maarays m on l.id = m.lupa_id
+             WHERE m.koodisto = 'koulutusmuoto' AND m.koodiarvo = '1');
