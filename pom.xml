@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -89,84 +89,84 @@
     </repositories>
 
     <build>
-	    <pluginManagement>
-	    	<plugins>
-				<plugin>
-		            <groupId>org.codehaus.mojo</groupId>
-		            <artifactId>sql-maven-plugin</artifactId>
-		            <version>1.5</version>
-		            <dependencies>
-		                <dependency>
-		                    <groupId>org.postgresql</groupId>
-		                    <artifactId>postgresql</artifactId>
-		                    <version>${postgres.driver.version}</version>
-		                </dependency>
-		            </dependencies>
-	           	</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-enforcer-plugin</artifactId>
-					<version>${maven-enforcer-plugin.version}</version>
-					<configuration>
-					    <rules>
-					        <requireMavenVersion>
-					            <message>You are running an older version of Maven. Oiva Backend requires at least Maven 3.0</message>
-					            <version>[3.0.0,)</version>
-					        </requireMavenVersion>
-					        <requireJavaVersion>
-					            <message>You are running an older version of Java. Oiva Backend requires at least JDK ${java.version}</message>
-					            <version>[${java.version}.0,)</version>
-					        </requireJavaVersion>
-					    </rules>
-					</configuration>
-				</plugin>
-				<plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-surefire-plugin</artifactId>
-	                <configuration>
-	                    <skipTests>true</skipTests>
-	                </configuration>
-	            </plugin>
-	            <plugin>
-	                <groupId>net.alchim31.maven</groupId>
-	                <artifactId>scala-maven-plugin</artifactId>
-	                <version>${scala.maven.version}</version>
-            	</plugin>
-				<plugin>
-	                <groupId>org.scalatest</groupId>
-	                <artifactId>scalatest-maven-plugin</artifactId>
-	                <version>${scalatest.maven.version}</version>
-	                <configuration>
-	                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-	                    <junitxml>.</junitxml>
-	                </configuration>
-            	</plugin>
-            	<plugin>
-	                <groupId>org.codehaus.mojo</groupId>
-	                <artifactId>build-helper-maven-plugin</artifactId>
-	            </plugin>
-		            <plugin>
-	                <groupId>org.apache.maven.plugins</groupId>
-	                <artifactId>maven-resources-plugin</artifactId>
-	                <version>${maven.resources.version}</version>
-	                <configuration>
-	                    <nonFilteredFileExtensions>
-	                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
-	                    </nonFilteredFileExtensions>
-	                </configuration>
-	            </plugin>
-	            <plugin>
-	                <artifactId>maven-clean-plugin</artifactId>
-	                <version>3.0.0</version>
-	                <configuration>
-	                    <filesets>
-	                        <fileset>
-	                            <directory>logs/</directory>
-	                            <followSymlinks>false</followSymlinks>
-	                        </fileset>
-	                    </filesets>
-	                </configuration>
-	            </plugin>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>sql-maven-plugin</artifactId>
+                    <version>1.5</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.postgresql</groupId>
+                            <artifactId>postgresql</artifactId>
+                            <version>${postgres.driver.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${maven-enforcer-plugin.version}</version>
+                    <configuration>
+                        <rules>
+                            <requireMavenVersion>
+                                <message>You are running an older version of Maven. Oiva Backend requires at least Maven 3.0</message>
+                                <version>[3.0.0,)</version>
+                            </requireMavenVersion>
+                            <requireJavaVersion>
+                                <message>You are running an older version of Java. Oiva Backend requires at least JDK ${java.version}</message>
+                                <version>[${java.version}.0,)</version>
+                            </requireJavaVersion>
+                        </rules>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <skipTests>true</skipTests>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>${scala.maven.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest-maven-plugin</artifactId>
+                    <version>${scalatest.maven.version}</version>
+                    <configuration>
+                        <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                        <junitxml>.</junitxml>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven.resources.version}</version>
+                    <configuration>
+                        <nonFilteredFileExtensions>
+                            <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>3.0.0</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>logs/</directory>
+                                <followSymlinks>false</followSymlinks>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.jooq</groupId>
                     <artifactId>jooq-codegen-maven</artifactId>
@@ -178,7 +178,7 @@
                             <version>${postgres.driver.version}</version>
                         </dependency>
                     </dependencies>
-            	</plugin>
+                </plugin>
                 <!-- Integration test plugins -->
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
@@ -221,7 +221,7 @@
                                 <alias>oiva-test-db</alias>
                                 <build>
                                     <from>postgres:9.6</from>
-                                    <runCmds>echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > /docker-entrypoint-initdb.d/init-db.sql</runCmds>
+                                    <runCmds>echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"> /docker-entrypoint-initdb.d/init-db.sql</runCmds>
                                 </build>
                                 <run>
                                     <network>
@@ -263,11 +263,11 @@
                     </executions>
                 </plugin>
             </plugins>
-	    </pluginManagement>
-   </build>
+        </pluginManagement>
+    </build>
 
     <dependencyManagement>
-    	<dependencies>
+        <dependencies>
             <dependency>
                 <groupId>fi.minedu.oiva</groupId>
                 <artifactId>oiva-core</artifactId>
@@ -278,23 +278,23 @@
                 <artifactId>aspectjweaver</artifactId>
                 <version>1.8.5</version>
             </dependency>
-	        <dependency>
-	            <groupId>org.postgresql</groupId>
-	            <artifactId>postgresql</artifactId>
-	            <version>${postgres.driver.version}</version>
-	        </dependency>
-    		<dependency>
-	            <groupId>org.scalatest</groupId>
-	            <artifactId>scalatest_2.11</artifactId>
-	            <version>${scalatest.version}</version>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgres.driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_2.11</artifactId>
+                <version>${scalatest.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.scala-lang</groupId>
                         <artifactId>scala-library</artifactId>
                     </exclusion>
                 </exclusions>
-	            <scope>test</scope>
-	        </dependency>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
@@ -319,7 +319,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-    	</dependencies>
+        </dependencies>
     </dependencyManagement>
 
     <profiles>
@@ -371,5 +371,5 @@
                 <module>oiva-core-model</module>
             </modules>
         </profile>
-  </profiles>
+    </profiles>
 </project>
