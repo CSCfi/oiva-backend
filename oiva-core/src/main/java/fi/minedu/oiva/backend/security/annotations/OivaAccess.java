@@ -24,7 +24,7 @@ public interface OivaAccess {
     String Context_Oiva = "OIVA_APP";
     String Context_Yllapitaja = "OIVA_APP_ADMIN";
     String Context_Esittelija = "ESITTELIJA";
-    String Context_Kayttaja = "MUOKKAAJA";
+    String Context_Kayttaja = "KAYTTAJA";
     String Context_Katselija = "KATSELIJA";
     String Context_Nimenkirjoittaja = "NIMENKIRJOITTAJA";
 
