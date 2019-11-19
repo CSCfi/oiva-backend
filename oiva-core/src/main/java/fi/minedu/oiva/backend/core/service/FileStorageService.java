@@ -117,7 +117,7 @@ public class FileStorageService {
         Optional<Muutospyynto> muutospyyntoOpt = Optional.ofNullable(muutospyynto);
         if(muutospyyntoOpt.isPresent()) {
             final Muutospyynto mp = muutospyyntoOpt.get();
-            return Optional.of(fileStorage.getHakemuksetBasePath() + "/" + mp.getUuid().toString());
+            return Optional.of(fileStorage.getHakemuksetBasePath() + "/" + mp.getUuid().toString() + ".pdf");
         } else return Optional.empty();
     }
 
