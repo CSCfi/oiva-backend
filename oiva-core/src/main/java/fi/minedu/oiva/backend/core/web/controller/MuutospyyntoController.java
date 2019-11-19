@@ -143,7 +143,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
     @RequestMapping(method = POST, value = "/passivoi/{uuid}")
     public HttpEntity<UUID> passivoi(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.PASSIVOITU));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PASSIVOITU));
     }
 
 
@@ -152,7 +152,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/avoin/{uuid}")
     public HttpEntity<UUID> vieKasittelyyn(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.AVOIN));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.AVOIN));
     }
 
     // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn
@@ -160,7 +160,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Ota muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/valmistelussa/{uuid}")
     public HttpEntity<UUID> kasittelyssa(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.VALMISTELUSSA));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.VALMISTELUSSA));
     }
 
     // Vaihda muutospyynnön tilaa -> palauta täydennettäväksi
@@ -168,7 +168,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Palauta järjestäjän täydennettäväksi", value = "")
     @RequestMapping(method = POST, value = "/tila/taydennettava/{uuid}")
     public HttpEntity<UUID> taydennettava(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.TAYDENNETTAVA));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.TAYDENNETTAVA));
     }
 
     // Vaihda muutospyynnön tilaa -> valmis
@@ -176,7 +176,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Merkitse muutospyyntö valmiiksi", value = "")
     @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
     public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.PAATETTY));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PAATETTY));
     }
 
     private boolean inValid(Muutospyynto muutospyynto) {

@@ -78,16 +78,19 @@ public class MuutospyyntoService {
     private final LiiteService liiteService;
     private final OpintopolkuService opintopolkuService;
     private final MaaraysService maaraysService;
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
-                               LiiteService liiteService, OpintopolkuService opintopolkuService, MaaraysService maaraysService) {
+                               LiiteService liiteService, OpintopolkuService opintopolkuService,
+                               MaaraysService maaraysService, FileStorageService fileStorageService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
         this.liiteService = liiteService;
         this.opintopolkuService = opintopolkuService;
         this.maaraysService = maaraysService;
+        this.fileStorageService = fileStorageService;
     }
 
     public enum Muutospyyntotila {
@@ -162,15 +165,30 @@ public class MuutospyyntoService {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
-    // Vaihtaa muutospyynnön tilan
-    public Optional<UUID> changeTila(final String uuid, Muutospyyntotila tila) {
+    /**
+     * Set muutospyynto tila
+     *
+     * @param muutospyynto
+     * @param tila
+     * @throws DataAccessException on failure in setting tila
+     */
+    private void setMuutospyyntoTila(MuutospyyntoRecord muutospyynto, Muutospyyntotila tila) throws DataAccessException {
+        muutospyynto.setTila(tila.name());
+        dsl.executeUpdate(muutospyynto);
+    }
+
+    /**
+     * Find muutospyynto based on uuid and set its tila
+     * @param uuid
+     * @param tila
+     * @return UUID of muutospyynto or empty
+     */
+    public Optional<UUID> findMuutospyyntoAndSetTila(final String uuid, Muutospyyntotila tila) {
         try {
             final Optional<MuutospyyntoRecord> muutospyyntoOpt =
                     Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
             if (muutospyyntoOpt.isPresent()) {
-                MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                mp.setTila(tila.name());
-                dsl.executeUpdate(mp);
+                setMuutospyyntoTila(muutospyyntoOpt.get(), tila);
                 return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
             }
             return Optional.empty();
