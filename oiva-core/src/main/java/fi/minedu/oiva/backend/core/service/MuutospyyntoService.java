@@ -168,6 +168,12 @@ public class MuutospyyntoService {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
+    /**
+     * Find Muutospyynto based on UUID, write out a PDF for it and set it as submitted
+     * along with related actions.
+     * @param uuid UUID of Muutospyynto
+     * @throws Exception on failure to find Muutospyynto or errors during the process
+     */
     public void submitMuutospyyntoForApproval(final String uuid) throws Exception {
         final Optional<Muutospyynto> muutospyyntoOpt = getByUuid(uuid);
         if(!muutospyyntoOpt.isPresent()) {
