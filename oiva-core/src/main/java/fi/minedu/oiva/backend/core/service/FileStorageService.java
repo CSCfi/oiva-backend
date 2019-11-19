@@ -64,17 +64,22 @@ public class FileStorageService {
         return Optional.empty();
     }
 
+    private File createFileWithPath(String filePath) {
+        final File file = new File(filePath);
+        final File folder = file.getParentFile();
+        if (folder.exists() || folder.mkdirs()) {
+            return file;
+        }
+        logger.error("Failed to create file " + filePath);
+        return null;
+    }
+
     private Optional<File> createLupaFile(final Lupa lupa) {
         Optional<Lupa> lupaOpt = Optional.ofNullable(lupa);
-        return lupaOpt.map(l -> getLupaPDFFilePath(l).map(filePath -> {
-            final File file = new File(filePath);
-            final File folder = file.getParentFile();
-            if (folder.exists() || folder.mkdirs()) {
-                return file;
-            }
-            logger.error("Failed to create file path: " + filePath);
-            return null;
-        }).orElse(null));
+        return lupaOpt.map(l ->
+                getLupaPDFFilePath(l).map(filePath ->
+                        createFileWithPath(filePath)
+                ).orElse(null));
     }
 
     public Optional<String> getLupaPDFFilePath(final Lupa lupa) {
