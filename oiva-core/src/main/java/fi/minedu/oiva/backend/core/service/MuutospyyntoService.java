@@ -35,9 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -163,6 +166,21 @@ public class MuutospyyntoService {
 
     private Stream<Muutos> getAlimaaraykset(Muutos muutos) {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
+    }
+
+    public void submitMuutospyyntoForApproval(final String uuid) throws Exception {
+        final Optional<Muutospyynto> muutospyyntoOpt = getByUuid(uuid);
+        if(!muutospyyntoOpt.isPresent()) {
+            throw new Exception("No muutospyynto for UUID "+uuid);
+        }
+        else {
+            Muutospyynto mp = muutospyyntoOpt.get();
+            fileStorageService.writeHakemusPDF(mp);
+            MuutospyyntoRecord mpRecord = dsl.newRecord(MUUTOSPYYNTO, mp);
+            mpRecord.setTila(Muutospyyntotila.AVOIN.name());
+            mpRecord.setHakupvm(Date.valueOf(LocalDate.now()));
+            dsl.executeUpdate(mpRecord);
+        }
     }
 
     /**
