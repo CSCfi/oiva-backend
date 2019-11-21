@@ -21,12 +21,12 @@ elif [[ $cmdArg == "start" ]]; then
     sServiceNames="amos-postgres yva-postgres amos-redis yva-redis"
     if [[ $userArgs == *"--amos"* ]]; then
         echo -e "Starting only amos containers"
-        sServiceNames="amos-postgres amos-redis"
+        sServiceNames="nginx amos-postgres amos-redis"
         userArgs=$(echo "$userArgs" | sed 's/--amos//g')
     fi
     if [[ $userArgs == *"--yva"* ]]; then
         echo -e "Starting only yva containers"
-        sServiceNames="yva-postgres yva-redis"
+        sServiceNames="yva-nginx yva-postgres yva-redis"
         userArgs=$(echo "$userArgs" | sed 's/--yva//g')
     fi
 
@@ -52,7 +52,7 @@ elif [[ $cmdArg == "start" ]]; then
         echo "No ethernetdevice found. Try adding it as argument"
     else
         echo -e "Using hostmachine ip: $HOSTMACHINE_IP"
-        sed -e "s/HOSTIP/${HOSTMACHINE_IP}/g" docker-compose.yml | docker-compose --file - up $sServiceNames nginx &
+        sed -e "s/HOSTIP/${HOSTMACHINE_IP}/g" docker-compose.yml | docker-compose --file - up $sServiceNames &
     fi
 else
     echo "Usage: ./oiva-docker.sh CMD [args]"
