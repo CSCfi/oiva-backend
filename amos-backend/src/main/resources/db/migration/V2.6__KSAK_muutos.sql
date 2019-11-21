@@ -72,7 +72,7 @@ with old as (
                     m.luontipvm,
                     m.paivittaja,
                     m.paivityspvm,
-                    m.koodistoversio
+                    CASE WHEN m.koodisto = 'koulutus' THEN 12 ELSE m.koodistoversio END
              from new_lupa,
                   maarays m
                       join old on m.lupa_id = old.id
@@ -81,7 +81,7 @@ with old as (
      -- copy new maarays
      new_maarays as (
          insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, luoja, koodistoversio)
-             select id, 1, 'koulutus', '384148', 1, 'oiva', 7 from new_lupa
+             select id, 1, 'koulutus', '384148', 1, 'oiva', 12 from new_lupa
              returning *
      )
 select *

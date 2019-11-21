@@ -72,7 +72,7 @@ with old as (
                     m.luontipvm,
                     m.paivittaja,
                     m.paivityspvm,
-                    m.koodistoversio
+                    CASE WHEN m.koodisto = 'koulutus' THEN 12 ELSE m.koodistoversio END
              from new_lupa,
                   maarays m
                       join old on m.lupa_id = old.id
@@ -81,13 +81,13 @@ with old as (
      -- insert kehitysvamma-alan ammattitutkinto
      kva_at as (
          insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, luoja, koodistoversio)
-             select id, 1, 'koulutus', '374122', 1, 'oiva', 11 from new_lupa
+             select id, 1, 'koulutus', '374122', 1, 'oiva', 12 from new_lupa
              returning *
      ),
      -- insert kalatalouden erikoisammattututkinto
      kt_eat as (
          insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, luoja, koodistoversio)
-             select id, 1, 'koulutus', '467441', 1, 'oiva', 11 from new_lupa
+             select id, 1, 'koulutus', '467441', 1, 'oiva', 12 from new_lupa
              returning *
      )
 
