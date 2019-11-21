@@ -9,6 +9,8 @@ import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -27,9 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.model.util.ControllerUtil.badRequest;
-import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr400;
-import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -40,6 +40,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
         produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Muutospyyntöjen hallinta")
 public class MuutospyyntoController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MuutospyyntoController.class);
 
     @Value("${templates.base.path}")
     private String templateBasePath;
@@ -143,7 +145,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
     @RequestMapping(method = POST, value = "/passivoi/{uuid}")
     public HttpEntity<UUID> passivoi(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.PASSIVOITU));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PASSIVOITU));
     }
 
 
@@ -152,7 +154,18 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/avoin/{uuid}")
     public HttpEntity<UUID> vieKasittelyyn(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.AVOIN));
+        try {
+            service.submitMuutospyyntoForApproval(uuid);
+            return ok(UUID.fromString(uuid));
+        }
+        catch(NullPointerException e) {
+            logger.error(e.getMessage());
+            return get500();
+        }
+        catch(Exception e) {
+            logger.error(e.getMessage());
+            return notFound();
+        }
     }
 
     // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn
@@ -160,7 +173,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Ota muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/valmistelussa/{uuid}")
     public HttpEntity<UUID> kasittelyssa(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.VALMISTELUSSA));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.VALMISTELUSSA));
     }
 
     // Vaihda muutospyynnön tilaa -> palauta täydennettäväksi
@@ -168,7 +181,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Palauta järjestäjän täydennettäväksi", value = "")
     @RequestMapping(method = POST, value = "/tila/taydennettava/{uuid}")
     public HttpEntity<UUID> taydennettava(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.TAYDENNETTAVA));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.TAYDENNETTAVA));
     }
 
     // Vaihda muutospyynnön tilaa -> valmis
@@ -176,7 +189,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Merkitse muutospyyntö valmiiksi", value = "")
     @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
     public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
-        return getOr404(service.changeTila(uuid, Muutospyyntotila.PAATETTY));
+        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PAATETTY));
     }
 
     private boolean inValid(Muutospyynto muutospyynto) {

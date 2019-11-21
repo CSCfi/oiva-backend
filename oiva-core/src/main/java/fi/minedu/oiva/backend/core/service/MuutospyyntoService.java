@@ -35,9 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,16 +81,19 @@ public class MuutospyyntoService {
     private final LiiteService liiteService;
     private final OpintopolkuService opintopolkuService;
     private final MaaraysService maaraysService;
+    private final FileStorageService fileStorageService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
-                               LiiteService liiteService, OpintopolkuService opintopolkuService, MaaraysService maaraysService) {
+                               LiiteService liiteService, OpintopolkuService opintopolkuService,
+                               MaaraysService maaraysService, FileStorageService fileStorageService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
         this.liiteService = liiteService;
         this.opintopolkuService = opintopolkuService;
         this.maaraysService = maaraysService;
+        this.fileStorageService = fileStorageService;
     }
 
     public enum Muutospyyntotila {
@@ -162,15 +168,51 @@ public class MuutospyyntoService {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
-    // Vaihtaa muutospyynnön tilan
-    public Optional<UUID> changeTila(final String uuid, Muutospyyntotila tila) {
+    /**
+     * Find Muutospyynto based on UUID, write out a PDF for it and set it as submitted
+     * along with related actions.
+     * @param uuid UUID of Muutospyynto
+     * @throws Exception on failure to find Muutospyynto or errors during the process
+     */
+    public void submitMuutospyyntoForApproval(final String uuid) throws Exception {
+        final Optional<Muutospyynto> muutospyyntoOpt = getByUuid(uuid);
+        if(!muutospyyntoOpt.isPresent()) {
+            throw new Exception("No muutospyynto for UUID "+uuid);
+        }
+        else {
+            Muutospyynto mp = muutospyyntoOpt.get();
+            fileStorageService.writeHakemusPDF(mp);
+            MuutospyyntoRecord mpRecord = dsl.newRecord(MUUTOSPYYNTO, mp);
+            mpRecord.setTila(Muutospyyntotila.AVOIN.name());
+            mpRecord.setHakupvm(Date.valueOf(LocalDate.now()));
+            dsl.executeUpdate(mpRecord);
+        }
+    }
+
+    /**
+     * Set muutospyynto tila
+     *
+     * @param muutospyynto
+     * @param tila
+     * @throws DataAccessException on failure in setting tila
+     */
+    private void setMuutospyyntoTila(MuutospyyntoRecord muutospyynto, Muutospyyntotila tila) throws DataAccessException {
+        muutospyynto.setTila(tila.name());
+        dsl.executeUpdate(muutospyynto);
+    }
+
+    /**
+     * Find muutospyynto based on uuid and set its tila
+     * @param uuid
+     * @param tila
+     * @return UUID of muutospyynto or empty
+     */
+    public Optional<UUID> findMuutospyyntoAndSetTila(final String uuid, Muutospyyntotila tila) {
         try {
             final Optional<MuutospyyntoRecord> muutospyyntoOpt =
                     Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
             if (muutospyyntoOpt.isPresent()) {
-                MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                mp.setTila(tila.name());
-                dsl.executeUpdate(mp);
+                setMuutospyyntoTila(muutospyyntoOpt.get(), tila);
                 return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
             }
             return Optional.empty();

@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.model.entity.OivaTemplates;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.core.util.ExecutorContext;
 import fi.minedu.oiva.backend.core.util.With;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,19 @@ public class FileStorageService {
         this.princeXMLService = princeXMLService;
         this.asyncService = asyncService;
     }
+    public void writeHakemusPDF(final Muutospyynto muutospyynto) throws Exception {
+        if(muutospyynto == null) {
+            throw new NullPointerException("Muutospyynto must not be null");
+        }
+        final OivaTemplates.RenderOptions options = OivaTemplates.RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
+        final String muutospyyntoHTMLVersion = pebbleService.muutospyyntoToHTML(muutospyynto, options).orElseThrow(IllegalStateException::new);
+        final File file = createHakemusFile(muutospyynto).orElseThrow(IllegalStateException::new);
+        final FileOutputStream fileOutputStream = new FileOutputStream(file);
+        boolean writeResult = princeXMLService.toPDF(muutospyyntoHTMLVersion, fileOutputStream, options);
+        if(!writeResult) {
+            throw new Exception("Unable to write PDF content");
+        }
+    }
 
     public Optional<File> writeLupaPDF(final Lupa lupa) throws Exception {
         final Optional<Lupa> lupaOpt = Optional.ofNullable(lupa);
@@ -64,17 +78,31 @@ public class FileStorageService {
         return Optional.empty();
     }
 
+    private File createFileWithPath(String filePath) {
+        final File file = new File(filePath);
+        final File folder = file.getParentFile();
+        if (folder.exists() || folder.mkdirs()) {
+            return file;
+        }
+        logger.error("Failed to create file " + filePath);
+        return null;
+    }
+
+    private Optional<File> createHakemusFile(final Muutospyynto muutospyynto) {
+        Optional<Muutospyynto> muutospyyntoOpt = Optional.ofNullable(muutospyynto);
+
+        return muutospyyntoOpt.map(mp ->
+                getHakemusPDFFilePath(mp).map(filePath ->
+                        createFileWithPath(filePath)
+                ).orElse(null));
+    }
+
     private Optional<File> createLupaFile(final Lupa lupa) {
         Optional<Lupa> lupaOpt = Optional.ofNullable(lupa);
-        return lupaOpt.map(l -> getLupaPDFFilePath(l).map(filePath -> {
-            final File file = new File(filePath);
-            final File folder = file.getParentFile();
-            if (folder.exists() || folder.mkdirs()) {
-                return file;
-            }
-            logger.error("Failed to create file path: " + filePath);
-            return null;
-        }).orElse(null));
+        return lupaOpt.map(l ->
+                getLupaPDFFilePath(l).map(filePath ->
+                        createFileWithPath(filePath)
+                ).orElse(null));
     }
 
     public Optional<String> getLupaPDFFilePath(final Lupa lupa) {
@@ -82,6 +110,14 @@ public class FileStorageService {
         if (lupaOpt.isPresent()) {
             final Lupa l = lupaOpt.get();
             return Optional.of(fileStorage.getLuvatBasePath() + "/" + l.getUUIDValue() + "/" + l.getPDFFileName());
+        } else return Optional.empty();
+    }
+
+    public Optional<String> getHakemusPDFFilePath(final Muutospyynto muutospyynto) {
+        Optional<Muutospyynto> muutospyyntoOpt = Optional.ofNullable(muutospyynto);
+        if(muutospyyntoOpt.isPresent()) {
+            final Muutospyynto mp = muutospyyntoOpt.get();
+            return Optional.of(fileStorage.getHakemuksetBasePath() + "/" + mp.getUuid().toString() + ".pdf");
         } else return Optional.empty();
     }
 
