@@ -33,7 +33,7 @@ public class TranslateFilter extends OivaFilter {
         return null;
     }
 
-    protected static String fromTranslatedString(final TranslatedString content, final Optional<String> languageOpt) {
+    public static String fromTranslatedString(final TranslatedString content, final Optional<String> languageOpt) {
         return languageOpt.isPresent() ? content.getOrFirst(languageOpt.get()).orElse("") : "";
     }
 
