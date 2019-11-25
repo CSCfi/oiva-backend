@@ -48,7 +48,7 @@ class Maarays(
 
   @JsonIgnore def isKohde(kohde: String) = null != kohde && StringUtils.equalsIgnoreCase(kohdeValue, kohde)
 
-  @JsonIgnore def hasMetaValue(key: String, value: String) = null != getMeta && getMeta.has(key) && getMeta.get(key).asText("").equals(value)
+  @JsonIgnore def hasMetaValue(key: String, value: String) = null != getMeta && getMeta.has(key) && getMeta.get(key).asText("").equalsIgnoreCase(value)
 
   @JsonIgnore def isKoodisto(koodisto: String) = null != getKoodisto && StringUtils.equalsIgnoreCase(getKoodisto, koodisto)
 
