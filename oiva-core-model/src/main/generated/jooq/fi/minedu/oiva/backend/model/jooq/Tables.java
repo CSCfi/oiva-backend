@@ -18,7 +18,10 @@ import fi.minedu.oiva.backend.model.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
+import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
+import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
+import fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos;
 
 import javax.annotation.Generated;
 
@@ -107,7 +110,22 @@ public class Tables {
     public static final MuutospyyntoLiite MUUTOSPYYNTO_LIITE = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite.MUUTOSPYYNTO_LIITE;
 
     /**
+     * The table <code>muutospyynto_tilamuutos</code>.
+     */
+    public static final MuutospyyntoTilamuutos MUUTOSPYYNTO_TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos.MUUTOSPYYNTO_TILAMUUTOS;
+
+    /**
      * The table <code>paatoskierros</code>.
      */
     public static final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros.PAATOSKIERROS;
+
+    /**
+     * The table <code>tiedote</code>.
+     */
+    public static final Tiedote TIEDOTE = fi.minedu.oiva.backend.model.jooq.tables.Tiedote.TIEDOTE;
+
+    /**
+     * The table <code>tilamuutos</code>.
+     */
+    public static final Tilamuutos TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos.TILAMUUTOS;
 }

@@ -82,11 +82,12 @@ public class MuutospyyntoService {
     private final OpintopolkuService opintopolkuService;
     private final MaaraysService maaraysService;
     private final FileStorageService fileStorageService;
+    private final TilamuutosService tilamuutosService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
                                LiiteService liiteService, OpintopolkuService opintopolkuService,
-                               MaaraysService maaraysService, FileStorageService fileStorageService) {
+                               MaaraysService maaraysService, FileStorageService fileStorageService, TilamuutosService tilamuutosService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
@@ -94,6 +95,7 @@ public class MuutospyyntoService {
         this.opintopolkuService = opintopolkuService;
         this.maaraysService = maaraysService;
         this.fileStorageService = fileStorageService;
+        this.tilamuutosService = tilamuutosService;
     }
 
     public enum Muutospyyntotila {
@@ -123,7 +125,7 @@ public class MuutospyyntoService {
     }
 
     // Muutospyyntölistaus (hakemukset) esittelijälle
-    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila) {
+    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila, boolean vainOmat) {
         return getBaseSelect()
                 .where(baseFilter())
                 .and(MUUTOSPYYNTO.TILA.eq(tila.toString()))
@@ -131,6 +133,8 @@ public class MuutospyyntoService {
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))
                 .filter(Optional::isPresent).map(Optional::get)
+                // Filter only own if param is set. Own is defined by having any change made by user
+                .filter(m -> !vainOmat || m.getTilamuutokset().stream().anyMatch(t -> authService.getUsername().equals(t.getKayttajatunnus())))
                 .collect(Collectors.toList());
     }
 
@@ -183,7 +187,9 @@ public class MuutospyyntoService {
             Muutospyynto mp = muutospyyntoOpt.get();
             fileStorageService.writeHakemusPDF(mp);
             MuutospyyntoRecord mpRecord = dsl.newRecord(MUUTOSPYYNTO, mp);
-            mpRecord.setTila(Muutospyyntotila.AVOIN.name());
+            String tila = Muutospyyntotila.AVOIN.name();
+            tilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila, authService.getUsername());
+            mpRecord.setTila(tila);
             mpRecord.setHakupvm(Date.valueOf(LocalDate.now()));
             dsl.executeUpdate(mpRecord);
         }
@@ -212,6 +218,10 @@ public class MuutospyyntoService {
             final Optional<MuutospyyntoRecord> muutospyyntoOpt =
                     Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
             if (muutospyyntoOpt.isPresent()) {
+                MuutospyyntoRecord mp = muutospyyntoOpt.get();
+                tilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila.name(), authService.getUsername());
+                mp.setTila(tila.name());
+                dsl.executeUpdate(mp);
                 setMuutospyyntoTila(muutospyyntoOpt.get(), tila);
                 return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
             }
@@ -303,6 +313,7 @@ public class MuutospyyntoService {
             withLupaUuid(muutospyynto);
             withPaatoskierros(muutospyynto);
             withOrganization(muutospyynto);
+            withTilamuutokset(muutospyynto);
         }
         return Optional.ofNullable(muutospyynto);
     }
@@ -421,6 +432,12 @@ public class MuutospyyntoService {
         Optional.ofNullable(muutospyynto)
                 .ifPresent(m -> organisaatioService.getWithLocation(m.getJarjestajaYtunnus())
                         .ifPresent(m::setJarjestaja));
+    }
+
+    private void withTilamuutokset(final Muutospyynto muutospyynto) {
+        Optional.ofNullable(muutospyynto)
+                .ifPresent(m -> tilamuutosService.forMuutospyynto(m)
+                        .ifPresent(m::setTilamuutokset));
     }
 
     // Hakee muutospyyntöön liittyvät muutokset

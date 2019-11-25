@@ -18,7 +18,10 @@ import fi.minedu.oiva.backend.model.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
+import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
+import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
+import fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +48,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = -2136112646;
+    private static final long serialVersionUID = -146649020;
 
     /**
      * The reference instance of <code></code>
@@ -123,9 +126,24 @@ public class DefaultSchema extends SchemaImpl {
     public final MuutospyyntoLiite MUUTOSPYYNTO_LIITE = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite.MUUTOSPYYNTO_LIITE;
 
     /**
+     * The table <code>muutospyynto_tilamuutos</code>.
+     */
+    public final MuutospyyntoTilamuutos MUUTOSPYYNTO_TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos.MUUTOSPYYNTO_TILAMUUTOS;
+
+    /**
      * The table <code>paatoskierros</code>.
      */
     public final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros.PAATOSKIERROS;
+
+    /**
+     * The table <code>tiedote</code>.
+     */
+    public final Tiedote TIEDOTE = fi.minedu.oiva.backend.model.jooq.tables.Tiedote.TIEDOTE;
+
+    /**
+     * The table <code>tilamuutos</code>.
+     */
+    public final Tilamuutos TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos.TILAMUUTOS;
 
     /**
      * No further instances allowed
@@ -165,7 +183,9 @@ public class DefaultSchema extends SchemaImpl {
             Sequences.MAARAYSTYYPPI_ID_SEQ,
             Sequences.MUUTOS_ID_SEQ,
             Sequences.MUUTOSPYYNTO_ID_SEQ,
-            Sequences.PAATOSKIERROS_ID_SEQ);
+            Sequences.PAATOSKIERROS_ID_SEQ,
+            Sequences.TIEDOTE_ID_SEQ,
+            Sequences.TILAMUUTOS_ID_SEQ);
     }
 
     @Override
@@ -191,6 +211,9 @@ public class DefaultSchema extends SchemaImpl {
             MuutosLiite.MUUTOS_LIITE,
             Muutospyynto.MUUTOSPYYNTO,
             MuutospyyntoLiite.MUUTOSPYYNTO_LIITE,
-            Paatoskierros.PAATOSKIERROS);
+            MuutospyyntoTilamuutos.MUUTOSPYYNTO_TILAMUUTOS,
+            Paatoskierros.PAATOSKIERROS,
+            Tiedote.TIEDOTE,
+            Tilamuutos.TILAMUUTOS);
     }
 }

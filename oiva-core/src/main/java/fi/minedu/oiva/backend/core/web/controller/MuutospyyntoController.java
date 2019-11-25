@@ -17,6 +17,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -70,15 +71,16 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "/avoimet")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getAvoimetMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.AVOIN));
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.AVOIN, false));
     }
 
     // palauttaa kaikki valmistelussa olevat muutospyynnöt
     @OivaAccess_Esittelija
     @RequestMapping(method = GET, value = "/valmistelussa")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getValmistelussaMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA));
+    public CompletableFuture<Collection<Muutospyynto>> getValmistelussaMuutospyynnot(
+            @RequestParam(required = false, defaultValue = "false") boolean vainOmat) {
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA, vainOmat));
     }
 
     // palauttaa kaikki päätetyt muutospyynnöt (TARVITAANKO!!!?)
@@ -86,7 +88,7 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "/paatetyt")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getPaatetytMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.PAATETTY));
+        return async(() -> service.getMuutospyynnot(Muutospyyntotila.PAATETTY, false));
     }
 
 
