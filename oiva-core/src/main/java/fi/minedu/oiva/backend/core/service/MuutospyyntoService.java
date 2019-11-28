@@ -82,12 +82,13 @@ public class MuutospyyntoService {
     private final OpintopolkuService opintopolkuService;
     private final MaaraysService maaraysService;
     private final FileStorageService fileStorageService;
-    private final TilamuutosService tilamuutosService;
+    private final AsiatilamuutosService asiatilamuutosService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
                                LiiteService liiteService, OpintopolkuService opintopolkuService,
-                               MaaraysService maaraysService, FileStorageService fileStorageService, TilamuutosService tilamuutosService) {
+                               MaaraysService maaraysService, FileStorageService fileStorageService,
+                               AsiatilamuutosService asiatilamuutosService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
@@ -95,7 +96,7 @@ public class MuutospyyntoService {
         this.opintopolkuService = opintopolkuService;
         this.maaraysService = maaraysService;
         this.fileStorageService = fileStorageService;
-        this.tilamuutosService = tilamuutosService;
+        this.asiatilamuutosService = asiatilamuutosService;
     }
 
     public enum Muutospyyntotila {
@@ -134,7 +135,7 @@ public class MuutospyyntoService {
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))
                 .filter(Optional::isPresent).map(Optional::get)
                 // Filter only own if param is set. Own is defined by having any change made by user
-                .filter(m -> !vainOmat || m.getTilamuutokset().stream().anyMatch(t -> authService.getUsername().equals(t.getKayttajatunnus())))
+                .filter(m -> !vainOmat || m.getAsiatilamuutokset().stream().anyMatch(t -> authService.getUsername().equals(t.getKayttajatunnus())))
                 .collect(Collectors.toList());
     }
 
@@ -188,7 +189,7 @@ public class MuutospyyntoService {
             fileStorageService.writeHakemusPDF(mp);
             MuutospyyntoRecord mpRecord = dsl.newRecord(MUUTOSPYYNTO, mp);
             String tila = Muutospyyntotila.AVOIN.name();
-            tilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila, authService.getUsername());
+            asiatilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila, authService.getUsername());
             mpRecord.setTila(tila);
             mpRecord.setHakupvm(Date.valueOf(LocalDate.now()));
             dsl.executeUpdate(mpRecord);
@@ -219,7 +220,7 @@ public class MuutospyyntoService {
                     Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
             if (muutospyyntoOpt.isPresent()) {
                 MuutospyyntoRecord mp = muutospyyntoOpt.get();
-                tilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila.name(), authService.getUsername());
+                asiatilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila.name(), authService.getUsername());
                 mp.setTila(tila.name());
                 dsl.executeUpdate(mp);
                 setMuutospyyntoTila(muutospyyntoOpt.get(), tila);
@@ -436,8 +437,8 @@ public class MuutospyyntoService {
 
     private void withTilamuutokset(final Muutospyynto muutospyynto) {
         Optional.ofNullable(muutospyynto)
-                .ifPresent(m -> tilamuutosService.forMuutospyynto(m)
-                        .ifPresent(m::setTilamuutokset));
+                .ifPresent(m -> asiatilamuutosService.forMuutospyynto(m)
+                        .ifPresent(m::setAsiatilamuutokset));
     }
 
     // Hakee muutospyyntöön liittyvät muutokset

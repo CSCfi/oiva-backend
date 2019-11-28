@@ -24,6 +24,11 @@ import org.jooq.impl.SequenceImpl;
 public class Sequences {
 
     /**
+     * The sequence <code>asiatilamuutos_id_seq</code>
+     */
+    public static final Sequence<Long> ASIATILAMUUTOS_ID_SEQ = new SequenceImpl<Long>("asiatilamuutos_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
+
+    /**
      * The sequence <code>asiatyyppi_id_seq</code>
      */
     public static final Sequence<Long> ASIATYYPPI_ID_SEQ = new SequenceImpl<Long>("asiatyyppi_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
@@ -97,9 +102,4 @@ public class Sequences {
      * The sequence <code>tiedote_id_seq</code>
      */
     public static final Sequence<Long> TIEDOTE_ID_SEQ = new SequenceImpl<Long>("tiedote_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
-
-    /**
-     * The sequence <code>tilamuutos_id_seq</code>
-     */
-    public static final Sequence<Long> TILAMUUTOS_ID_SEQ = new SequenceImpl<Long>("tilamuutos_id_seq", DefaultSchema.DEFAULT_SCHEMA, org.jooq.impl.SQLDataType.BIGINT.nullable(false));
 }

@@ -4,6 +4,7 @@
 package fi.minedu.oiva.backend.model.jooq;
 
 
+import fi.minedu.oiva.backend.model.jooq.tables.Asiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.Asiatyyppi;
 import fi.minedu.oiva.backend.model.jooq.tables.Esitysmalli;
 import fi.minedu.oiva.backend.model.jooq.tables.Kohde;
@@ -17,11 +18,10 @@ import fi.minedu.oiva.backend.model.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
+import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoAsiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
-import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
 import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
-import fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos;
 
 import javax.annotation.Generated;
 
@@ -38,6 +38,11 @@ import javax.annotation.Generated;
 )
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Tables {
+
+    /**
+     * The table <code>asiatilamuutos</code>.
+     */
+    public static final Asiatilamuutos ASIATILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.Asiatilamuutos.ASIATILAMUUTOS;
 
     /**
      * The table <code>asiatyyppi</code>.
@@ -105,14 +110,14 @@ public class Tables {
     public static final Muutospyynto MUUTOSPYYNTO = fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto.MUUTOSPYYNTO;
 
     /**
+     * The table <code>muutospyynto_asiatilamuutos</code>.
+     */
+    public static final MuutospyyntoAsiatilamuutos MUUTOSPYYNTO_ASIATILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS;
+
+    /**
      * The table <code>muutospyynto_liite</code>.
      */
     public static final MuutospyyntoLiite MUUTOSPYYNTO_LIITE = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite.MUUTOSPYYNTO_LIITE;
-
-    /**
-     * The table <code>muutospyynto_tilamuutos</code>.
-     */
-    public static final MuutospyyntoTilamuutos MUUTOSPYYNTO_TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoTilamuutos.MUUTOSPYYNTO_TILAMUUTOS;
 
     /**
      * The table <code>paatoskierros</code>.
@@ -123,9 +128,4 @@ public class Tables {
      * The table <code>tiedote</code>.
      */
     public static final Tiedote TIEDOTE = fi.minedu.oiva.backend.model.jooq.tables.Tiedote.TIEDOTE;
-
-    /**
-     * The table <code>tilamuutos</code>.
-     */
-    public static final Tilamuutos TILAMUUTOS = fi.minedu.oiva.backend.model.jooq.tables.Tilamuutos.TILAMUUTOS;
 }

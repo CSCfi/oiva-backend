@@ -23,7 +23,7 @@ class Muutospyynto(
                     var jarjestaja: Organisaatio,
                     var muutospyynto: Muutospyynto,
                     @BeanProperty
-                    var tilamuutokset: util.Collection[Tilamuutos]) extends pojos.Muutospyynto  {
+                    var asiatilamuutokset: util.Collection[Asiatilamuutos]) extends pojos.Muutospyynto  {
 
   def this() = this(null,null,null,null,null,null,null,null,null)
 

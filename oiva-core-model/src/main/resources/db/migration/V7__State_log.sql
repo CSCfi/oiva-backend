@@ -1,5 +1,5 @@
 -- generic state change table for e.g. muutospyynto/uusi hakemus
-CREATE TABLE IF NOT EXISTS tilamuutos (
+CREATE TABLE IF NOT EXISTS asiatilamuutos (
     id bigserial NOT NULL PRIMARY KEY,
     alkutila varchar(50) NOT NULL,
     lopputila varchar(50) NOT NULL,
@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS tilamuutos (
 );
 
 -- link muutospyynto to state change
-CREATE TABLE IF NOT EXISTS muutospyynto_tilamuutos (
-    muutospyynto_id bigint NOT NULL REFERENCES muutospyynto(id),
-    tilamuutos_id bigint NOT NULL REFERENCES tilamuutos(id),
-    PRIMARY KEY (muutospyynto_id, tilamuutos_id)
+CREATE TABLE IF NOT EXISTS muutospyynto_asiatilamuutos (
+    muutospyynto_id bigint NOT NULL UNIQUE REFERENCES muutospyynto(id),
+    asiatilamuutos_id bigint NOT NULL REFERENCES asiatilamuutos(id),
+    PRIMARY KEY (muutospyynto_id, asiatilamuutos_id)
 );
