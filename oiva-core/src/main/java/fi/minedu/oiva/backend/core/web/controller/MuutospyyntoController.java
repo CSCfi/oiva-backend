@@ -161,11 +161,11 @@ public class MuutospyyntoController {
             return ok(UUID.fromString(uuid));
         }
         catch(NullPointerException e) {
-            logger.error(e.getMessage());
+            logger.error("Error in submit", e);
             return get500();
         }
         catch(Exception e) {
-            logger.error(e.getMessage());
+            logger.error("Error in submit", e);
             return notFound();
         }
     }

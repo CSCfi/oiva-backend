@@ -9,10 +9,11 @@ import fi.minedu.oiva.backend.model.jooq.tables._
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Asiatilamuutos( var alkutila: String,
-                  var lopputila: String,
-                  var muutosaika: Timestamp,
-                  var kayttajatunnus: String) extends pojos.Asiatilamuutos {
+class Asiatilamuutos(
+                      var alkutila: String,
+                      var lopputila: String,
+                      var muutosaika: Timestamp,
+                      var kayttajatunnus: String) extends pojos.Asiatilamuutos {
 
   def this() = this(null, null, null, null)
 

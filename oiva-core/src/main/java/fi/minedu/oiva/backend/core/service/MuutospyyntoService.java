@@ -556,6 +556,8 @@ public class MuutospyyntoService {
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();
             muutospyynto.setId(muutospyyntoRecord.getId());
+            asiatilamuutosService.insertForMuutospyynto(muutospyyntoRecord.getId(), "",
+                    muutospyynto.getTila(), authService.getUsername());
 
             createMuutospyyntoLiitteet(muutospyynto, fileMap, muutospyyntoRecord.getId());
             saveMuutokset(muutospyynto, null, muutospyynto.getMuutokset(), fileMap);

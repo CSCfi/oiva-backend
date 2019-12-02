@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS asiatilamuutos (
 
 -- link muutospyynto to state change
 CREATE TABLE IF NOT EXISTS muutospyynto_asiatilamuutos (
-    muutospyynto_id bigint NOT NULL UNIQUE REFERENCES muutospyynto(id),
-    asiatilamuutos_id bigint NOT NULL REFERENCES asiatilamuutos(id),
+    muutospyynto_id bigint NOT NULL REFERENCES muutospyynto(id),
+    asiatilamuutos_id bigint NOT NULL UNIQUE REFERENCES asiatilamuutos(id),
     PRIMARY KEY (muutospyynto_id, asiatilamuutos_id)
 );
