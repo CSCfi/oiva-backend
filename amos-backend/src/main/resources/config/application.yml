@@ -31,6 +31,9 @@ opintopolku:
     apiCredentials:
         username: override_this_in_local_application_yml
         password: override_this_in_local_application_yml
+    apiCaller:
+        header: Caller-Id
+        id: 1.2.246.562.10.78946234170.oiva
 
 koulutustyyppi:
   ammatillinen:

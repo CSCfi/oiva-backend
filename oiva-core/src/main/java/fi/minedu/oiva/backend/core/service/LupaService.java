@@ -235,7 +235,8 @@ public class LupaService extends BaseService {
         // All except TELMA and VALMA
         List<String> except = Arrays.asList("999901", "999903");
 
-        Date currentDate = new Date(Calendar.getInstance().getTime().getTime());
+        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
+
         SelectConditionStep<Record> query = dsl.select(ArrayUtils.addAll(LUPA.fields(), MAARAYS.fields()))
                 .from(LUPA)
                 .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))

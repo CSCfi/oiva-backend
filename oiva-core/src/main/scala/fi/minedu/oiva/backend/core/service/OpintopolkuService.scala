@@ -37,6 +37,10 @@ class OpintopolkuService extends CacheAware {
 
     @Value("${opintopolku.baseUrl}${opintopolku.koodisto.restUrl}")
     private val koodistoServiceUrl: String = null
+    @Value("${opintopolku.apiCaller.header}")
+    private val callerHeader: String = null
+    @Value("${opintopolku.apiCaller.id}")
+    private val callerId: String = null
 
     // Koodisto relaatiot
     private lazy val relaatioAlakoodiPath: String = "/relaatio/sisaltyy-alakoodit/"
@@ -91,8 +95,13 @@ class OpintopolkuService extends CacheAware {
 
     implicit def future2CS[T](future: Future[T]): CompletionStage[T] = FutureConverters.toJava(future)
 
-    def requestRx[T](url: String, clazz: Class[T]) = rxClient.target(url).request().rx().get(clazz)
-    def request[T](url: String, clazz: Class[T]) = rxClient.target(url).request().get(clazz)
+    def requestRx[T](url: String, clazz: Class[T]) = buildRequest(url).rx().get(clazz)
+
+    def request[T](url: String, clazz: Class[T]) = buildRequest(url).get(clazz)
+
+    private def buildRequest[T](url: String) =
+        rxClient.target(url).request().header(callerHeader, callerId)
+
     def toEntity[T](str: String, clazz: Class[T]) = ObjectMapperSingleton.mapper.readValue(str, clazz)
 
     def requestWithCasTicket(serviceUrl: String)(httpRequest: dispatch.Req) =

@@ -7,7 +7,7 @@ package fi.minedu.oiva.backend.model.security.annotations;
  * OIVA_APP_NIMENKIRJOITTAJA
  * OIVA_APP_KAYTTAJA
  * OIVA_APP_KATSELIJA
- */
+*/
 
 public interface OivaAccess {
 
