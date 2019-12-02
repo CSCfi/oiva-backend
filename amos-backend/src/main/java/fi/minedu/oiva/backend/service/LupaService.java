@@ -234,12 +234,14 @@ public class LupaService {
         // All except TELMA and VALMA
         List<String> except = Arrays.asList("999901", "999903");
 
+        java.sql.Date currentDate = new java.sql.Date(Calendar.getInstance().getTime().getTime());
         SelectConditionStep<Record> query = dsl.select(ArrayUtils.addAll(LUPA.fields(), MAARAYS.fields()))
                 .from(LUPA)
                 .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
                 .where(MAARAYS.KOODISTO.eq("koulutus")
                         .and(MAARAYS.KOODIARVO.in(except)).not()
-                        .and(LUPA.LOPPUPVM.isNull()));
+                        .and(LUPA.ALKUPVM.lessOrEqual(currentDate).or(LUPA.ALKUPVM.isNull()))
+                        .and(LUPA.LOPPUPVM.greaterOrEqual(currentDate).or(LUPA.LOPPUPVM.isNull())));
 
         logger.debug(query.getSQL());
 
