@@ -1,4 +1,3 @@
--- add 384148 Ruokapalvelujen at to Koillis-Suomen Aikuiskoulutus (KSAK)
 
 with old as (
     update lupa set loppupvm = '2019-12-31'
@@ -29,7 +28,7 @@ with old as (
              SELECT 19,
                     lupatila_id,
                     asiatyyppi_id,
-                    '98/531/2019',
+                    '98/531/2018',
                     jarjestaja_ytunnus,
                     jarjestaja_oid,
                     '2020-01-01',
@@ -76,16 +75,36 @@ with old as (
              from new_lupa,
                   maarays m
                       join old on m.lupa_id = old.id
+                      AND (m.koodisto != 'koulutus'
+                          -- Do not include ended koulutus maarays
+                          OR (m.koodisto = 'koulutus' AND m.koodiarvo NOT IN
+                                                          ('351106', '351704', '334105',
+                                                           '334114', '364904', '351204',
+                                                           '351701', '352401', '352902',
+                                                           '364402', '364403')))
              returning *
      ),
-     -- copy new maarays
+     -- add 384148 Ruokapalvelujen at to Koillis-Suomen Aikuiskoulutus (KSAK)
      new_maarays as (
          insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, luoja, koodistoversio)
              select id, 1, 'koulutus', '384148', 1, 'oiva', 12 from new_lupa
              returning *
      )
+
 select *
 from copied_maarays
 union
 select *
 from new_maarays;
+
+-- Update correct parent ids for osaamisalarajoite
+UPDATE maarays osaamisala
+SET parent_id = koulutus.id
+FROM maarays koulutus,
+     lupa l
+WHERE koulutus.lupa_id = l.id
+  AND osaamisala.lupa_id = l.id
+  AND l.diaarinumero = '98/531/2018'
+  AND ((koulutus.koodiarvo = '352201' AND osaamisala.koodiarvo = '1505') OR
+       (koulutus.koodiarvo = '381408' AND osaamisala.koodiarvo = '1531') OR
+       (koulutus.koodiarvo = '381408' AND osaamisala.koodiarvo = '1617'));
