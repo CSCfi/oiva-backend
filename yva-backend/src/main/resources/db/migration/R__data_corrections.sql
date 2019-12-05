@@ -344,3 +344,6 @@ WHERE meta ->> 'koulutustehtävämääräys-0' = 'Kesäyliopiston koulutustehtä
 UPDATE lupa SET paatoskierros_id = 2
 WHERE id IN (SELECT l.id FROM lupa l LEFT JOIN maarays m on l.id = m.lupa_id
              WHERE m.koodisto = 'koulutusmuoto' AND m.koodiarvo = '1');
+
+-- Change kieli koodisto to OPH
+UPDATE maarays SET koodisto = 'kielikoodistoopetushallinto' WHERE koodisto = 'kieli';
