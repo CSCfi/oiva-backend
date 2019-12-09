@@ -18,7 +18,7 @@ elif [[ $cmdArg == "stop" ]]; then
         docker images --format "{{.Repository}} {{.ID}}" | grep oiva | cut -d' ' -f2 | xargs docker rmi -f
     fi
 elif [[ $cmdArg == "start" ]]; then
-    sServiceNames="amos-postgres yva-postgres amos-redis yva-redis"
+    sServiceNames="amos-postgres yva-postgres amos-redis yva-redis nginx yva-nginx"
     if [[ $userArgs == *"--amos"* ]]; then
         echo -e "Starting only amos containers"
         sServiceNames="nginx amos-postgres amos-redis"
