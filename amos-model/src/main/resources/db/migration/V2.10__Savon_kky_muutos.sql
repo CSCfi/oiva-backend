@@ -2,7 +2,7 @@
 UPDATE lupa
 SET loppupvm = '2019-12-31'
 WHERE jarjestaja_ytunnus = '1852679-9'
-  AND diaarinumero = '98/531/2017';
+  AND diaarinumero = '46/531/2018';
 
 -- Create lupahistoria row
 INSERT INTO lupahistoria
@@ -15,10 +15,10 @@ INSERT INTO lupahistoria
  voimassaololoppupvm,
  paatospvm,
  filename)
-VALUES ('98/531/2017', '1852679-9', '1.2.246.562.10.99191194051',
+VALUES ('46/531/2018', '1852679-9', '1.2.246.562.10.99191194051',
         'Pohjois-Savo',
-        'Järjestämisluvan muutos', '2018-01-01', '2019-12-31', '2017-10-06',
-        '98-531-2017.pdf');
+        'Järjestämisluvan muutos', '2019-01-01', '2019-12-31', '2018-12-14',
+        '46-531-2018.pdf');
 
 WITH new_lupa AS (
     -- Create new lupa for Savon koulutuskuntayhtymä (1852679-9)
@@ -77,11 +77,26 @@ WITH new_lupa AS (
                       maarays m
                           LEFT JOIN lupa l ON m.lupa_id = l.id
                  WHERE l.jarjestaja_ytunnus = '1852679-9'
-                   AND l.diaarinumero = '98/531/2017'
+                   AND l.diaarinumero = '46/531/2018'
+                   AND (m.koodisto != 'osaamisala'
+                     -- Do not include obsolete osaamisalarajoite maarays
+                     OR (m.koodisto = 'osaamisala' AND m.koodiarvo NOT IN
+                                                       ('2332', '3123')))
      )
 
 SELECT *
 FROM new_lupa;
+
+-- Update correct parent ids for osaamisalarajoite
+UPDATE maarays osaamisala
+SET parent_id = koulutus.id
+FROM maarays koulutus,
+     lupa l
+WHERE koulutus.lupa_id = l.id
+  AND osaamisala.lupa_id = l.id
+  AND l.diaarinumero = '37/531/2019'
+  AND ((koulutus.koodiarvo = '352201' AND osaamisala.koodiarvo = '1505') OR
+       (koulutus.koodiarvo = '457241' AND osaamisala.koodiarvo = '3137'));
 
 -- Update opiskelijamäärä
 UPDATE maarays m
