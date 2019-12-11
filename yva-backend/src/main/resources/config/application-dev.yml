@@ -1,0 +1,71 @@
+oiva:
+   dbhost: localhost
+   dbport: 7432
+   dbname: kuja
+   dbusername: kuja
+   dbpassword: kuja
+   baseUrl: https://localhost:4433
+
+opintopolku:
+    baseUrl: https://virkailija.testiopintopolku.fi
+    apiCredentials:
+        username: ${opintopolku.username}
+        password: ${opintopolku.password}
+
+cas:
+    baseUrl: https://virkailija.testiopintopolku.fi
+
+ldap:
+    url: ldaps://ldaps.opintopolku.fi:20636
+    base-prefix: dc=opintopolku,dc=fi
+    user-search-base: ou=People
+    manager:
+        dn: uid=koute,ou=People,dc=opintopolku,dc=fi
+        password: ${opintopolku.password}
+    cas:
+        user-search-filter: (|(mail={0})(uid={0}))
+        group-search-base: ou=Groups
+        group-search-filter: (uniqueMember={0})
+        group-role-attribute: cn
+
+server:
+    port: 8100
+
+spring:
+    mvc:
+      async:
+        request-timeout: 120000
+
+redis:
+   host: localhost
+   port: 8379
+
+file.storage:
+  base.path: target/kuja-files
+
+prince:
+    exec.path: /usr/local/bin/prince
+
+templates:
+    base.path: ../../kuja-template
+
+logging:
+    file: target/log/kuja-backend.log
+    level:
+        fi.minedu.oiva: DEBUG
+        org.springframework.security: DEBUG
+        com.mitchellbosecke: DEBUG
+        springfox.documentation: ERROR
+        tRepository$SaveToSessionResponseWrapper: ERROR
+        org.springframework.security.web.: ERROR
+        org.springframework.security.web.FilterChainProxy: ERROR
+        org.springframework.security.web.util.matcher: ERROR
+        org.springframework.security.cas.web.CasAuthenticationFilter: ERROR
+
+koulutustyyppi:
+    ammatillinen.koodiarvot: 1,11,12
+
+api:
+    basicauth:
+        username: kuja
+        password: kuja

@@ -168,7 +168,7 @@ Käynnistä docker:
 
     $ ./oiva-docker.sh start
     
-Docker-compose luo viisi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis ja nginx.
+Docker-compose luo kuusi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis, yva-nginx ja nginx.
 
 Backend-palvelun käynnistäminen kehityskäyttöön:
 
@@ -176,7 +176,9 @@ Backend-palvelun käynnistäminen kehityskäyttöön:
     $ ./oiva-backend.sh yva -c
 
 Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelulle niin luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `launch-dev-backend.sh` suoritetaan.
-
+Syötä tiedostoon testi opintopolun tarvitsemat käyttäjätunnus ja salasana. Nämä tiedot voi kysyä muilta kehittäjiltä.
+ 
+    OIVA_JAVA_OPTS="-Dopintopolku.username='käyttäjätunnus' -Dopintopolku.password='salasana'"
 
 ## PDF-exportin konfiguroiminen [TODO: UPDATE]
 
