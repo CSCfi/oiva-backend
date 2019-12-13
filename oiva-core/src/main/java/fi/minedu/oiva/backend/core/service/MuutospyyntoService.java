@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
 import fi.minedu.oiva.backend.core.util.ValidationUtils;
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton;
 import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
@@ -35,12 +37,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import javax.validation.ValidationException;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -83,12 +83,13 @@ public class MuutospyyntoService {
     private final MaaraysService maaraysService;
     private final FileStorageService fileStorageService;
     private final AsiatilamuutosService asiatilamuutosService;
+    private final LupaService lupaService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
                                LiiteService liiteService, OpintopolkuService opintopolkuService,
                                MaaraysService maaraysService, FileStorageService fileStorageService,
-                               AsiatilamuutosService asiatilamuutosService) {
+                               AsiatilamuutosService asiatilamuutosService, LupaService lupaService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
@@ -97,6 +98,14 @@ public class MuutospyyntoService {
         this.maaraysService = maaraysService;
         this.fileStorageService = fileStorageService;
         this.asiatilamuutosService = asiatilamuutosService;
+        this.lupaService = lupaService;
+    }
+
+    public enum Action {
+        LUO,
+        TALLENNA,
+        LAHETA,
+        OTA_KASITTELYYN
     }
 
     public enum Muutospyyntotila {
@@ -173,39 +182,78 @@ public class MuutospyyntoService {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
-    /**
-     * Find Muutospyynto based on UUID, write out a PDF for it and set it as submitted
-     * along with related actions.
-     * @param uuid UUID of Muutospyynto
-     * @throws Exception on failure to find Muutospyynto or errors during the process
-     */
-    public void submitMuutospyyntoForApproval(final String uuid) throws Exception {
-        final Optional<Muutospyynto> muutospyyntoOpt = getByUuid(uuid);
-        if(!muutospyyntoOpt.isPresent()) {
-            throw new Exception("No muutospyynto for UUID "+uuid);
-        }
-        else {
-            Muutospyynto mp = muutospyyntoOpt.get();
-            fileStorageService.writeHakemusPDF(mp);
-            MuutospyyntoRecord mpRecord = dsl.newRecord(MUUTOSPYYNTO, mp);
-            String tila = Muutospyyntotila.AVOIN.name();
-            asiatilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila, authService.getUsername());
-            mpRecord.setTila(tila);
-            mpRecord.setHakupvm(Date.valueOf(LocalDate.now()));
-            dsl.executeUpdate(mpRecord);
-        }
+
+    public Optional<Muutospyynto> executeAction(String uuid, Action action) {
+        return executeAction(uuid, action, null, null);
     }
 
-    /**
-     * Set muutospyynto tila
-     *
-     * @param muutospyynto
-     * @param tila
-     * @throws DataAccessException on failure in setting tila
-     */
-    private void setMuutospyyntoTila(MuutospyyntoRecord muutospyynto, Muutospyyntotila tila) throws DataAccessException {
-        muutospyynto.setTila(tila.name());
-        dsl.executeUpdate(muutospyynto);
+    private interface Assert<T extends Exception> {
+        void check(Boolean bool) throws T;
+    }
+
+    @Transactional
+    public Optional<Muutospyynto> executeAction(String uuid, Action action, Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+        logger.info("Executing muutospyynto action " + action);
+        Optional<Muutospyynto> existing = uuid != null ? getByUuid(uuid) : Optional.empty();
+
+        // Muutospyynto and lupa have same organization identifier and lupa oid equals user organization oid
+        Optional<Lupa> lupa = muutospyynto != null ? lupaService.getByUuid(muutospyynto.getLupaUuid()) : Optional.empty();
+        boolean sameOrg = lupa.map(m -> m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false) &&
+                lupa.map(l -> l.getJarjestajaOid().equals(authService.getUserOrganisationOid())).orElse(false);
+
+        boolean sameExistingOrg = existing
+                .map(m -> lupaService.getByUuid(m.getLupaUuid()).map(l -> l.getJarjestajaOid().equals(authService.getUserOrganisationOid())).orElse(false))
+                .orElse(false);
+
+        final Assert<ForbiddenException> illegalAccess = (bool) -> {
+            if (!bool) {
+                throw new ForbiddenException("User has no right");
+            }
+        };
+
+        final Assert<ForbiddenException> isAllowed = (bool) -> {
+            if (!bool) {
+                throw new ForbiddenException("Action " + action +" is not allowed");
+            }
+        };
+
+        try {
+            switch (action) {
+                case LUO:
+                    assertValid(muutospyynto);
+                    illegalAccess.check(sameOrg && authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja));
+
+                    muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
+                    return save(muutospyynto, fileMap).map(m -> getById(m.getId())).orElse(Optional.empty());
+                case TALLENNA:
+                    assertValid(muutospyynto);
+                    illegalAccess.check(sameOrg && authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja));
+                    illegalAccess.check(sameExistingOrg);
+                    isAllowed.check(existing.map(e -> Muutospyyntotila.LUONNOS.toString().equals(e.getTila())).orElse(false));
+
+                    muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
+                    return update(muutospyynto, fileMap).map(m -> getById(m.getId())).orElse(Optional.empty());
+                case LAHETA:
+                    Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+                    illegalAccess.check(sameExistingOrg && authService.hasAnyRole(OivaAccess.Role_Nimenkirjoittaja));
+                    isAllowed.check(existing.map(e -> Muutospyyntotila.LUONNOS.toString().equals(e.getTila())).orElse(false));
+
+                    findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.AVOIN);
+                    fileStorageService.writeHakemusPDF(mp);
+                    return getByUuid(uuid);
+                case OTA_KASITTELYYN:
+                    isAllowed.check(existing.map(e -> Muutospyyntotila.AVOIN.toString().equals(e.getTila())).orElse(false));
+                    illegalAccess.check(authService.hasAnyRole(OivaAccess.Role_Esittelija));
+
+                    findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.VALMISTELUSSA);
+                    return getByUuid(uuid);
+                default:
+                    throw new UnsupportedOperationException("Action " + action + " is not supported for muutospyynto");
+            }
+        } catch (Exception e) {
+            logger.warn("Error executing muutospyynto " + action, e);
+            throw e;
+        }
     }
 
     /**
@@ -214,7 +262,7 @@ public class MuutospyyntoService {
      * @param tila
      * @return UUID of muutospyynto or empty
      */
-    public Optional<UUID> findMuutospyyntoAndSetTila(final String uuid, Muutospyyntotila tila) {
+    private Optional<UUID> findMuutospyyntoAndSetTila(final String uuid, Muutospyyntotila tila) {
         try {
             final Optional<MuutospyyntoRecord> muutospyyntoOpt =
                     Optional.ofNullable(dsl.fetchOne(MUUTOSPYYNTO, MUUTOSPYYNTO.UUID.equal(UUID.fromString(uuid))));
@@ -223,7 +271,6 @@ public class MuutospyyntoService {
                 asiatilamuutosService.insertForMuutospyynto(mp.getId(), mp.getTila(), tila.name(), authService.getUsername());
                 mp.setTila(tila.name());
                 dsl.executeUpdate(mp);
-                setMuutospyyntoTila(muutospyyntoOpt.get(), tila);
                 return Optional.ofNullable(muutospyyntoOpt.get().getUuid());
             }
             return Optional.empty();
@@ -234,13 +281,16 @@ public class MuutospyyntoService {
     }
 
     // VALIDOINNIT
-    public boolean validate(Muutospyynto muutospyynto) {
-        return ValidationUtils.validate(
-                validation(muutospyynto.getTila(), "Muutospyynto tila is missing")
-        ) && Optional.ofNullable(muutospyynto.getLiitteet())
-                .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
+    private void assertValid(Muutospyynto muutospyynto) {
+        boolean isValid = muutospyynto != null &&
+                Optional.ofNullable(muutospyynto.getLiitteet())
+                        .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true);
+
+        if (!isValid) {
+            throw new ValidationException("Invalid object");
+        }
     }
 
     // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
@@ -276,8 +326,7 @@ public class MuutospyyntoService {
                 .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
     }
 
-    @Transactional
-    public Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+    private Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
         logger.debug("Save muutospyynto: {}", muutospyynto.toString());
         try {
             Long paatoskierrosId = getPaatoskierrosId(muutospyynto);
@@ -387,13 +436,6 @@ public class MuutospyyntoService {
     private Optional<Long> getPaatoskierrosId(UUID uuid) {
         return dsl.select(PAATOSKIERROS.ID).from(PAATOSKIERROS)
                 .where(PAATOSKIERROS.UUID.equal(uuid)).fetchOptionalInto(Long.class);
-    }
-
-    private Long getLupaId(String uuid) {
-        return dsl.select(LUPA.ID).from(LUPA)
-                .where(LUPA.UUID.eq(UUID.fromString(uuid)))
-                .and(baseFilter()).fetchOptional(LUPA.ID)
-                .orElseThrow(ResourceNotFoundException::new);
     }
 
     private Optional<Long> getMaaraystyyppiId(UUID uuid) {
@@ -551,7 +593,11 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
-            muutospyyntoRecord.setLupaId(getLupaId(muutospyynto.getLupaUuid()));
+            Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
+            if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
+                throw new ForbiddenException("Muutospyynto and lupa must have same organizations");
+            }
+            muutospyyntoRecord.setLupaId(lupa.get().getId());
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();

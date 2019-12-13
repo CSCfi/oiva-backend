@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import javax.validation.ValidationException;
+
 @ControllerAdvice
 class GlobalExceptionHandler {
 
@@ -17,6 +19,24 @@ class GlobalExceptionHandler {
         final ObjectNode node = new ObjectMapper().createObjectNode();
         node.put("status", HttpStatus.NOT_FOUND.value());
         node.put("title", HttpStatus.NOT_FOUND.getReasonPhrase());
+        return node;
+    }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public JsonNode handleNoAccess() {
+        final ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("status", HttpStatus.FORBIDDEN.value());
+        node.put("title", HttpStatus.FORBIDDEN.getReasonPhrase());
+        return node;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidationException.class)
+    public JsonNode handleInvalid() {
+        final ObjectNode node = new ObjectMapper().createObjectNode();
+        node.put("status", HttpStatus.BAD_REQUEST.value());
+        node.put("title", HttpStatus.BAD_REQUEST.getReasonPhrase());
         return node;
     }
 

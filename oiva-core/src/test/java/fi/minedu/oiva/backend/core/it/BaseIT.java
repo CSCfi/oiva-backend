@@ -5,7 +5,6 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
-import com.jayway.jsonpath.internal.JsonContext;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import fi.minedu.oiva.backend.core.EmbeddedRedisConfig;
@@ -19,7 +18,6 @@ import fi.minedu.oiva.backend.model.entity.opintopolku.OrganisaatioKayttooikeus;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -209,6 +207,7 @@ abstract public class BaseIT {
         final Map<String, String> lang = new HashMap<>();
         lang.put("fi", "Testi organisaatio");
         final Organisaatio o = new Organisaatio();
+        o.setOid("1.1.111.111.11.11111111111");
         o.setNimi(TranslatedString.of(lang));
         when(opintopolkuService.getBlockingOrganisaatio(anyString()))
                 .thenReturn(o);
