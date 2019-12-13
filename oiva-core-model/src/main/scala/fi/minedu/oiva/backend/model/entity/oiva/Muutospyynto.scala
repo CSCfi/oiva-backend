@@ -9,6 +9,8 @@ import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio
 import fi.minedu.oiva.backend.model.jooq.tables._
 import org.apache.commons.lang3.StringUtils
 
+import scala.beans.BeanProperty
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 class Muutospyynto(
@@ -19,9 +21,11 @@ class Muutospyynto(
                     var liitteet: util.Collection[Liite],
                     var paatoskierros: Paatoskierros,
                     var jarjestaja: Organisaatio,
-                    var muutospyynto: Muutospyynto) extends pojos.Muutospyynto  {
+                    var muutospyynto: Muutospyynto,
+                    @BeanProperty
+                    var asiatilamuutokset: util.Collection[Asiatilamuutos]) extends pojos.Muutospyynto  {
 
-  def this() = this(null,null,null,null,null,null,null,null)
+  def this() = this(null,null,null,null,null,null,null,null,null)
 
   // exclude from json
   @JsonIgnore override def getId: lang.Long = super.getId

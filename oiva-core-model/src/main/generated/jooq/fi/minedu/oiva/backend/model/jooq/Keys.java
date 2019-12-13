@@ -4,6 +4,7 @@
 package fi.minedu.oiva.backend.model.jooq;
 
 
+import fi.minedu.oiva.backend.model.jooq.tables.Asiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.Asiatyyppi;
 import fi.minedu.oiva.backend.model.jooq.tables.Esitysmalli;
 import fi.minedu.oiva.backend.model.jooq.tables.Kohde;
@@ -17,8 +18,11 @@ import fi.minedu.oiva.backend.model.jooq.tables.Maaraystyyppi;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutosLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
+import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoAsiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
+import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
+import fi.minedu.oiva.backend.model.jooq.tables.records.AsiatilamuutosRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.AsiatyyppiRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.EsitysmalliRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.KohdeRecord;
@@ -31,9 +35,11 @@ import fi.minedu.oiva.backend.model.jooq.tables.records.MaaraysRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MaaraystyyppiRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosLiiteRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoAsiatilamuutosRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.PaatoskierrosRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.TiedoteRecord;
 
 import javax.annotation.Generated;
 
@@ -61,6 +67,7 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<AsiatilamuutosRecord, Long> IDENTITY_ASIATILAMUUTOS = Identities0.IDENTITY_ASIATILAMUUTOS;
     public static final Identity<AsiatyyppiRecord, Long> IDENTITY_ASIATYYPPI = Identities0.IDENTITY_ASIATYYPPI;
     public static final Identity<EsitysmalliRecord, Long> IDENTITY_ESITYSMALLI = Identities0.IDENTITY_ESITYSMALLI;
     public static final Identity<KohdeRecord, Long> IDENTITY_KOHDE = Identities0.IDENTITY_KOHDE;
@@ -74,11 +81,13 @@ public class Keys {
     public static final Identity<MuutosRecord, Long> IDENTITY_MUUTOS = Identities0.IDENTITY_MUUTOS;
     public static final Identity<MuutospyyntoRecord, Long> IDENTITY_MUUTOSPYYNTO = Identities0.IDENTITY_MUUTOSPYYNTO;
     public static final Identity<PaatoskierrosRecord, Long> IDENTITY_PAATOSKIERROS = Identities0.IDENTITY_PAATOSKIERROS;
+    public static final Identity<TiedoteRecord, Long> IDENTITY_TIEDOTE = Identities0.IDENTITY_TIEDOTE;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<AsiatilamuutosRecord> ASIATILAMUUTOS_PKEY = UniqueKeys0.ASIATILAMUUTOS_PKEY;
     public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_PKEY = UniqueKeys0.ASIATYYPPI_PKEY;
     public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_UUID_KEY = UniqueKeys0.ASIATYYPPI_UUID_KEY;
     public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_PKEY = UniqueKeys0.ESITYSMALLI_PKEY;
@@ -104,9 +113,13 @@ public class Keys {
     public static final UniqueKey<MuutosLiiteRecord> MUUTOS_LIITE_PKEY = UniqueKeys0.MUUTOS_LIITE_PKEY;
     public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_PKEY = UniqueKeys0.MUUTOSPYYNTO_PKEY;
     public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_UUID_KEY = UniqueKeys0.MUUTOSPYYNTO_UUID_KEY;
+    public static final UniqueKey<MuutospyyntoAsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS_PKEY = UniqueKeys0.MUUTOSPYYNTO_ASIATILAMUUTOS_PKEY;
+    public static final UniqueKey<MuutospyyntoAsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_KEY = UniqueKeys0.MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_KEY;
     public static final UniqueKey<MuutospyyntoLiiteRecord> MUUTOSPYYNTO_LIITE_PKEY = UniqueKeys0.MUUTOSPYYNTO_LIITE_PKEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = UniqueKeys0.PAATOSKIERROS_PKEY;
     public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = UniqueKeys0.PAATOSKIERROS_UUID_KEY;
+    public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = UniqueKeys0.TIEDOTE_PKEY;
+    public static final UniqueKey<TiedoteRecord> TIEDOTE_UUID_KEY = UniqueKeys0.TIEDOTE_UUID_KEY;
 
     // -------------------------------------------------------------------------
     // FOREIGN KEY definitions
@@ -126,6 +139,8 @@ public class Keys {
     public static final ForeignKey<MuutosLiiteRecord, LiiteRecord> MUUTOS_LIITE__MUUTOS_LIITE_LIITE_ID_FKEY = ForeignKeys0.MUUTOS_LIITE__MUUTOS_LIITE_LIITE_ID_FKEY;
     public static final ForeignKey<MuutospyyntoRecord, LupaRecord> MUUTOSPYYNTO__FK_LUPA = ForeignKeys0.MUUTOSPYYNTO__FK_LUPA;
     public static final ForeignKey<MuutospyyntoRecord, PaatoskierrosRecord> MUUTOSPYYNTO__FK_PAATOSKIERROS = ForeignKeys0.MUUTOSPYYNTO__FK_PAATOSKIERROS;
+    public static final ForeignKey<MuutospyyntoAsiatilamuutosRecord, MuutospyyntoRecord> MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_FKEY = ForeignKeys0.MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_FKEY;
+    public static final ForeignKey<MuutospyyntoAsiatilamuutosRecord, AsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_ASIATILAMUUTOS_ID_FKEY = ForeignKeys0.MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_ASIATILAMUUTOS_ID_FKEY;
     public static final ForeignKey<MuutospyyntoLiiteRecord, MuutospyyntoRecord> MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_MUUTOSPYYNTO_ID_FKEY = ForeignKeys0.MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_MUUTOSPYYNTO_ID_FKEY;
     public static final ForeignKey<MuutospyyntoLiiteRecord, LiiteRecord> MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_LIITE_ID_FKEY = ForeignKeys0.MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_LIITE_ID_FKEY;
     public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = ForeignKeys0.PAATOSKIERROS__FK_ESITYSMALLI;
@@ -135,6 +150,7 @@ public class Keys {
     // -------------------------------------------------------------------------
 
     private static class Identities0 extends AbstractKeys {
+        public static Identity<AsiatilamuutosRecord, Long> IDENTITY_ASIATILAMUUTOS = createIdentity(Asiatilamuutos.ASIATILAMUUTOS, Asiatilamuutos.ASIATILAMUUTOS.ID);
         public static Identity<AsiatyyppiRecord, Long> IDENTITY_ASIATYYPPI = createIdentity(Asiatyyppi.ASIATYYPPI, Asiatyyppi.ASIATYYPPI.ID);
         public static Identity<EsitysmalliRecord, Long> IDENTITY_ESITYSMALLI = createIdentity(Esitysmalli.ESITYSMALLI, Esitysmalli.ESITYSMALLI.ID);
         public static Identity<KohdeRecord, Long> IDENTITY_KOHDE = createIdentity(Kohde.KOHDE, Kohde.KOHDE.ID);
@@ -148,9 +164,11 @@ public class Keys {
         public static Identity<MuutosRecord, Long> IDENTITY_MUUTOS = createIdentity(Muutos.MUUTOS, Muutos.MUUTOS.ID);
         public static Identity<MuutospyyntoRecord, Long> IDENTITY_MUUTOSPYYNTO = createIdentity(Muutospyynto.MUUTOSPYYNTO, Muutospyynto.MUUTOSPYYNTO.ID);
         public static Identity<PaatoskierrosRecord, Long> IDENTITY_PAATOSKIERROS = createIdentity(Paatoskierros.PAATOSKIERROS, Paatoskierros.PAATOSKIERROS.ID);
+        public static Identity<TiedoteRecord, Long> IDENTITY_TIEDOTE = createIdentity(Tiedote.TIEDOTE, Tiedote.TIEDOTE.ID);
     }
 
     private static class UniqueKeys0 extends AbstractKeys {
+        public static final UniqueKey<AsiatilamuutosRecord> ASIATILAMUUTOS_PKEY = createUniqueKey(Asiatilamuutos.ASIATILAMUUTOS, "asiatilamuutos_pkey", Asiatilamuutos.ASIATILAMUUTOS.ID);
         public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_PKEY = createUniqueKey(Asiatyyppi.ASIATYYPPI, "asiatyyppi_pkey", Asiatyyppi.ASIATYYPPI.ID);
         public static final UniqueKey<AsiatyyppiRecord> ASIATYYPPI_UUID_KEY = createUniqueKey(Asiatyyppi.ASIATYYPPI, "asiatyyppi_uuid_key", Asiatyyppi.ASIATYYPPI.UUID);
         public static final UniqueKey<EsitysmalliRecord> ESITYSMALLI_PKEY = createUniqueKey(Esitysmalli.ESITYSMALLI, "esitysmalli_pkey", Esitysmalli.ESITYSMALLI.ID);
@@ -176,9 +194,13 @@ public class Keys {
         public static final UniqueKey<MuutosLiiteRecord> MUUTOS_LIITE_PKEY = createUniqueKey(MuutosLiite.MUUTOS_LIITE, "muutos_liite_pkey", MuutosLiite.MUUTOS_LIITE.MUUTOS_ID, MuutosLiite.MUUTOS_LIITE.LIITE_ID);
         public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_PKEY = createUniqueKey(Muutospyynto.MUUTOSPYYNTO, "muutospyynto_pkey", Muutospyynto.MUUTOSPYYNTO.ID);
         public static final UniqueKey<MuutospyyntoRecord> MUUTOSPYYNTO_UUID_KEY = createUniqueKey(Muutospyynto.MUUTOSPYYNTO, "muutospyynto_uuid_key", Muutospyynto.MUUTOSPYYNTO.UUID);
+        public static final UniqueKey<MuutospyyntoAsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS_PKEY = createUniqueKey(MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS, "muutospyynto_asiatilamuutos_pkey", MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS.MUUTOSPYYNTO_ID, MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS.ASIATILAMUUTOS_ID);
+        public static final UniqueKey<MuutospyyntoAsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_KEY = createUniqueKey(MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS, "muutospyynto_asiatilamuutos_muutospyynto_id_key", MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS.MUUTOSPYYNTO_ID);
         public static final UniqueKey<MuutospyyntoLiiteRecord> MUUTOSPYYNTO_LIITE_PKEY = createUniqueKey(MuutospyyntoLiite.MUUTOSPYYNTO_LIITE, "muutospyynto_liite_pkey", MuutospyyntoLiite.MUUTOSPYYNTO_LIITE.MUUTOSPYYNTO_ID, MuutospyyntoLiite.MUUTOSPYYNTO_LIITE.LIITE_ID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_PKEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_pkey", Paatoskierros.PAATOSKIERROS.ID);
         public static final UniqueKey<PaatoskierrosRecord> PAATOSKIERROS_UUID_KEY = createUniqueKey(Paatoskierros.PAATOSKIERROS, "paatoskierros_uuid_key", Paatoskierros.PAATOSKIERROS.UUID);
+        public static final UniqueKey<TiedoteRecord> TIEDOTE_PKEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_pkey", Tiedote.TIEDOTE.ID);
+        public static final UniqueKey<TiedoteRecord> TIEDOTE_UUID_KEY = createUniqueKey(Tiedote.TIEDOTE, "tiedote_uuid_key", Tiedote.TIEDOTE.UUID);
     }
 
     private static class ForeignKeys0 extends AbstractKeys {
@@ -196,6 +218,8 @@ public class Keys {
         public static final ForeignKey<MuutosLiiteRecord, LiiteRecord> MUUTOS_LIITE__MUUTOS_LIITE_LIITE_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LIITE_PKEY, MuutosLiite.MUUTOS_LIITE, "muutos_liite__muutos_liite_liite_id_fkey", MuutosLiite.MUUTOS_LIITE.LIITE_ID);
         public static final ForeignKey<MuutospyyntoRecord, LupaRecord> MUUTOSPYYNTO__FK_LUPA = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LUPA_PKEY, Muutospyynto.MUUTOSPYYNTO, "muutospyynto__fk_lupa", Muutospyynto.MUUTOSPYYNTO.LUPA_ID);
         public static final ForeignKey<MuutospyyntoRecord, PaatoskierrosRecord> MUUTOSPYYNTO__FK_PAATOSKIERROS = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.PAATOSKIERROS_PKEY, Muutospyynto.MUUTOSPYYNTO, "muutospyynto__fk_paatoskierros", Muutospyynto.MUUTOSPYYNTO.PAATOSKIERROS_ID);
+        public static final ForeignKey<MuutospyyntoAsiatilamuutosRecord, MuutospyyntoRecord> MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.MUUTOSPYYNTO_PKEY, MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS, "muutospyynto_asiatilamuutos__muutospyynto_asiatilamuutos_muutospyynto_id_fkey", MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS.MUUTOSPYYNTO_ID);
+        public static final ForeignKey<MuutospyyntoAsiatilamuutosRecord, AsiatilamuutosRecord> MUUTOSPYYNTO_ASIATILAMUUTOS__MUUTOSPYYNTO_ASIATILAMUUTOS_ASIATILAMUUTOS_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.ASIATILAMUUTOS_PKEY, MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS, "muutospyynto_asiatilamuutos__muutospyynto_asiatilamuutos_asiatilamuutos_id_fkey", MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS.ASIATILAMUUTOS_ID);
         public static final ForeignKey<MuutospyyntoLiiteRecord, MuutospyyntoRecord> MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_MUUTOSPYYNTO_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.MUUTOSPYYNTO_PKEY, MuutospyyntoLiite.MUUTOSPYYNTO_LIITE, "muutospyynto_liite__muutospyynto_liite_muutospyynto_id_fkey", MuutospyyntoLiite.MUUTOSPYYNTO_LIITE.MUUTOSPYYNTO_ID);
         public static final ForeignKey<MuutospyyntoLiiteRecord, LiiteRecord> MUUTOSPYYNTO_LIITE__MUUTOSPYYNTO_LIITE_LIITE_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LIITE_PKEY, MuutospyyntoLiite.MUUTOSPYYNTO_LIITE, "muutospyynto_liite__muutospyynto_liite_liite_id_fkey", MuutospyyntoLiite.MUUTOSPYYNTO_LIITE.LIITE_ID);
         public static final ForeignKey<PaatoskierrosRecord, EsitysmalliRecord> PAATOSKIERROS__FK_ESITYSMALLI = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.ESITYSMALLI_PKEY, Paatoskierros.PAATOSKIERROS, "paatoskierros__fk_esitysmalli", Paatoskierros.PAATOSKIERROS.ESITYSMALLI_ID);

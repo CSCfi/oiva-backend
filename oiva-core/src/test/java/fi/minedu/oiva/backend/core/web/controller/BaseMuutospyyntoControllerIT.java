@@ -3,11 +3,14 @@ package fi.minedu.oiva.backend.core.web.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.core.it.BaseIT;
+import fi.minedu.oiva.backend.core.service.FileStorageService;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +31,11 @@ import static org.junit.Assert.assertTrue;
 public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     private final String lupaJarjestajaOid = "1.1.111.111.11.11111111111";
+
+
+    // Do not render and write pdf files because templates are in different project
+    @MockBean
+    private FileStorageService fileStorageService;
 
     @Override
     public void beforeTest() {
@@ -206,6 +214,69 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final List<Liite> liiteList = doc.read("$.*", liiteRef);
         assertEquals("Liite count should match!", 8, liiteList.size());
+    }
+
+    @Test
+    public void stateChangeIsLogged() throws IOException {
+        String username = "testuser";
+        loginAs(username, lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+
+        final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+                readFileToString("json/muutospyynto.json")));
+
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        log.info("Muutospyynto createResponse: {}", doc.jsonString());
+        final String uuid = doc.read("$.uuid", String.class);
+
+        // Vie käsittelyyn esittelijälle
+        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, HttpMethod.POST);
+
+        List<Map<String, Object>> muutokset = jdbcTemplate.queryForList("select * from asiatilamuutos");
+        assertEquals("Should have 2: creation \"\" -> luonnos and luonnos -> avoin",2, muutokset.size());
+        Map<String, Object> row = muutokset.get(1);
+        assertEquals("LUONNOS", row.get("alkutila"));
+        assertEquals("AVOIN", row.get("lopputila"));
+        assertEquals(username, row.get("kayttajatunnus"));
+    }
+
+    @Test
+    public void esittelijaCanHandleMuutospyynto() throws IOException {
+        String username = "testuser";
+        loginAs(username, lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+
+        ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+                readFileToString("json/muutospyynto.json")));
+
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        log.info("Muutospyynto createResponse: {}", doc.jsonString());
+        final String uuid = doc.read("$.uuid", String.class);
+
+        // Vie käsittelyyn esittelijälle
+        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, HttpMethod.POST);
+
+        // Login as esittelijä
+        loginAs("esittelija", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
+        response = makeRequest("api/muutospyynnot/avoimet", HttpStatus.OK);
+        doc = jsonPath.parse(response.getBody());
+        assertEquals(1, doc.read("$.length()", Integer.class).intValue());
+
+        // Ota käsittelyyn
+        super.requestBody("/api/muutospyynnot/tila/valmistelussa/" + uuid, HttpMethod.POST);
+
+        doc = requestJSONData("/api/muutospyynnot/avoimet");
+        assertEquals(0, doc.read("$.length()", Integer.class).intValue());
+
+        doc = requestJSONData("/api/muutospyynnot/valmistelussa");
+        assertEquals(1, doc.read("$.length()", Integer.class).intValue());
+
+        doc = requestJSONData("/api/muutospyynnot/valmistelussa?vainOmat=true");
+        assertEquals("Esittelija has one own muutospyynto", 1, doc.read("$.length()", Integer.class).intValue());
+
+        loginAs("esittelija_2", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
+        doc = requestJSONData("/api/muutospyynnot/valmistelussa?vainOmat=true");
+        assertEquals("Another esittelijä has no own muutospyynot", 0, doc.read("$.length()", Integer.class).intValue());
     }
 
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {

@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.core.it;
 
 import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.ParseContext;
@@ -43,6 +44,7 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.ws.rs.NotSupportedException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Connection;
@@ -59,6 +61,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import static org.springframework.http.HttpMethod.GET;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -128,7 +131,7 @@ abstract public class BaseIT {
                 orElse(new HttpHeaders()));
         final ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort(uri),
-                HttpMethod.GET, entity, String.class);
+                GET, entity, String.class);
         assertEquals(status, response.getStatusCode());
         return response;
     }
@@ -234,5 +237,28 @@ abstract public class BaseIT {
 
     protected String readFileToString(String file) throws IOException {
         return IOUtils.toString(getResource(file).getInputStream(), Charset.forName("utf-8"));
+    }
+
+    protected String requestBody(String uri, HttpMethod method) {
+        log.info("Doing " + method + " request to " + uri);
+        ResponseEntity<String> response;
+        switch (method) {
+            case GET:
+                response = restTemplate.getForEntity(createURLWithPort(uri), String.class);
+                break;
+            case POST:
+                response = restTemplate.postForEntity(createURLWithPort(uri), null, String.class);
+                break;
+            default:
+                throw new NotSupportedException("Method " + method + " is not supported. More implementation is needed");
+        }
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        log.debug("Response body: " + response.getBody());
+        return response.getBody();
+    }
+
+    protected DocumentContext requestJSONData(String uri) {
+        return jsonPath.parse(requestBody(uri, HttpMethod.GET));
     }
 }
