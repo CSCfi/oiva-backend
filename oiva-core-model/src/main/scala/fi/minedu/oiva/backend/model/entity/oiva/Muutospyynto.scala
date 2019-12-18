@@ -51,5 +51,5 @@ class Muutospyynto(
   def getJarjestaja: Organisaatio = jarjestaja
   def setJarjestaja(jarjestaja: Organisaatio): Unit = this.jarjestaja = jarjestaja
   @JsonIgnore def getJarjestajaOpt: java.util.Optional[Organisaatio] = Optional.ofNullable(jarjestaja)
-  @JsonIgnore def getPDFFileName: String = "muutospyynto-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
+  @JsonIgnore def getPDFFileName: String = "Ammatillisten tutkintojen ja koulutuksen järjestämisluvan muutoshakemus.pdf"
 }
