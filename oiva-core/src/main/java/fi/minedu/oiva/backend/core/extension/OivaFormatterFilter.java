@@ -61,7 +61,10 @@ public class OivaFormatterFilter extends OivaFilter {
             }
         } else if(type == Type.pick) {
             final Optional opt = getFirstArgument(map);
-            if(opt.isPresent()) return pick(source, String.valueOf(opt.get()));
+            if(opt.isPresent()) {
+                return pick(source, String.valueOf(opt.get()));
+            }
+            return "";
         }
         return source;
     }
