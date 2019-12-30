@@ -68,8 +68,10 @@ public class MuutosTransformerFilter extends OivaFilter {
                 final long maakuntaCount = Math.min(muutoksetOpt.get().stream().filter(this::isMaakunta).count(), 2);
                 final long kuntaCount = Math.min(muutoksetOpt.get().stream().filter(this::isKunta).count(), 2);
                 return String.valueOf(maakuntaCount + "" + kuntaCount);
+            } else if (muutoksetOpt.get().stream().anyMatch(this::isNotDefined)) {
+                return toimintaAlueEiArvoa;
             }
-        } return toimintaAlueEiArvoa;
+        } return null;
     }
 
     private boolean isValtakunnallinen(final Muutos muutos) {
@@ -78,6 +80,10 @@ public class MuutosTransformerFilter extends OivaFilter {
 
     private boolean isAlueellinen(final Muutos muutos) {
         return isMaakunta(muutos) || isKunta(muutos);
+    }
+
+    private boolean isNotDefined(final Muutos muutos) {
+        return null != muutos && muutos.isKoodi("nuts1", "FI2");
     }
 
     private boolean isMaakunta(final Muutos muutos) {

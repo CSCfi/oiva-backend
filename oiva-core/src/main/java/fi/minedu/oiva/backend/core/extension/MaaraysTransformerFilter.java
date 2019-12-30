@@ -70,8 +70,10 @@ public class MaaraysTransformerFilter extends OivaFilter {
                 final long maakuntaCount = Math.min(maarayksetOpt.get().stream().filter(this::isMaakunta).count(), 2);
                 final long kuntaCount = Math.min(maarayksetOpt.get().stream().filter(this::isKunta).count(), 2);
                 return String.valueOf(maakuntaCount + "" + kuntaCount);
+            } else if (maarayksetOpt.get().stream().anyMatch(this::isNotDefined)) {
+                return toimintaAlueEiArvoa;
             }
-        } return toimintaAlueEiArvoa;
+        } return null;
     }
 
     private boolean isValtakunnallinen(final Maarays maarays) {
@@ -80,6 +82,10 @@ public class MaaraysTransformerFilter extends OivaFilter {
 
     private boolean isAlueellinen(final Maarays maarays) {
         return isMaakunta(maarays) || isKunta(maarays);
+    }
+
+    private boolean isNotDefined(final Maarays maarays) {
+        return null != maarays && maarays.isKoodi("nuts1", "FI2");
     }
 
     private boolean isMaakunta(final Maarays maarays) {

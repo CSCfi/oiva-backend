@@ -29,6 +29,7 @@ public class OivaPebbleConfig extends PebbleConfig {
                 final Map<String, Filter> filters = super.getFilters();
                 filters.put("filterMaarays", new MaaraysListFilter());
                 filters.put("toimintaAlueArvo", new MaaraysTransformerFilter(toimintaAlueArvo));
+                filters.put("muutosToimintaAlueArvo", new MuutosTransformerFilter(MuutosTransformerFilter.Type.toimintaAlueArvo));
                 filters.put("ylakoodi", new MaaraysTransformerFilter(ylakoodi));
                 filters.put("htmlClass", new MaaraysTransformerFilter(htmlClass));
                 filters.put("sortLupa", new SortListFilter(luvat));
