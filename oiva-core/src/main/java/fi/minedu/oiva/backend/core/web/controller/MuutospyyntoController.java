@@ -141,12 +141,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/avoin/{uuid}")
     public HttpEntity<UUID> vieKasittelyyn(final @PathVariable String uuid) {
-        try {
-            return getOr404(service.executeAction(uuid, Action.LAHETA).map(Muutospyynto::getUuid));
-        } catch (RuntimeException e) {
-            logger.error("Error in submit", e);
-            return get500();
-        }
+        return getOr404(service.executeAction(uuid, Action.LAHETA).map(Muutospyynto::getUuid));
     }
 
     // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn

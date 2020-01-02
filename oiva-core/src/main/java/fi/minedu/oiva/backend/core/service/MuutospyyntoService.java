@@ -182,71 +182,88 @@ public class MuutospyyntoService {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
+    private Optional<Muutospyynto> luo(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+        assertValid(muutospyynto);
+        if (!lupaAndMuutospyyntoOrganizationsMatch(muutospyynto) ||
+                !authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja) ||
+                !userOidMatchMuutospyynto(muutospyynto)) {
+            throw new ForbiddenException("User has no right");
+        }
+        muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
+        return save(muutospyynto, fileMap).flatMap(m -> getById(m.getId()));
+    }
+
+    private Optional<Muutospyynto> tallenna(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+        assertValid(muutospyynto);
+        Muutospyynto existing = getByUuid(muutospyynto.getUuid().toString()).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + muutospyynto.getUuid()));
+        if (!Muutospyyntotila.LUONNOS.toString().equals(existing.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+
+        if (!lupaAndMuutospyyntoOrganizationsMatch(existing) ||
+                !authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja) ||
+                !userOidMatchMuutospyynto(existing) ||
+                !userOidMatchMuutospyynto(muutospyynto)) {
+            throw new ForbiddenException("User has no right");
+        }
+
+        muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
+        return update(muutospyynto, fileMap).flatMap(m -> getById(m.getId()));
+    }
+
+    private Optional<Muutospyynto> laheta(String uuid) {
+        Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+        if (!Muutospyyntotila.LUONNOS.toString().equals(mp.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+        if (!userOidMatchMuutospyynto(mp) || !authService.hasAnyRole(OivaAccess.Role_Nimenkirjoittaja)) {
+            throw new ForbiddenException("User has no right");
+        }
+        findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.AVOIN);
+        fileStorageService.writeHakemusPDF(mp);
+        return getByUuid(uuid);
+    }
+
+    private Optional<Muutospyynto> otaKasittelyyn(String uuid) {
+        Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+        if (!Muutospyyntotila.AVOIN.toString().equals(mp.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+        if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
+            throw new ForbiddenException("User has no right");
+        }
+        return findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.VALMISTELUSSA)
+                .flatMap(uuid_ -> getByUuid(uuid_.toString()));
+    }
+
+    // Check that muutospyynto and lupa organizations match each other
+    private boolean lupaAndMuutospyyntoOrganizationsMatch(final Muutospyynto toBeSaved) {
+        return lupaService.getByUuid(toBeSaved.getLupaUuid()).map(l -> l.getJarjestajaYtunnus().equals(toBeSaved.getJarjestajaYtunnus())).orElse(false);
+    }
+
+    // Check that user is in same org than muutospyynto
+    private boolean userOidMatchMuutospyynto(final Muutospyynto muutospyynto) {
+        return lupaService.getByUuid(muutospyynto.getLupaUuid()).map(l -> l.getJarjestajaOid().equals(authService.getUserOrganisationOid())).orElse(false);
+    }
 
     public Optional<Muutospyynto> executeAction(String uuid, Action action) {
         return executeAction(uuid, action, null, null);
     }
 
-    private interface Assert<T extends Exception> {
-        void check(Boolean bool) throws T;
-    }
-
     @Transactional
     public Optional<Muutospyynto> executeAction(String uuid, Action action, Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
-        logger.info("Executing muutospyynto action " + action);
-        Optional<Muutospyynto> existing = uuid != null ? getByUuid(uuid) : Optional.empty();
-
-        // Muutospyynto and lupa have same organization identifier and lupa oid equals user organization oid
-        Optional<Lupa> lupa = muutospyynto != null ? lupaService.getByUuid(muutospyynto.getLupaUuid()) : Optional.empty();
-        boolean sameOrg = lupa.map(m -> m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false) &&
-                lupa.map(l -> l.getJarjestajaOid().equals(authService.getUserOrganisationOid())).orElse(false);
-
-        boolean sameExistingOrg = existing
-                .map(m -> lupaService.getByUuid(m.getLupaUuid()).map(l -> l.getJarjestajaOid().equals(authService.getUserOrganisationOid())).orElse(false))
-                .orElse(false);
-
-        final Assert<ForbiddenException> illegalAccess = (bool) -> {
-            if (!bool) {
-                throw new ForbiddenException("User has no right");
-            }
-        };
-
-        final Assert<ForbiddenException> isAllowed = (bool) -> {
-            if (!bool) {
-                throw new ForbiddenException("Action " + action +" is not allowed");
-            }
-        };
-
         try {
+            logger.info("Executing muutospyynto action " + action);
+
             switch (action) {
                 case LUO:
-                    assertValid(muutospyynto);
-                    illegalAccess.check(sameOrg && authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja));
-
-                    muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
-                    return save(muutospyynto, fileMap).map(m -> getById(m.getId())).orElse(Optional.empty());
+                    return luo(muutospyynto, fileMap);
                 case TALLENNA:
-                    assertValid(muutospyynto);
-                    illegalAccess.check(sameOrg && authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja));
-                    illegalAccess.check(sameExistingOrg);
-                    isAllowed.check(existing.map(e -> Muutospyyntotila.LUONNOS.toString().equals(e.getTila())).orElse(false));
-
-                    muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
-                    return update(muutospyynto, fileMap).map(m -> getById(m.getId())).orElse(Optional.empty());
+                    return tallenna(muutospyynto, fileMap);
                 case LAHETA:
-                    Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
-                    illegalAccess.check(sameExistingOrg && authService.hasAnyRole(OivaAccess.Role_Nimenkirjoittaja));
-                    isAllowed.check(existing.map(e -> Muutospyyntotila.LUONNOS.toString().equals(e.getTila())).orElse(false));
-
-                    findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.AVOIN);
-                    fileStorageService.writeHakemusPDF(mp);
-                    return getByUuid(uuid);
+                    return laheta(uuid);
                 case OTA_KASITTELYYN:
-                    isAllowed.check(existing.map(e -> Muutospyyntotila.AVOIN.toString().equals(e.getTila())).orElse(false));
-                    illegalAccess.check(authService.hasAnyRole(OivaAccess.Role_Esittelija));
-
-                    findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.VALMISTELUSSA);
-                    return getByUuid(uuid);
+                    return otaKasittelyyn(uuid);
                 default:
                     throw new UnsupportedOperationException("Action " + action + " is not supported for muutospyynto");
             }
