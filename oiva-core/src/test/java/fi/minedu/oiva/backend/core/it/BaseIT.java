@@ -8,6 +8,7 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import fi.minedu.oiva.backend.core.EmbeddedRedisConfig;
+import fi.minedu.oiva.backend.core.service.FileStorageService;
 import fi.minedu.oiva.backend.core.service.OpintopolkuService;
 import fi.minedu.oiva.backend.core.task.BuildCaches;
 import fi.minedu.oiva.backend.model.entity.TranslatedString;
@@ -84,6 +85,9 @@ abstract public class BaseIT {
     private BuildCaches mockCacheBuilder;
     @MockBean
     private OpintopolkuService opintopolkuService;
+    // Do not render and write pdf files because templates are in different project
+    @MockBean
+    private FileStorageService fileStorageService;
     protected ParseContext jsonPath;
 
     @Rule

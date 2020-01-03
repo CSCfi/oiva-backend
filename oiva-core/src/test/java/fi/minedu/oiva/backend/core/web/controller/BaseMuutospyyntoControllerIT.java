@@ -3,11 +3,9 @@ package fi.minedu.oiva.backend.core.web.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.core.it.BaseIT;
-import fi.minedu.oiva.backend.core.service.FileStorageService;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,11 +29,6 @@ import static org.junit.Assert.assertTrue;
 public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     private final String lupaJarjestajaOid = "1.1.111.111.11.11111111111";
-
-
-    // Do not render and write pdf files because templates are in different project
-    @MockBean
-    private FileStorageService fileStorageService;
 
     @Override
     public void beforeTest() {
