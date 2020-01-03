@@ -1,10 +1,10 @@
 package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.config.FileStorageConfig;
-import fi.minedu.oiva.backend.model.entity.OivaTemplates;
-import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.core.util.ExecutorContext;
 import fi.minedu.oiva.backend.core.util.With;
+import fi.minedu.oiva.backend.model.entity.OivaTemplates;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,17 +51,19 @@ public class FileStorageService {
         this.princeXMLService = princeXMLService;
         this.asyncService = asyncService;
     }
-    public void writeHakemusPDF(final Muutospyynto muutospyynto) throws Exception {
-        if(muutospyynto == null) {
-            throw new NullPointerException("Muutospyynto must not be null");
-        }
+    public void writeHakemusPDF(final Muutospyynto muutospyynto) {
         final OivaTemplates.RenderOptions options = OivaTemplates.RenderOptions.pdfOptions(OivaTemplates.RenderLanguage.fi);
         final String muutospyyntoHTMLVersion = pebbleService.muutospyyntoToHTML(muutospyynto, options).orElseThrow(IllegalStateException::new);
         final File file = createHakemusFile(muutospyynto).orElseThrow(IllegalStateException::new);
-        final FileOutputStream fileOutputStream = new FileOutputStream(file);
+        final FileOutputStream fileOutputStream;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException("Cannot write to a file", e);
+        }
         boolean writeResult = princeXMLService.toPDF(muutospyyntoHTMLVersion, fileOutputStream, options);
         if(!writeResult) {
-            throw new Exception("Unable to write PDF content");
+            throw new RuntimeException("Unable to write PDF content");
         }
     }
 

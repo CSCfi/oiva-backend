@@ -207,6 +207,7 @@ abstract public class BaseIT {
         final Map<String, String> lang = new HashMap<>();
         lang.put("fi", "Testi organisaatio");
         final Organisaatio o = new Organisaatio();
+        o.setOid("1.1.111.111.11.11111111111");
         o.setNimi(TranslatedString.of(lang));
         when(opintopolkuService.getBlockingOrganisaatio(anyString()))
                 .thenReturn(o);

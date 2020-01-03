@@ -45,7 +45,7 @@ public class AuthService {
         return new OivaPermission(Type.OnlyPublic);
     }
 
-    private boolean hasAnyRole(final String... roles) {
+    public boolean hasAnyRole(final String... roles) {
         return SecurityUtil.userRoles().stream().anyMatch(s -> Arrays.asList(roles).contains(s));
     }
 
@@ -53,5 +53,9 @@ public class AuthService {
         final OivaPermission access = new OivaPermission(Type.OrganizationAndPublic);
         access.oids.add(SecurityUtil.userOrganisationOid());
         return access;
+    }
+
+    public String getUserOrganisationOid() {
+        return SecurityUtil.userOrganisationOid();
     }
 }

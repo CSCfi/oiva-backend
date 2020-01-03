@@ -62,7 +62,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         loginAs("testuser", "1.2.3.4", OivaAccess.Context_Kayttaja);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json")));
-        assertEquals("Response code should match!", HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals("Response code should match! Response was\n" + response, HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
     @Test
@@ -220,7 +220,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void stateChangeIsLogged() throws IOException {
         String username = "testuser";
         loginAs(username, lupaJarjestajaOid,
-                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
 
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json")));
@@ -244,7 +244,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void esittelijaCanHandleMuutospyynto() throws IOException {
         String username = "testuser";
         loginAs(username, lupaJarjestajaOid,
-                OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
 
         ResponseEntity<String> response = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json")));

@@ -9,6 +9,9 @@ package fi.minedu.oiva.backend.model.security.annotations;
  * OIVA_APP_KATSELIJA
 */
 
+import java.util.Arrays;
+import java.util.List;
+
 public interface OivaAccess {
 
     enum Type {
@@ -38,4 +41,13 @@ public interface OivaAccess {
     String Kayttaja = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "')";
     String Katselija = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "," +
             Role_Katselija + "')";
+
+    List<String> roles = Arrays.asList(
+            Role_Application,
+            Role_Yllapitaja,
+            Role_Esittelija,
+            Role_Kayttaja,
+            Role_Katselija,
+            Role_Nimenkirjoittaja
+    );
 }

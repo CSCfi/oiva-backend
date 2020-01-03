@@ -75,7 +75,7 @@ public abstract class BaseExportControllerIT extends BaseIT {
         final String uri = uriBuilder.build().toUriString();
         final ResponseEntity<String> response =
                 makeRequest(uri, status, getBasicAuthHeaders("oiva", "oiva"));
-        final DocumentContext doc = jsonPath.parse(response.getBody());
+        final DocumentContext doc = jsonPath.parse(response.getBody() == null ? "{}" : response.getBody());
         log.info(doc.jsonString());
         return doc;
     }
