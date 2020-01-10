@@ -14,36 +14,36 @@
 
 Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista saada projekti nopeastikin käyntiin, mutta älä lannistu, jos koet vastoinkäymisiä asennuksia tehdessäsi. Ohjeita päivitetään tarpeen vaatiessa, mutta toisinaan paras apu kipakka, kehittäjien suunnattu, kysymys.
 
-- [Buildaus- ja kehitysympäristön asentaminen](#buildaus--ja-kehitysymp%C3%A4rist%C3%B6n-asentaminen)
-  - [Alkuvalmistelut](#alkuvalmistelut)
-  - [1. Docker](#1-docker)
-  - [2. Java](#2-java)
-  - [3. Maven](#3-maven)
-  - [4. PrinceXML](#4-princexml)
-  - [5. IDE](#5-ide)
-  - [6. Projektin kääntäminen](#6-projektin-k%C3%A4%C3%A4nt%C3%A4minen)
-  - [6.1 Huomioita](#61-huomioita)
-  - [7. Palveluiden käynnistäminen](#7-palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.1 Oiva-puolen palveluiden käynnistäminen](#71-oiva-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.2 Kuja-puolen palveluiden käynnistäminen](#72-kuja-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.3 Huomioita](#73-huomioita)
-  - [8. Tietokanta](#8-tietokanta)
-    - [8.1 Tietokantojen alustaminen](#81-tietokantojen-alustaminen)
-      - [8.1.1 Amos](#811-amos)
-      - [8.1.2 Yva](#812-yva)
-- [Läpi käymättä olevat asennusohjeet](#l%C3%A4pi-k%C3%A4ym%C3%A4tt%C3%A4-olevat-asennusohjeet)
-  - [Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi](#flyway-migraatioiden-ajaminen-mavenilla-ja-jooq-tietokantaluokkien-generointi)
-  - [Tietokannan puhdistus ja populointi Maven SQL pluginilla](#tietokannan-puhdistus-ja-populointi-maven-sql-pluginilla)
-      - [Pudota flyway-migraatiokanta ja sovelluksen skeemat](#pudota-flyway-migraatiokanta-ja-sovelluksen-skeemat)
-      - [Entityjen luominen](#entityjen-luominen)
-      - [Populoi tietokanta alustavalla datasetillä](#populoi-tietokanta-alustavalla-datasetill%C3%A4)
-  - [Aja kehitysversiota lokaali-Mavenilla](#aja-kehitysversiota-lokaali-mavenilla)
-  - [PDF-exportin konfiguroiminen [TODO: UPDATE]](#pdf-exportin-konfiguroiminen-todo-update)
-  - [Sananen konfiguraatiosta](#sananen-konfiguraatiosta)
-  - [Testit](#testit)
-  - [Debug ja JRebel](#debug-ja-jrebel)
-  - [Paketointi serveriympäristöihin](#paketointi-serveriymp%C3%A4rist%C3%B6ihin)
-  - [Serverillä manuaalinen backendin käynnistys stagingissa:](#serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
+- [Buildaus- ja kehitysympäristön asentaminen](#Buildaus--ja-kehitysymp%C3%A4rist%C3%B6n-asentaminen)
+  - [Alkuvalmistelut](#Alkuvalmistelut)
+  - [1. Docker](#1-Docker)
+  - [2. Java](#2-Java)
+  - [3. Maven](#3-Maven)
+  - [4. PrinceXML](#4-PrinceXML)
+  - [5. IDE](#5-IDE)
+  - [6. Projektin kääntäminen](#6-Projektin-k%C3%A4%C3%A4nt%C3%A4minen)
+  - [6.1 Huomioita](#61-Huomioita)
+  - [7. Palveluiden käynnistäminen](#7-Palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.1 Oiva-puolen palveluiden käynnistäminen](#71-Oiva-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.2 Kuja-puolen palveluiden käynnistäminen](#72-Kuja-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
+    - [7.3 Huomioita](#73-Huomioita)
+  - [8. Tietokanta](#8-Tietokanta)
+    - [8.1 Tietokantojen alustaminen](#81-Tietokantojen-alustaminen)
+      - [8.1.1 Amos](#811-Amos)
+      - [8.1.2 Yva](#812-Yva)
+- [Läpi käymättä olevat asennusohjeet](#L%C3%A4pi-k%C3%A4ym%C3%A4tt%C3%A4-olevat-asennusohjeet)
+  - [Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi](#Flyway-migraatioiden-ajaminen-Mavenilla-ja-JOOQ-tietokantaluokkien-generointi)
+  - [Tietokannan puhdistus ja populointi Maven SQL pluginilla](#Tietokannan-puhdistus-ja-populointi-Maven-SQL-pluginilla)
+      - [Pudota flyway-migraatiokanta ja sovelluksen skeemat](#Pudota-flyway-migraatiokanta-ja-sovelluksen-skeemat)
+      - [Entityjen luominen](#Entityjen-luominen)
+      - [Populoi tietokanta alustavalla datasetillä](#Populoi-tietokanta-alustavalla-datasetill%C3%A4)
+  - [Aja kehitysversiota lokaali-Mavenilla](#Aja-kehitysversiota-lokaali-Mavenilla)
+  - [PDF-exportin konfiguroiminen [TODO: UPDATE]](#PDF-exportin-konfiguroiminen-TODO-UPDATE)
+  - [Sananen konfiguraatiosta](#Sananen-konfiguraatiosta)
+  - [Testit](#Testit)
+  - [Debug ja JRebel](#Debug-ja-JRebel)
+  - [Paketointi serveriympäristöihin](#Paketointi-serveriymp%C3%A4rist%C3%B6ihin)
+  - [Serverillä manuaalinen backendin käynnistys stagingissa:](#Serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
 
 ## Alkuvalmistelut
 
@@ -90,7 +90,7 @@ mvn clean install
 mvn clean install
 docker exec -it oiva-backend_amos-redis_1 redis-cli (avaa promptin)
 FLUSHALL
-```
+````
 
 ## 7. Palveluiden käynnistäminen
 Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
@@ -168,7 +168,7 @@ Käynnistä docker:
 
     $ ./oiva-docker.sh start
     
-Docker-compose luo viisi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis ja nginx.
+Docker-compose luo kuusi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis, yva-nginx ja nginx.
 
 Backend-palvelun käynnistäminen kehityskäyttöön:
 
@@ -176,12 +176,14 @@ Backend-palvelun käynnistäminen kehityskäyttöön:
     $ ./oiva-backend.sh yva -c
 
 Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelulle niin luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `launch-dev-backend.sh` suoritetaan.
-
+Syötä tiedostoon testi opintopolun tarvitsemat käyttäjätunnus ja salasana. Nämä tiedot voi kysyä muilta kehittäjiltä.
+ 
+    OIVA_JAVA_OPTS="-Dopintopolku.username='käyttäjätunnus' -Dopintopolku.password='salasana'"
 
 ## PDF-exportin konfiguroiminen [TODO: UPDATE]
 
 PrinceXML tuottaa PDF-tiedostoja HTML-lähteistä jotka on muodostettu Pebble-frameworkillä (http://www.mitchellbosecke.com/pebble).
-- Pebblen kontekstit muodostetaan fi.minedu.oiva.backend.service.TemplateRenderingService luokassa.
+- Pebblen kontekstit muodostetaan fi.minedu.oiva.backend.core.service.TemplateRenderingService luokassa.
 - Pebblen templatet ja resurssit on määritetty omassa git-respositoryssa (/oiva/template). Hanki templatet koneelle jolla ajat backendiä
 
 Pebble-templateihin viitataan absoluuttisilla poluilla, esimerkiksi:

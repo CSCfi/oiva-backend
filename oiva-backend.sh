@@ -65,9 +65,10 @@ if [[ ! $optionsArg == *"-c"* && ! $optionsArg == *"-l"* ]]; then
 fi
 
 # Developer specific setup
-sUserArgsFile=./vars-`whoami`.sh
+sUserArgsFile=../vars-`whoami`.sh
 echo "$sUserArgsFile"
 if [ -f $sUserArgsFile ]; then
+    echo "Sourcing user settings"
     source $sUserArgsFile
 fi
 

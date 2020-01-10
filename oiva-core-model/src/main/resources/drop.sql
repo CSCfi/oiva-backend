@@ -1,0 +1,2 @@
+DROP SCHEMA IF EXISTS ${oiva.schema} CASCADE;
+DROP TABLE IF EXISTS schema_version CASCADE;

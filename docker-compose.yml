@@ -18,7 +18,7 @@ services:
             context: .
             dockerfile: ./Dockerfile-yva-backend
         ports:
-            - "9100:8099"
+            - "9100:8100"
         volumes:
             - ../oiva-template:/opt/oiva/template
         depends_on:
@@ -70,6 +70,20 @@ services:
             - "80:80"
         volumes:
             - ./nginx/nginx.conf:/opt/openresty/nginx/conf/nginx.conf
+            - ./nginx/ssl/nginx.crt:/opt/openresty/nginx/conf/ssl/nginx.crt
+            - ./nginx/ssl/nginx.key:/opt/openresty/nginx/conf/ssl/nginx.key
+        extra_hosts:
+            hostmachine: HOSTIP
+        networks:
+            - vpnsafe
+    yva-nginx:
+        hostname: localhost
+        image: ficusio/openresty:latest
+        ports:
+            - "4433:4433"
+            - "8888:8888"
+        volumes:
+            - ./nginx/yva-nginx.conf:/opt/openresty/nginx/conf/nginx.conf
             - ./nginx/ssl/nginx.crt:/opt/openresty/nginx/conf/ssl/nginx.crt
             - ./nginx/ssl/nginx.key:/opt/openresty/nginx/conf/ssl/nginx.key
         extra_hosts:

@@ -14,14 +14,14 @@
     <version>1.9.0</version>
     <packaging>jar</packaging>
 
+    <properties>
+        <exclude.resources></exclude.resources>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>fi.minedu.oiva</groupId>
             <artifactId>oiva-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>fi.minedu.oiva</groupId>
-            <artifactId>amos-model</artifactId>
             <version>1.9.0</version>
         </dependency>
         <dependency>
@@ -34,13 +34,13 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-devtools</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -50,25 +50,24 @@
         <dependency>
             <groupId>org.mock-server</groupId>
             <artifactId>mockserver-netty</artifactId>
-            <version>5.5.1</version>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-lang3</artifactId>
-                    <groupId>org.apache.commons</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>it.ozimov</groupId>
             <artifactId>embedded-redis</artifactId>
-            <version>0.7.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fi.minedu.oiva</groupId>
+            <artifactId>oiva-core</artifactId>
+            <version>1.9.0</version>
+            <classifier>tests</classifier>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -82,6 +81,9 @@
                 <includes>
                     <include>logback.xml</include>
                 </includes>
+                <excludes>
+                    <exclude>${exclude.resources}</exclude>
+                </excludes>
             </resource>
         </resources>
         <testResources>
@@ -152,89 +154,31 @@
             </activation>
             <properties>
                 <oiva.dbport>15432</oiva.dbport>
+                <exclude.resources>**/migration/V2.**</exclude.resources>
             </properties>
             <build>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>false</filtering>
+                        <excludes>
+                            <exclude>${exclude.resources}</exclude>
+                        </excludes>
+                    </resource>
+                </resources>
                 <plugins>
                     <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
                         <configuration>
-                            <classesDirectory>target/classes</classesDirectory>
+                            <dependenciesToScan>
+                                <dependency>fi.minedu.oiva:oiva-core</dependency>
+                            </dependenciesToScan>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>integration-test</id>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>verify</id>
-                                <goals>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>io.fabric8</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.28.0</version>
-                        <configuration>
-                            <imagePullPolicy>IfNotPresent</imagePullPolicy>
-                            <showLogs>true</showLogs>
-                            <logStdout>true</logStdout>
-                            <verbose>true</verbose>
-                            <autoCreateCustomNetworks>true</autoCreateCustomNetworks>
-                            <machine>
-                                <name>test-db-machine</name>
-                                <autoCreate>true</autoCreate>
-                            </machine>
-                            <images>
-                                <image>
-                                    <name>amos-backend-test-db</name>
-                                    <alias>amos-test-db</alias>
-                                    <build>
-                                        <from>postgres:9.6</from>
-                                        <runCmds>echo "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";" > /docker-entrypoint-initdb.d/init-db.sql</runCmds>
-                                    </build>
-                                    <run>
-                                        <network>
-                                            <mode>bridge</mode>
-                                        </network>
-                                        <ports>
-                                            <port>15432:5432</port>
-                                        </ports>
-                                        <env>
-                                            <POSTGRES_USER>oiva</POSTGRES_USER>
-                                            <POSTGRES_PASSWORD>oiva</POSTGRES_PASSWORD>
-                                            <POSTGRES_DB>oiva</POSTGRES_DB>
-                                        </env>
-                                    </run>
-                                </image>
-                            </images>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>build</id>
-                                <goals>
-                                    <goal>build</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>start</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -255,6 +199,9 @@
                     <resource>
                         <directory>src/main/resources</directory>
                         <filtering>false</filtering>
+                        <excludes>
+                            <exclude>${exclude.resources}</exclude>
+                        </excludes>
                     </resource>
                 </resources>
                 <plugins>

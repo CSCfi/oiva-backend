@@ -67,12 +67,15 @@ management:
 spring:
     datasource:
         dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
-        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}
+        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}?currentSchema=kuja
         username: ${oiva.dbusername}
         password: ${oiva.dbpassword}
         platform: postgresql
         driverClassName: org.postgresql.Driver
         initialize: false
+    mvc:
+      async:
+        request-timeout: 60000 # Async request timeout 60 seconds.
 
 redis:
     host: override_this_in_local_application_yml

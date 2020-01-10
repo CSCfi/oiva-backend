@@ -1,0 +1,1 @@
+INSERT INTO muutospyynto_liite (muutospyynto_id, liite_id) VALUES (1, 1), (1, 2);

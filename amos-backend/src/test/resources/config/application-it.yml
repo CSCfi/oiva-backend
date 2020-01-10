@@ -33,9 +33,11 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva
+    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva?currentSchema=oiva
   cache:
     type: none
+  profiles:
+    include: amos
 
 redis:
   host: localhost
