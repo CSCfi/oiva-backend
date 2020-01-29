@@ -41,7 +41,7 @@ redis:
    port: 7379
 
 file.storage:
-  base.path: target/kuja-files
+  base.path: target/oiva-files
 
 prince:
   exec.path: /usr/local/bin/prince
