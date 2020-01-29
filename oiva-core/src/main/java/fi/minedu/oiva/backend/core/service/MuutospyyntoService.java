@@ -207,7 +207,9 @@ public class MuutospyyntoService {
             throw new ForbiddenException("User has no right");
         }
 
-        muutospyynto.setTila(Muutospyyntotila.LUONNOS.name());
+        String uusiTila = Muutospyyntotila.LUONNOS.name();
+        asiatilamuutosService.insertForMuutospyynto(existing.getId(), muutospyynto.getTila(), uusiTila, authService.getUsername());
+        muutospyynto.setTila(uusiTila);
         return update(muutospyynto, fileMap).flatMap(m -> getById(m.getId()));
     }
 
