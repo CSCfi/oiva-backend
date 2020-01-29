@@ -78,9 +78,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>logback.xml</include>
-                </includes>
                 <excludes>
                     <exclude>${exclude.resources}</exclude>
                 </excludes>

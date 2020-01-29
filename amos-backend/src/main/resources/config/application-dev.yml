@@ -50,7 +50,8 @@ templates:
   base.path: ../../oiva-template
 
 logging:
-    file: target/log/oiva-backend.log
+    path: target/log
+    file: ${logging.path}/oiva-backend.log
     level:
         fi.minedu.oiva: DEBUG
         org.springframework.security: DEBUG

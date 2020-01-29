@@ -50,7 +50,8 @@ templates:
     base.path: ../../kuja-template
 
 logging:
-    file: target/log/kuja-backend.log
+    path: target/log
+    file: ${logging.path}/kuja-backend.log
     level:
         fi.minedu.oiva: DEBUG
         org.springframework.security: DEBUG
