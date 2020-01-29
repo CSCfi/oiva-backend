@@ -2,14 +2,15 @@ package fi.minedu.oiva.backend.core.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicates;
+import fi.minedu.oiva.backend.core.service.LoggingService;
 import fi.minedu.oiva.backend.core.spring.handler.CompletionStageReturnValueHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -36,8 +37,13 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 @EnableSwagger2
 public class MvcConfig extends WebMvcConfigurerAdapter {
 
-    @Autowired
-    private TypeResolver typeResolver;
+    private final TypeResolver typeResolver;
+    private final LoggingService loggingService;
+
+    public MvcConfig(TypeResolver typeResolver, LoggingService loggingService) {
+        this.typeResolver = typeResolver;
+        this.loggingService = loggingService;
+    }
 
     @Override
     public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -104,5 +110,11 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public HandlerMethodReturnValueHandler completionStageReturnValueHandler() {
         return new CompletionStageReturnValueHandler();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        super.addInterceptors(registry);
+        registry.addInterceptor(new RestApiInterceptor(loggingService));
     }
 }

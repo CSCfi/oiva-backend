@@ -24,4 +24,14 @@ public class OivaUserDetails extends User {
     public boolean isPermissionsDecreased() {
         return permissionsDecreased;
     }
+
+    @Override
+    public String toString() {
+        return "OivaUserDetails{" +
+                "username='"+ getUsername() + '\'' +
+                ", organisationOid='" + organisationOid + '\'' +
+                ", authorities='" + getAuthorities() + '\'' +
+                ", permissionsDecreased=" + permissionsDecreased +
+                '}';
+    }
 }
