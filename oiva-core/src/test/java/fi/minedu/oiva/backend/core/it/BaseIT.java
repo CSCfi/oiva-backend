@@ -43,6 +43,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.ws.rs.NotSupportedException;
@@ -67,6 +68,8 @@ import static org.springframework.http.HttpMethod.GET;
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Import(EmbeddedRedisConfig.class)
+// We are not interested in log files when running integration tests
+@TestPropertySource(properties = {"logging.path = /tmp"})
 @ActiveProfiles("it")
 abstract public class BaseIT {
 

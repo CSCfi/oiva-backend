@@ -4,6 +4,7 @@ import fi.minedu.oiva.backend.core.security.OivaUserDetails;
 import fi.minedu.oiva.backend.core.service.LoggingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.cas.authentication.CasAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,6 +12,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.session.SessionDestroyedEvent;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Stream;
 
 @Component
 public class SecurityEventListener {
@@ -24,8 +27,13 @@ public class SecurityEventListener {
 
     @EventListener
     public void onLoginSuccessEvent(AuthenticationSuccessEvent event) {
-        UserDetails userDetails = ((CasAuthenticationToken) event.getAuthentication()).getUserDetails();
-        loggingService.logAction(userDetails.getUsername(), "Logged in " + userDetails);
+        if (event.getAuthentication() instanceof CasAuthenticationToken) {
+            UserDetails userDetails = ((CasAuthenticationToken) event.getAuthentication()).getUserDetails();
+            loggingService.logAction(userDetails.getUsername(), "Logged in " + userDetails);
+        }
+        else {
+            loggingService.logAction(event.getAuthentication().getName(), "Logged in using basic auth: " + event.getAuthentication());
+        }
     }
 
     @EventListener
