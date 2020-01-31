@@ -53,7 +53,8 @@ templates:
   base.path:
 
 logging:
-  file: target/logs/spring.log
+  path: target/logs
+  file: ${logging.path}/spring.log
   level:
     fi.minedu.oiva: DEBUG
     org.springframework.security: DEBUG
