@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,6 +45,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
         produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Muutospyyntöjen hallinta")
 @OivaAccess_Application
+@Transactional
 public class MuutospyyntoController {
 
     private static final Logger logger = LoggerFactory.getLogger(MuutospyyntoController.class);

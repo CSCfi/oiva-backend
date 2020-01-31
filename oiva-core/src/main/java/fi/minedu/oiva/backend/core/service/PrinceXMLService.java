@@ -95,8 +95,7 @@ public class PrinceXMLService {
         try {
             return getPrinceEngine().convert(IOUtils.toInputStream(html), output);
         } catch (IOException e) {
-            logger.error("Failed to generate PDF from html");
-            return false;
+            throw new RuntimeException("Failed to generate PDF from html", e);
         }
     }
 

@@ -216,6 +216,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>logback-spring.xml</include>
+                </includes>
             </resource>
         </resources>
         <testResources>

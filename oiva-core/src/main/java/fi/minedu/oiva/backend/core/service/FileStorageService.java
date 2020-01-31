@@ -61,6 +61,7 @@ public class FileStorageService {
         } catch (FileNotFoundException e) {
             throw new RuntimeException("Cannot write to a file", e);
         }
+        logger.info("Writing muutospyynto pdf to " + file.getAbsolutePath());
         boolean writeResult = princeXMLService.toPDF(muutospyyntoHTMLVersion, fileOutputStream, options);
         if(!writeResult) {
             throw new RuntimeException("Unable to write PDF content");
