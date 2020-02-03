@@ -13,7 +13,7 @@ opintopolku:
     password:
 
 cas:
-  baseUrl: http://localhost:8888/mock-cas
+  baseUrl: http://localhost:9999/mock-cas
 
 ldap:
   url:

@@ -35,7 +35,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class MuutospyyntoAsiatilamuutos extends TableImpl<MuutospyyntoAsiatilamuutosRecord> {
 
-    private static final long serialVersionUID = -2021864959;
+    private static final long serialVersionUID = 577841180;
 
     /**
      * The reference instance of <code>muutospyynto_asiatilamuutos</code>
@@ -103,7 +103,7 @@ public class MuutospyyntoAsiatilamuutos extends TableImpl<MuutospyyntoAsiatilamu
      */
     @Override
     public List<UniqueKey<MuutospyyntoAsiatilamuutosRecord>> getKeys() {
-        return Arrays.<UniqueKey<MuutospyyntoAsiatilamuutosRecord>>asList(Keys.MUUTOSPYYNTO_ASIATILAMUUTOS_PKEY, Keys.MUUTOSPYYNTO_ASIATILAMUUTOS_MUUTOSPYYNTO_ID_KEY);
+        return Arrays.<UniqueKey<MuutospyyntoAsiatilamuutosRecord>>asList(Keys.MUUTOSPYYNTO_ASIATILAMUUTOS_PKEY, Keys.MUUTOSPYYNTO_ASIATILAMUUTOS_ASIATILAMUUTOS_ID_KEY);
     }
 
     /**

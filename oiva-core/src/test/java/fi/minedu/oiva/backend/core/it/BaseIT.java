@@ -48,7 +48,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.ws.rs.NotSupportedException;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -92,7 +92,7 @@ abstract public class BaseIT {
     protected ParseContext jsonPath;
 
     @Rule
-    public MockServerRule mockServerRule = new MockServerRule(this, 8888);
+    public MockServerRule mockServerRule = new MockServerRule(this, 9999);
 
     @Before
     public void setUp() {
@@ -162,7 +162,7 @@ abstract public class BaseIT {
         final HttpHeaders httpHeaders = new HttpHeaders();
         String auth = username + ":" + password;
         byte[] encodedAuth = Base64.encodeBase64(
-                auth.getBytes(Charset.forName("US-ASCII")));
+                auth.getBytes(StandardCharsets.US_ASCII));
         String authHeader = "Basic " + new String(encodedAuth);
         httpHeaders.set("Authorization", authHeader);
         return httpHeaders;
@@ -242,7 +242,7 @@ abstract public class BaseIT {
     }
 
     protected String readFileToString(String file) throws IOException {
-        return IOUtils.toString(getResource(file).getInputStream(), Charset.forName("utf-8"));
+        return IOUtils.toString(getResource(file).getInputStream(), StandardCharsets.UTF_8);
     }
 
     protected String requestBody(String uri, HttpMethod method) {
