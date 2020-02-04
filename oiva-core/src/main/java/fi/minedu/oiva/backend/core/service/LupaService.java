@@ -103,8 +103,12 @@ public class LupaService extends BaseService {
         } else return Optional.empty();
     }
 
-    public Collection<Lupa> getAllWithJarjestaja(final String... options) {
+    public Collection<Lupa> getAllWithJarjestaja(final String koulutustyyppi,
+                                                 final String oppilaitostyyppi,
+                                                 final String... options) {
         final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
+        Optional.ofNullable(koulutustyyppi).ifPresent(t -> query.where(LUPA.KOULUTUSTYYPPI.eq(t)));
+        Optional.ofNullable(oppilaitostyyppi).ifPresent(t -> query.where(LUPA.OPPILAITOSTYYPPI.eq(t)));
         query.leftJoin(ASIATYYPPI).on(ASIATYYPPI.ID.eq(LUPA.ASIATYYPPI_ID));
         return fetch(query, options);
     }

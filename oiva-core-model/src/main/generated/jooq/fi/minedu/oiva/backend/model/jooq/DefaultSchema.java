@@ -21,7 +21,6 @@ import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoAsiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +47,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DefaultSchema extends SchemaImpl {
 
-    private static final long serialVersionUID = -500353658;
+    private static final long serialVersionUID = -1958699505;
 
     /**
      * The reference instance of <code></code>
@@ -141,11 +140,6 @@ public class DefaultSchema extends SchemaImpl {
     public final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros.PAATOSKIERROS;
 
     /**
-     * The table <code>tiedote</code>.
-     */
-    public final Tiedote TIEDOTE = fi.minedu.oiva.backend.model.jooq.tables.Tiedote.TIEDOTE;
-
-    /**
      * No further instances allowed
      */
     private DefaultSchema() {
@@ -184,8 +178,7 @@ public class DefaultSchema extends SchemaImpl {
             Sequences.MAARAYSTYYPPI_ID_SEQ,
             Sequences.MUUTOS_ID_SEQ,
             Sequences.MUUTOSPYYNTO_ID_SEQ,
-            Sequences.PAATOSKIERROS_ID_SEQ,
-            Sequences.TIEDOTE_ID_SEQ);
+            Sequences.PAATOSKIERROS_ID_SEQ);
     }
 
     @Override
@@ -213,7 +206,6 @@ public class DefaultSchema extends SchemaImpl {
             Muutospyynto.MUUTOSPYYNTO,
             MuutospyyntoAsiatilamuutos.MUUTOSPYYNTO_ASIATILAMUUTOS,
             MuutospyyntoLiite.MUUTOSPYYNTO_LIITE,
-            Paatoskierros.PAATOSKIERROS,
-            Tiedote.TIEDOTE);
+            Paatoskierros.PAATOSKIERROS);
     }
 }
