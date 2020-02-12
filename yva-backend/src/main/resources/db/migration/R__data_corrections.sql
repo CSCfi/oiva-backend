@@ -347,3 +347,8 @@ WHERE id IN (SELECT l.id FROM lupa l LEFT JOIN maarays m on l.id = m.lupa_id
 
 -- Change kieli koodisto to OPH
 UPDATE maarays SET koodisto = 'kielikoodistoopetushallinto' WHERE koodisto = 'kieli';
+
+-- Correct koodisto names
+UPDATE maarays SET koodisto = 'vsttyypit' WHERE koodisto = 'vsttyyppi';
+UPDATE maarays SET koodisto = 'yleissivistavankoulutusmuodot' WHERE koodisto = 'koulutusmuoto';
+UPDATE maarays SET koodisto = 'vsterityinenkoulutustehtava' WHERE koodisto = 'erityinenkoulutustehtava';
