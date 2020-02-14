@@ -37,7 +37,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
 
-    private static final long serialVersionUID = 1746107326;
+    private static final long serialVersionUID = 1592916346;
 
     /**
      * The reference instance of <code>lupahistoria</code>
@@ -106,6 +106,11 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
      * The column <code>lupahistoria.uuid</code>.
      */
     public final TableField<LupahistoriaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
+     * The column <code>lupahistoria.asianumero</code>.
+     */
+    public final TableField<LupahistoriaRecord, String> ASIANUMERO = createField("asianumero", org.jooq.impl.SQLDataType.VARCHAR.length(16).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>lupahistoria</code> table reference
