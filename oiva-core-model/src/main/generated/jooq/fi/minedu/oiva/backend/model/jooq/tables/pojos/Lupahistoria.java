@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -2050409438;
+    private static final long serialVersionUID = -357919546;
 
     private Long   id;
     private String diaarinumero;
@@ -39,6 +39,7 @@ public class Lupahistoria implements Serializable {
     private Date   paatospvm;
     private String filename;
     private UUID   uuid;
+    private String asianumero;
 
     public Lupahistoria() {}
 
@@ -54,6 +55,7 @@ public class Lupahistoria implements Serializable {
         this.paatospvm = value.paatospvm;
         this.filename = value.filename;
         this.uuid = value.uuid;
+        this.asianumero = value.asianumero;
     }
 
     public Lupahistoria(
@@ -67,7 +69,8 @@ public class Lupahistoria implements Serializable {
         Date   voimassaololoppupvm,
         Date   paatospvm,
         String filename,
-        UUID   uuid
+        UUID   uuid,
+        String asianumero
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -80,6 +83,7 @@ public class Lupahistoria implements Serializable {
         this.paatospvm = paatospvm;
         this.filename = filename;
         this.uuid = uuid;
+        this.asianumero = asianumero;
     }
 
     public Long getId() {
@@ -185,6 +189,15 @@ public class Lupahistoria implements Serializable {
         this.uuid = uuid;
     }
 
+    @Size(max = 16)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -200,6 +213,7 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(filename);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(asianumero);
 
         sb.append(")");
         return sb.toString();
