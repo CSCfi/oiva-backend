@@ -23,9 +23,9 @@ import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -141,6 +141,7 @@ public class LupaService extends BaseService {
         return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
     }
 
+    @Cacheable(value = "LupaService:getByYtunnus", key = "#ytunnus.concat(#withOptions)")
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
