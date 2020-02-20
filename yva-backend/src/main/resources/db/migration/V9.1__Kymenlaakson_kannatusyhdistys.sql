@@ -46,15 +46,6 @@ with new_lupa AS (
            and lupa.diaarinumero = '50/532/2011'
          returning *),
 
-     -- modify koulutustehtava
-     koulutustehtava AS (update maarays set meta = '{
-       "koulutustehtävämääräys-0": "Kymenlaakson Opisto on grundvigilainen kansanopisto. Opiston koulutus painottuu kulttuuri- ja taideaineisiin, kieliin ja kansainvälisyyteen sekä maahanmuuttajakoulutukseen. Opisto järjestää lisäksi työllisyyttä edistäviä koulutuksia sekä siirtymävaiheiden valmistavaa ja jatko-opintoihin valmentavaa koulutusta.",
-       "koulutustehtävämääräys-1": "",
-       "koulutustehtävämääräys-2": ""
-     }'
-         where lupa_id = (select id from new_lupa) and koodisto = 'koulutustehtava'
-         returning *),
-
      -- insert erityinen koulutustehtava
      erityinen_koulutustehtava AS (insert into maarays (parent_id, lupa_id, kohde_id, koodisto, koodiarvo, arvo,
                                                         maaraystyyppi_id, meta, koodistoversio)
@@ -73,6 +64,18 @@ with new_lupa AS (
          returning *)
 SELECT *
 FROM new_lupa;
+
+-- modify koulutustehtava
+update maarays
+set meta = '{
+  "koulutustehtävämääräys-0": "Kymenlaakson Opisto on grundvigilainen kansanopisto. Opiston koulutus painottuu kulttuuri- ja taideaineisiin, kieliin ja kansainvälisyyteen sekä maahanmuuttajakoulutukseen. Opisto järjestää lisäksi työllisyyttä edistäviä koulutuksia sekä siirtymävaiheiden valmistavaa ja jatko-opintoihin valmentavaa koulutusta.",
+  "koulutustehtävämääräys-1": "",
+  "koulutustehtävämääräys-2": ""
+}'
+from lupa l
+where lupa_id = l.id
+  and l.diaarinumero = '47/531/2019'
+  and koodisto = 'koulutustehtava';
 
 -- ending dates and history for kymenlaakson opiston kannatusyhdistys
 update lupa
