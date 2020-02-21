@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.model.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 
 public final class ControllerUtil {
 
+    private static Logger log = Logger.getLogger(ControllerUtil.class);
+
     private ControllerUtil() {}
 
     public static <T> CompletableFuture<ResponseEntity> respondWith(final CompletableFuture<Optional<T>> itemOptFuture, final ResponseEntity success, final ResponseEntity failure) {
@@ -32,8 +35,13 @@ public final class ControllerUtil {
     }
 
     public static <T> CompletableFuture<HttpEntity<T>> getOr404(final CompletableFuture<Optional<T>> itemOptFuture) {
-        return itemOptFuture.handle((itemOpt, throwable) ->
-            (throwable == null) ? itemOpt.map(i -> ok(i)).orElse(notFound()) : notFound());
+        return itemOptFuture.handle((itemOpt, throwable) -> {
+            if (throwable != null) {
+                log.error("Could not get item!", throwable);
+                return notFound();
+            }
+            return itemOpt.map(i -> ok(i)).orElse(notFound());
+        });
     }
 
     public static <T, E> HttpEntity<E> getOr404(final Optional<T> itemOpt, final Function<T, HttpEntity<E>> transformer) {
