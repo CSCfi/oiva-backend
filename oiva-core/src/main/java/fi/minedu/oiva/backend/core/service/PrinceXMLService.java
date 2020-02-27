@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static fi.minedu.oiva.backend.model.entity.OivaTemplates.*;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.AttachmentType;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderLanguage;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderOptions;
 
 @Service
 public class PrinceXMLService {
@@ -103,14 +105,7 @@ public class PrinceXMLService {
         return new Prince(princeExecPath, (msg1, msg2, msg3) -> logger.info("Prince data " + msg1 + " -- " + msg2 + " --- " + msg3));
     }
 
-    /**
-     *  Throws exception if princexml engine fails
-     */
-    protected void healthCheck() throws Exception {
-        try {
-            getPrinceEngine().convert(IOUtils.toInputStream("<html/>"), NullOutputStream.NULL_OUTPUT_STREAM);
-        } catch(Exception e) {
-            throw new IllegalStateException("PrinceXML failure");
-        }
+    protected boolean healthCheck()  {
+        return generatePDF("<html/>", NullOutputStream.NULL_OUTPUT_STREAM);
     }
 }
