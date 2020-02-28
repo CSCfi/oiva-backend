@@ -17,6 +17,7 @@ import static fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter.Typ
 import static fi.minedu.oiva.backend.core.extension.MuutosTransformerFilter.Type.muutosYlakoodi;
 import static fi.minedu.oiva.backend.core.extension.SortListFilter.SortTarget.luvat;
 import static fi.minedu.oiva.backend.core.extension.SortListFilter.SortTarget.maaraykset;
+import static fi.minedu.oiva.backend.core.extension.SortListFilter.SortTarget.muutokset;
 
 @Configuration
 public class OivaPebbleConfig extends PebbleConfig {
@@ -34,6 +35,7 @@ public class OivaPebbleConfig extends PebbleConfig {
                 filters.put("htmlClass", new MaaraysTransformerFilter(htmlClass));
                 filters.put("sortLupa", new SortListFilter(luvat));
                 filters.put("sortMaarays", new SortListFilter(maaraykset));
+                filters.put("sortMuutos", new SortListFilter(muutokset));
                 filters.put("filterMuutos", new MuutosListFilter());
                 filters.put("muutosYlakoodi", new MuutosTransformerFilter(muutosYlakoodi));
                 return filters;
