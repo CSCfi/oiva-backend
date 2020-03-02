@@ -66,14 +66,13 @@ public abstract class CacheService {
         });
     }
 
-    /**
-     * Throws exception if cannot connect to redis
-     */
-    protected void healthCheck() {
+    protected boolean healthCheck() {
         try {
             redisTemplate.getClientList();
+            return true;
         } catch(Exception e) {
-            throw new IllegalStateException("Redis failure");
+            logger.error("Cannot connect to redis", e);
+            return false;
         }
     }
 }
