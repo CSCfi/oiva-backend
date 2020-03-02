@@ -77,12 +77,11 @@ public class PrinceXMLController {
     private OpintopolkuService opintopolkuService;
 
     @OivaAccess_Public
-    @RequestMapping(value = "/{diaarinumero}/**", method = GET)
+    @RequestMapping(value = "/{uuid}", method = GET)
     @ApiOperation(notes = "Tarjoaa luvan PDF-muodossa", value = "")
-    public ResponseEntity<Resource> providePdf(final @PathVariable String diaarinumero, final HttpServletRequest request) {
-        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+    public ResponseEntity<Resource> providePdf(final @PathVariable String uuid) {
         try {
-            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
+            final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
             if(lupaOpt.isPresent()) {
                 final Path lupaPath = Paths.get(fileStorageService.getLupaPDFFilePath(lupaOpt).orElseThrow(IllegalArgumentException::new));
                 if(Files.exists(lupaPath)) {
@@ -93,28 +92,27 @@ public class PrinceXMLController {
                         .contentLength(lupaBar.contentLength())
                         .body(lupaBar);
                 } else {
-                    logger.error("No such Lupa PDF with diaarinumero " + diaariNumero);
+                    logger.error("No such Lupa PDF with diaarinumero " + uuid);
                     return ResponseEntity.notFound().build();
                 }
             } else {
-                logger.error("No such Lupa with diaarinumero " + diaariNumero);
+                logger.error("No such Lupa with diaarinumero " + uuid);
                 return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
-            logger.error("Failed to provide Lupa PDF with diaarinumero {}", diaariNumero, e);
+            logger.error("Failed to provide Lupa PDF with diaarinumero {}", uuid, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @OivaAccess_Esittelija
-    @RequestMapping(value = "/esikatsele/{diaarinumero}/**", method = GET)
+    @RequestMapping(value = "/esikatsele/{uuid}", method = GET)
     @Produces({ PrinceXMLController.APPLICATION_PDF })
     @ResponseBody
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
-    public void previewPdf(final @PathVariable String diaarinumero, final HttpServletResponse response, final HttpServletRequest request) {
-        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+    public void previewPdf(final @PathVariable String uuid, final HttpServletResponse response) {
         try {
-            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
+            final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
             if(lupaOpt.isPresent()) {
                 final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt, renderOptions).orElseThrow(IllegalStateException::new);
@@ -122,39 +120,38 @@ public class PrinceXMLController {
                 response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
-                    response.getWriter().write("Failed to generate Lupa with diaarinumero " + diaariNumero);
+                    response.getWriter().write("Failed to generate Lupa with diaarinumero " + uuid);
                 }
             } else {
                 response.setStatus(notFound().getStatusCode().value());
-                response.getWriter().write("No such Lupa with diaarinumero " + diaariNumero);
+                response.getWriter().write("No such Lupa with diaarinumero " + uuid);
             }
         } catch (Exception e) {
-            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaariNumero, e);
+            logger.error("Failed to generate Lupa PDF with diaarinumero {}", uuid, e);
             response.setStatus(get500().getStatusCode().value());
         }
     }
 
     @OivaAccess_Esittelija
-    @RequestMapping(value = "/tallenna/{diaarinumero}/**", method = PUT)
+    @RequestMapping(value = "/tallenna/{uuid}", method = PUT)
     @ApiOperation(notes = "Tuottaa ja tallentaa luvan PDF-muodossa", value = "")
-    public ResponseEntity savePDF(final @PathVariable String diaarinumero, final HttpServletRequest request) {
-        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+    public ResponseEntity savePDF(final @PathVariable String uuid) {
         try {
-            final Optional<Lupa> lupaOpt = lupaService.getByDiaarinumero(diaariNumero, With.all);
+            final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
             if(lupaOpt.isPresent()) {
                 final Optional<File> writtenFile = fileStorageService.writeLupaPDF(lupaOpt);
                 if(writtenFile.isPresent()) {
                     return ok();
                 } else {
-                    logger.error("Failed to generate Lupa with diaarinumero " + diaariNumero);
+                    logger.error("Failed to generate Lupa with uuid " + uuid);
                     return get500();
                 }
             } else {
-                logger.error("No such Lupa with diaarinumero " + diaariNumero);
+                logger.error("No such Lupa with uuid " + uuid);
                 return notFound();
             }
         } catch (Exception e) {
-            logger.error("Failed to generate Lupa PDF with diaarinumero {}", diaariNumero, e);
+            logger.error("Failed to generate Lupa PDF with uuid {}", uuid, e);
             return get500();
         }
     }

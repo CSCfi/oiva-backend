@@ -55,7 +55,7 @@ public class PebbleController {
     public HttpEntity<String> renderList() {
         try {
             final List<Lupa> luvat = lupaService.getAll().stream()
-                .map(lupa -> lupaService.getByDiaarinumero(lupa.getDiaarinumero(), With.all))
+                .map(lupa -> lupaService.getByUuid(lupa.getUUIDValue(), With.all))
                 .filter(Optional::isPresent).map(Optional::get)
                 .collect(Collectors.toList());
             return getOr404(service.toListHTML(luvat));
@@ -67,19 +67,17 @@ public class PebbleController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(value = "/{diaarinumero}/**", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
+    @RequestMapping(value = "/{uuid}", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
     @ApiOperation(notes = "Tuottaa luvan HTML-muodossa", value = "")
-    public HttpEntity<String> renderHTML(final @PathVariable String diaarinumero, final HttpServletRequest request, final @QueryParam("mode") String mode) {
-
-        final String diaariNumero =  RequestUtils.getPathVariable(request, diaarinumero);
+    public HttpEntity<String> renderHTML(final @PathVariable String uuid, final @QueryParam("mode") String mode) {
         try {
-            final Lupa lupa = lupaService.getByDiaarinumero(diaariNumero, With.all).get();
+            final Lupa lupa = lupaService.getByUuid(uuid, With.all).get();
             final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
             options.setDebugMode(StringUtils.equals(mode, "debug"));
             return getOr404(service.toHTML(Optional.ofNullable(lupa), options));
 
         } catch (Exception e) {
-            logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaariNumero, e);
+            logger.error("Failed to toHTML html from source with uuid {}: {}", uuid, e);
             return get500();
         }
     }
