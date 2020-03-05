@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = 1922849981;
+    private static final long serialVersionUID = -836952775;
 
     private Long   id;
     private String diaarinumero;
@@ -39,6 +39,7 @@ public class Lupahistoria implements Serializable {
     private Date   paatospvm;
     private String filename;
     private UUID   uuid;
+    private Date   kumottupvm;
 
     public Lupahistoria() {}
 
@@ -54,6 +55,7 @@ public class Lupahistoria implements Serializable {
         this.paatospvm = value.paatospvm;
         this.filename = value.filename;
         this.uuid = value.uuid;
+        this.kumottupvm = value.kumottupvm;
     }
 
     public Lupahistoria(
@@ -67,7 +69,8 @@ public class Lupahistoria implements Serializable {
         Date   voimassaololoppupvm,
         Date   paatospvm,
         String filename,
-        UUID   uuid
+        UUID   uuid,
+        Date   kumottupvm
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -80,6 +83,7 @@ public class Lupahistoria implements Serializable {
         this.paatospvm = paatospvm;
         this.filename = filename;
         this.uuid = uuid;
+        this.kumottupvm = kumottupvm;
     }
 
     public Long getId() {
@@ -185,6 +189,14 @@ public class Lupahistoria implements Serializable {
         this.uuid = uuid;
     }
 
+    public Date getKumottupvm() {
+        return this.kumottupvm;
+    }
+
+    public void setKumottupvm(Date kumottupvm) {
+        this.kumottupvm = kumottupvm;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -200,6 +212,7 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(filename);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(kumottupvm);
 
         sb.append(")");
         return sb.toString();
