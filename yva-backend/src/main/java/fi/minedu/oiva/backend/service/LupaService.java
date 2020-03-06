@@ -103,10 +103,6 @@ public class LupaService {
                 .collect(Collectors.toList());
     }
 
-    public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
-    }
-
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
         return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus).
                 and(LUPA.ALKUPVM.le(DSL.currentDate()))), withOptions);

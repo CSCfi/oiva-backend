@@ -1,9 +1,8 @@
 package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
-
+import fi.minedu.oiva.backend.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.LupaService;
 import fi.minedu.oiva.backend.service.LupahistoriaService;
@@ -61,11 +60,10 @@ public class LupaController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/{diaarinumero}/**")
-    @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero, final HttpServletRequest request,
-        final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.getByDiaarinumero(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
+    @RequestMapping(method = GET, value = "/{uuid}")
+    @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.getByUuid(uuid, options(with))));
     }
 
     @OivaAccess_Public
@@ -89,10 +87,11 @@ public class LupaController {
         return async(() -> lhservice.getHistoriaByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 
+    @Deprecated
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/lupa/{uuid}")
-    @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.getByUuid(uuid, options(with))));
+    @ApiOperation(notes = "Huom! Rajapinta voi poistua sillä se on duplikaatti rajapinnalle `" + path + "/{uuid}`", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getLupaByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
+        return getByUuid(uuid, with);
     }
 }

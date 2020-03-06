@@ -54,7 +54,7 @@ public class YvaCacheService extends CacheService {
         koodistoService.getKuntaAluehallintovirastoMap();
         koodistoService.getKuntaMaakuntaMap();
         lupaService.getAll(With.all).stream().forEach(lupa ->
-            lupaService.getByDiaarinumero(lupa.getDiaarinumero(), With.all));
+            lupaService.getByUuid(lupa.getUUIDValue(), With.all));
         refreshKoulutus(false);
 
         final long duration = System.currentTimeMillis() - startTime;
@@ -65,14 +65,14 @@ public class YvaCacheService extends CacheService {
     /**
      * Clear and pre-populate specific lupa related cache
      *
-     * @param diaarinumero Lupa's diaarinumero
+     * @param uuid Lupa's uuid
      * @return Duration
      */
-    public long refreshLupa(final String diaarinumero) {
+    public long refreshLupa(final String uuid) {
         final long startTime = System.currentTimeMillis();
 
         final Set<String> cacheKeys = new HashSet<>();
-        final Function<String, Optional<Lupa>> getLupa = byDiaarinumero -> lupaService.getByDiaarinumero(byDiaarinumero, With.all);
+        final Function<String, Optional<Lupa>> getLupa = byUuid -> lupaService.getByUuid(byUuid, With.all);
 
         final BiFunction<Class<?>, String, String> cacheNameBuilder = (cacheBase, cacheSuffix) ->
             cacheBase.getSimpleName() + (StringUtils.isNotBlank(cacheSuffix) ? ":" + cacheSuffix : "");
@@ -107,7 +107,7 @@ public class YvaCacheService extends CacheService {
         };
 
         // collect cache keys
-        getLupa.apply(diaarinumero).ifPresent(lupa -> {
+        getLupa.apply(uuid).ifPresent(lupa -> {
             organisaatioKeys.accept(lupa.getJarjestajaOpt());
             maarayksetKeys.accept(lupa.getMaaraykset());
         });
@@ -116,10 +116,10 @@ public class YvaCacheService extends CacheService {
         flushCacheKeys(cacheKeys);
 
         // refresh lupa
-        getLupa.apply(diaarinumero);
+        getLupa.apply(uuid);
 
         final long duration = System.currentTimeMillis() - startTime;
-        logger.info("Lupa {} cache refreshed in {}ms", diaarinumero, duration);
+        logger.info("Lupa {} cache refreshed in {}ms", uuid, duration);
         return duration;
     }
 
