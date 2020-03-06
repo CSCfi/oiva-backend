@@ -56,8 +56,7 @@ public class LupaController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestajilla")
-    @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla. " +
-            "Voidaan myös rajata koulutustyypin ja oppilaitostyypin mukaan.", value = "")
+    @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla.", value = "")
     public CompletableFuture<Collection<Lupa>> getAllWithJarjestaja() {
         return async(() -> service.getAllWithJarjestaja(options(Organisaatio.class)));
     }
