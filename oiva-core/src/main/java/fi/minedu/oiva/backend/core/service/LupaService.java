@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -141,11 +140,18 @@ public class LupaService extends BaseService {
         return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+    public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
+        return getByYtunnus(ytunnus, null, null, withOptions);
+    }
+
+    public Optional<Lupa> getByYtunnus(final String ytunnus, String koulutustyyppi, String oppilaitostyyppi,
+                                       final String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
-                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())))
-        ), withOptions);
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+        Optional.ofNullable(koulutustyyppi).ifPresent(tyyppi -> query.and(LUPA.KOULUTUSTYYPPI.eq(tyyppi)));
+        Optional.ofNullable(oppilaitostyyppi).ifPresent(tyyppi -> query.and(LUPA.OPPILAITOSTYYPPI.eq(tyyppi)));
+        return get(query, withOptions);
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {

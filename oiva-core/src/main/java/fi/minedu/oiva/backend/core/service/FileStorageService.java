@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;
+
 @Service
 public class FileStorageService {
 
@@ -139,7 +141,7 @@ public class FileStorageService {
             return Collections.singleton(executorName + "does not exist");
         }
 
-        final Function<Lupa, Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), With.all);
+        final Function<Lupa, Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), options(With.all));
         final Consumer<String> addExecutorState = state -> asyncService.addState(writeAllPDFs, state);
         if (existingExecutorContext.isPresent()) {
             return existingExecutorContext.get().reversedStates();

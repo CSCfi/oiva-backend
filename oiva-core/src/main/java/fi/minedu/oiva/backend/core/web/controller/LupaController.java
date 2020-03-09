@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
+
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;
@@ -29,8 +30,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping(
-    value = "${api.url.prefix}" + LupaController.path,
-    produces = { MediaType.APPLICATION_JSON_VALUE })
+        value = "${api.url.prefix}" + LupaController.path,
+        produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Lupien hallinta")
 public class LupaController {
 
@@ -65,7 +66,7 @@ public class LupaController {
     @RequestMapping(method = GET, value = "/{diaarinumero}/**")
     @ApiOperation(notes = "Palauttaa luvan diaarinumeron perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByDiaarinumero(final @PathVariable String diaarinumero, final HttpServletRequest request,
-        final @RequestParam(value = "with", required = false) String with) {
+                                                                 final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.getByDiaarinumero(RequestUtils.getPathVariable(request, diaarinumero), options(with))));
     }
 
@@ -74,6 +75,16 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus, final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.getByYtunnus(ytunnus, options(with))));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/koulutustyyppi/{koulutustyyppi}/oppilaitostyyppi/{oppilaitostyyppi}")
+    @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getByYtunnusAndKoulutustyyppi(final @PathVariable String ytunnus,
+                                                                             @PathVariable String koulutustyyppi,
+                                                                             @PathVariable String oppilaitostyyppi,
+                                                                             final @RequestParam(value = "with", required = false) String with) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, options(with))));
     }
 
     @OivaAccess_Public

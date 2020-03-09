@@ -53,6 +53,14 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         getLuvat(params, 2);
     }
 
+    @Test
+    public void getByYtunnusAndKoulutustyyppi() {
+        setUpDb("sql/extra_lupa_data.sql");
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/koulutustyyppi/2/oppilaitostyyppi/1", HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(response.getBody());
+        assertEquals("11/111/2020", doc.read("$.diaarinumero"));
+    }
+
     private void getLuvat(MultiValueMap<String, String> queryParams, int expected) {
         final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString("/api/luvat/jarjestajilla")
                 .queryParams(queryParams);
