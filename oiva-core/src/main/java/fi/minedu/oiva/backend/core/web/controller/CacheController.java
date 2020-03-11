@@ -30,10 +30,10 @@ public class CacheController extends BaseCacheController {
     private OivaCacheService cacheService;
 
     @OivaAccess_Application
-    @RequestMapping(value="/refresh/lupa/{diaarinumero}/**", method = PUT)
+    @RequestMapping(value="/refresh/lupa/{uuid}", method = PUT)
     @ApiOperation(notes = "Uudistaa lupaan liittyvän välimuistin", value = "", authorizations = @Authorization(value = "CAS"))
-    public ResponseEntity refreshLupa(final @PathVariable String diaarinumero, final HttpServletRequest request) {
-        async(() -> cacheService.refreshLupa(RequestUtils.getPathVariable(request, diaarinumero)));
+    public ResponseEntity refreshLupa(final @PathVariable String uuid) {
+        async(() -> cacheService.refreshLupa(uuid));
         return ok();
     }
 

@@ -136,10 +136,6 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
-    }
-
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
         return getByYtunnus(ytunnus, null, null, withOptions);
     }
@@ -239,6 +235,7 @@ public class LupaService extends BaseService {
 
     /**
      * Ammattilisten tutkintojen ja koulutuksen järjestämisluvissa määrätyt tutkinnot, osaamisalarajoitukset sekä opetuskielet koulutuksen järjestäjän mukaan
+     *
      * @return csv file of query result
      */
     public String getReport() {
