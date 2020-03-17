@@ -1,10 +1,13 @@
 package fi.minedu.oiva.backend.service;
 
 import fi.minedu.oiva.backend.entity.oiva.Lupahistoria;
+import fi.minedu.oiva.backend.jooq.tables.records.LupahistoriaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 import static fi.minedu.oiva.backend.jooq.Tables.LUPAHISTORIA;
 
@@ -28,5 +31,12 @@ public class LupahistoriaService {
             LUPAHISTORIA.FILENAME, LUPAHISTORIA.PAATOSPVM, LUPAHISTORIA.UUID, LUPAHISTORIA.KUMOTTUPVM).from(LUPAHISTORIA)
             .where(LUPAHISTORIA.YTUNNUS.eq(ytunnus))
             .orderBy(LUPAHISTORIA.PAATOSPVM).fetchInto(Lupahistoria.class);
+    }
+
+    public Optional<Lupahistoria> getByUuid(String uuid) {
+        return dsl.select(LUPAHISTORIA.fields())
+                .from(LUPAHISTORIA)
+                .where(LUPAHISTORIA.UUID.eq(UUID.fromString(uuid)))
+                .fetchOptionalInto(Lupahistoria.class);
     }
 }
