@@ -14,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -53,6 +54,9 @@ public class PrinceXMLController {
     public static final String APPLICATION_PDF = "application/pdf";
 
     public static final String path = "/pdf";
+
+    @Value("${api.url.prefix}")
+    private String apiPrefix;
 
     @Autowired
     private PebbleService pebbleService;
@@ -122,10 +126,10 @@ public class PrinceXMLController {
                         }
 
                         headers.add("Location",
-                                "/api" + PrinceXMLController.path + "/" + lupa.get().getUUIDValue());
+                                apiPrefix + PrinceXMLController.path + "/" + lupa.get().getUUIDValue());
                     } else {
                         headers.add("Location",
-                                "/api" + PebbleController.path + "/resources/liitteet/lupahistoria/" + historia.getFilename());
+                                apiPrefix + PebbleController.path + "/resources/liitteet/lupahistoria/" + historia.getFilename());
                     }
                     return new ResponseEntity<>(headers, HttpStatus.FOUND);
                 })
