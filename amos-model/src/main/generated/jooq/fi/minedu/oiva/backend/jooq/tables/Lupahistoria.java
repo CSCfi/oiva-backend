@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -37,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
 
-    private static final long serialVersionUID = -673726707;
+    private static final long serialVersionUID = 825338497;
 
     /**
      * The reference instance of <code>oiva.lupahistoria</code>
@@ -113,6 +114,11 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     public final TableField<LupahistoriaRecord, Date> KUMOTTUPVM = createField("kumottupvm", org.jooq.impl.SQLDataType.DATE, this, "");
 
     /**
+     * The column <code>oiva.lupahistoria.lupa_id</code>.
+     */
+    public final TableField<LupahistoriaRecord, Long> LUPA_ID = createField("lupa_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * Create a <code>oiva.lupahistoria</code> table reference
      */
     public Lupahistoria() {
@@ -164,6 +170,14 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     @Override
     public List<UniqueKey<LupahistoriaRecord>> getKeys() {
         return Arrays.<UniqueKey<LupahistoriaRecord>>asList(Keys.LUPAHISTORIA_PKEY, Keys.LUPAHISTORIA_UUID_KEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<LupahistoriaRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<LupahistoriaRecord, ?>>asList(Keys.LUPAHISTORIA__LUPAHISTORIA_LUPA_ID_FKEY);
     }
 
     /**

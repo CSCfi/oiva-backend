@@ -81,7 +81,7 @@ public class LupaService {
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
     }
 
-    protected Optional<Lupa> getById(final Long id) {
+    public Optional<Lupa> getById(final Long id) {
         return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id)).fetchOneInto(Lupa.class) : null);
     }
 

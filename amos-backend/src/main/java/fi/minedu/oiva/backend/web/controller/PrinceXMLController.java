@@ -2,22 +2,22 @@ package fi.minedu.oiva.backend.web.controller;
 
 import fi.minedu.oiva.backend.entity.*;
 import fi.minedu.oiva.backend.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.*;
-import fi.minedu.oiva.backend.util.RequestUtils;
 import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +55,9 @@ public class PrinceXMLController {
 
     public static final String path = "/pdf";
 
+    @Value("${api.url.prefix}")
+    private String apiPrefix;
+
     @Autowired
     private PebbleService pebbleService;
 
@@ -75,6 +78,9 @@ public class PrinceXMLController {
 
     @Autowired
     private OpintopolkuService opintopolkuService;
+
+    @Autowired
+    private LupahistoriaService lupahistoriaService;
 
     @OivaAccess_Public
     @RequestMapping(value = "/{uuid}", method = GET)
@@ -103,6 +109,34 @@ public class PrinceXMLController {
             logger.error("Failed to provide Lupa PDF with uuid {}", uuid, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/historia/{uuid}", method = GET)
+    @ApiOperation(notes = "Tarjoaa ei-voimassa olevan luvan PDF-muodossa ohjaamalla pyynnön oikeaan urliin", value = "")
+    public ResponseEntity<?> provideHistoryPdf(final @PathVariable String uuid) {
+        return lupahistoriaService.getByUuid(uuid)
+                .map(historia -> {
+                    HttpHeaders headers = new HttpHeaders();
+                    if (historia.getLupaId() != null) {
+                        Optional<Lupa> lupa = lupaService.getById(historia.getLupaId());
+                        if (!lupa.isPresent()) {
+                            logger.error("No lupa found (id={}) by lupa history item (uuid={})", historia.getLupaId(), uuid);
+                            return ResponseEntity.notFound().build();
+                        }
+
+                        headers.add("Location",
+                                apiPrefix + PrinceXMLController.path + "/" + lupa.get().getUUIDValue());
+                    } else {
+                        headers.add("Location",
+                                apiPrefix + PebbleController.path + "/resources/liitteet/lupahistoria/" + historia.getFilename());
+                    }
+                    return new ResponseEntity<>(headers, HttpStatus.FOUND);
+                })
+                .orElseGet(() -> {
+                    logger.error("No lupa history with uuid {}", uuid);
+                    return ResponseEntity.notFound().build();
+                });
     }
     
     @OivaAccess_Esittelija
