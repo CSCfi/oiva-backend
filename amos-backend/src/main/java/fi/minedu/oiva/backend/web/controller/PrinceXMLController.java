@@ -112,7 +112,7 @@ public class PrinceXMLController {
     }
 
     @OivaAccess_Public
-    @RequestMapping(value = "/history/{uuid}", method = GET)
+    @RequestMapping(value = "/historia/{uuid}", method = GET)
     @ApiOperation(notes = "Tarjoaa ei-voimassa olevan luvan PDF-muodossa ohjaamalla pyynnön oikeaan urliin", value = "")
     public ResponseEntity<?> provideHistoryPdf(final @PathVariable String uuid) {
         return lupahistoriaService.getByUuid(uuid)
