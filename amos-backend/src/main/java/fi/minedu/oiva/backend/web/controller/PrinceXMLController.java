@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.service.*;
+import fi.minedu.oiva.backend.util.ControllerUtil;
 import fi.minedu.oiva.backend.util.With;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -117,20 +118,19 @@ public class PrinceXMLController {
     public ResponseEntity<?> provideHistoryPdf(final @PathVariable String uuid) {
         return lupahistoriaService.getByUuid(uuid)
                 .map(historia -> {
-                    HttpHeaders headers = new HttpHeaders();
+                    final String location;
                     if (historia.getLupaId() != null) {
                         Optional<Lupa> lupa = lupaService.getById(historia.getLupaId());
                         if (!lupa.isPresent()) {
                             logger.error("No lupa found (id={}) by lupa history item (uuid={})", historia.getLupaId(), uuid);
                             return ResponseEntity.notFound().build();
                         }
-
-                        headers.add("Location",
-                                apiPrefix + PrinceXMLController.path + "/" + lupa.get().getUUIDValue());
+                        location = apiPrefix + PrinceXMLController.path + "/" + lupa.get().getUUIDValue();
                     } else {
-                        headers.add("Location",
-                                apiPrefix + PebbleController.path + "/resources/liitteet/lupahistoria/" + historia.getFilename());
+                        location = apiPrefix + PebbleController.path + "/resources/liitteet/lupahistoria/" + ControllerUtil.encode(historia.getFilename());
                     }
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add("Location", location);
                     return new ResponseEntity<>(headers, HttpStatus.FOUND);
                 })
                 .orElseGet(() -> {

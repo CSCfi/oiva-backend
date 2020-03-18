@@ -6,7 +6,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,5 +121,13 @@ public final class ControllerUtil {
 
     public static String[] options(final Class<?>... with) {
         return null == with ? new String[0] : options(Arrays.asList(with).stream().map(Class::getSimpleName).collect(Collectors.joining(",")));
+    }
+
+    public static String encode(String value) {
+        try {
+            return URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Cannot encode value: " + value);
+        }
     }
 }
