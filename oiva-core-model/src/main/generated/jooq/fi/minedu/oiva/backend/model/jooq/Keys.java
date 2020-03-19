@@ -94,7 +94,6 @@ public class Keys {
     public static final UniqueKey<LiiteRecord> LIITE_PKEY = UniqueKeys0.LIITE_PKEY;
     public static final UniqueKey<LiiteRecord> LIITE_UUID_KEY = UniqueKeys0.LIITE_UUID_KEY;
     public static final UniqueKey<LupaRecord> LUPA_PKEY = UniqueKeys0.LUPA_PKEY;
-    public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = UniqueKeys0.LUPA_DIAARINUMERO_KEY;
     public static final UniqueKey<LupaRecord> LUPA_UUID_KEY = UniqueKeys0.LUPA_UUID_KEY;
     public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = UniqueKeys0.LUPA_LIITE_PKEY;
     public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = UniqueKeys0.LUPAHISTORIA_PKEY;
@@ -125,6 +124,7 @@ public class Keys {
     public static final ForeignKey<LupaRecord, AsiatyyppiRecord> LUPA__FK_ASIATYYPPI = ForeignKeys0.LUPA__FK_ASIATYYPPI;
     public static final ForeignKey<LupaLiiteRecord, LupaRecord> LUPA_LIITE__FK_LUPA = ForeignKeys0.LUPA_LIITE__FK_LUPA;
     public static final ForeignKey<LupaLiiteRecord, LiiteRecord> LUPA_LIITE__FK_LIITE = ForeignKeys0.LUPA_LIITE__FK_LIITE;
+    public static final ForeignKey<LupahistoriaRecord, LupaRecord> LUPAHISTORIA__LUPAHISTORIA_LUPA_ID_FKEY = ForeignKeys0.LUPAHISTORIA__LUPAHISTORIA_LUPA_ID_FKEY;
     public static final ForeignKey<MaaraysRecord, LupaRecord> MAARAYS__FK_LUPA = ForeignKeys0.MAARAYS__FK_LUPA;
     public static final ForeignKey<MaaraysRecord, KohdeRecord> MAARAYS__FK_KOHDE = ForeignKeys0.MAARAYS__FK_KOHDE;
     public static final ForeignKey<MaaraysRecord, MaaraystyyppiRecord> MAARAYS__FK_MAARAYSTYYPPI = ForeignKeys0.MAARAYS__FK_MAARAYSTYYPPI;
@@ -172,7 +172,6 @@ public class Keys {
         public static final UniqueKey<LiiteRecord> LIITE_PKEY = createUniqueKey(Liite.LIITE, "liite_pkey", Liite.LIITE.ID);
         public static final UniqueKey<LiiteRecord> LIITE_UUID_KEY = createUniqueKey(Liite.LIITE, "liite_uuid_key", Liite.LIITE.UUID);
         public static final UniqueKey<LupaRecord> LUPA_PKEY = createUniqueKey(Lupa.LUPA, "lupa_pkey", Lupa.LUPA.ID);
-        public static final UniqueKey<LupaRecord> LUPA_DIAARINUMERO_KEY = createUniqueKey(Lupa.LUPA, "lupa_diaarinumero_key", Lupa.LUPA.DIAARINUMERO);
         public static final UniqueKey<LupaRecord> LUPA_UUID_KEY = createUniqueKey(Lupa.LUPA, "lupa_uuid_key", Lupa.LUPA.UUID);
         public static final UniqueKey<LupaLiiteRecord> LUPA_LIITE_PKEY = createUniqueKey(LupaLiite.LUPA_LIITE, "lupa_liite_pkey", LupaLiite.LUPA_LIITE.ID);
         public static final UniqueKey<LupahistoriaRecord> LUPAHISTORIA_PKEY = createUniqueKey(Lupahistoria.LUPAHISTORIA, "lupahistoria_pkey", Lupahistoria.LUPAHISTORIA.ID);
@@ -201,6 +200,7 @@ public class Keys {
         public static final ForeignKey<LupaRecord, AsiatyyppiRecord> LUPA__FK_ASIATYYPPI = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.ASIATYYPPI_PKEY, Lupa.LUPA, "lupa__fk_asiatyyppi", Lupa.LUPA.ASIATYYPPI_ID);
         public static final ForeignKey<LupaLiiteRecord, LupaRecord> LUPA_LIITE__FK_LUPA = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LUPA_PKEY, LupaLiite.LUPA_LIITE, "lupa_liite__fk_lupa", LupaLiite.LUPA_LIITE.LUPA_ID);
         public static final ForeignKey<LupaLiiteRecord, LiiteRecord> LUPA_LIITE__FK_LIITE = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LIITE_PKEY, LupaLiite.LUPA_LIITE, "lupa_liite__fk_liite", LupaLiite.LUPA_LIITE.LIITE_ID);
+        public static final ForeignKey<LupahistoriaRecord, LupaRecord> LUPAHISTORIA__LUPAHISTORIA_LUPA_ID_FKEY = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LUPA_PKEY, Lupahistoria.LUPAHISTORIA, "lupahistoria__lupahistoria_lupa_id_fkey", Lupahistoria.LUPAHISTORIA.LUPA_ID);
         public static final ForeignKey<MaaraysRecord, LupaRecord> MAARAYS__FK_LUPA = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.LUPA_PKEY, Maarays.MAARAYS, "maarays__fk_lupa", Maarays.MAARAYS.LUPA_ID);
         public static final ForeignKey<MaaraysRecord, KohdeRecord> MAARAYS__FK_KOHDE = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.KOHDE_PKEY, Maarays.MAARAYS, "maarays__fk_kohde", Maarays.MAARAYS.KOHDE_ID);
         public static final ForeignKey<MaaraysRecord, MaaraystyyppiRecord> MAARAYS__FK_MAARAYSTYYPPI = createForeignKey(fi.minedu.oiva.backend.model.jooq.Keys.MAARAYSTYYPPI_PKEY, Maarays.MAARAYS, "maarays__fk_maaraystyyppi", Maarays.MAARAYS.MAARAYSTYYPPI_ID);

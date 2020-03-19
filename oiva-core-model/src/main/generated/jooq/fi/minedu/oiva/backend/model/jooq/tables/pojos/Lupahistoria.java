@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -357919546;
+    private static final long serialVersionUID = -375823495;
 
     private Long   id;
     private String diaarinumero;
@@ -40,6 +40,8 @@ public class Lupahistoria implements Serializable {
     private String filename;
     private UUID   uuid;
     private String asianumero;
+    private Date   kumottupvm;
+    private Long   lupaId;
 
     public Lupahistoria() {}
 
@@ -56,6 +58,8 @@ public class Lupahistoria implements Serializable {
         this.filename = value.filename;
         this.uuid = value.uuid;
         this.asianumero = value.asianumero;
+        this.kumottupvm = value.kumottupvm;
+        this.lupaId = value.lupaId;
     }
 
     public Lupahistoria(
@@ -70,7 +74,9 @@ public class Lupahistoria implements Serializable {
         Date   paatospvm,
         String filename,
         UUID   uuid,
-        String asianumero
+        String asianumero,
+        Date   kumottupvm,
+        Long   lupaId
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -84,6 +90,8 @@ public class Lupahistoria implements Serializable {
         this.filename = filename;
         this.uuid = uuid;
         this.asianumero = asianumero;
+        this.kumottupvm = kumottupvm;
+        this.lupaId = lupaId;
     }
 
     public Long getId() {
@@ -198,6 +206,22 @@ public class Lupahistoria implements Serializable {
         this.asianumero = asianumero;
     }
 
+    public Date getKumottupvm() {
+        return this.kumottupvm;
+    }
+
+    public void setKumottupvm(Date kumottupvm) {
+        this.kumottupvm = kumottupvm;
+    }
+
+    public Long getLupaId() {
+        return this.lupaId;
+    }
+
+    public void setLupaId(Long lupaId) {
+        this.lupaId = lupaId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -214,6 +238,8 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(filename);
         sb.append(", ").append(uuid);
         sb.append(", ").append(asianumero);
+        sb.append(", ").append(kumottupvm);
+        sb.append(", ").append(lupaId);
 
         sb.append(")");
         return sb.toString();
