@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa extends TableImpl<LupaRecord> {
 
-    private static final long serialVersionUID = -733125209;
+    private static final long serialVersionUID = -1247351184;
 
     /**
      * The reference instance of <code>lupa</code>
@@ -213,7 +213,7 @@ public class Lupa extends TableImpl<LupaRecord> {
      */
     @Override
     public List<UniqueKey<LupaRecord>> getKeys() {
-        return Arrays.<UniqueKey<LupaRecord>>asList(Keys.LUPA_PKEY, Keys.LUPA_DIAARINUMERO_KEY, Keys.LUPA_UUID_KEY);
+        return Arrays.<UniqueKey<LupaRecord>>asList(Keys.LUPA_PKEY, Keys.LUPA_UUID_KEY);
     }
 
     /**
