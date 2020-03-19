@@ -28,7 +28,7 @@ public abstract class BaseLocalizationController {
         final @RequestParam(defaultValue = "false") Boolean refresh) {
         return async(() -> {
             if(refresh) service.refreshTranslations();
-            return service.getTranslationsWS(lang);
+            return service.getTranslations(lang);
         });
     }
 }
