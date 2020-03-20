@@ -1,7 +1,6 @@
 package fi.minedu.oiva.backend.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class LocalizationService {
@@ -28,26 +25,20 @@ public class LocalizationService {
     @Value("${opintopolku.baseUrl}${opintopolku.lokalisaatio.restUrl}")
     private String localizationUrl;
 
+    private final RestTemplate restTemplate;
+
     @Autowired
-    private RestTemplate restTemplate;
-
-    public Optional<JsonNode> getTranslations(final String lang) {
-        final ObjectMapper mapper = new ObjectMapper();
-        final InputStream is = getClass().getClassLoader().getResourceAsStream("languages/" + lang + ".json");
-        try {
-            return Optional.ofNullable(mapper.readTree(is));
-
-        } catch (IOException ioe) {
-            logger.error("Failed to get translation", ioe);
-            return Optional.empty();
-        }
+    public LocalizationService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
     @Cacheable(value = "LocalizationService:get", key = "#lang")
-    public Map<String, String> getTranslationsWS(final String lang) {
+    public Map<String, String> getTranslations(final String lang) {
         final Map<String, String> translations = new HashMap<>();
         try {
-            final JsonNode json = ObjectMapperSingleton.mapper.readTree(restTemplate.getForObject(String.format(localizationUrl + urlSuffix, lang), String.class));
+            final JsonNode json = ObjectMapperSingleton.mapper
+                    .readTree(restTemplate.getForObject(String.
+                            format(localizationUrl + urlSuffix, lang), String.class));
             if (json.isArray()) {
                 for (final JsonNode translation : json) {
                     translations.put(translation.get("key").asText(), translation.get("value").asText());
@@ -60,5 +51,6 @@ public class LocalizationService {
     }
 
     @CacheEvict(value = "LocalizationService", allEntries = true)
-    public void refreshTranslations() {}
+    public void refreshTranslations() {
+    }
 }
