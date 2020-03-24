@@ -13,6 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.http.HttpMethod.GET;
+
 public abstract class BaseExportControllerIT extends BaseIT {
 
     @Test
@@ -74,7 +76,7 @@ public abstract class BaseExportControllerIT extends BaseIT {
         }
         final String uri = uriBuilder.build().toUriString();
         final ResponseEntity<String> response =
-                makeRequest(uri, status, getBasicAuthHeaders("oiva", "oiva"));
+                makeRequest(GET, uri, getBasicAuthHeaders("oiva", "oiva"), null, status);
         final DocumentContext doc = jsonPath.parse(response.getBody() == null ? "{}" : response.getBody());
         log.info(doc.jsonString());
         return doc;
