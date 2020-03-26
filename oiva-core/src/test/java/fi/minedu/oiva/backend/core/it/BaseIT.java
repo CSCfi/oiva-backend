@@ -127,15 +127,19 @@ abstract public class BaseIT {
     }
 
     protected ResponseEntity<String> makeRequest(String uri, HttpStatus status) {
-        return makeRequest(uri, status, null);
+        return makeRequest(GET, uri, null, status);
     }
 
-    protected ResponseEntity<String> makeRequest(String uri, HttpStatus status, HttpHeaders headers) {
-        HttpEntity<String> entity = new HttpEntity<>(null, Optional.ofNullable(headers).
+    protected ResponseEntity<String> makeRequest(HttpMethod httpMethod, String uri, Object body, HttpStatus status) {
+        return makeRequest(httpMethod, uri, null, body, status);
+    }
+
+    protected ResponseEntity<String> makeRequest(HttpMethod method, String uri, HttpHeaders headers, Object body, HttpStatus status) {
+        HttpEntity<Object> entity = new HttpEntity<>(body, Optional.ofNullable(headers).
                 orElse(new HttpHeaders()));
         final ResponseEntity<String> response = restTemplate.exchange(
                 createURLWithPort(uri),
-                GET, entity, String.class);
+                method, entity, String.class);
         assertEquals(status, response.getStatusCode());
         return response;
     }
