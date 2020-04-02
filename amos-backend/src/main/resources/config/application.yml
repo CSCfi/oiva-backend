@@ -96,7 +96,8 @@ support:
     api.enabled: false
 
 logging:
-    file: /var/log/oiva/oiva-backend.log
+    path: /var/log/oiva
+    file: ${logging.path}/oiva-backend.log
     level:
         root: WARN
         fi.minedu.oiva: INFO

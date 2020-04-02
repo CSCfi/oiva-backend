@@ -78,9 +78,6 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <includes>
-                    <include>logback.xml</include>
-                </includes>
                 <excludes>
                     <exclude>${exclude.resources}</exclude>
                 </excludes>
@@ -154,7 +151,7 @@
             </activation>
             <properties>
                 <oiva.dbport>15432</oiva.dbport>
-                <exclude.resources>**/migration/V2.**</exclude.resources>
+                <exclude.resources>**/migration/V*.**</exclude.resources>
             </properties>
             <build>
                 <resources>

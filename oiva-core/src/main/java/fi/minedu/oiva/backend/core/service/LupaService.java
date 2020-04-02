@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -86,7 +85,7 @@ public class LupaService extends BaseService {
                 .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID));
     }
 
-    protected Optional<Lupa> getById(final Long id) {
+    public Optional<Lupa> getById(final Long id) {
         return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id))
                 .fetchOneInto(Lupa.class) : null);
     }
@@ -103,8 +102,12 @@ public class LupaService extends BaseService {
         } else return Optional.empty();
     }
 
-    public Collection<Lupa> getAllWithJarjestaja(final String... options) {
+    public Collection<Lupa> getAllWithJarjestaja(final String koulutustyyppi,
+                                                 final String oppilaitostyyppi,
+                                                 final String... options) {
         final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
+        Optional.ofNullable(koulutustyyppi).ifPresent(t -> query.where(LUPA.KOULUTUSTYYPPI.eq(t)));
+        Optional.ofNullable(oppilaitostyyppi).ifPresent(t -> query.where(LUPA.OPPILAITOSTYYPPI.eq(t)));
         query.leftJoin(ASIATYYPPI).on(ASIATYYPPI.ID.eq(LUPA.ASIATYYPPI_ID));
         return fetch(query, options);
     }
@@ -133,15 +136,18 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getByDiaarinumero(final String diaarinumero, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.DIAARINUMERO.eq(diaarinumero)), withOptions);
+    public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
+        return getByYtunnus(ytunnus, null, null, withOptions);
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+    public Optional<Lupa> getByYtunnus(final String ytunnus, String koulutustyyppi, String oppilaitostyyppi,
+                                       final String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
-                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())))
-        ), withOptions);
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+        Optional.ofNullable(koulutustyyppi).ifPresent(tyyppi -> query.and(LUPA.KOULUTUSTYYPPI.eq(tyyppi)));
+        Optional.ofNullable(oppilaitostyyppi).ifPresent(tyyppi -> query.and(LUPA.OPPILAITOSTYYPPI.eq(tyyppi)));
+        return get(query, withOptions);
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
@@ -229,6 +235,7 @@ public class LupaService extends BaseService {
 
     /**
      * Ammattilisten tutkintojen ja koulutuksen järjestämisluvissa määrätyt tutkinnot, osaamisalarajoitukset sekä opetuskielet koulutuksen järjestäjän mukaan
+     *
      * @return csv file of query result
      */
     public String getReport() {

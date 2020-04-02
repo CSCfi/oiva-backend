@@ -49,19 +49,17 @@ public abstract class BasePebbleController<T extends BasePebbleService> {
     }
 
     @OivaAccess_Public
-    @RequestMapping(value = "/{diaarinumero}/**", method = GET, produces = {javax.ws.rs.core.MediaType.TEXT_HTML})
+    @RequestMapping(value = "/{uuid}", method = GET, produces = { javax.ws.rs.core.MediaType.TEXT_HTML })
     @ApiOperation(notes = "Tuottaa luvan HTML-muodossa", value = "")
-    public HttpEntity<String> renderHTML(final @PathVariable String diaarinumero, final HttpServletRequest request, final @QueryParam("mode") String mode) {
-
-        final String diaariNumero = RequestUtils.getPathVariable(request, diaarinumero);
+    public HttpEntity<String> renderHTML(final @PathVariable String uuid, final @QueryParam("mode") String mode) {
         try {
-            return lupaService.getByDiaarinumero(diaariNumero, With.all).map(lupa -> {
+            return lupaService.getByUuid(uuid, With.all).map(lupa -> {
                 final RenderOptions options = RenderOptions.webOptions(lupaService.renderLanguageFor(lupa));
                 options.setDebugMode(StringUtils.equals(mode, "debug"));
                 return getOr404(service.toHTML(lupa, options));
             }).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         } catch (Exception e) {
-            logger.error("Failed to toHTML html from source with diaarinro {}: {}", diaariNumero, e);
+            logger.error("Failed to toHTML html from source with uuid {}: {}", uuid, e);
             return get500();
         }
     }

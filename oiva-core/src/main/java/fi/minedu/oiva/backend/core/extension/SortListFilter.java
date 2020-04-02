@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.extension;
 
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import org.slf4j.Logger;
@@ -23,7 +24,8 @@ public class SortListFilter extends OivaFilter {
 
     public enum SortTarget {
         luvat,
-        maaraykset
+        maaraykset,
+        muutokset
     }
 
     private static final Logger logger = LoggerFactory.getLogger(SortListFilter.class);
@@ -56,7 +58,7 @@ public class SortListFilter extends OivaFilter {
             final Organisaatio jarjestaja = lupa.jarjestaja();
             return null != jarjestaja ? koodistoKoodiNimi.apply(jarjestaja.getKuntaKoodi()) : "";
         });
-        final Function<String, Comparator> toLupaComparators = sortBy -> {
+        final Function<String, Comparator<Lupa>> toLupaComparators = sortBy -> {
             if (equalsIgnoreCase(sortBy, "esittelija")) return lupaSortByEsittelijaNimi;
             else if (equalsIgnoreCase(sortBy, "jarjestaja")) return lupaSortByJarjestaja;
             else if (equalsIgnoreCase(sortBy, "maakunta")) return lupaSortByJarjestajaMaakunta;
@@ -66,14 +68,14 @@ public class SortListFilter extends OivaFilter {
             return lupaSortByDiaarinumero;
         };
 
-        final Comparator<Maarays> maaraysSortById = Comparator.comparing(maarays -> maarays.getId());
+        final Comparator<Maarays> maaraysSortById = Comparator.comparing(Maarays::getId);
         final Comparator<Maarays> maaraysSortByKoodisto = Comparator.comparing(maarays -> null != maarays.getKoodisto() ? maarays.getKoodisto() : "");
         final Comparator<Maarays> maaraysSortByKoodiarvo = Comparator.comparing(maarays -> null != maarays.getKoodiarvo() ? maarays.getKoodiarvo() : "");
         final Comparator<Maarays> maaraysSortByKoodiNimi = Comparator.comparing(maarays -> {
             final KoodistoKoodi koodi = maarays.koodi();
             return null != koodi ? TranslateFilter.fromTranslatedString(koodi.getNimi(), languageOpt) : "";
         });
-        final Function<String, Comparator> toMaaraysComparators = sortBy -> {
+        final Function<String, Comparator<Maarays>> toMaaraysComparators = sortBy -> {
             if (equalsIgnoreCase(sortBy, "koodisto")) return maaraysSortByKoodisto;
             else if (equalsIgnoreCase(sortBy, "koodiarvo")) return maaraysSortByKoodiarvo;
             else if (equalsIgnoreCase(sortBy, "koodinimi")) return maaraysSortByKoodiNimi;
@@ -81,43 +83,53 @@ public class SortListFilter extends OivaFilter {
             return maaraysSortById;
         };
 
+        final Comparator<Muutos> muutosSortById = Comparator.comparing(Muutos::getId);
+        final Comparator<Muutos> muutosSortByKoodisto = Comparator.comparing(muutos -> muutos.getKoodisto() + "");
+        final Comparator<Muutos> muutosSortByKoodiarvo = Comparator.comparing(muutos -> muutos.getKoodiarvo() + "");
+        final Comparator<Muutos> muutosSortByKoodiNimi = Comparator.comparing(muutos -> {
+            final KoodistoKoodi koodi = muutos.koodi();
+            return null != koodi ? TranslateFilter.fromTranslatedString(koodi.getNimi(), languageOpt) : "";
+        });
+        final Function<String, Comparator<Muutos>> toMuutosComparators = sortBy -> {
+            if (equalsIgnoreCase(sortBy, "koodisto")) return muutosSortByKoodisto;
+            else if (equalsIgnoreCase(sortBy, "koodiarvo")) return muutosSortByKoodiarvo;
+            else if (equalsIgnoreCase(sortBy, "koodinimi")) return muutosSortByKoodiNimi;
+            else logger.warn("Unsupported sortMaarays option: {}. Using maaraysSortById", sortBy);
+            return muutosSortById;
+        };
+
         if (sortTarget == SortTarget.luvat) {
-            final Optional<Collection<Lupa>> luvatOpt = asLupaList(obj);
-            if (luvatOpt.isPresent()) {
-                final List<Comparator> lupaComparators = sortBys.stream().map(toLupaComparators::apply).collect(Collectors.toList());
-                if(!lupaComparators.isEmpty()) {
-                    final Comparator<Lupa> comparatorChain = lupaComparators.iterator().next();
-                    lupaComparators.stream().skip(1).reduce(comparatorChain, (comp, thenComp) -> comp.thenComparing(thenComp));
-                    return luvatOpt.get().stream().sorted(comparatorChain).collect(Collectors.toList());
-                } else logger.warn("No sort options provided");
-                return luvatOpt.get();
-            }
+            return sort(obj, toLupaComparators, sortBys);
         } else if (sortTarget == SortTarget.maaraykset) {
-            final Optional<Collection<Maarays>> maarayksetOpt = asMaaraysList(obj);
-            if (maarayksetOpt.isPresent()) {
-                final List<Comparator> maaraysComparators = sortBys.stream().map(toMaaraysComparators::apply).collect(Collectors.toList());
-                if(!maaraysComparators.isEmpty()) {
-                    final Comparator<Maarays> comparatorChain = maaraysComparators.iterator().next();
-                    maaraysComparators.stream().skip(1).reduce(comparatorChain, (comp, thenComp) -> comp.thenComparing(thenComp));
-                    return maarayksetOpt.get().stream().sorted(comparatorChain).collect(Collectors.toList());
-                } else logger.warn("No sort options provided");
-                return maarayksetOpt.get();
-            }
-        } else logger.warn("Unsupported target");
+            return sort(obj, toMaaraysComparators, sortBys);
+        } else if (sortTarget == SortTarget.muutokset) {
+            return sort(obj, toMuutosComparators, sortBys);
+        } else {
+            logger.warn("Unsupported target");
+        }
         return Collections.emptyList();
     }
 
-    private Optional<Collection<Lupa>> asLupaList(final Object obj) {
-        if(obj instanceof Collection) {
-            final Collection<Lupa> list = (Collection<Lupa>) obj;
-            return Optional.ofNullable(list);
-        } return Optional.empty();
+    private <T> Collection<T> sort(Object obj, Function<String, Comparator<T>> comparator, Collection<String> sortBys) {
+        final Optional<Collection<T>> opt = asTypedList(obj);
+        if (opt.isPresent()) {
+            final List<Comparator<T>> comparators = sortBys.stream().map(comparator).collect(Collectors.toList());
+            if(!comparators.isEmpty()) {
+                final Comparator<T> comparatorChain = comparators.iterator().next();
+                comparators.stream().skip(1).reduce(comparatorChain, Comparator::thenComparing);
+                return opt.get().stream().sorted(comparatorChain).collect(Collectors.toList());
+            } else {
+                logger.warn("No sort options provided");
+                return opt.get();
+            }
+        }
+        return Collections.emptyList();
     }
 
-    private Optional<Collection<Maarays>> asMaaraysList(final Object obj) {
+    private <T> Optional<Collection<T>> asTypedList(final Object obj) {
         if(obj instanceof Collection) {
-            final Collection<Maarays> list = (Collection<Maarays>) obj;
-            return Optional.ofNullable(list);
+            final Collection<T> list = (Collection<T>) obj;
+            return Optional.of(list);
         } return Optional.empty();
     }
 

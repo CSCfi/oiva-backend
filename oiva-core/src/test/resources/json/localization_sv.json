@@ -1,0 +1,30 @@
+[
+  {
+    "accesscount": 0,
+    "id": 1,
+    "category": "oiva",
+    "key": "test_key_1",
+    "accessed": 1548419288721,
+    "created": 1548419288721,
+    "createdBy": "1.2.3.4.111111",
+    "modified": 1548419288719,
+    "modifiedBy": "1.2.3.4.111111",
+    "force": false,
+    "locale": "sv",
+    "value": "Testet översättning 1"
+  },
+  {
+    "accesscount": 0,
+    "id": 2,
+    "category": "oiva",
+    "key": "test_key_2",
+    "accessed": 1548419288724,
+    "created": 1548419288724,
+    "createdBy": "1.2.3.4.111111",
+    "modified": 1548419288719,
+    "modifiedBy": "1.2.3.4.111111",
+    "force": false,
+    "locale": "sv",
+    "value": "Testet översättning 2"
+  }
+]

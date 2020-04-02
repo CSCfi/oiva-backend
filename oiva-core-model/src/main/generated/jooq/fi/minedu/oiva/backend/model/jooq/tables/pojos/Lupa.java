@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = -438464403;
+    private static final long serialVersionUID = -287963109;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -49,6 +49,9 @@ public class Lupa implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private String    koulutustyyppi;
+    private String    oppilaitostyyppi;
+    private String    asianumero;
 
     public Lupa() {}
 
@@ -71,6 +74,9 @@ public class Lupa implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.koulutustyyppi = value.koulutustyyppi;
+        this.oppilaitostyyppi = value.oppilaitostyyppi;
+        this.asianumero = value.asianumero;
     }
 
     public Lupa(
@@ -91,7 +97,10 @@ public class Lupa implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        UUID      uuid
+        UUID      uuid,
+        String    koulutustyyppi,
+        String    oppilaitostyyppi,
+        String    asianumero
     ) {
         this.id = id;
         this.edellinenLupaId = edellinenLupaId;
@@ -111,6 +120,9 @@ public class Lupa implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.koulutustyyppi = koulutustyyppi;
+        this.oppilaitostyyppi = oppilaitostyyppi;
+        this.asianumero = asianumero;
     }
 
     public Long getId() {
@@ -266,6 +278,31 @@ public class Lupa implements Serializable {
         this.uuid = uuid;
     }
 
+    public String getKoulutustyyppi() {
+        return this.koulutustyyppi;
+    }
+
+    public void setKoulutustyyppi(String koulutustyyppi) {
+        this.koulutustyyppi = koulutustyyppi;
+    }
+
+    public String getOppilaitostyyppi() {
+        return this.oppilaitostyyppi;
+    }
+
+    public void setOppilaitostyyppi(String oppilaitostyyppi) {
+        this.oppilaitostyyppi = oppilaitostyyppi;
+    }
+
+    @Size(max = 16)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupa (");
@@ -288,6 +325,9 @@ public class Lupa implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(koulutustyyppi);
+        sb.append(", ").append(oppilaitostyyppi);
+        sb.append(", ").append(asianumero);
 
         sb.append(")");
         return sb.toString();

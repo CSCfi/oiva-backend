@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.core.service;
 
 import com.princexml.Prince;
+import com.princexml.PrinceEvents;
 import org.apache.pdfbox.util.PDFMergerUtility;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.io.NullOutputStream;
@@ -11,11 +12,14 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static fi.minedu.oiva.backend.model.entity.OivaTemplates.*;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.AttachmentType;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderLanguage;
+import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderOptions;
 
 @Service
 public class PrinceXMLService {
@@ -36,7 +40,8 @@ public class PrinceXMLService {
     }
     public boolean toPDF(final String html, final OutputStream output, final RenderOptions options)  {
         final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
-        if(generatePDF(html, basePDFStream)) {
+        boolean succesfull = generatePDF(html, basePDFStream);
+        if(succesfull) {
             return appendAttachments(new ByteArrayInputStream(basePDFStream.toByteArray()), output, options);
         }
         return false;
@@ -91,27 +96,44 @@ public class PrinceXMLService {
             logger.error("prince.exec.path not defined");
             return false;
         }
-
-        try {
-            return getPrinceEngine().convert(IOUtils.toInputStream(html), output);
-        } catch (IOException e) {
-            logger.error("Failed to generate PDF from html");
+        else if (!new File(princeExecPath).exists()) {
+            logger.error("PrinceXML binary executable not found in " + princeExecPath);
             return false;
         }
+
+        String errorMsg = "Error using PrinceXML to generate PDF file. Make sure PrinceXML could be run manually: {} --version";
+        try {
+            boolean result = getPrinceEngine().convert(IOUtils.toInputStream(html), output);
+            if (result) {
+                return true;
+            }
+            else {
+                logger.error(errorMsg, princeExecPath);
+            }
+        } catch (IOException e) {
+            logger.error(errorMsg, princeExecPath, e);
+        }
+
+        return false;
+
     }
 
     protected Prince getPrinceEngine() {
-        return new Prince(princeExecPath, (msg1, msg2, msg3) -> logger.info("Prince data " + msg1 + " -- " + msg2 + " --- " + msg3));
+        PrinceEvents princeEvents = (msg1, msg2, msg3) -> {
+            if ("inf".equals(msg1)) {
+                logger.info("Prince data " + msg2 + " --- " + msg3);
+            } else if ("wrn".equals(msg1)) {
+                logger.warn("Prince data " + msg2 + " --- " + msg3);
+            } else if ("err".equals(msg1)) {
+                logger.error("Prince data " + msg2 + " --- " + msg3);
+            } else {
+                logger.error("Prince data Unknown level " + msg1 + " -- " + msg2 + " -- " + msg3);
+            }
+        };
+        return new Prince(princeExecPath, princeEvents);
     }
 
-    /**
-     *  Throws exception if princexml engine fails
-     */
-    protected void healthCheck() throws Exception {
-        try {
-            getPrinceEngine().convert(IOUtils.toInputStream("<html/>"), NullOutputStream.NULL_OUTPUT_STREAM);
-        } catch(Exception e) {
-            throw new IllegalStateException("PrinceXML failure");
-        }
+    protected boolean healthCheck()  {
+        return generatePDF("<html/>", NullOutputStream.NULL_OUTPUT_STREAM);
     }
 }

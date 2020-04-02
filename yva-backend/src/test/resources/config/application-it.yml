@@ -7,13 +7,13 @@ oiva:
   baseUrl: http://localhost
 
 opintopolku:
-  baseUrl:
+  baseUrl: http://localhost:9999
   apiCredentials:
     username:
     password:
 
 cas:
-  baseUrl: http://localhost:8888/mock-cas
+  baseUrl: http://localhost:9999/mock-cas
 
 ldap:
   url:
@@ -53,7 +53,8 @@ templates:
   base.path:
 
 logging:
-  file: target/logs/spring.log
+  path: target/logs
+  file: ${logging.path}/spring.log
   level:
     fi.minedu.oiva: DEBUG
     org.springframework.security: DEBUG

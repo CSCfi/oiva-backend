@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.annotation.Generated;
 
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
 import org.jooq.Schema;
 import org.jooq.Table;
@@ -37,7 +38,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
 
-    private static final long serialVersionUID = 1746107326;
+    private static final long serialVersionUID = 1234059487;
 
     /**
      * The reference instance of <code>lupahistoria</code>
@@ -108,6 +109,21 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     public final TableField<LupahistoriaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
+     * The column <code>lupahistoria.asianumero</code>.
+     */
+    public final TableField<LupahistoriaRecord, String> ASIANUMERO = createField("asianumero", org.jooq.impl.SQLDataType.VARCHAR.length(16).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>lupahistoria.kumottupvm</code>.
+     */
+    public final TableField<LupahistoriaRecord, Date> KUMOTTUPVM = createField("kumottupvm", org.jooq.impl.SQLDataType.DATE, this, "");
+
+    /**
+     * The column <code>lupahistoria.lupa_id</code>.
+     */
+    public final TableField<LupahistoriaRecord, Long> LUPA_ID = createField("lupa_id", org.jooq.impl.SQLDataType.BIGINT, this, "");
+
+    /**
      * Create a <code>lupahistoria</code> table reference
      */
     public Lupahistoria() {
@@ -159,6 +175,14 @@ public class Lupahistoria extends TableImpl<LupahistoriaRecord> {
     @Override
     public List<UniqueKey<LupahistoriaRecord>> getKeys() {
         return Arrays.<UniqueKey<LupahistoriaRecord>>asList(Keys.LUPAHISTORIA_PKEY, Keys.LUPAHISTORIA_UUID_KEY);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ForeignKey<LupahistoriaRecord, ?>> getReferences() {
+        return Arrays.<ForeignKey<LupahistoriaRecord, ?>>asList(Keys.LUPAHISTORIA__LUPAHISTORIA_LUPA_ID_FKEY);
     }
 
     /**

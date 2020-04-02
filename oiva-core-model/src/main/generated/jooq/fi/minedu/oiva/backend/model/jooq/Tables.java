@@ -21,7 +21,6 @@ import fi.minedu.oiva.backend.model.jooq.tables.Muutospyynto;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoAsiatilamuutos;
 import fi.minedu.oiva.backend.model.jooq.tables.MuutospyyntoLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros;
-import fi.minedu.oiva.backend.model.jooq.tables.Tiedote;
 
 import javax.annotation.Generated;
 
@@ -123,9 +122,4 @@ public class Tables {
      * The table <code>paatoskierros</code>.
      */
     public static final Paatoskierros PAATOSKIERROS = fi.minedu.oiva.backend.model.jooq.tables.Paatoskierros.PAATOSKIERROS;
-
-    /**
-     * The table <code>tiedote</code>.
-     */
-    public static final Tiedote TIEDOTE = fi.minedu.oiva.backend.model.jooq.tables.Tiedote.TIEDOTE;
 }
