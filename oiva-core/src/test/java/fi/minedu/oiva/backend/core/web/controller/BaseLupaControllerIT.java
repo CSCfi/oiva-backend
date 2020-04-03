@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public abstract class BaseLupaControllerIT extends BaseIT {
 
@@ -59,6 +60,24 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/koulutustyyppi/2/oppilaitostyyppi/1", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         assertEquals("11/111/2020", doc.read("$.diaarinumero"));
+    }
+
+    @Test
+    public void getAllLupaOrganizations() {
+        ResponseEntity<String> response = makeRequest("/api/luvat/organisaatiot", HttpStatus.OK);
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        final Integer organizations = 5;
+        log.debug("Response was " + doc.jsonString());
+        assertEquals("Result should have " + organizations + " items", organizations, doc.read("$.length()"));
+        assertTrue("Result item should have oid field", (doc.read("$[0].oid") + "").length() > 0);
+        assertTrue("Result item should have nimi field", (doc.read("$[0].nimi") + "").length() > 0);
+
+        // Add new lupa to existing organization, add old lupa which is not valid anymore
+        setUpDb("sql/organisaatio_lupa_data.sql");
+        response = makeRequest("/api/luvat/organisaatiot", HttpStatus.OK);
+        doc = jsonPath.parse(response.getBody());
+        // Result should be same as before
+        assertEquals(organizations, doc.read("$.length()"));
     }
 
     private void getLuvat(MultiValueMap<String, String> queryParams, int expected) {
