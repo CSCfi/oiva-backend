@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.core.web.controller;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.core.it.BaseIT;
+import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
@@ -271,6 +272,49 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         doc = requestJSONData("/api/muutospyynnot/valmistelussa?vainOmat=true");
         assertEquals("Another esittelijä has no own muutospyynot", 0, doc.read("$.length()", Integer.class).intValue());
     }
+
+    @Test
+    public void esittelijaCreateAndSave() throws IOException {
+        loginAs("elli esittelija", "", OivaAccess.Context_Esittelija);
+
+        // Create new
+        ResponseEntity<String> createResponse =
+                restTemplate.postForEntity(
+                        createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
+                        prepareMultipartEntity(readFileToString("json/muutospyynto.json"),
+                                "file0", "file1", "file2", "file3", "file4", "file5"),
+                        String.class);
+
+        assertEquals("Response status should match", HttpStatus.OK, createResponse.getStatusCode());
+        DocumentContext doc = jsonPath.parse(createResponse.getBody());
+        log.info("Muutospyynto createResponse: {}", doc.jsonString());
+        final String uuid = doc.read("$.uuid", String.class);
+        assertNotNull("Muutospyynto uuid should not be null", uuid);
+        assertEquals("Liite table count should match!", 6,
+                JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
+        assertEquals("Tila should be VALMISTELUSSA", MuutospyyntoService.Muutospyyntotila.VALMISTELUSSA.toString(),
+                doc.read("$.tila", String.class));
+
+        // Load created
+        ResponseEntity<String> getResponse = restTemplate
+                .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
+        assertEquals("Get response status should match!", HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals("Create response and get response should match!", createResponse.getBody(),
+                getResponse.getBody());
+
+        // ----- UPDATE EXISTING -----
+        final ResponseEntity<String> updateResponse =
+                restTemplate.postForEntity(
+                        createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
+                        prepareMultipartEntity(doc.jsonString()),
+                        String.class);
+
+        assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
+
+        doc = jsonPath.parse(updateResponse.getBody());
+
+    }
+
 
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
         return restTemplate
