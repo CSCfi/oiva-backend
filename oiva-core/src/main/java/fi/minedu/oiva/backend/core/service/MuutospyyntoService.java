@@ -108,6 +108,11 @@ public class MuutospyyntoService {
         OTA_KASITTELYYN
     }
 
+    public enum Tyyppi {
+        KJ,
+        ESITTELIJA
+    }
+
     public enum Muutospyyntotila {
         LUONNOS,            // KJ:n tekemä hakemus
         AVOIN,              // KJ lähettänyt hakemuksen eteenpäin
@@ -300,7 +305,7 @@ public class MuutospyyntoService {
     }
 
     // VALIDOINNIT
-    private void assertValid(Muutospyynto muutospyynto) {
+    protected void assertValid(Muutospyynto muutospyynto) {
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
@@ -345,7 +350,7 @@ public class MuutospyyntoService {
                 .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
     }
 
-    private Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+    protected Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
         logger.debug("Save muutospyynto: {}", muutospyynto.toString());
         try {
             Long paatoskierrosId = getPaatoskierrosId(muutospyynto);
