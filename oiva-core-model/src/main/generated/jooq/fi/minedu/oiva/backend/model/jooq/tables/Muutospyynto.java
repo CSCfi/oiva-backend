@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
 
-    private static final long serialVersionUID = 1600131511;
+    private static final long serialVersionUID = -724393283;
 
     /**
      * The reference instance of <code>muutospyynto</code>
@@ -126,6 +126,11 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
      * The column <code>muutospyynto.meta</code>.
      */
     public final TableField<MuutospyyntoRecord, JsonNode> META = createField("meta", org.jooq.impl.DefaultDataType.getDefaultDataType("jsonb"), this, "", new PostgresJSONJacksonBinding());
+
+    /**
+     * The column <code>muutospyynto.alkupera</code>.
+     */
+    public final TableField<MuutospyyntoRecord, String> ALKUPERA = createField("alkupera", org.jooq.impl.SQLDataType.VARCHAR.length(10).nullable(false), this, "");
 
     /**
      * Create a <code>muutospyynto</code> table reference

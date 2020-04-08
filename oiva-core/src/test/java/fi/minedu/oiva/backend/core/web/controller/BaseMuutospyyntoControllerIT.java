@@ -294,6 +294,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
         assertEquals("Tila should be VALMISTELUSSA", MuutospyyntoService.Muutospyyntotila.VALMISTELUSSA.toString(),
                 doc.read("$.tila", String.class));
+        assertEquals("Alkupera should be ESITTELIJA", MuutospyyntoService.Tyyppi.ESITTELIJA.toString(),
+                doc.read("$.alkupera", String.class));
 
         // Load created
         ResponseEntity<String> getResponse = restTemplate
@@ -303,6 +305,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 getResponse.getBody());
 
         // ----- UPDATE EXISTING -----
+        String newEndDate = "2020-02-20";
+        doc.set("$.voimassaloppupvm", newEndDate);
         final ResponseEntity<String> updateResponse =
                 restTemplate.postForEntity(
                         createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
@@ -310,8 +314,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                         String.class);
 
         assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
-
         doc = jsonPath.parse(updateResponse.getBody());
+        assertEquals(newEndDate, doc.read("$.voimassaloppupvm"));
 
     }
 

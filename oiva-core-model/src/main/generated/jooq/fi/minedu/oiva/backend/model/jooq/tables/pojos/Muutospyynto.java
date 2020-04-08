@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -901117926;
+    private static final long serialVersionUID = -306072715;
 
     private Long      id;
     private Long      lupaId;
@@ -45,6 +45,7 @@ public class Muutospyynto implements Serializable {
     private Timestamp paivityspvm;
     private UUID      uuid;
     private JsonNode  meta;
+    private String    alkupera;
 
     public Muutospyynto() {}
 
@@ -63,6 +64,7 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
         this.meta = value.meta;
+        this.alkupera = value.alkupera;
     }
 
     public Muutospyynto(
@@ -79,7 +81,8 @@ public class Muutospyynto implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         UUID      uuid,
-        JsonNode  meta
+        JsonNode  meta,
+        String    alkupera
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -95,6 +98,7 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
         this.meta = meta;
+        this.alkupera = alkupera;
     }
 
     public Long getId() {
@@ -215,6 +219,16 @@ public class Muutospyynto implements Serializable {
         this.meta = meta;
     }
 
+    @NotNull
+    @Size(max = 10)
+    public String getAlkupera() {
+        return this.alkupera;
+    }
+
+    public void setAlkupera(String alkupera) {
+        this.alkupera = alkupera;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -233,6 +247,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
         sb.append(", ").append(meta);
+        sb.append(", ").append(alkupera);
 
         sb.append(")");
         return sb.toString();

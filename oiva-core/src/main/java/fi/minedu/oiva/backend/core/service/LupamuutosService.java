@@ -2,10 +2,10 @@ package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
-import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
-import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService.Action;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,6 @@ public class LupamuutosService {
         this.authService = authService;
     }
 
-    // Complimentary method for päättäminen
-    public Optional<Muutospyynto> executeAction(String uuid, Action action) {
-        return executeAction(uuid, action, null, null);
-    }
-
     public Optional<Muutospyynto> executeAction(String uuid, Action action, Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
         try {
             logger.info("Executing muutospyynto action " + action);
@@ -46,7 +41,6 @@ public class LupamuutosService {
                     return luo(muutospyynto, fileMap);
                 case TALLENNA:
                     return tallenna(muutospyynto, fileMap);
-                // case PAATA:   implementation here
                 default:
                     throw new UnsupportedOperationException("Action " + action + " is not supported for muutospyynto");
             }
@@ -57,8 +51,8 @@ public class LupamuutosService {
     }
 
     private Optional<Muutospyynto> luo(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
-//        muutospyynto.setTyyppi(Tyyppi.ESITTELIJA.toString());
-        assertValid(muutospyynto);
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.name());
+        assertValidEsittelijanMuutospyynto(muutospyynto);
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
             throw new ForbiddenException("User has no right");
         }
@@ -67,9 +61,10 @@ public class LupamuutosService {
     }
 
     private Optional<Muutospyynto> tallenna(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
-        assertValid(muutospyynto);
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.name());
+        assertValidEsittelijanMuutospyynto(muutospyynto);
         Muutospyynto existing = muutospyyntoService.getByUuid(muutospyynto.getUuid().toString()).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + muutospyynto.getUuid()));
-        if (!Muutospyyntotila.VALMISTELUSSA.toString().equals(existing.getTila())) {
+        if (!Muutospyyntotila.VALMISTELUSSA.name().equals(existing.getTila())) {
             throw new ForbiddenException("Action is not allowed");
         }
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
@@ -78,11 +73,11 @@ public class LupamuutosService {
         return muutospyyntoService.update(muutospyynto, fileMap).flatMap(m -> muutospyyntoService.getById(m.getId()));
     }
 
-    protected void assertValid(Muutospyynto muutospyynto) {
-//        if (muutospyynto.getTyyppi()) {
-//            throw new ValidationException("Invalid object");
-//        }
+    protected void assertValidEsittelijanMuutospyynto(Muutospyynto muutospyynto) {
+        if (!MuutospyyntoService.Tyyppi.ESITTELIJA.name().equals(muutospyynto.getAlkupera())) {
+            throw new ForbiddenException("Invalid object type");
+        }
 
-        muutospyyntoService.assertValid(muutospyynto);
+        muutospyyntoService.assertValidMuutospyynto(muutospyynto);
     }
 }
