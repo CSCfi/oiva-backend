@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -901117926;
+    private static final long serialVersionUID = 208190676;
 
     private Long      id;
     private Long      lupaId;
@@ -45,6 +45,9 @@ public class Muutospyynto implements Serializable {
     private Timestamp paivityspvm;
     private UUID      uuid;
     private JsonNode  meta;
+    private String    alkupera;
+    private String    asianumero;
+    private Date      paatospvm;
 
     public Muutospyynto() {}
 
@@ -63,6 +66,9 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
         this.meta = value.meta;
+        this.alkupera = value.alkupera;
+        this.asianumero = value.asianumero;
+        this.paatospvm = value.paatospvm;
     }
 
     public Muutospyynto(
@@ -79,7 +85,10 @@ public class Muutospyynto implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         UUID      uuid,
-        JsonNode  meta
+        JsonNode  meta,
+        String    alkupera,
+        String    asianumero,
+        Date      paatospvm
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -95,6 +104,9 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
         this.meta = meta;
+        this.alkupera = alkupera;
+        this.asianumero = asianumero;
+        this.paatospvm = paatospvm;
     }
 
     public Long getId() {
@@ -215,6 +227,33 @@ public class Muutospyynto implements Serializable {
         this.meta = meta;
     }
 
+    @NotNull
+    @Size(max = 10)
+    public String getAlkupera() {
+        return this.alkupera;
+    }
+
+    public void setAlkupera(String alkupera) {
+        this.alkupera = alkupera;
+    }
+
+    @Size(max = 16)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
+    public Date getPaatospvm() {
+        return this.paatospvm;
+    }
+
+    public void setPaatospvm(Date paatospvm) {
+        this.paatospvm = paatospvm;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -233,6 +272,9 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
         sb.append(", ").append(meta);
+        sb.append(", ").append(alkupera);
+        sb.append(", ").append(asianumero);
+        sb.append(", ").append(paatospvm);
 
         sb.append(")");
         return sb.toString();

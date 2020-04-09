@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.web.controller;
 
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.service.LupamuutosService;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
@@ -32,7 +33,6 @@ import java.util.concurrent.CompletableFuture;
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Action;
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
-import static fi.minedu.oiva.backend.model.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr400;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -55,11 +55,13 @@ public class MuutospyyntoController {
 
     public static final String path = "/muutospyynnot";
 
-    private final MuutospyyntoService service;
+    private final MuutospyyntoService muutospyyntoService;
+    private final LupamuutosService lupamuutosService;
 
     @Autowired
-    public MuutospyyntoController(MuutospyyntoService service) {
-        this.service = service;
+    public MuutospyyntoController(MuutospyyntoService muutospyyntoService, LupamuutosService lupamuutosService) {
+        this.muutospyyntoService = muutospyyntoService;
+        this.lupamuutosService = lupamuutosService;
     }
 
 
@@ -68,7 +70,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Palauttaa muutospyynnöt järjestäjän ytunnuksen perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getByYtunnus(final @PathVariable String ytunnus,
                                                                     final HttpServletRequest request) {
-        return async(() -> service.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
+        return async(() -> muutospyyntoService.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 
     // palauttaa kaikki avoimet muutospyynnöt
@@ -76,7 +78,7 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "/avoimet")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getAvoimetMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.AVOIN, false));
+        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.AVOIN, false));
     }
 
     // palauttaa kaikki valmistelussa olevat muutospyynnöt
@@ -85,7 +87,7 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getValmistelussaMuutospyynnot(
             @RequestParam(required = false, defaultValue = "false") boolean vainOmat) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA, vainOmat));
+        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA, vainOmat));
     }
 
     // palauttaa kaikki päätetyt muutospyynnöt (TARVITAANKO!!!?)
@@ -93,7 +95,7 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "/paatetyt")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getPaatetytMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> service.getMuutospyynnot(Muutospyyntotila.PAATETTY, false));
+        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.PAATETTY, false));
     }
 
 
@@ -101,14 +103,14 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "/id/{uuid}")
     @ApiOperation(notes = "Palauttaa muutospyynnön uuid:n perusteella", value = "")
     public CompletableFuture<HttpEntity<Muutospyynto>> getById(final @PathVariable String uuid) {
-        return getOr404(async(() -> service.getByUuid(uuid)));
+        return getOr404(async(() -> muutospyyntoService.getByUuid(uuid)));
     }
 
     // palauttaa kaikki muutospyynnön muutokset
     @RequestMapping(method = GET, value = "/muutokset/{muutospyyntoUuid}")
     @ApiOperation(notes = "Palauttaa kaikki muutospyynnön muutokset", value = "")
     public CompletableFuture<Collection<Muutos>> getMuutoksetByMuutospyyntoId(final @PathVariable String muutospyyntoUuid) {
-        return async(() -> service.getByMuutospyyntoUuid(muutospyyntoUuid));
+        return async(() -> muutospyyntoService.getByMuutospyyntoUuid(muutospyyntoUuid));
     }
 
     @ApiOperation(notes = "Tallentaa muutospyynnön", value = "")
@@ -117,10 +119,25 @@ public class MuutospyyntoController {
                                          MultipartHttpServletRequest request) {
         Optional<Muutospyynto> result;
         if (muutospyynto.getUuid() != null) {
-            result = service.executeAction(muutospyynto.getUuid().toString(), Action.TALLENNA, muutospyynto, request.getFileMap());
+            result = muutospyyntoService.executeAction(muutospyynto.getUuid().toString(), Action.TALLENNA, muutospyynto, request.getFileMap());
         } else {
             logger.debug("Creating new muutospyynto");
-            result = service.executeAction(null, Action.LUO, muutospyynto, request.getFileMap());
+            result = muutospyyntoService.executeAction(null, Action.LUO, muutospyynto, request.getFileMap());
+        }
+        return getOr400(result);
+    }
+
+    @OivaAccess_Esittelija
+    @ApiOperation(notes = "Tallentaa esittelijän luoman lupamuutoksen", value = "")
+    @RequestMapping(method = POST, value = "/esittelija/tallenna", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public HttpEntity<Muutospyynto> tallennaLupamuutos(@RequestPart(value = "muutospyynto") Muutospyynto muutospyynto,
+                                         MultipartHttpServletRequest request) {
+        Optional<Muutospyynto> result;
+        if (muutospyynto.getUuid() != null) {
+            result = lupamuutosService.executeAction(muutospyynto.getUuid().toString(), Action.TALLENNA, muutospyynto, request.getFileMap());
+        } else {
+            logger.debug("Creating new esittelijan muutospyynto");
+            result = lupamuutosService.executeAction(null, Action.LUO, muutospyynto, request.getFileMap());
         }
         return getOr400(result);
     }
@@ -128,14 +145,14 @@ public class MuutospyyntoController {
     @RequestMapping(method = GET, value = "{muutospyyntoUuid}/liitteet/")
     @ApiOperation(notes = "Palauttaa kaikki muutospyynnön liitteet", value = "")
     public CompletableFuture<HttpEntity<Collection<Liite>>> getLiitteetByMuutospyyntoUuid(final @PathVariable String muutospyyntoUuid) {
-        return getOr404(async(() -> service.getLiitteetByUuid(muutospyyntoUuid)));
+        return getOr404(async(() -> muutospyyntoService.getLiitteetByUuid(muutospyyntoUuid)));
     }
 
     // hakee yksittäisen muutoksen (jos tarvii)
     @RequestMapping(method = GET, value = "/muutos/id/{uuid}")
     @ApiOperation(notes = "Palauttaa muutoksen tietokantatunnuksen perusteella", value = "")
     public CompletableFuture<HttpEntity<Muutos>> getMuutosByUuid(final @PathVariable String uuid) {
-        return getOr404(async(() -> service.getMuutosByUuId(uuid)));
+        return getOr404(async(() -> muutospyyntoService.getMuutosByUuId(uuid)));
     }
 
 
@@ -143,14 +160,14 @@ public class MuutospyyntoController {
     @ApiOperation(notes = "Vie muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/avoin/{uuid}")
     public HttpEntity<UUID> vieKasittelyyn(final @PathVariable String uuid) {
-        return getOr404(service.executeAction(uuid, Action.LAHETA).map(Muutospyynto::getUuid));
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.LAHETA).map(Muutospyynto::getUuid));
     }
 
     // Vaihda muutospyynnön tilaa -> ota esittelijänä käsittelyyn
     @ApiOperation(notes = "Ota muutospyyntö esittelijän käsittelyyn", value = "")
     @RequestMapping(method = POST, value = "/tila/valmistelussa/{uuid}")
     public HttpEntity<UUID> kasittelyssa(final @PathVariable String uuid) {
-        return getOr404(service.executeAction(uuid, Action.OTA_KASITTELYYN).map(Muutospyynto::getUuid));
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.OTA_KASITTELYYN).map(Muutospyynto::getUuid));
     }
 
 

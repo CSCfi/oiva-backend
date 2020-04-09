@@ -108,6 +108,11 @@ public class MuutospyyntoService {
         OTA_KASITTELYYN
     }
 
+    public enum Tyyppi {
+        KJ,
+        ESITTELIJA
+    }
+
     public enum Muutospyyntotila {
         LUONNOS,            // KJ:n tekemä hakemus
         AVOIN,              // KJ lähettänyt hakemuksen eteenpäin
@@ -183,7 +188,8 @@ public class MuutospyyntoService {
     }
 
     private Optional<Muutospyynto> luo(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
-        assertValid(muutospyynto);
+        muutospyynto.setAlkupera(Tyyppi.KJ.name());
+        assertValidJarjestajanMuutospyynto(muutospyynto);
         if (!lupaAndMuutospyyntoOrganizationsMatch(muutospyynto) ||
                 !authService.hasAnyRole(OivaAccess.Role_Kayttaja, OivaAccess.Role_Nimenkirjoittaja) ||
                 !userOidMatchMuutospyynto(muutospyynto)) {
@@ -194,7 +200,8 @@ public class MuutospyyntoService {
     }
 
     private Optional<Muutospyynto> tallenna(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
-        assertValid(muutospyynto);
+        muutospyynto.setAlkupera(Tyyppi.KJ.name());
+        assertValidJarjestajanMuutospyynto(muutospyynto);
         Muutospyynto existing = getByUuid(muutospyynto.getUuid().toString()).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + muutospyynto.getUuid()));
         if (!Muutospyyntotila.LUONNOS.toString().equals(existing.getTila())) {
             throw new ForbiddenException("Action is not allowed");
@@ -299,8 +306,16 @@ public class MuutospyyntoService {
         }
     }
 
+    private void assertValidJarjestajanMuutospyynto(Muutospyynto muutospyynto) {
+        if (!MuutospyyntoService.Tyyppi.KJ.name().equals(muutospyynto.getAlkupera())) {
+            throw new ForbiddenException("Invalid object type");
+        }
+
+        this.assertValidMuutospyynto(muutospyynto);
+    }
+
     // VALIDOINNIT
-    private void assertValid(Muutospyynto muutospyynto) {
+    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto) {
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
@@ -345,7 +360,7 @@ public class MuutospyyntoService {
                 .where(MUUTOS.ID.eq(id)).fetchOptionalInto(Muutos.class);
     }
 
-    private Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
+    protected Optional<Muutospyynto> save(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
         logger.debug("Save muutospyynto: {}", muutospyynto.toString());
         try {
             Long paatoskierrosId = getPaatoskierrosId(muutospyynto);
