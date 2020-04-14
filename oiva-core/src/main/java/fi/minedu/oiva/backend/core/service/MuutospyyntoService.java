@@ -479,6 +479,12 @@ public class MuutospyyntoService {
         if (!isValid) {
             throw new ValidationException("Invalid object");
         }
+
+        try {
+            UUID.fromString(muutospyynto.getLupaUuid());
+        } catch(IllegalArgumentException e) {
+            throw new ForbiddenException("Muutospyynto should have a valid lupa uuid");
+        }
     }
 
     // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
@@ -783,7 +789,7 @@ public class MuutospyyntoService {
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
-                throw new ForbiddenException("Muutospyynto and lupa must have same organizations");
+                throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
             }
             muutospyyntoRecord.setLupaId(lupa.get().getId());
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);

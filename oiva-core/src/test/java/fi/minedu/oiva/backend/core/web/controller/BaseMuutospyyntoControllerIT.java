@@ -356,8 +356,12 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 getResponse.getBody());
 
         // ----- UPDATE EXISTING -----
-        String newEndDate = "2020-02-20";
-        doc.put("$", "voimassaloppupvm", newEndDate);
+        final String newEndDate = "2020-02-20";
+        final String asianumero = "VNK/123/2020";
+        doc.put("$", "voimassaalkupvm", newEndDate)
+                .put("$", "paatospvm", newEndDate)
+                .put("$", "asianumero", asianumero);
+
         final ResponseEntity<String> updateResponse =
                 restTemplate.postForEntity(
                         createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
@@ -366,7 +370,9 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
         doc = jsonPath.parse(updateResponse.getBody());
-        assertEquals(newEndDate, doc.read("$.voimassaloppupvm"));
+        assertEquals(newEndDate, doc.read("$.voimassaalkupvm"));
+        assertEquals(newEndDate, doc.read("$.paatospvm"));
+        assertEquals(asianumero, doc.read("$.asianumero"));
     }
 
 
