@@ -57,6 +57,7 @@ public class MuutospyyntoServiceTest {
     private FileStorageService fileStorageService = mock(FileStorageService.class);
     private AsiatilamuutosService asiatilamuutosService = mock(AsiatilamuutosService.class);
     private LupaService lupaService = mock(LupaService.class);
+    private KoodistoService koodistoService = mock(KoodistoService.class);
 
     private MuutospyyntoService service;
     private Lupa lupa;
@@ -64,7 +65,7 @@ public class MuutospyyntoServiceTest {
     @Before
     public void setUp() {
         this.service = spy(new MuutospyyntoService(dsl, authService, organisaatioService, liiteService,
-                opintopolkuService, maaraysService, fileStorageService, asiatilamuutosService, lupaService));
+                opintopolkuService, maaraysService, fileStorageService, asiatilamuutosService, lupaService, koodistoService));
 
         this.lupa = new Lupa();
         this.lupa.setJarjestajaYtunnus("123");

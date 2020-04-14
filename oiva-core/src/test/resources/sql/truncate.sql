@@ -1,4 +1,5 @@
 TRUNCATE table lupa CASCADE;
+TRUNCATE table maarays CASCADE;
 TRUNCATE table paatoskierros CASCADE;
 TRUNCATE table asiatyyppi CASCADE;
 TRUNCATE table esitysmalli CASCADE;

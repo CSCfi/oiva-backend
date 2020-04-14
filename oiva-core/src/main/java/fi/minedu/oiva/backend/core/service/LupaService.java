@@ -91,6 +91,11 @@ public class LupaService extends BaseService {
                 .fetchOneInto(Lupa.class) : null);
     }
 
+    public Optional<Lupa> getById(final Long id, String... options) {
+        final SelectConditionStep<Record> query = dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id));
+        return entity(query.fetchOne(), options);
+    }
+
     protected Optional<Condition> baseLupaFilter() {
         final OivaPermission accessPermission = authService.accessPermission();
         final Condition valmisLupaCondition = LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS);
