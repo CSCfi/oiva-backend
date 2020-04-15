@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 208190676;
+    private static final long serialVersionUID = 664809006;
 
     private Long      id;
     private Long      lupaId;
@@ -48,6 +48,8 @@ public class Muutospyynto implements Serializable {
     private String    alkupera;
     private String    asianumero;
     private Date      paatospvm;
+    private String    diaarinumero;
+    private String    jarjestajaOid;
 
     public Muutospyynto() {}
 
@@ -69,6 +71,8 @@ public class Muutospyynto implements Serializable {
         this.alkupera = value.alkupera;
         this.asianumero = value.asianumero;
         this.paatospvm = value.paatospvm;
+        this.diaarinumero = value.diaarinumero;
+        this.jarjestajaOid = value.jarjestajaOid;
     }
 
     public Muutospyynto(
@@ -88,7 +92,9 @@ public class Muutospyynto implements Serializable {
         JsonNode  meta,
         String    alkupera,
         String    asianumero,
-        Date      paatospvm
+        Date      paatospvm,
+        String    diaarinumero,
+        String    jarjestajaOid
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -107,6 +113,8 @@ public class Muutospyynto implements Serializable {
         this.alkupera = alkupera;
         this.asianumero = asianumero;
         this.paatospvm = paatospvm;
+        this.diaarinumero = diaarinumero;
+        this.jarjestajaOid = jarjestajaOid;
     }
 
     public Long getId() {
@@ -254,6 +262,23 @@ public class Muutospyynto implements Serializable {
         this.paatospvm = paatospvm;
     }
 
+    @Size(max = 20)
+    public String getDiaarinumero() {
+        return this.diaarinumero;
+    }
+
+    public void setDiaarinumero(String diaarinumero) {
+        this.diaarinumero = diaarinumero;
+    }
+
+    public String getJarjestajaOid() {
+        return this.jarjestajaOid;
+    }
+
+    public void setJarjestajaOid(String jarjestajaOid) {
+        this.jarjestajaOid = jarjestajaOid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -275,6 +300,8 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(alkupera);
         sb.append(", ").append(asianumero);
         sb.append(", ").append(paatospvm);
+        sb.append(", ").append(diaarinumero);
+        sb.append(", ").append(jarjestajaOid);
 
         sb.append(")");
         return sb.toString();

@@ -170,17 +170,15 @@ public class MuutospyyntoController {
         return getOr404(muutospyyntoService.executeAction(uuid, Action.OTA_KASITTELYYN).map(Muutospyynto::getUuid));
     }
 
+    @ApiOperation(notes = "Merkitse muutospyyntö päätetyksi ja muodostaa muutospyynnön pohjalta uuden luvan", value = "")
+    @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
+    public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.PAATA).map(Muutospyynto::getUuid));
+    }
 
     /*
 
     TODO: Commented out because these have missing access rules
-
-    // Vaihda muutospyynnön tilaa -> valmis
-    @ApiOperation(notes = "Merkitse muutospyyntö valmiiksi", value = "")
-    @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
-    public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
-        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PAATETTY));
-    }
 
     // Vaihda muutospyynnön tilaa ->  passivoi
     @ApiOperation(notes = "Passivoi muutospyyntö", value = "")

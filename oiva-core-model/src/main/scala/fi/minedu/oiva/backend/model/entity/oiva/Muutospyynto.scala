@@ -14,8 +14,6 @@ import scala.beans.BeanProperty
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
 class Muutospyynto(
-                    var diaarinumero: String,
-                    var jarjestaja_oid: String,
                     var lupa_uuid: String,
                     var muutokset: util.Collection[Muutos],
                     var liitteet: util.Collection[Liite],
@@ -25,19 +23,13 @@ class Muutospyynto(
                     @BeanProperty
                     var asiatilamuutokset: util.Collection[Asiatilamuutos]) extends pojos.Muutospyynto  {
 
-  def this() = this(null,null,null,null,null,null,null,null,null)
+  def this() = this(null,null,null,null,null,null,null)
 
   // exclude from json
   @JsonIgnore override def getId: lang.Long = super.getId
 
-  def getJarjestajaOid: String = jarjestaja_oid
-  def setJarjestajaOid(jarjestajaOid: String): Unit = this.jarjestaja_oid = jarjestajaOid
-
   def getLupaUuid: String = lupa_uuid
   def setLupaUuid(lupaUuid: String): Unit = this.lupa_uuid = lupaUuid
-
-  def getDiaarinumero: String = diaarinumero
-  def setDiaarinumero(diaarinumero: String): Unit = this.diaarinumero = diaarinumero
 
   def getMuutokset: util.Collection[Muutos] = muutokset
   def setMuutokset(muutokset: util.Collection[Muutos]): Unit = this.muutokset = muutokset

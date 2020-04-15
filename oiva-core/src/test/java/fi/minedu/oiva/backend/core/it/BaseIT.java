@@ -104,6 +104,7 @@ abstract public class BaseIT {
         // Setup JsonPath
         setupJsonPath();
         beforeTest();
+        setUpDb("sql/restart_requences.sql");
     }
 
     protected TestRestTemplate createRestTemplate() {
@@ -199,7 +200,7 @@ abstract public class BaseIT {
                         "</cas:serviceResponse>"));
     }
 
-    private void logout() {
+    protected void logout() {
         restTemplate.getForEntity(createURLWithPort("/api/auth/logout"), String.class);
     }
 

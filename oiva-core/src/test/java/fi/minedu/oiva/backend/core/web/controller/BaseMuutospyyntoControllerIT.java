@@ -24,16 +24,20 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.OK;
 
 public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     private final String lupaJarjestajaOid = "1.1.111.111.11.11111111111";
+    private final String okmOid = "1.1.111.111.11.22222222";
 
     @Override
     public void beforeTest() {
-        setUpDb("sql/lupa_data.sql");
+        setUpDb("sql/lupa_data.sql", "sql/maarays_data.sql");
     }
 
     @Test
@@ -64,7 +68,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Nimenkirjoittaja);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json")));
-        assertEquals("Response code should match!", HttpStatus.OK, response.getStatusCode());
+        assertEquals("Response code should match!", OK, response.getStatusCode());
     }
 
     @Test
@@ -78,7 +82,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json"),
                 "file0", "file1", "file2", "file3", "file4", "file5"));
-        assertEquals("Response status should match", HttpStatus.OK, createResponse.getStatusCode());
+        assertEquals("Response status should match", OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
         final String uuid = doc.read("$.uuid", String.class);
@@ -110,7 +114,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Load created
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
-        assertEquals("Get response status should match!", HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals("Get response status should match!", OK, getResponse.getStatusCode());
         assertEquals("Create response and get response should match!", createResponse.getBody(),
                 getResponse.getBody());
 
@@ -128,7 +132,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()));
 
-        assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
+        assertEquals("Update response code should match!", OK, updateResponse.getStatusCode());
 
         assertEquals("Liite table count should match!", 4,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
@@ -163,6 +167,53 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     }
 
     @Test
+    public void valmis() throws IOException {
+        loginAs("testuser", lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Kayttaja);
+        // Create new muutospyynto
+        ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
+                readFileToString("json/muutospyynto.json"),
+                "file0", "file1", "file2", "file3", "file4", "file5"));
+        assertEquals("Response status should match", OK, createResponse.getStatusCode());
+        DocumentContext doc = jsonPath.parse(createResponse.getBody());
+        final String uuid = doc.read("$.uuid", String.class);
+        logout();
+        // Change muutospyynto tila to "KASITTELYSSA"
+        loginAs("testNimenkirjoittaja", lupaJarjestajaOid, OivaAccess.Context_Nimenkirjoittaja);
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/avoin/" + uuid,
+                null, OK).getBody();
+        logout();
+        // Change muutospyynto tila to "VALMISTELUSSA"
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/valmistelussa/" + uuid,
+                null, OK).getBody();
+        // Change muutospyynto tila to "PAATETTY"
+        final String response = makeRequest(POST,
+                "/api/muutospyynnot/tila/paatetty/" + uuid,
+                null, OK).getBody();
+        assertEquals("\"" + uuid + "\"", response);
+
+        // Fetch the latest lupa for jarjestaja
+        final TypeRef<List<String>> stringRef = new TypeRef<List<String>>() {
+        };
+        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1111111-1?with=all", OK);
+        doc = jsonPath.parse(lupaJson.getBody());
+        assertEquals("Lupa diaarinumero should match.", "20/531/2018", doc.read("$.diaarinumero"));
+        assertEquals("Maarays count should match!", 6, doc.read("$.maaraykset.length()",
+                Integer.class).intValue());
+        assertEquals("AliMaarays count should match!", 4,
+                doc.read("$..aliMaaraykset[*].uuid", stringRef).size());
+        final List<String> koodiarvoList = doc.read("$.maaraykset[*].koodiarvo", stringRef);
+        assertFalse("There should not be removed maarays.", koodiarvoList.contains("124"));
+
+        // Check history
+        assertEquals("There should be history row for old lupa", 1,
+                JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lupahistoria", "lupa_id = 1"));
+    }
+
+    @Test
     public void updateWithoutMuutokset() throws IOException {
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
@@ -171,7 +222,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json"),
                 "file0", "file1", "file2", "file3", "file4", "file5"));
-        assertEquals("Response status should match", HttpStatus.OK, createResponse.getStatusCode());
+        assertEquals("Response status should match", OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
         final String uuid = doc.read("$.uuid", String.class);
@@ -181,7 +232,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         doc.set("$.muutokset", Collections.EMPTY_LIST);
 
         final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()));
-        assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
+        assertEquals("Update response code should match!", OK, updateResponse.getStatusCode());
 
         assertEquals("Liite table count should match!", 2,
                 JdbcTestUtils.countRowsInTable(jdbcTemplate, "liite"));
@@ -189,7 +240,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Load updated muutospyynto
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
-        assertEquals("Get response status should match!", HttpStatus.OK, getResponse.getStatusCode());
+        assertEquals("Get response status should match!", OK, getResponse.getStatusCode());
 
         assertEquals("Update response and get response should match!", updateResponse.getBody(),
                 getResponse.getBody());
@@ -202,7 +253,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Katselija);
         final ResponseEntity<String> liiteResponse = requestLiitteet("2b02c730-ebef-11e9-8d25-0242ac110023");
-        assertEquals("Response status should match!", liiteResponse.getStatusCode(), HttpStatus.OK);
+        assertEquals("Response status should match!", liiteResponse.getStatusCode(), OK);
         final DocumentContext doc = jsonPath.parse(liiteResponse.getBody());
         final TypeRef<List<Liite>> liiteRef = new TypeRef<List<Liite>>() {
         };
@@ -224,7 +275,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final String uuid = doc.read("$.uuid", String.class);
 
         // Vie käsittelyyn esittelijälle
-        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, HttpMethod.POST);
+        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, POST);
 
         List<Map<String, Object>> muutokset = jdbcTemplate.queryForList("select * from asiatilamuutos");
         assertEquals("Should have 2: creation \"\" -> luonnos and luonnos -> avoin",2, muutokset.size());
@@ -248,16 +299,16 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final String uuid = doc.read("$.uuid", String.class);
 
         // Vie käsittelyyn esittelijälle
-        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, HttpMethod.POST);
+        super.requestBody("/api/muutospyynnot/tila/avoin/" + uuid, POST);
 
         // Login as esittelijä
         loginAs("esittelija", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
-        response = makeRequest("api/muutospyynnot/avoimet", HttpStatus.OK);
+        response = makeRequest("api/muutospyynnot/avoimet", OK);
         doc = jsonPath.parse(response.getBody());
         assertEquals(1, doc.read("$.length()", Integer.class).intValue());
 
         // Ota käsittelyyn
-        super.requestBody("/api/muutospyynnot/tila/valmistelussa/" + uuid, HttpMethod.POST);
+        super.requestBody("/api/muutospyynnot/tila/valmistelussa/" + uuid, POST);
 
         doc = requestJSONData("/api/muutospyynnot/avoimet");
         assertEquals(0, doc.read("$.length()", Integer.class).intValue());
@@ -306,7 +357,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         // ----- UPDATE EXISTING -----
         String newEndDate = "2020-02-20";
-        doc.set("$.voimassaloppupvm", newEndDate);
+        doc.put("$", "voimassaloppupvm", newEndDate);
         final ResponseEntity<String> updateResponse =
                 restTemplate.postForEntity(
                         createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
@@ -316,7 +367,6 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
         doc = jsonPath.parse(updateResponse.getBody());
         assertEquals(newEndDate, doc.read("$.voimassaloppupvm"));
-
     }
 
 

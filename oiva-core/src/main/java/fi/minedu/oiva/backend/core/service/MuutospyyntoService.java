@@ -8,18 +8,30 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.core.util.BeanUtils;
 import fi.minedu.oiva.backend.core.util.ValidationUtils;
+import fi.minedu.oiva.backend.core.util.With;
+import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
+import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton;
+import fi.minedu.oiva.backend.model.entity.oiva.Asiatyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupatila;
+import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.oiva.Paatoskierros;
+import fi.minedu.oiva.backend.model.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutosLiite;
 import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutospyyntoLiite;
+import fi.minedu.oiva.backend.model.jooq.tables.records.LupaRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.LupahistoriaRecord;
+import fi.minedu.oiva.backend.model.jooq.tables.records.MaaraysRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosLiiteRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
@@ -39,8 +51,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ValidationException;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,15 +69,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static fi.minedu.oiva.backend.core.util.ValidationUtils.validation;
+import static fi.minedu.oiva.backend.model.jooq.Tables.ASIATYYPPI;
 import static fi.minedu.oiva.backend.model.jooq.Tables.KOHDE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA;
+import static fi.minedu.oiva.backend.model.jooq.Tables.LUPAHISTORIA;
+import static fi.minedu.oiva.backend.model.jooq.Tables.LUPATILA;
+import static fi.minedu.oiva.backend.model.jooq.Tables.MAARAYS;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MAARAYSTYYPPI;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOS;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO_LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOS_LIITE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.PAATOSKIERROS;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.options;
 
 @Service
 public class MuutospyyntoService {
@@ -84,12 +103,14 @@ public class MuutospyyntoService {
     private final FileStorageService fileStorageService;
     private final AsiatilamuutosService asiatilamuutosService;
     private final LupaService lupaService;
+    private final KoodistoService koodistoService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
                                LiiteService liiteService, OpintopolkuService opintopolkuService,
                                MaaraysService maaraysService, FileStorageService fileStorageService,
-                               AsiatilamuutosService asiatilamuutosService, LupaService lupaService) {
+                               AsiatilamuutosService asiatilamuutosService, LupaService lupaService,
+                               KoodistoService koodistoService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
@@ -99,13 +120,15 @@ public class MuutospyyntoService {
         this.fileStorageService = fileStorageService;
         this.asiatilamuutosService = asiatilamuutosService;
         this.lupaService = lupaService;
+        this.koodistoService = koodistoService;
     }
 
     public enum Action {
         LUO,
         TALLENNA,
         LAHETA,
-        OTA_KASITTELYYN
+        OTA_KASITTELYYN,
+        PAATA;
     }
 
     public enum Tyyppi {
@@ -119,7 +142,7 @@ public class MuutospyyntoService {
         VALMISTELUSSA,      // Esittelijä ottanut valmisteluun
         TAYDENNETTAVA,      // Esittelijä palauttanut täydennettäväksi
         PAATETTY,           // Valmis allekirjoitettu lupa
-        PASSIVOITU;         // Lupa poistettu
+        PASSIVOITU         // Lupa poistettu
     }
 
     public enum MuutosPaatostila {
@@ -128,7 +151,7 @@ public class MuutospyyntoService {
         HYLATTY,            // Esittelijä on hylännyt muutoksen
         TAYDENNETTAVA,      // Esittelijä palauttaa muutoksen täydennettäväksi
         HYV_MUUTETTUNA,     // Esittelijä on hyväksynyt muutoksen muutettuna
-        PASSIVOITU;         // Muutos on muusta syystä poistettu
+        PASSIVOITU         // Muutos on muusta syystä poistettu
     }
 
     // hakee yksittäinen muutospyynnön perusteluineen
@@ -185,6 +208,10 @@ public class MuutospyyntoService {
 
     private Stream<Muutos> getAlimaaraykset(Muutos muutos) {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
+    }
+
+    private Stream<Maarays> getAlimaaraykset(Maarays maarays) {
+        return Stream.concat(Stream.of(maarays), maarays.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
     private Optional<Muutospyynto> luo(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
@@ -245,6 +272,130 @@ public class MuutospyyntoService {
                 .flatMap(uuid_ -> getByUuid(uuid_.toString()));
     }
 
+    private Optional<Muutospyynto> paata(String uuid) {
+        Muutospyynto mp = getByUuid(uuid)
+                .orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+        final String[] options = options(Maarays.class, Organisaatio.class);
+        Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
+                .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+        if (!Muutospyyntotila.VALMISTELUSSA.toString().equals(mp.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+        if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
+            throw new ForbiddenException("User has no right");
+        }
+        final Optional<Muutospyynto> optionalMuutospyynto = findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PAATETTY)
+                .flatMap(uuid_ -> getByUuid(uuid_.toString()));
+        return optionalMuutospyynto.map(muutospyynto -> {
+            final Lupatila tila = dsl.fetchOne(LUPATILA, LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS))
+                    .into(Lupatila.class);
+            final Asiatyyppi asiatyyppi = dsl.fetchOne(ASIATYYPPI, ASIATYYPPI.TUNNISTE.eq(AsiatyyppiValue.MUUTOS))
+                    .into(Asiatyyppi.class);
+            final Muutospyynto muutospyyntoCopy = new Muutospyynto();
+            // Create new lupa
+            BeanUtils.copyNonNullProperties(muutospyyntoCopy, mp);
+            muutospyyntoCopy.setId(null);
+            muutospyyntoCopy.setUuid(null);
+            final LupaRecord lupa = dsl.newRecord(LUPA, muutospyyntoCopy);
+            lupa.setLupatilaId(tila.getId());
+            lupa.setAsiatyyppiId(asiatyyppi.getId());
+            lupa.setLuoja(authService.getUsername());
+            lupa.setAlkupvm(muutospyynto.getVoimassaalkupvm());
+            lupa.setLoppupvm(muutospyynto.getVoimassaloppupvm());
+            lupa.store();
+
+            // Copy maaraykset which is not removed
+            final List<Long> removed = getMuutoksetRecursively(muutospyynto.getMuutokset())
+                    .filter(muutos -> "POISTO".equals(muutos.getTila()))
+                    .map(Muutos::getMaaraysId)
+                    .collect(Collectors.toList());
+            Optional.ofNullable(oldLupa.getMaaraykset()).ifPresent(maaraykset ->
+                    maaraykset.forEach(maarays ->
+                            createMaaraysFromMaarays(lupa.getId(), maarays, null, removed)));
+
+            Optional.ofNullable(muutospyynto.getMuutokset()).ifPresent(muutokset ->
+                    muutokset.forEach(muutos ->
+                            createMaaraysFromMuutos(lupa.getId(), muutos, null)));
+
+            // Create history entry and set ending date for old lupa.
+            createLupahistoria(oldLupa, lupa);
+
+            // Generate PDF for new lupa
+            lupaService.getById(lupa.getId(), With.all)
+                    .ifPresent(l -> {
+                        try {
+                            fileStorageService.writeLupaPDF(l);
+                        } catch (Exception e) {
+                            throw new RuntimeException("Could not write lupa pdf.", e);
+                        }
+                    });
+            return muutospyynto;
+        });
+    }
+
+    private void createLupahistoria(Lupa oldLupa, LupaRecord lupa) {
+        final LupaRecord oldLupaRecord = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getId()));
+        final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
+        oldLupaRecord.setLoppupvm(Date.valueOf(loppupvm));
+        oldLupaRecord.store();
+        final LupahistoriaRecord historiaRecord = dsl.newRecord(LUPAHISTORIA, oldLupa);
+        historiaRecord.setLupaId(oldLupa.getId());
+        historiaRecord.setYtunnus(oldLupa.getJarjestajaYtunnus());
+        historiaRecord.setOid(oldLupa.getJarjestajaOid());
+        historiaRecord.setMaakunta(Optional.ofNullable(oldLupa.getJarjestaja())
+                .map(Organisaatio::getMaakuntaKoodi)
+                .map(KoodistoKoodi::getNimi)
+                .flatMap(nimi -> nimi.getOrFirst("fi"))
+                .orElse(""));
+        historiaRecord.setFilename(oldLupa.getPDFFileName());
+        historiaRecord.setTila(oldLupa.getLupatila().getTunniste().name());
+        historiaRecord.setVoimassaoloalkupvm(oldLupaRecord.getAlkupvm());
+        historiaRecord.setVoimassaololoppupvm(oldLupaRecord.getLoppupvm());
+        if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
+            // Old lupa was never affective
+            historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));
+        }
+        historiaRecord.store();
+    }
+
+    private void createMaaraysFromMaarays(Long lupaId, Maarays maarays, Long parentMaaraysId, List<Long> removed) {
+        if (removed.contains(maarays.getId())) {
+            return;
+        }
+        final Maarays maaraysCopy = new Maarays();
+        BeanUtils.copyNonNullProperties(maaraysCopy, maarays);
+        maaraysCopy.setId(null);
+        maaraysCopy.setUuid(null);
+        maaraysCopy.setKoodistoversio(koodistoService.getLatestKoodistoVersio(maaraysCopy.getKoodisto()));
+        final MaaraysRecord maaraysRecord = dsl.newRecord(MAARAYS, maaraysCopy);
+        maaraysRecord.setParentId(parentMaaraysId);
+        maaraysRecord.setLuoja(authService.getUsername());
+        maaraysRecord.setLupaId(lupaId);
+        maaraysRecord.store();
+        Optional.ofNullable(maarays.getAliMaaraykset())
+                .ifPresent(maaraykset -> maaraykset.forEach(m ->
+                        createMaaraysFromMaarays(lupaId, m, maaraysRecord.getId(), removed)));
+    }
+
+    private void createMaaraysFromMuutos(Long lupaId, Muutos muutos, Long parentMaaraysId) {
+        if (!"LISAYS".equals(muutos.getTila())) {
+            return;
+        }
+        final Muutos muutosCopy = new Muutos();
+        BeanUtils.copyNonNullProperties(muutosCopy, muutos);
+        muutosCopy.setId(null);
+        muutosCopy.setUuid(null);
+        final MaaraysRecord maaraysRecord = dsl.newRecord(MAARAYS, muutosCopy);
+        maaraysRecord.setKoodistoversio(koodistoService.getLatestKoodistoVersio(muutosCopy.getKoodisto()));
+        maaraysRecord.setLuoja(authService.getUsername());
+        maaraysRecord.setLupaId(lupaId);
+        maaraysRecord.setParentId(parentMaaraysId);
+        maaraysRecord.store();
+        Optional.ofNullable(muutos.getAliMaaraykset())
+                .ifPresent(muutokset -> muutokset.forEach(m ->
+                        createMaaraysFromMuutos(lupaId, m, maaraysRecord.getId())));
+    }
+
     // Check that muutospyynto and lupa organizations match each other
     private boolean lupaAndMuutospyyntoOrganizationsMatch(final Muutospyynto toBeSaved) {
         return lupaService.getByUuid(toBeSaved.getLupaUuid()).map(l -> l.getJarjestajaYtunnus().equals(toBeSaved.getJarjestajaYtunnus())).orElse(false);
@@ -273,6 +424,8 @@ public class MuutospyyntoService {
                     return laheta(uuid);
                 case OTA_KASITTELYYN:
                     return otaKasittelyyn(uuid);
+                case PAATA:
+                    return paata(uuid);
                 default:
                     throw new UnsupportedOperationException("Action " + action + " is not supported for muutospyynto");
             }
@@ -284,6 +437,7 @@ public class MuutospyyntoService {
 
     /**
      * Find muutospyynto based on uuid and set its tila
+     *
      * @param uuid
      * @param tila
      * @return UUID of muutospyynto or empty
@@ -685,7 +839,7 @@ public class MuutospyyntoService {
 
         if (directChildren != null) {
             directChildren.forEach(muutos -> {
-                muutos.setParentId(parentMuutos !=null ? parentMuutos.getId() : null);
+                muutos.setParentId(parentMuutos != null ? parentMuutos.getId() : null);
                 Long muutosId;
                 if (muutos.getUuid() == null) {
                     muutosId = createMuutos(muutospyynto.getId(), muutos, fileMap);
@@ -710,6 +864,17 @@ public class MuutospyyntoService {
                 muutokset.stream().flatMap(parent -> {
                     if (parent.getAliMaaraykset() != null) {
                         return getMuutoksetRecursively(parent.getAliMaaraykset());
+                    }
+                    return Stream.empty();
+                }));
+    }
+
+    private Stream<Maarays> getMaarayksetRecursively(Collection<Maarays> maaraykset) {
+        return Stream.concat(
+                maaraykset.stream(),
+                maaraykset.stream().flatMap(parent -> {
+                    if (parent.getAliMaaraykset() != null) {
+                        return getMaarayksetRecursively(parent.getAliMaaraykset());
                     }
                     return Stream.empty();
                 }));
