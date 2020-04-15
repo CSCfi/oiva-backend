@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio
 import fi.minedu.oiva.backend.model.jooq.tables._
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.RegExUtils
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
@@ -46,5 +46,5 @@ class Lupa(
     def setMaaraykset(maaraykset: Collection[Maarays]): Unit = this.maaraykset = maaraykset
 
     @JsonIgnore def getUUIDValue = getUuid.toString
-    @JsonIgnore def getPDFFileName = "lupa-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
+    @JsonIgnore def getPDFFileName = "lupa-" + RegExUtils.replaceAll(Option(getAsianumero).getOrElse(getDiaarinumero), "/", "-") + ".pdf"
 }

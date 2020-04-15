@@ -366,7 +366,7 @@ public class MuutospyyntoService {
         BeanUtils.copyNonNullProperties(maaraysCopy, maarays);
         maaraysCopy.setId(null);
         maaraysCopy.setUuid(null);
-        maaraysCopy.setKoodistoversio(getLatestKoodistoVersio(maaraysCopy.getKoodisto()));
+        maaraysCopy.setKoodistoversio(koodistoService.getLatestKoodistoVersio(maaraysCopy.getKoodisto()));
         final MaaraysRecord maaraysRecord = dsl.newRecord(MAARAYS, maaraysCopy);
         maaraysRecord.setParentId(parentMaaraysId);
         maaraysRecord.setLuoja(authService.getUsername());
@@ -375,12 +375,6 @@ public class MuutospyyntoService {
         Optional.ofNullable(maarays.getAliMaaraykset())
                 .ifPresent(maaraykset -> maaraykset.forEach(m ->
                         createMaaraysFromMaarays(lupaId, m, maaraysRecord.getId(), removed)));
-    }
-
-    private Integer getLatestKoodistoVersio(String koodisto) {
-        return Optional.ofNullable(koodistoService.getKoodisto(koodisto, null))
-                .map(Koodisto::getVersio)
-                .orElse(null);
     }
 
     private void createMaaraysFromMuutos(Long lupaId, Muutos muutos, Long parentMaaraysId) {
@@ -392,7 +386,7 @@ public class MuutospyyntoService {
         muutosCopy.setId(null);
         muutosCopy.setUuid(null);
         final MaaraysRecord maaraysRecord = dsl.newRecord(MAARAYS, muutosCopy);
-        maaraysRecord.setKoodistoversio(getLatestKoodistoVersio(muutosCopy.getKoodisto()));
+        maaraysRecord.setKoodistoversio(koodistoService.getLatestKoodistoVersio(muutosCopy.getKoodisto()));
         maaraysRecord.setLuoja(authService.getUsername());
         maaraysRecord.setLupaId(lupaId);
         maaraysRecord.setParentId(parentMaaraysId);

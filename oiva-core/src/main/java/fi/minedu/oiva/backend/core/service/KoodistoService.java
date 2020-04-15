@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -79,6 +80,18 @@ public class KoodistoService {
      */
     public KoodistoKoodi getKoodi(final String koodistoUri, final String koodiArvo, final Integer koodistoVersio) {
         return opintopolkuService.getKoodi(koodistoUri, koodiArvo, koodistoVersio);
+    }
+
+    /**
+     * Hae uusin koodiston versio koodistopalvelusta.
+     *
+     * @param koodisto Koodiston nimi
+     * @return Koodiston versionumero
+     */
+    public Integer getLatestKoodistoVersio(String koodisto) {
+        return Optional.ofNullable(getKoodisto(koodisto, null))
+                .map(Koodisto::getVersio)
+                .orElse(null);
     }
 
     /**
