@@ -12,6 +12,7 @@ class Lupahistoria(var lupahistoria: Lupahistoria) extends pojos.Lupahistoria  {
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
+  @JsonIgnore override def getLupaId = super.getLupaId
 
   def getEsitysmalli = lupahistoria
   def setEsitysmalli(esitysmalli: Esitysmalli): Unit = this.lupahistoria = lupahistoria

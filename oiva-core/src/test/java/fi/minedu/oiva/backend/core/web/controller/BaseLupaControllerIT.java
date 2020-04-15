@@ -1,8 +1,12 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.MapFunction;
+import com.jayway.jsonpath.Option;
 import fi.minedu.oiva.backend.core.it.BaseIT;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
+import org.assertj.core.util.Lists;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public abstract class BaseLupaControllerIT extends BaseIT {
@@ -103,7 +108,27 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         DocumentContext doc2 = jsonPath.parse(makeRequest("/api/luvat/historiaytunnuksella/1111111-1", HttpStatus.OK).getBody());
         assertEquals(new Integer(1), doc.read("$.length()"));
         assertEquals("1.1.111.111.11.11111111111", doc.read("$[0].oid"));
+        doc = JsonPath.using(doc.configuration().addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(doc.jsonString());
+        assertNull(doc.read("$[0].id"));
+        assertNull(doc.read("$[0].lupaId"));
         assertEquals(doc.jsonString(), doc2.jsonString());
+    }
+
+    @Test
+    public void printLupahistoriaLupa() {
+        setUpDb("sql/lupahistoria_data.sql");
+        ResponseEntity<String> response = makeRequest("/api/pdf/historia/cc3c1d00-43b6-11e8-b2ef-005056aa0e61", HttpStatus.FOUND);
+
+        // case: redirect to lupa printing api  /api/pdf/<uuid>
+        List<String> locations = response.getHeaders().get("Location");
+        assertEquals(1, locations.size());
+        assertTrue(locations.get(0).matches("/api/pdf/[a-z0-9-]+"));
+
+        // case: redirect to direct file download  /api/pebble/resouces/liitteet...
+        response = makeRequest("/api/pdf/historia/cc3c1d00-43b6-11e8-b2ef-005056aa0e63", HttpStatus.FOUND);
+        locations = response.getHeaders().get("Location");
+        assertEquals(1, locations.size());
+        assertEquals("/api/pebble/resources/liitteet/lupahistoria/a+b+c.pdf", locations.get(0));
     }
 
     private void getLuvat(MultiValueMap<String, String> queryParams, int expected) {
