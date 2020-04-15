@@ -4,13 +4,19 @@ import com.jayway.jsonpath.DocumentContext;
 import fi.minedu.oiva.backend.core.it.BaseIT;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +27,10 @@ public abstract class BaseLupaControllerIT extends BaseIT {
 
     private static String PARAM_KOULUTUSTYYPPI = "koulutustyyppi";
     private static String PARAM_OPPILAITOSTYYPPI = "oppilaitostyyppi";
+
+    @Autowired
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    protected JdbcTemplate jdbcTemplate;
 
     @Test
     public void getAll() {
@@ -78,6 +88,22 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         doc = jsonPath.parse(response.getBody());
         // Result should be same as before
         assertEquals(organizations, doc.read("$.length()"));
+    }
+
+    @Test
+    public void getLupahistoria() {
+        setUpDb("sql/lupahistoria_data.sql");
+
+        // Set one historia lupa loppu pvm to distant future
+        LocalDate future = LocalDate.now().plusDays(2);
+        int updateCount = jdbcTemplate.update("update lupahistoria set voimassaololoppupvm = ? where id=1;", future);
+        assertEquals(1, updateCount);
+
+        DocumentContext doc = jsonPath.parse(makeRequest("/api/luvat/historia/1.1.111.111.11.11111111111", HttpStatus.OK).getBody());
+        DocumentContext doc2 = jsonPath.parse(makeRequest("/api/luvat/historiaytunnuksella/1111111-1", HttpStatus.OK).getBody());
+        assertEquals(new Integer(1), doc.read("$.length()"));
+        assertEquals("1.1.111.111.11.11111111111", doc.read("$[0].oid"));
+        assertEquals(doc.jsonString(), doc2.jsonString());
     }
 
     private void getLuvat(MultiValueMap<String, String> queryParams, int expected) {
