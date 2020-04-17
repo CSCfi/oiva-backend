@@ -281,6 +281,7 @@ public class MuutospyyntoServiceTest {
         muutospyynto.setLiitteet(new LinkedList<>());
         muutospyynto.setMuutokset(new LinkedList<>());
         muutospyynto.setJarjestajaYtunnus(lupa.getJarjestajaYtunnus());
+        muutospyynto.setLupaUuid(UUID.randomUUID().toString());
         return muutospyynto;
     }
 
