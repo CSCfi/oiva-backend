@@ -338,7 +338,11 @@ public class MuutospyyntoService {
         final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
         oldLupaRecord.setLoppupvm(Date.valueOf(loppupvm));
         oldLupaRecord.store();
-        final LupahistoriaRecord historiaRecord = dsl.newRecord(LUPAHISTORIA, oldLupa);
+        final Lupa lupaCopy = new Lupa();
+        BeanUtils.copyNonNullProperties(lupaCopy, oldLupa);
+        lupaCopy.setId(null);
+        lupaCopy.setUuid(null);
+        final LupahistoriaRecord historiaRecord = dsl.newRecord(LUPAHISTORIA, lupaCopy);
         historiaRecord.setLupaId(oldLupa.getId());
         historiaRecord.setYtunnus(oldLupa.getJarjestajaYtunnus());
         historiaRecord.setOid(oldLupa.getJarjestajaOid());
