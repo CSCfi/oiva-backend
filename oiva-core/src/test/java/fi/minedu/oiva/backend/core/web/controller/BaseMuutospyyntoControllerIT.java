@@ -167,7 +167,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     }
 
     @Test
-    public void valmis() throws IOException {
+    public void testHappyPath() throws IOException {
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Kayttaja);
         // Create new muutospyynto
@@ -189,6 +189,12 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         makeRequest(POST,
                 "/api/muutospyynnot/tila/valmistelussa/" + uuid,
                 null, OK).getBody();
+
+        // Change tila to "ESITTELYSSA"
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/esittelyssa/" + uuid,
+                null, OK).getBody();
+
         // Change muutospyynto tila to "PAATETTY"
         final String response = makeRequest(POST,
                 "/api/muutospyynnot/tila/paatetty/" + uuid,

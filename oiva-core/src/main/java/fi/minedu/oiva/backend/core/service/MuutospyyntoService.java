@@ -128,6 +128,7 @@ public class MuutospyyntoService {
         TALLENNA,
         LAHETA,
         OTA_KASITTELYYN,
+        ESITTELE,
         PAATA;
     }
 
@@ -141,6 +142,7 @@ public class MuutospyyntoService {
         AVOIN,              // KJ lähettänyt hakemuksen eteenpäin
         VALMISTELUSSA,      // Esittelijä ottanut valmisteluun
         TAYDENNETTAVA,      // Esittelijä palauttanut täydennettäväksi
+        ESITTELYSSA,        // Esittelijä on siirtänyt esittelyyn
         PAATETTY,           // Valmis allekirjoitettu lupa
         PASSIVOITU         // Lupa poistettu
     }
@@ -272,13 +274,25 @@ public class MuutospyyntoService {
                 .flatMap(uuid_ -> getByUuid(uuid_.toString()));
     }
 
+    private Optional<Muutospyynto> esittele(String uuid) {
+        Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+        if (!Muutospyyntotila.VALMISTELUSSA.toString().equals(mp.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+        if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
+            throw new ForbiddenException("User has no right");
+        }
+        return findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.ESITTELYSSA)
+                .flatMap(uuid_ -> getByUuid(uuid_.toString()));
+    }
+
     private Optional<Muutospyynto> paata(String uuid) {
         Muutospyynto mp = getByUuid(uuid)
                 .orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
         final String[] options = options(Maarays.class, Organisaatio.class);
         Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
                 .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
-        if (!Muutospyyntotila.VALMISTELUSSA.toString().equals(mp.getTila())) {
+        if (!Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila())) {
             throw new ForbiddenException("Action is not allowed");
         }
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
@@ -424,6 +438,8 @@ public class MuutospyyntoService {
                     return laheta(uuid);
                 case OTA_KASITTELYYN:
                     return otaKasittelyyn(uuid);
+                case ESITTELE:
+                    return esittele(uuid);
                 case PAATA:
                     return paata(uuid);
                 default:

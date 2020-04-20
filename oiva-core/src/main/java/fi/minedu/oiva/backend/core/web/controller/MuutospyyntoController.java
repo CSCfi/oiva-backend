@@ -170,6 +170,12 @@ public class MuutospyyntoController {
         return getOr404(muutospyyntoService.executeAction(uuid, Action.OTA_KASITTELYYN).map(Muutospyynto::getUuid));
     }
 
+    @ApiOperation(notes = "Merkitse muutospyyntö esitellyksi", value = "")
+    @RequestMapping(method = POST, value = "/tila/esittelyssa/{uuid}")
+    public HttpEntity<UUID> esittele(final @PathVariable String uuid) {
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.ESITTELE).map(Muutospyynto::getUuid));
+    }
+
     @ApiOperation(notes = "Merkitse muutospyyntö päätetyksi ja muodostaa muutospyynnön pohjalta uuden luvan", value = "")
     @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
     public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
