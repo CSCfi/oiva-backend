@@ -35,6 +35,7 @@ import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyn
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr400;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -180,6 +181,12 @@ public class MuutospyyntoController {
     @RequestMapping(method = POST, value = "/tila/paatetty/{uuid}")
     public HttpEntity<UUID> valmis(final @PathVariable String uuid) {
         return getOr404(muutospyyntoService.executeAction(uuid, Action.PAATA).map(Muutospyynto::getUuid));
+    }
+
+    @ApiOperation(notes = "Poista muutospyyntö.", value = "")
+    @RequestMapping(method = DELETE, value = "/{uuid}")
+    public HttpEntity<UUID> delete(final @PathVariable String uuid) {
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.POISTA).map(Muutospyynto::getUuid));
     }
 
     /*

@@ -292,6 +292,27 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     }
 
     @Test
+    public void nimenkirjoittajaCanDelete() throws IOException {
+        String username = "testuser";
+        loginAs(username, lupaJarjestajaOid,
+                OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
+
+        final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+                readFileToString("json/muutospyynto.json")));
+
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        log.info("Muutospyynto createResponse: {}", doc.jsonString());
+        final String uuid = doc.read("$.uuid", String.class);
+
+        ResponseEntity<String> deleteResponse = restTemplate.exchange(
+                createURLWithPort("/api/muutospyynnot/" + uuid),
+                HttpMethod.DELETE, null, String.class);
+        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND,
+                restTemplate.getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class).getStatusCode());
+    }
+
+    @Test
     public void esittelijaCanHandleMuutospyynto() throws IOException {
         String username = "testuser";
         loginAs(username, lupaJarjestajaOid,
@@ -331,10 +352,10 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     }
 
     @Test
-    public void esittelijaCreateAndSave() throws IOException {
+    public void esittelijaCreateSaveAndDelete() throws IOException {
         loginAs("elli esittelija", "", OivaAccess.Context_Esittelija);
 
-        // Create new
+        // ----- CREATE NEW -----
         ResponseEntity<String> createResponse =
                 restTemplate.postForEntity(
                         createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
@@ -354,7 +375,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("Alkupera should be ESITTELIJA", MuutospyyntoService.Tyyppi.ESITTELIJA.toString(),
                 doc.read("$.alkupera", String.class));
 
-        // Load created
+        // ----- LOAD CREATED -----
         ResponseEntity<String> getResponse = restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class);
         assertEquals("Get response status should match!", HttpStatus.OK, getResponse.getStatusCode());
@@ -379,6 +400,14 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals(newEndDate, doc.read("$.voimassaalkupvm"));
         assertEquals(newEndDate, doc.read("$.paatospvm"));
         assertEquals(asianumero, doc.read("$.asianumero"));
+
+        // ----- DELETE DRAFT -----
+        ResponseEntity<String> deleteResponse = restTemplate.exchange(
+                        createURLWithPort("/api/muutospyynnot/" + uuid),
+                        HttpMethod.DELETE, null, String.class);
+        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND,
+                restTemplate.getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class).getStatusCode());
     }
 
 
