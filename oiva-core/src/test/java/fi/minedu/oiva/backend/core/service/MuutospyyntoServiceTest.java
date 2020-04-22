@@ -248,6 +248,37 @@ public class MuutospyyntoServiceTest {
     }
 
     @Test
+    public void esittelijaCanEsitteleMuutospyynto() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(new UUID(4, 4));
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
+        when(dsl.fetchOne(any(Table.class), any(Condition.class))).thenReturn(mock(MuutospyyntoRecord.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Happy case
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE);
+
+        // Wrong tila
+        muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE));
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+
+        // Wrong user
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        catchExpectedException(
+                ForbiddenException.class,
+                "User has no right",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE));
+    }
+
+    @Test
     public void testKJActions() throws Exception {
         Muutospyynto muutospyynto = generateMuutospyynto();
         muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
@@ -268,10 +299,12 @@ public class MuutospyyntoServiceTest {
 
         catchExpectedException(
                 ForbiddenException.class,
+                "Action is not allowed",
                 () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.TALLENNA, muutospyynto, new HashMap<>()));
 
         catchExpectedException(
                 ForbiddenException.class,
+                "Action is not allowed",
                 () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.LAHETA));
 
     }
@@ -281,15 +314,19 @@ public class MuutospyyntoServiceTest {
         muutospyynto.setLiitteet(new LinkedList<>());
         muutospyynto.setMuutokset(new LinkedList<>());
         muutospyynto.setJarjestajaYtunnus(lupa.getJarjestajaYtunnus());
+        muutospyynto.setLupaUuid(UUID.randomUUID().toString());
         return muutospyynto;
     }
 
-    private void catchExpectedException(Class expected, ThrowableFunction fn) throws Exception {
+    private void catchExpectedException(Class<?> expected, String msg, ThrowableFunction fn) throws Exception {
         try {
             fn.apply();
         } catch (Exception e) {
             if (!expected.isInstance(e)) {
-                throw e;
+                throw new RuntimeException("Exception is wrong type", e);
+            }
+            else if (msg != null && !msg.equals(e.getMessage())) {
+                throw new RuntimeException("Exception message does not match " + msg + " != " + e.getMessage() , e);
             }
         }
     }
