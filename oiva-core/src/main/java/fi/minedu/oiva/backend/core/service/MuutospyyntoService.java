@@ -24,7 +24,6 @@ import fi.minedu.oiva.backend.model.entity.oiva.Maaraystyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.oiva.Paatoskierros;
-import fi.minedu.oiva.backend.model.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.jooq.tables.pojos.MuutosLiite;
@@ -129,7 +128,8 @@ public class MuutospyyntoService {
         LAHETA,
         OTA_KASITTELYYN,
         ESITTELE,
-        PAATA;
+        PAATA,
+        POISTA
     }
 
     public enum Tyyppi {
@@ -347,6 +347,56 @@ public class MuutospyyntoService {
         });
     }
 
+    /**
+     * Delete muutospyynto and relating entities from db permanently
+     * @param muutospyynto
+     */
+    protected void delete(Muutospyynto muutospyynto) {
+        deleteFromExistingMetaLiitteet(muutospyynto.getMeta(), true);
+        deleteFromExistingLiitteet(muutospyynto.getLiitteet(), true);
+
+        muutospyynto.setMuutokset(Collections.emptySet());
+        clearNonExistingMuutokset(muutospyynto);
+
+        asiatilamuutosService.deleteAll(muutospyynto.getId());
+
+        dsl.delete(MUUTOSPYYNTO).where(MUUTOSPYYNTO.UUID.eq(muutospyynto.getUuid())).execute();
+    }
+
+    private Optional<Muutospyynto> poista(String uuid) {
+        Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+
+        // Koulutuksen järjestäjä can delete own organization's muutospyynto when its status is LUONNOS
+        if(Tyyppi.KJ.toString().equals(mp.getAlkupera())) {
+
+            if (!Muutospyyntotila.LUONNOS.toString().equals(mp.getTila())) {
+                throw new ForbiddenException("Action is not allowed");
+            }
+            if (!userOidMatchMuutospyynto(mp) || !authService.hasAnyRole(OivaAccess.Role_Nimenkirjoittaja)) {
+                throw new ForbiddenException("User has no right");
+            }
+
+            delete(mp);
+        }
+        // Esittelija created muutospyynto can be deleted
+        else if (Tyyppi.ESITTELIJA.toString().equals(mp.getAlkupera())) {
+
+            if (!Muutospyyntotila.VALMISTELUSSA.toString().equals(mp.getTila())) {
+                throw new ForbiddenException("Action is not allowed");
+            }
+            if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
+                throw new ForbiddenException("User has no right");
+            }
+
+            delete(mp);
+        }
+        else {
+            throw new ForbiddenException("Access rights cannot be defined for muutospyynto:\n" + mp);
+        }
+
+        return Optional.of(mp);
+    }
+
     private void createLupahistoria(Lupa oldLupa, LupaRecord lupa) {
         final LupaRecord oldLupaRecord = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getId()));
         final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
@@ -446,6 +496,8 @@ public class MuutospyyntoService {
                     return esittele(uuid);
                 case PAATA:
                     return paata(uuid);
+                case POISTA:
+                    return poista(uuid);
                 default:
                     throw new UnsupportedOperationException("Action " + action + " is not supported for muutospyynto");
             }
