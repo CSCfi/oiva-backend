@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
@@ -166,9 +167,13 @@ public class MuutospyyntoService {
 
     // Muutospyyntölistaus (hakemukset) esittelijälle
     public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila, boolean vainOmat) {
+        return getMuutospyynnot(Lists.newArrayList(tila), vainOmat);
+    }
+
+    public Collection<Muutospyynto> getMuutospyynnot(List<Muutospyyntotila> tilat, boolean vainOmat) {
         return getBaseSelect()
                 .where(baseFilter())
-                .and(MUUTOSPYYNTO.TILA.eq(tila.toString()))
+                .and(MUUTOSPYYNTO.TILA.in(tilat.stream().map(Muutospyyntotila::toString).collect(Collectors.toList())))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))

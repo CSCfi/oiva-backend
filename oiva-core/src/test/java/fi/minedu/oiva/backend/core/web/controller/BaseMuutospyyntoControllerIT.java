@@ -330,24 +330,28 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         // Login as esittelijä
         loginAs("esittelija", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
-        response = makeRequest("api/muutospyynnot/avoimet", OK);
+        response = makeRequest("api/muutospyynnot?tilat=AVOIN", OK);
         doc = jsonPath.parse(response.getBody());
         assertEquals(1, doc.read("$.length()", Integer.class).intValue());
 
         // Ota käsittelyyn
         super.requestBody("/api/muutospyynnot/tila/valmistelussa/" + uuid, POST);
 
-        doc = requestJSONData("/api/muutospyynnot/avoimet");
+        doc = requestJSONData("/api/muutospyynnot?tilat=AVOIN");
         assertEquals(0, doc.read("$.length()", Integer.class).intValue());
 
-        doc = requestJSONData("/api/muutospyynnot/valmistelussa");
+        doc = requestJSONData("/api/muutospyynnot?tilat=VALMISTELUSSA");
         assertEquals(1, doc.read("$.length()", Integer.class).intValue());
 
-        doc = requestJSONData("/api/muutospyynnot/valmistelussa?vainOmat=true");
+        // Test api with multiple values for the same parameter
+        assertEquals(1, requestJSONData("/api/muutospyynnot?tilat=VALMISTELUSSA,AVOIN").read("$.length()", Integer.class).intValue());
+        assertEquals(1, requestJSONData("/api/muutospyynnot?tilat=VALMISTELUSSA&tilat=AVOIN").read("$.length()", Integer.class).intValue());
+
+        doc = requestJSONData("/api/muutospyynnot?tilat=VALMISTELUSSA&vainOmat=true");
         assertEquals("Esittelija has one own muutospyynto", 1, doc.read("$.length()", Integer.class).intValue());
 
         loginAs("esittelija_2", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
-        doc = requestJSONData("/api/muutospyynnot/valmistelussa?vainOmat=true");
+        doc = requestJSONData("/api/muutospyynnot?tilat=VALMISTELUSSA&vainOmat=true");
         assertEquals("Another esittelijä has no own muutospyynot", 0, doc.read("$.length()", Integer.class).intValue());
     }
 

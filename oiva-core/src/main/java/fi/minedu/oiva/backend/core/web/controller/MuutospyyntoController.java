@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -74,7 +75,8 @@ public class MuutospyyntoController {
         return async(() -> muutospyyntoService.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 
-    // palauttaa kaikki avoimet muutospyynnöt
+    // Will be replaced by getMuutospyynnot
+    @Deprecated
     @OivaAccess_Esittelija
     @RequestMapping(method = GET, value = "/avoimet")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
@@ -82,7 +84,8 @@ public class MuutospyyntoController {
         return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.AVOIN, false));
     }
 
-    // palauttaa kaikki valmistelussa olevat muutospyynnöt
+    // Will be replaced by getMuutospyynnot
+    @Deprecated
     @OivaAccess_Esittelija
     @RequestMapping(method = GET, value = "/valmistelussa")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
@@ -91,12 +94,22 @@ public class MuutospyyntoController {
         return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA, vainOmat));
     }
 
-    // palauttaa kaikki päätetyt muutospyynnöt (TARVITAANKO!!!?)
+    // Will be replaced by getMuutospyynnot
+    @Deprecated
     @OivaAccess_Esittelija
     @RequestMapping(method = GET, value = "/paatetyt")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getPaatetytMuutospyynnot(final HttpServletRequest request) {
         return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.PAATETTY, false));
+    }
+
+    @OivaAccess_Esittelija
+    @RequestMapping(method = GET, value = "")
+    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijälle.", value = "")
+    public CompletableFuture<Collection<Muutospyynto>> getMuutospyynnot(
+            @RequestParam() List<Muutospyyntotila> tilat,
+            @RequestParam(required = false, defaultValue = "false") boolean vainOmat) {
+        return async(() -> muutospyyntoService.getMuutospyynnot(tilat, vainOmat));
     }
 
 
