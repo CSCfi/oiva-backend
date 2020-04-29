@@ -27,7 +27,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 
 public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
@@ -306,7 +309,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         ResponseEntity<String> deleteResponse = restTemplate.exchange(
                 createURLWithPort("/api/muutospyynnot/" + uuid),
-                HttpMethod.DELETE, null, String.class);
+                DELETE, null, String.class);
         assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
         assertEquals(HttpStatus.NOT_FOUND,
                 restTemplate.getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class).getStatusCode());
@@ -405,13 +408,15 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals(newEndDate, doc.read("$.paatospvm"));
         assertEquals(asianumero, doc.read("$.asianumero"));
 
+        // ----- ESITTELE -----
+        makeRequest(POST, "/api/muutospyynnot/tila/esittelyssa/" + uuid, null, OK);
+
+        // ----- REVERSE TO VALMISTELU -----
+        makeRequest(POST, "/api/muutospyynnot/tila/valmistelussa/" + uuid, null, OK);
+
         // ----- DELETE DRAFT -----
-        ResponseEntity<String> deleteResponse = restTemplate.exchange(
-                        createURLWithPort("/api/muutospyynnot/" + uuid),
-                        HttpMethod.DELETE, null, String.class);
-        assertEquals(HttpStatus.OK, deleteResponse.getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND,
-                restTemplate.getForEntity(createURLWithPort("/api/muutospyynnot/id/" + uuid), String.class).getStatusCode());
+        makeRequest(DELETE, "/api/muutospyynnot/" + uuid, null, OK);
+        makeRequest(GET, "/api/muutospyynnot/id/" + uuid, null, NOT_FOUND);
     }
 
 

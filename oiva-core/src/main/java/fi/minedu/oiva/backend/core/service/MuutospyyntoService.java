@@ -269,7 +269,11 @@ public class MuutospyyntoService {
 
     private Optional<Muutospyynto> otaKasittelyyn(String uuid) {
         Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
-        if (!Muutospyyntotila.AVOIN.toString().equals(mp.getTila())) {
+
+        // Muutospyynto must be AVOIN or ESITTELYSSA only if created by esittelija
+        if (!(Muutospyyntotila.AVOIN.toString().equals(mp.getTila())
+                || Tyyppi.ESITTELIJA.toString().equals(mp.getAlkupera())
+                && Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()))) {
             throw new ForbiddenException("Action is not allowed");
         }
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {

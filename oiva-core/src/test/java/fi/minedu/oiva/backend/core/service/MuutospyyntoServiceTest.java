@@ -250,6 +250,39 @@ public class MuutospyyntoServiceTest {
     }
 
     @Test
+    public void esitettelijaCanReverseEsittelyssa() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(new UUID(4, 4));
+        muutospyynto.setTila(Muutospyyntotila.ESITTELYSSA.toString());
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
+        when(dsl.fetchOne(any(Table.class), any(Condition.class))).thenReturn(mock(MuutospyyntoRecord.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Happy case
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.toString());
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN);
+
+        // Only esittelija self created muutospyynnot can be reversed
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+
+        // Nimenkirjoittaja has no right
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+    }
+
+    @Test
     public void esittelijaCanEsitteleMuutospyynto() throws Exception {
         Muutospyynto muutospyynto = generateMuutospyynto();
         muutospyynto.setUuid(new UUID(4, 4));
