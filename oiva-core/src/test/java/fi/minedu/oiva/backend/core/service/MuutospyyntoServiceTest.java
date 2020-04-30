@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.model.jooq.Tables;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.apache.commons.lang3.Functions;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -250,6 +252,39 @@ public class MuutospyyntoServiceTest {
     }
 
     @Test
+    public void esitettelijaCanReverseEsittelyssa() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(new UUID(4, 4));
+        muutospyynto.setTila(Muutospyyntotila.ESITTELYSSA.toString());
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
+        when(dsl.fetchOne(any(Table.class), any(Condition.class))).thenReturn(mock(MuutospyyntoRecord.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Happy case
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.toString());
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN);
+
+        // Only esittelija self created muutospyynnot can be reversed
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+
+        // Nimenkirjoittaja has no right
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+    }
+
+    @Test
     public void esittelijaCanEsitteleMuutospyynto() throws Exception {
         Muutospyynto muutospyynto = generateMuutospyynto();
         muutospyynto.setUuid(new UUID(4, 4));
@@ -291,6 +326,13 @@ public class MuutospyyntoServiceTest {
         doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
         doReturn(Optional.of(muutospyynto)).when(service).getById(anyLong());
 
+        // Save state changes to local muutospyynto object
+        when(dsl.fetchOne(any(Tables.MUUTOSPYYNTO.getClass()), any(Condition.class))).thenReturn(new MuutospyyntoRecord());
+        when(dsl.executeUpdate(any(MuutospyyntoRecord.class))).then(invocation -> {
+            muutospyynto.setTila(invocation.getArgumentAt(0, MuutospyyntoRecord.class).getTila());
+            return 1;
+        });
+
         // Happy path
         when(authService.hasAnyRole(argThat(new StringVarargMatcher(OivaAccess.Role_Nimenkirjoittaja)))).thenReturn(true);
         service.executeAction(null, MuutospyyntoService.Action.LUO, muutospyynto, new HashMap<>());
@@ -298,7 +340,7 @@ public class MuutospyyntoServiceTest {
         when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
         service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.LAHETA);
 
-
+        assertEquals(Muutospyyntotila.AVOIN.toString(), muutospyynto.getTila());
         catchExpectedException(
                 ForbiddenException.class,
                 "Action is not allowed",
@@ -408,6 +450,7 @@ public class MuutospyyntoServiceTest {
     private void catchExpectedException(Class<?> expected, String msg, ThrowableFunction fn) throws Exception {
         try {
             fn.apply();
+            fail("Exception is expected but not thrown");
         } catch (Exception e) {
             if (!expected.isInstance(e)) {
                 throw new RuntimeException("Exception is wrong type: " + e.getClass().getSimpleName(), e);
