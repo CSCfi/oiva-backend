@@ -1,11 +1,11 @@
 package fi.minedu.oiva.backend.core.service;
 
+import com.google.common.collect.Lists;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Koodisto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
-import jersey.repackaged.com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,17 +125,17 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
     public List<Maakunta> getMaakuntaKunnat() {
-        return opintopolkuService.getMaakuntaKunnat(getLatestKoodistoVersio("kunta"));
+        return new ArrayList<>(opintopolkuService.getMaakuntaKunnat(getLatestKoodistoVersio("kunta")));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutustoimijat", key = "''")
     public List<Organisaatio> getKoulutustoimijat() {
-        return opintopolkuService.getKoulutustoimijat();
+        return new ArrayList<>(opintopolkuService.getKoulutustoimijat());
     }
 
     @Cacheable(value = "KoodistoService:getMaakuntaJarjestajat", key = "''")
     public List<Maakunta> getMaakuntaJarjestajat() {
-        return opintopolkuService.getMaakuntaJarjestajat(getLatestKoodistoVersio("kunta"));
+        return new ArrayList<>(opintopolkuService.getMaakuntaJarjestajat(getLatestKoodistoVersio("kunta")));
     }
 
     @Cacheable(value = "KoodistoService:getKunta")
@@ -186,7 +186,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKoulutusalat", key = "''")
     public List<KoodistoKoodi> getKoulutusalat() {
-        return opintopolkuService.getKoulutusalaKoodit();
+        return new ArrayList<>(opintopolkuService.getKoulutusalaKoodit());
     }
 
     @Cacheable(value = "KoodistoService:getKoulutusala", key = "#koodi")
@@ -196,7 +196,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKoulutusalaKoulutukset", key = "#koodi")
     public List<KoodistoKoodi> getKoulutusalaKoulutukset(final String koodi) {
-        return opintopolkuService.getKoulutusKooditForKoulutusala(koodi);
+        return new ArrayList<>(opintopolkuService.getKoulutusKooditForKoulutusala(koodi));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutusalaRelation", key = "''")
@@ -211,7 +211,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKoulutustyypit", key = "''")
     public List<KoodistoKoodi> getKoulutustyypit() {
-        return opintopolkuService.getKoulutustyyppiKoodit();
+        return new ArrayList<>(opintopolkuService.getKoulutustyyppiKoodit());
     }
 
     @Cacheable(value = "KoodistoService:getKoulutustyyppi", key = "#koodi")
@@ -221,7 +221,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getKoulutustyyppiKoulutukset", key = "#koodi")
     public List<KoodistoKoodi> getKoulutustyyppiKoulutukset(final String koodi) {
-        return opintopolkuService.getKoulutusKooditForKoulutustyyppi(koodi);
+        return new ArrayList<>(opintopolkuService.getKoulutusKooditForKoulutustyyppi(koodi));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
@@ -264,7 +264,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getOsaamisalaKoulutukset", key = "#koodi")
     public List<KoodistoKoodi> getOsaamisalaKoulutukset(final String koodi) {
-        return opintopolkuService.getKoulutusKooditForOsaamisala(koodi);
+        return new ArrayList<>(opintopolkuService.getKoulutusKooditForOsaamisala(koodi));
     }
 
     private Map<String, Set<KoodistoKoodi>> getKoulutusToOsaamisalatRelation() {
@@ -315,7 +315,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getTutkintotyypit", key = "''")
     public List<KoodistoKoodi> getTutkintotyypit() {
-        return opintopolkuService.getTutkintotyyppiKoodit();
+        return new ArrayList<>(opintopolkuService.getTutkintotyyppiKoodit());
     }
 
     @Cacheable(value = "KoodistoService:getTutkintotyyppi", key = "#koodi")
@@ -325,7 +325,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getTutkintotyyppiKoulutukset", key = "#koodi")
     public List<KoodistoKoodi> getTutkintotyyppiKoulutukset(final String koodi) {
-        return opintopolkuService.getKoulutusKooditForTutkintotyyppi(koodi);
+        return new ArrayList<>(opintopolkuService.getKoulutusKooditForTutkintotyyppi(koodi));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutusToTutkintotyyppiRelation", key = "''")

@@ -50,6 +50,10 @@ cas:
     url.logout: /logout
     service.url: /login/cas
 
+multipart:
+    maxFileSize: 512MB
+    maxRequestSize: 512MB
+
 server:
     port: override_this_in_local_application_yml
     tomcat:
@@ -68,21 +72,19 @@ spring:
         password: ${oiva.dbpassword}
         platform: postgresql
         driverClassName: org.postgresql.Driver
-        initialize: false
+        initializition-mode: never
     mvc:
       async:
-        request-timeout: 180000 # Async request timeout 180 seconds.
-
-    http:
-      multipart:
-        max-file-size: 512MB
-        max-request-size: 512MB
+        request-timeout: 60000 # Async request timeout 60 seconds.
+    flyway:
+      table: schema_version
+    redis:
+        host: override_this_in_local_application_yml
+        port: override_this_in_local_application_yml
 
 redis:
-    host: override_this_in_local_application_yml
-    port: override_this_in_local_application_yml
-    userSessionPrefix: spring:session
-    refreshOnStartup: true
+  userSessionPrefix: spring:session
+  refreshOnStartup: true
 
 prince:
     exec.path: /usr/bin/prince

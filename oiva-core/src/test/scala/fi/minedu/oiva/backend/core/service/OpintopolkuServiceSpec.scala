@@ -2,7 +2,7 @@ package fi.minedu.oiva.backend.core.service
 
 import fi.minedu.oiva.backend.BaseSuite
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import scala.collection.JavaConverters._
 

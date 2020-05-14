@@ -27,7 +27,7 @@ public class BasicAuthWebSecurityAdapter extends WebSecurityConfigurerAdapter {
     public void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
             .withUser(oivaBasicAuthUsername)
-            .password(oivaBasicAuthPassword)
+            .password("{noop}" + oivaBasicAuthPassword)
             .roles(OivaAccess.Role_Application);
     }
 

@@ -16,7 +16,7 @@ import dispatch._
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton
 import org.glassfish.jersey.client.rx.RxClient
 import org.glassfish.jersey.client.rx.java8.RxCompletionStageInvoker
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.{Scope, ScopedProxyMode}
@@ -30,7 +30,7 @@ import scala.compat.java8.FutureConverters
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 class OpintopolkuService extends CacheAware {
 
-    private val logger = LoggerFactory.getLogger(getClass)
+    private val log: Logger = LoggerFactory.getLogger(this.getClass)
 
     @Value("${opintopolku.baseUrl}${opintopolku.organisaatio.restUrl}")
     private val organisaatioServiceUrl: String = null
@@ -102,7 +102,7 @@ class OpintopolkuService extends CacheAware {
     implicit def future2CS[T](future: Future[T]): CompletionStage[T] = FutureConverters.toJava(future)
 
     def requestRx[T](url: String, clazz: Class[T]): CompletionStage[T] = {
-        logger.debug("Fetching " + url)
+        log.debug("Fetching " + url)
         buildRequest(url).rx().get(clazz)
     }
 
@@ -263,19 +263,25 @@ class OpintopolkuService extends CacheAware {
       * @return Koodisto
       */
     private def getKoodistoBlocking(koodistoUri: String, koodistoVersio: Integer = null): Koodisto =
-        try cacheRx(koodistoUri, koodistoVersio, versionRequired = true) { requestKoodisto(koodistoUri, koodistoVersio) }.toCompletableFuture.join()
-        catch { case _: Exception => Koodisto.notFound(koodistoUri, koodistoVersio) }
+        try cacheRx(koodistoUri, koodistoVersio, true) { requestKoodisto(koodistoUri, koodistoVersio) }.toCompletableFuture.join()
+        catch { case e: Exception =>
+            log.error("Could not fetch koodisto!", e)
+            Koodisto.notFound(koodistoUri, koodistoVersio) }
 
     private def getKoodistoKooditList(koodistoKoodiPath: String, koodistoVersio: Integer = null, includeExpired: Boolean = false): java.util.List[KoodistoKoodi] =
         getKoodistoKooditBlocking(koodistoKoodiPath, koodistoVersio).toList.filter(koodi => includeExpired || koodi.isValidDate).distinct.asJava
 
     private def getKoodistoKooditBlocking(koodistoKoodiPath: String, koodistoVersio: Integer): Array[KoodistoKoodi] =
         try requestKoodistoKoodit(koodistoKoodiPath, koodistoVersio).toCompletableFuture.join
-        catch { case _: Exception => Array.empty }
+        catch { case e: Exception =>
+            log.error("Can not fetch koodistokoodi list!", e)
+            Array.empty }
 
     private def getKoodistoKoodiBlocking(koodistoUrl: String, koodiUri: String, koodistoVersio: Integer = null): KoodistoKoodi =
         try requestKoodistoKoodi(koodistoUrl, koodiUri, koodistoVersio).toCompletableFuture.join
-        catch { case _: Exception => KoodistoKoodi.notFound(koodiUri) }
+        catch { case e: Exception =>
+            log.error("Could not fetch koodistokoodi!", e)
+            KoodistoKoodi.notFound(koodiUri) }
 
     private def requestKoodisto(koodistoUri: String, koodistoVersio: Integer) =
         requestRx(withKoodistoVersio(koodistoUrl(koodistoUri), koodistoVersio), classOf[Koodisto])

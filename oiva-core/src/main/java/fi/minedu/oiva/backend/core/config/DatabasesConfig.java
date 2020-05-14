@@ -2,8 +2,8 @@ package fi.minedu.oiva.backend.core.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import fi.minedu.oiva.backend.model.jooq.AuditFieldsRecordListener;
 import fi.minedu.oiva.backend.core.jooq.SpringTransactionProvider;
+import fi.minedu.oiva.backend.model.jooq.AuditFieldsRecordListener;
 import org.flywaydb.core.Flyway;
 import org.jooq.ConnectionProvider;
 import org.jooq.DSLContext;
@@ -16,7 +16,6 @@ import org.jooq.impl.DefaultDSLContext;
 import org.jooq.impl.DefaultRecordListenerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
@@ -39,12 +38,9 @@ public class DatabasesConfig implements EnvironmentAware {
 
     private Environment env;
 
-    private RelaxedPropertyResolver dataSourcePropertyResolver;
-
     @Override
     public void setEnvironment(final Environment environment) {
         this.env = environment;
-        this.dataSourcePropertyResolver = new RelaxedPropertyResolver(environment, "spring.datasource.");
     }
 
     @Primary
@@ -52,18 +48,18 @@ public class DatabasesConfig implements EnvironmentAware {
     @Bean(destroyMethod = "close")
     public DataSource dataSource() {
         log.debug("Configuring Datasource");
-        if (dataSourcePropertyResolver.getProperty("url") == null && dataSourcePropertyResolver.getProperty("databaseName") == null) {
+        if (!this.env.containsProperty("spring.datasource.url") && !this.env.containsProperty("spring.datasource.databaseName")) {
             log.error("Your database connection pool configuration is incorrect! The application" +
-                    " cannot start. Please check your Spring profile, current profiles are: {}",
-                Arrays.toString(env.getActiveProfiles()));
+                            " cannot start. Please check your Spring profile, current profiles are: {}",
+                    Arrays.toString(env.getActiveProfiles()));
 
             throw new ApplicationContextException("Database connection pool is not configured correctly");
         }
         final HikariConfig config = new HikariConfig();
-        config.setDataSourceClassName(dataSourcePropertyResolver.getProperty("dataSourceClassName"));
-        config.addDataSourceProperty("url", dataSourcePropertyResolver.getProperty("url"));
-        config.addDataSourceProperty("user", dataSourcePropertyResolver.getProperty("username"));
-        config.addDataSourceProperty("password", dataSourcePropertyResolver.getProperty("password"));
+        config.setDataSourceClassName(this.env.getProperty("spring.datasource.dataSourceClassName"));
+        config.addDataSourceProperty("url", this.env.getProperty("spring.datasource.url"));
+        config.addDataSourceProperty("user", this.env.getProperty("spring.datasource.username"));
+        config.addDataSourceProperty("password", this.env.getProperty("spring.datasource.password"));
 
         final DataSource source = new HikariDataSource(config);
 
@@ -73,6 +69,7 @@ public class DatabasesConfig implements EnvironmentAware {
         flyway.setDataSource(source);
         flyway.setBaselineOnMigrate(true);
         flyway.setOutOfOrder(true);
+        flyway.setTable("schema_version");
         flyway.migrate();
 
         return source;
@@ -103,10 +100,10 @@ public class DatabasesConfig implements EnvironmentAware {
     @Primary
     public org.jooq.Configuration jooqConfig(final ConnectionProvider connectionProvider, final TransactionProvider transactionProvider) {
         return new DefaultConfiguration()
-            .derive(connectionProvider)
-            .derive(transactionProvider)
-            .derive(SQLDialect.POSTGRES)
-            .derive(new DefaultRecordListenerProvider(new AuditFieldsRecordListener()))
-            .derive(new Settings().withExecuteWithOptimisticLocking(true));
+                .derive(connectionProvider)
+                .derive(transactionProvider)
+                .derive(SQLDialect.POSTGRES)
+                .derive(new DefaultRecordListenerProvider(new AuditFieldsRecordListener()))
+                .derive(new Settings().withExecuteWithOptimisticLocking(true));
     }
 }

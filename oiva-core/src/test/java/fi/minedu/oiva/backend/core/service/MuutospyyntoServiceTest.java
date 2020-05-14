@@ -29,7 +29,6 @@ import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -104,7 +103,12 @@ public class MuutospyyntoServiceTest {
         for (final String role : OivaAccess.roles) {
             reset(authService);
             setUserOrgToMuutospyyntoOrg("oid", muutospyynto);
-            when(authService.hasAnyRole(argThat(new StringVarargMatcher(role)))).thenReturn(true);
+            final StringVarargMatcher matcher = new StringVarargMatcher(role);
+            when(authService.hasAnyRole(argThat(matcher))).then(invocation -> {
+                boolean answer = matcher.isElementFound();
+                matcher.reset();
+                return answer;
+            });
 
             logger.debug("Testing role " + role);
 
@@ -119,8 +123,7 @@ public class MuutospyyntoServiceTest {
                     e.printStackTrace();
                     fail("User with role " + role + " should be able to create muutospyynto");
                 }
-            }
-            else {
+            } else {
                 try {
                     create.call();
                     fail("Role " + role + " should not have access to create new muutospyynto");
@@ -152,6 +155,7 @@ public class MuutospyyntoServiceTest {
         Muutospyynto muutospyynto = generateMuutospyynto();
         muutospyynto.setUuid(new UUID(1, 2));
         muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
+        muutospyynto.setId(1L);
         doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
         doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
         doReturn(Optional.of(muutospyynto)).when(service).getById(anyLong());
@@ -163,7 +167,12 @@ public class MuutospyyntoServiceTest {
         for (final String role : OivaAccess.roles) {
             reset(authService);
             setUserOrgToMuutospyyntoOrg("oid", muutospyynto);
-            when(authService.hasAnyRole(argThat(new StringVarargMatcher(role)))).thenReturn(true);
+            final StringVarargMatcher matcher = new StringVarargMatcher(role);
+            when(authService.hasAnyRole(argThat(matcher))).then(invocation -> {
+                boolean answer = matcher.isElementFound();
+                matcher.reset();
+                return answer;
+            });
 
             logger.debug("Testing role " + role);
 
@@ -176,8 +185,7 @@ public class MuutospyyntoServiceTest {
                     e.printStackTrace();
                     fail("User with role " + role + " should be able to update muutospyynto");
                 }
-            }
-            else {
+            } else {
                 try {
                     update.call();
                     fail("Role " + role + " should not have access to update new muutospyynto");
@@ -238,8 +246,7 @@ public class MuutospyyntoServiceTest {
                     e.printStackTrace();
                     fail("User with role " + role + " should be able to send muutospyynto");
                 }
-            }
-            else {
+            } else {
                 try {
                     send.call();
                     fail("Role " + role + " should not have access to send new muutospyynto");
@@ -337,6 +344,7 @@ public class MuutospyyntoServiceTest {
         muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
         setUserOrgToMuutospyyntoOrg("123", muutospyynto);
         muutospyynto.setUuid(new UUID(2, 3));
+        muutospyynto.setId(1L);
 
         doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
         doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
@@ -345,7 +353,8 @@ public class MuutospyyntoServiceTest {
         // Save state changes to local muutospyynto object
         when(dsl.fetchOne(any(Tables.MUUTOSPYYNTO.getClass()), any(Condition.class))).thenReturn(new MuutospyyntoRecord());
         when(dsl.executeUpdate(any(MuutospyyntoRecord.class))).then(invocation -> {
-            muutospyynto.setTila(invocation.getArgumentAt(0, MuutospyyntoRecord.class).getTila());
+            final MuutospyyntoRecord m = invocation.getArgument(0);
+            muutospyynto.setTila(m.getTila());
             return 1;
         });
 
@@ -617,9 +626,8 @@ public class MuutospyyntoServiceTest {
         } catch (Exception e) {
             if (!expected.isInstance(e)) {
                 throw new RuntimeException("Exception is wrong type: " + e.getClass().getSimpleName(), e);
-            }
-            else if (msg != null && !msg.equals(e.getMessage())) {
-                throw new RuntimeException("Exception message does not match " + msg + " != " + e.getMessage() , e);
+            } else if (msg != null && !msg.equals(e.getMessage())) {
+                throw new RuntimeException("Exception message does not match " + msg + " != " + e.getMessage(), e);
             }
         }
     }
@@ -636,17 +644,27 @@ public class MuutospyyntoServiceTest {
         when(authService.getUserOrganisationOid()).thenReturn(oid);
     }
 
-    private static class StringVarargMatcher extends ArgumentMatcher<String[]> implements VarargMatcher {
+    private static class StringVarargMatcher implements ArgumentMatcher<String>, VarargMatcher {
 
         private final String matching;
+        private boolean elementFound = false;
 
         private StringVarargMatcher(String matching) {
             this.matching = matching;
         }
 
+        public boolean isElementFound() {
+            return this.elementFound;
+        }
+
+        public void reset() {
+            this.elementFound = false;
+        }
+
         @Override
-        public boolean matches(Object o) {
-            return o != null && Arrays.asList((String[]) o).contains(matching);
+        public boolean matches(String o) {
+            this.elementFound |= matching.equals(o);
+            return true;
         }
     }
 }

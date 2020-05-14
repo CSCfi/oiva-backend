@@ -38,10 +38,9 @@ spring:
     type: none
   profiles:
     include: amos
-
-redis:
-  host: localhost
-  port: 8889
+  redis:
+    host: localhost
+    port: 8889
 
 file.storage:
   base.path: target/uploads

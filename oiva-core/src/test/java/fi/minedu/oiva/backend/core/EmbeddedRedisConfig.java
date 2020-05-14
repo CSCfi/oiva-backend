@@ -1,6 +1,7 @@
 package fi.minedu.oiva.backend.core;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,11 +13,11 @@ import redis.embedded.RedisServer;
 @IfProfileValue(name = "it")
 public class EmbeddedRedisConfig implements DisposableBean {
 
-    @Value("${redis.port}")
+    @Value("${spring.redis.port}")
     private int redisPort;
 
     private RedisServer redis;
-    private Logger logger = Logger.getLogger(this.getClass());
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Bean
     public RedisServer redisEmbeddedServer() {

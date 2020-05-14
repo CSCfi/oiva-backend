@@ -35,10 +35,9 @@ spring:
     mvc:
       async:
         request-timeout: 180000
-
-redis:
-   host: localhost
-   port: 7379
+    redis:
+      host: localhost
+      port: 7379
 
 file.storage:
   base.path: target/oiva-files
