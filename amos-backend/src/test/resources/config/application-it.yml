@@ -2,6 +2,7 @@ oiva:
   dbhost: @env.MACHINE_IP@
   dbport: 15432
   dbname: oiva
+  schema: oiva
   dbusername: oiva
   dbpassword: oiva
   baseUrl: http://localhost
@@ -33,7 +34,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva?currentSchema=oiva
+    url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/oiva?currentSchema=${oiva.schema}
   cache:
     type: none
   profiles:

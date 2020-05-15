@@ -16,7 +16,6 @@
         <groupId>fi.minedu.oiva</groupId>
         <artifactId>oiva-backend</artifactId>
         <version>1.9.0</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>Oiva Core Model</name>
@@ -269,9 +268,9 @@
                                         <driver>${postgres.driver.name}</driver>
                                     </jdbc>
                                     <generator>
-                                        <name>org.jooq.util.DefaultGenerator</name>
+                                        <name>org.jooq.codegen.DefaultGenerator</name>
                                         <database>
-                                            <name>org.jooq.util.postgres.PostgresDatabase</name>
+                                            <name>org.jooq.meta.postgres.PostgresDatabase</name>
                                             <includes>.*</includes>
                                             <excludes>schema_version</excludes>
                                             <inputSchema>${oiva.schema}</inputSchema>

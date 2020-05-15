@@ -67,7 +67,7 @@ management:
 spring:
     datasource:
         dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
-        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}?currentSchema=oiva
+        url: jdbc:postgresql://${oiva.dbhost}:${oiva.dbport}/${oiva.dbname}?currentSchema=${oiva.schema}
         username: ${oiva.dbusername}
         password: ${oiva.dbpassword}
         platform: postgresql
@@ -78,6 +78,9 @@ spring:
         request-timeout: 60000 # Async request timeout 60 seconds.
     flyway:
       table: schema_version
+      baseline-on-migrate: true
+      out-of-order: true
+      schemas: ${oiva.schema}
     redis:
         host: override_this_in_local_application_yml
         port: override_this_in_local_application_yml

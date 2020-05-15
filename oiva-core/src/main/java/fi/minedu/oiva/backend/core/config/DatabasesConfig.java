@@ -2,9 +2,7 @@ package fi.minedu.oiva.backend.core.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import fi.minedu.oiva.backend.core.jooq.SpringTransactionProvider;
 import fi.minedu.oiva.backend.model.jooq.AuditFieldsRecordListener;
-import org.flywaydb.core.Flyway;
 import org.jooq.ConnectionProvider;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -61,18 +59,7 @@ public class DatabasesConfig implements EnvironmentAware {
         config.addDataSourceProperty("user", this.env.getProperty("spring.datasource.username"));
         config.addDataSourceProperty("password", this.env.getProperty("spring.datasource.password"));
 
-        final DataSource source = new HikariDataSource(config);
-
-        log.info("Applying database migration");
-
-        final Flyway flyway = new Flyway();
-        flyway.setDataSource(source);
-        flyway.setBaselineOnMigrate(true);
-        flyway.setOutOfOrder(true);
-        flyway.setTable("schema_version");
-        flyway.migrate();
-
-        return source;
+        return new HikariDataSource(config);
     }
 
 
@@ -89,11 +76,6 @@ public class DatabasesConfig implements EnvironmentAware {
     @Bean
     public ConnectionProvider connectionProvider(final DataSource dataSource) {
         return new DataSourceConnectionProvider(new TransactionAwareDataSourceProxy(dataSource));
-    }
-
-    @Bean
-    public TransactionProvider transactionProvider() {
-        return new SpringTransactionProvider();
     }
 
     @Bean

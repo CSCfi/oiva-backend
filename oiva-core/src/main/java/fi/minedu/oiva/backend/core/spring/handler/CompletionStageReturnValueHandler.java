@@ -17,7 +17,6 @@
 package fi.minedu.oiva.backend.core.spring.handler;
 
 import org.springframework.core.MethodParameter;
-import org.springframework.lang.UsesJava8;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.async.DeferredResult;
 import org.springframework.web.context.request.async.WebAsyncUtils;
@@ -30,10 +29,9 @@ import java.util.concurrent.CompletionStage;
  * Support for {@link CompletionStage} as a return value type.
  *
  * @see org.springframework.web.servlet.mvc.method.annotation.ListenableFutureReturnValueHandler
- *
+ * <p>
  * Note: Spring 4.2 will support more specific CompletableFuture return type
  */
-@UsesJava8
 public class CompletionStageReturnValueHandler implements HandlerMethodReturnValueHandler {
 
     @Override

@@ -6,7 +6,6 @@
         <groupId>fi.minedu.oiva</groupId>
         <artifactId>oiva-backend</artifactId>
         <version>1.9.0</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>Amos Backend</name>

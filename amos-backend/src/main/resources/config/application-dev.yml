@@ -2,6 +2,7 @@ oiva:
    dbhost: localhost
    dbport: 6432
    dbname: oiva
+   schema: oiva
    dbusername: oiva
    dbpassword: oiva
    baseUrl: https://localhost
