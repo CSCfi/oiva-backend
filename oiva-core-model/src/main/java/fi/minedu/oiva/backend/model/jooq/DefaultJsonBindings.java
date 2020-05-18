@@ -9,6 +9,7 @@ import org.jooq.BindingSQLContext;
 import org.jooq.BindingSetSQLOutputContext;
 import org.jooq.BindingSetStatementContext;
 import org.jooq.Converter;
+import org.jooq.JSONB;
 import org.jooq.impl.DSL;
 
 import java.sql.SQLException;
@@ -16,9 +17,9 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Types;
 import java.util.Objects;
 
-public interface DefaultJsonBindings<U> extends Binding<Object, U> {
+public interface DefaultJsonBindings<U> extends Binding<JSONB, U> {
 
-    Converter<Object, U> converter();
+    Converter<JSONB, U> converter();
 
     @Override
     default void sql(final BindingSQLContext<U> ctx) throws SQLException {
@@ -38,13 +39,13 @@ public interface DefaultJsonBindings<U> extends Binding<Object, U> {
     @Override
     @SuppressWarnings("unchecked")
     default void get(final BindingGetResultSetContext<U> ctx) throws SQLException {
-        ctx.convert(converter()).value(ctx.resultSet().getString(ctx.index()));
+        ctx.convert(converter()).value(JSONB.valueOf(ctx.resultSet().getString(ctx.index())));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     default void get(final BindingGetStatementContext<U> ctx) throws SQLException {
-        ctx.convert(converter()).value(ctx.statement().getString(ctx.index()));
+        ctx.convert(converter()).value(JSONB.valueOf(ctx.statement().getString(ctx.index())));
     }
 
     @Override

@@ -4,15 +4,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import fi.minedu.oiva.backend.model.entity.TranslatedString;
 import org.jooq.Converter;
 import org.jooq.Converters;
+import org.jooq.JSONB;
 
 public class TranslatedStringBinding implements DefaultJsonBindings<TranslatedString> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Converter<Object, TranslatedString> converter() {
+    public Converter<JSONB, TranslatedString> converter() {
         return Converters.of(
-            new PostgresJSONJacksonBinding.JsonNodeConverter(),
-            new TranslatedStringConverter());
+                new PostgresJSONJacksonBinding.JsonNodeConverter(),
+                new TranslatedStringConverter());
     }
 
     public static class TranslatedStringConverter implements Converter<JsonNode, TranslatedString> {

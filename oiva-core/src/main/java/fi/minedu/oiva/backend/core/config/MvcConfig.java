@@ -11,9 +11,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.AlternateTypeRule;
@@ -35,7 +33,7 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @Configuration
 @EnableSwagger2
-public class MvcConfig extends WebMvcConfigurerAdapter {
+public class MvcConfig implements WebMvcConfigurer {
 
     private final TypeResolver typeResolver;
     private final LoggingService loggingService;
@@ -43,19 +41,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
     public MvcConfig(TypeResolver typeResolver, LoggingService loggingService) {
         this.typeResolver = typeResolver;
         this.loggingService = loggingService;
-    }
-
-    @Override
-    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-        super.addResourceHandlers(registry);
-        registry.addResourceHandler("**/swagger-ui.html")
-                .addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("**/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
-    }
-
-    @Override
-    public void addViewControllers(final ViewControllerRegistry registry) {
     }
 
     @Bean
@@ -103,7 +88,7 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
                 new Contact("", "", ""),
                 "",
                 "",
-                Collections.EMPTY_LIST
+                Collections.emptyList()
         );
     }
 
@@ -114,7 +99,6 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        super.addInterceptors(registry);
         registry.addInterceptor(new RestApiInterceptor(loggingService));
     }
 }

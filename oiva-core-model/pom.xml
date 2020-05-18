@@ -275,64 +275,38 @@
                                             <excludes>schema_version</excludes>
                                             <inputSchema>${oiva.schema}</inputSchema>
                                             <outputSchemaToDefault>true</outputSchemaToDefault>
-                                            <customTypes>
-                                                <customType>
-                                                    <name>JsonNode</name>
-                                                    <type>com.fasterxml.jackson.databind.JsonNode</type>
-                                                    <binding>fi.minedu.oiva.backend.model.jooq.PostgresJSONJacksonBinding</binding>
-                                                </customType>
-                                                <customType>
-                                                    <name>Timestamp</name>
-                                                    <type>java.sql.Timestamp</type>
-                                                    <binding>org.jooq.impl.DateAsTimestampBinding</binding>
-                                                </customType>
-                                                <customType>
-                                                    <name>TranslatedString</name>
-                                                    <type>fi.minedu.oiva.backend.model.entity.TranslatedString</type>
-                                                    <binding>fi.minedu.oiva.backend.model.jooq.TranslatedStringBinding</binding>
-                                                </customType>
-                                                <customType>
-                                                    <name>AsiatyyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue.Converter</converter>
-                                                </customType>
-                                                <customType>
-                                                    <name>MaaraystyyppiValue</name>
-                                                    <type>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue</type>
-                                                    <converter>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue.Converter</converter>
-                                                </customType>
-                                                <customType>
-                                                    <name>LupatilaValue</name>
-                                                    <type>fi.minedu.oiva.backend.model.entity.LupatilaValue</type>
-                                                    <converter>fi.minedu.oiva.backend.model.entity.LupatilaValue.Converter</converter>
-                                                </customType>
-                                            </customTypes>
                                             <forcedTypes>
                                                 <forcedType>
-                                                    <name>TranslatedString</name>
-                                                    <expression>.*selite.*</expression>
-                                                    <types>(?i).*jsonb.*</types>
+                                                    <userType>fi.minedu.oiva.backend.model.entity.TranslatedString</userType>
+                                                    <binding>fi.minedu.oiva.backend.model.jooq.TranslatedStringBinding</binding>
+                                                    <includeExpression>.*selite.*</includeExpression>
+                                                    <includeTypes>(?i).*jsonb.*</includeTypes>
                                                 </forcedType>
                                                 <forcedType>
-                                                    <name>TranslatedString</name>
-                                                    <expression>.*_i18n.*</expression>
-                                                    <types>(?i).*jsonb.*</types>
+                                                    <userType>fi.minedu.oiva.backend.model.entity.TranslatedString</userType>
+                                                    <binding>fi.minedu.oiva.backend.model.jooq.TranslatedStringBinding</binding>
+                                                    <includeExpression>.*_i18n.*</includeExpression>
+                                                    <includeTypes>(?i).*jsonb.*</includeTypes>
                                                 </forcedType>
                                                 <forcedType>
-                                                    <name>JsonNode</name>
-                                                    <types>(?i).*json.*</types>
+                                                    <userType>com.fasterxml.jackson.databind.JsonNode</userType>
+                                                    <binding>fi.minedu.oiva.backend.model.jooq.PostgresJSONJacksonBinding</binding>
+                                                    <includeTypes>(?i).*json.*</includeTypes>
                                                 </forcedType>
                                                 <forcedType>
-                                                    <name>AsiatyyppiValue</name>
-                                                    <expression>.*asiatyyppi.tunniste</expression>
+                                                    <userType>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue</userType>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.AsiatyyppiValue.Converter</converter>
+                                                    <includeExpression>.*asiatyyppi.tunniste</includeExpression>
                                                 </forcedType>
                                                 <forcedType>
-                                                    <name>MaaraystyyppiValue</name>
-                                                    <expression>.*maaraystyyppi.tunniste</expression>
+                                                    <userType>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue</userType>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue.Converter</converter>
+                                                    <includeExpression>.*maaraystyyppi.tunniste</includeExpression>
                                                 </forcedType>
                                                 <forcedType>
-                                                    <name>LupatilaValue</name>
-                                                    <expression>.*lupatila.tunniste</expression>
+                                                    <userType>fi.minedu.oiva.backend.model.entity.LupatilaValue</userType>
+                                                    <converter>fi.minedu.oiva.backend.model.entity.LupatilaValue.Converter</converter>
+                                                    <includeExpression>.*lupatila.tunniste</includeExpression>
                                                 </forcedType>
                                             </forcedTypes>
                                         </database>

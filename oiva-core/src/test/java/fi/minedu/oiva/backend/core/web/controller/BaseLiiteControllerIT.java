@@ -38,7 +38,7 @@ public abstract class BaseLiiteControllerIT extends BaseIT {
     public void deleteNoAccessForKayttaja() {
         loginAs("user1", okmOid, OivaAccess.Context_Kayttaja);
         makeRequest(HttpMethod.DELETE,
-                "/api/liitteet/cc3962e0-43b6-11e8-b2ef-005056aa0e61", null, HttpStatus.NOT_ACCEPTABLE);
+                "/api/liitteet/cc3962e0-43b6-11e8-b2ef-005056aa0e61", null, HttpStatus.FORBIDDEN);
     }
 
     @Test
