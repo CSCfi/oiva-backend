@@ -104,13 +104,14 @@ public class MuutospyyntoService {
     private final AsiatilamuutosService asiatilamuutosService;
     private final LupaService lupaService;
     private final KoodistoService koodistoService;
+    private final EsitysmalliService esitysmalliService;
 
     @Autowired
     public MuutospyyntoService(DSLContext dsl, AuthService authService, OrganisaatioService organisaatioService,
                                LiiteService liiteService, OpintopolkuService opintopolkuService,
                                MaaraysService maaraysService, FileStorageService fileStorageService,
                                AsiatilamuutosService asiatilamuutosService, LupaService lupaService,
-                               KoodistoService koodistoService) {
+                               KoodistoService koodistoService, EsitysmalliService esitysmalliService) {
         this.dsl = dsl;
         this.authService = authService;
         this.organisaatioService = organisaatioService;
@@ -121,6 +122,7 @@ public class MuutospyyntoService {
         this.asiatilamuutosService = asiatilamuutosService;
         this.lupaService = lupaService;
         this.koodistoService = koodistoService;
+        this.esitysmalliService = esitysmalliService;
     }
 
     public enum Action {
@@ -155,6 +157,10 @@ public class MuutospyyntoService {
         TAYDENNETTAVA,      // Esittelijä palauttaa muutoksen täydennettäväksi
         HYV_MUUTETTUNA,     // Esittelijä on hyväksynyt muutoksen muutettuna
         PASSIVOITU         // Muutos on muusta syystä poistettu
+    }
+
+    private static boolean isPoisto(Muutos muutos) {
+        return "POISTO".equals(muutos.getTila());
     }
 
     // hakee yksittäinen muutospyynnön perusteluineen
@@ -329,7 +335,7 @@ public class MuutospyyntoService {
 
             // Copy maaraykset which is not removed
             final List<Long> removed = getMuutoksetRecursively(muutospyynto.getMuutokset())
-                    .filter(muutos -> "POISTO".equals(muutos.getTila()))
+                    .filter(MuutospyyntoService::isPoisto)
                     .map(Muutos::getMaaraysId)
                     .collect(Collectors.toList());
             Optional.ofNullable(oldLupa.getMaaraykset()).ifPresent(maaraykset ->
@@ -354,6 +360,83 @@ public class MuutospyyntoService {
                     });
             return muutospyynto;
         });
+    }
+
+    public Optional<Lupa> generateLupaFromMuutospyynto(String uuid) {
+        return this.getByUuid(uuid).flatMap(mp -> {
+            withPaatoskierros(mp);
+            withOrganization(mp);
+            mp.setMuutokset(mp.getMuutokset().stream()
+                    .map(this::withAll)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet()));
+
+            final String[] options = options(Maarays.class, Organisaatio.class, KoodistoKoodi.class);
+            Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
+                    .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+
+            final Lupatila tila = dsl.fetchOne(LUPATILA, LUPATILA.TUNNISTE.eq(LupatilaValue.LUONNOS))
+                    .into(Lupatila.class);
+            final Asiatyyppi asiatyyppi = dsl.fetchOne(ASIATYYPPI, ASIATYYPPI.TUNNISTE.eq(AsiatyyppiValue.MUUTOS))
+                    .into(Asiatyyppi.class);
+            final Paatoskierros paatoskierros = mp.getPaatoskierros();
+            esitysmalliService.forPaatoskierros(mp.getPaatoskierros()).ifPresent(paatoskierros::setEsitysmalli);
+
+            Lupa lupa = BeanUtils.copyNonNullPropertiesAndReturn(new Lupa(), mp);
+            lupa.setId(null);
+            lupa.setUuid(null);
+            lupa.setLupatilaId(tila.getId());
+            lupa.setLupatila(tila);
+            lupa.setAsiatyyppiId(asiatyyppi.getId());
+            lupa.setAsiatyyppi(asiatyyppi);
+            lupa.setLuoja(authService.getUsername());
+            lupa.setAlkupvm(mp.getVoimassaalkupvm());
+            lupa.setLoppupvm(mp.getVoimassaloppupvm());
+            lupa.setEdellinenLupaId(oldLupa.getId());
+
+            final Set<Long> removed = getMuutoksetRecursively(mp.getMuutokset())
+                    .filter(MuutospyyntoService::isPoisto)
+                    .map(Muutos::getMaaraysId)
+                    .collect(Collectors.toSet());
+            // Copy maaraykset which are not removed
+            lupa.setMaaraykset(filterOutRemoved(oldLupa.getMaaraykset(), removed));
+            // Copy muutokset from muutospyynto and convert to maarays
+            lupa.getMaaraykset().addAll(convertToMaaraykset(mp.getMuutokset()));
+
+            return Optional.of(lupa);
+        });
+    }
+
+    final Collection<Maarays> filterOutRemoved(Collection<Maarays> maaraykset, Collection<Long> removed) {
+        if (null == maaraykset) {
+            return Lists.newLinkedList();
+        }
+        return maaraykset.stream()
+                .filter(m -> !removed.contains(m.getId()))
+                .map(m -> {
+                    Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
+                    maarays.setId(null);
+                    maarays.setUuid(null);
+                    maarays.setAliMaaraykset(this.filterOutRemoved(m.getAliMaaraykset(), removed));
+                    return maarays;
+                })
+                .collect(Collectors.toList());
+    }
+
+    final Collection<Maarays> convertToMaaraykset(Collection<Muutos> muutokset) {
+        if (null == muutokset) {
+            return Lists.newLinkedList();
+        }
+        return muutokset.stream()
+                .filter(m -> !isPoisto(m))
+                .map(m -> {
+                    Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
+                    maarays.setId(null);
+                    maarays.setUuid(null);
+                    maarays.setAliMaaraykset(this.convertToMaaraykset(m.getAliMaaraykset()));
+                    return maarays;
+                })
+                .collect(Collectors.toList());
     }
 
     /**

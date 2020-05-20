@@ -1,6 +1,6 @@
 package fi.minedu.oiva.backend.model.entity.oiva
 
-import java.util.{ArrayList, Collection}
+import java.util
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.fasterxml.jackson.annotation.{JsonIgnore, JsonIgnoreProperties, JsonInclude}
@@ -17,7 +17,7 @@ class Maarays(
                var koodi: KoodistoKoodi,
                var ylaKoodit: Array[KoodistoKoodi],
                var organisaatio: Organisaatio,
-               var aliMaaraykset: Collection[Maarays]) extends pojos.Maarays {
+               var aliMaaraykset: util.Collection[Maarays]) extends pojos.Maarays {
 
   def this() = this(null, null, null, null, null, null)
 
@@ -75,6 +75,7 @@ class Maarays(
   def setKoodi(koodi: KoodistoKoodi) = this.koodi = koodi
 
   def getYlaKoodit = ylaKoodit
+  def setYlaKoodit(ylaKoodit: Array[KoodistoKoodi]) = this.ylaKoodit = ylaKoodit
 
   @JsonIgnore def addYlaKoodi(koodi: KoodistoKoodi): Unit =
     if (null == this.ylaKoodit) this.ylaKoodit = Array(koodi)
@@ -87,9 +88,10 @@ class Maarays(
   def getOrganisaatio = organisaatio
 
   def getAliMaaraykset = aliMaaraykset
+  def setAliMaaraykset(alimaaraykset: util.Collection[Maarays]) = this.aliMaaraykset = alimaaraykset;
 
   @JsonIgnore def addAliMaarays(maarays: Maarays): Unit = if (null != maarays && getId != maarays.getId) {
-    if (null == this.aliMaaraykset) this.aliMaaraykset = new ArrayList()
+    if (null == this.aliMaaraykset) this.aliMaaraykset = new util.ArrayList()
     this.aliMaaraykset.add(maarays)
   }
 
