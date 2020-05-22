@@ -8,8 +8,10 @@ import com.jayway.jsonpath.ParseContext;
 import com.jayway.jsonpath.spi.json.JacksonJsonProvider;
 import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import fi.minedu.oiva.backend.core.EmbeddedRedisConfig;
+import fi.minedu.oiva.backend.core.service.DefaultPebbleService;
 import fi.minedu.oiva.backend.core.service.FileStorageService;
 import fi.minedu.oiva.backend.core.service.OpintopolkuService;
+import fi.minedu.oiva.backend.core.service.PrinceXMLService;
 import fi.minedu.oiva.backend.core.task.BuildCaches;
 import fi.minedu.oiva.backend.model.entity.TranslatedString;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KayttajaKayttooikeus;
@@ -88,6 +90,10 @@ abstract public class BaseIT {
     // Do not render and write pdf files because templates are in different project
     @MockBean
     private FileStorageService fileStorageService;
+    @MockBean
+    protected DefaultPebbleService pebbleService;
+    @MockBean
+    protected PrinceXMLService princeXMLService;
     protected ParseContext jsonPath;
 
     @Rule

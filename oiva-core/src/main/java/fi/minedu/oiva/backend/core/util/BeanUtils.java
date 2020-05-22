@@ -28,4 +28,9 @@ public class BeanUtils {
             }
         }
     }
+
+    public static <T, V> T copyNonNullPropertiesAndReturn(final T dest, final V orig) {
+        copyNonNullProperties(dest, orig);
+        return dest;
+    }
 }

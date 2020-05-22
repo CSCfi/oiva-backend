@@ -2,10 +2,15 @@ package fi.minedu.oiva.backend.core.web.controller;
 
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Application;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.service.DefaultPebbleService;
+import fi.minedu.oiva.backend.core.service.LupaRenderService;
 import fi.minedu.oiva.backend.core.service.LupamuutosService;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
+import fi.minedu.oiva.backend.core.service.PrinceXMLService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.OivaTemplates;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import io.swagger.annotations.Api;
@@ -21,10 +26,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Produces;
+import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +43,10 @@ import java.util.concurrent.CompletableFuture;
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Action;
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.get500;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr400;
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
+import static fi.minedu.oiva.backend.model.util.ControllerUtil.notFound;
 import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
@@ -59,11 +70,18 @@ public class MuutospyyntoController {
 
     private final MuutospyyntoService muutospyyntoService;
     private final LupamuutosService lupamuutosService;
+    private final DefaultPebbleService pebbleService;
+    private final LupaRenderService lupaRenderService;
+    private final PrinceXMLService princeXMLService;
 
     @Autowired
-    public MuutospyyntoController(MuutospyyntoService muutospyyntoService, LupamuutosService lupamuutosService) {
+    public MuutospyyntoController(MuutospyyntoService muutospyyntoService, LupamuutosService lupamuutosService,
+                                  DefaultPebbleService pebbleService, LupaRenderService lupaRenderService, PrinceXMLService princeXMLService) {
         this.muutospyyntoService = muutospyyntoService;
         this.lupamuutosService = lupamuutosService;
+        this.pebbleService = pebbleService;
+        this.lupaRenderService = lupaRenderService;
+        this.princeXMLService = princeXMLService;
     }
 
 
@@ -200,6 +218,33 @@ public class MuutospyyntoController {
     @RequestMapping(method = DELETE, value = "/{uuid}")
     public HttpEntity<UUID> delete(final @PathVariable String uuid) {
         return getOr404(muutospyyntoService.executeAction(uuid, Action.POISTA).map(Muutospyynto::getUuid));
+    }
+
+    @OivaAccess_Esittelija
+    @RequestMapping(value = "/pdf/esikatsele/{uuid}", method = GET)
+    @Produces({ MediaType.APPLICATION_PDF_VALUE })
+    @ResponseBody
+    @ApiOperation(notes = "Tuottaa muutospyynnön mukaisen luonnoksen tulevasta luvasta PDF-muodossa", value = "")
+    public void previewPdf(final @PathVariable String uuid, final HttpServletResponse response, final HttpServletRequest request) {
+        Optional<Lupa> lupaOpt = muutospyyntoService.generateLupaFromMuutospyynto(uuid);
+        try {
+            if (lupaOpt.isPresent()) {
+                final OivaTemplates.RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
+                final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
+                response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+                response.setHeader("Content-Disposition", "inline; filename=luonnos-" + lupaOpt.get().getPDFFileName());
+                if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
+                    response.setStatus(get500().getStatusCode().value());
+                    response.getWriter().write("Failed to generate lupa with uuid " + uuid);
+                }
+            } else {
+                response.setStatus(notFound().getStatusCode().value());
+                response.getWriter().write("No such muutospyynto with uuid " + uuid);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to generate muutospyynto lupa pdf with uuid {}", uuid, e);
+            response.setStatus(get500().getStatusCode().value());
+        }
     }
 
     /*
