@@ -154,15 +154,8 @@ public class PrinceXMLController {
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
     public void previewPdf(final @PathVariable String uuid, final HttpServletResponse response, final HttpServletRequest request) {
         try {
-            Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
-            if (!lupaOpt.isPresent()) {
-                Optional<Muutospyynto> mp = muutospyyntoService.getByUuid(uuid);
-                if (mp.isPresent()) {
-                    lupaOpt = muutospyyntoService.generateLupaFromMuutospyynto(uuid);
-                }
-            }
-
-            if (lupaOpt.isPresent()) {
+            final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
+            if(lupaOpt.isPresent()) {
                 final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(APPLICATION_PDF);
