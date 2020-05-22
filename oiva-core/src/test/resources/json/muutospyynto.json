@@ -8,8 +8,8 @@
   "tila": "LUONNOS",
   "paivittaja": "string",
   "paivityspvm": null,
-  "voimassaalkupvm": "2018-01-01",
-  "voimassaloppupvm": "2018-12-31",
+  "voimassaalkupvm": "2020-01-01",
+  "voimassaloppupvm": null,
   "paatoskierros": {
     "uuid": "cc6aaeb8-43b6-11e8-b2ef-005056aa0e66"
   },
@@ -257,6 +257,26 @@
       },
       "muutosperustelukoodiarvo": null,
       "tila": "LISAYS"
+    },
+    {
+      "koodisto": "koulutus",
+      "koodiarvo": "124",
+      "maaraystyyppiId": 1,
+      "maaraysUuid": "cc3c1d00-43b6-11e8-b2ef-005056aa0e63",
+      "meta": {},
+      "tila": "POISTO",
+      "kohde": {
+        "uuid": "cc35ffa6-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "maaraystyyppi": {
+        "tunniste": "OIKEUS",
+        "selite": {
+          "fi": "Oikeus"
+        },
+        "uuid": "cc6522b8-43b6-11e8-b2ef-005056aa0e66"
+      },
+      "aliMaaraykset": [],
+      "liitteet": []
     }
   ]
 }

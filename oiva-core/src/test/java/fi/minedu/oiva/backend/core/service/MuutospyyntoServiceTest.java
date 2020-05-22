@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
+import fi.minedu.oiva.backend.model.jooq.Tables;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.apache.commons.lang3.Functions;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,6 +29,7 @@ import java.util.UUID;
 
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -34,6 +37,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -57,6 +61,8 @@ public class MuutospyyntoServiceTest {
     private FileStorageService fileStorageService = mock(FileStorageService.class);
     private AsiatilamuutosService asiatilamuutosService = mock(AsiatilamuutosService.class);
     private LupaService lupaService = mock(LupaService.class);
+    private KoodistoService koodistoService = mock(KoodistoService.class);
+    private EsitysmalliService esitysmalliService = mock(EsitysmalliService.class);
 
     private MuutospyyntoService service;
     private Lupa lupa;
@@ -64,7 +70,7 @@ public class MuutospyyntoServiceTest {
     @Before
     public void setUp() {
         this.service = spy(new MuutospyyntoService(dsl, authService, organisaatioService, liiteService,
-                opintopolkuService, maaraysService, fileStorageService, asiatilamuutosService, lupaService));
+                opintopolkuService, maaraysService, fileStorageService, asiatilamuutosService, lupaService, koodistoService, esitysmalliService));
 
         this.lupa = new Lupa();
         this.lupa.setJarjestajaYtunnus("123");
@@ -247,6 +253,70 @@ public class MuutospyyntoServiceTest {
     }
 
     @Test
+    public void esitettelijaCanReverseEsittelyssa() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(new UUID(4, 4));
+        muutospyynto.setTila(Muutospyyntotila.ESITTELYSSA.toString());
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
+        when(dsl.fetchOne(any(Table.class), any(Condition.class))).thenReturn(mock(MuutospyyntoRecord.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Happy case
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.toString());
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN);
+
+        // Only esittelija self created muutospyynnot can be reversed
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+
+        // Nimenkirjoittaja has no right
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.OTA_KASITTELYYN));
+    }
+
+    @Test
+    public void esittelijaCanEsitteleMuutospyynto() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(new UUID(4, 4));
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
+        when(dsl.fetchOne(any(Table.class), any(Condition.class))).thenReturn(mock(MuutospyyntoRecord.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Happy case
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE);
+
+        // Wrong tila
+        muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE));
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+
+        // Wrong user
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        catchExpectedException(
+                ForbiddenException.class,
+                "User has no right",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.ESITTELE));
+    }
+
+    @Test
     public void testKJActions() throws Exception {
         Muutospyynto muutospyynto = generateMuutospyynto();
         muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
@@ -257,6 +327,13 @@ public class MuutospyyntoServiceTest {
         doReturn(Optional.of(muutospyynto)).when(service).update(any(Muutospyynto.class), anyMap());
         doReturn(Optional.of(muutospyynto)).when(service).getById(anyLong());
 
+        // Save state changes to local muutospyynto object
+        when(dsl.fetchOne(any(Tables.MUUTOSPYYNTO.getClass()), any(Condition.class))).thenReturn(new MuutospyyntoRecord());
+        when(dsl.executeUpdate(any(MuutospyyntoRecord.class))).then(invocation -> {
+            muutospyynto.setTila(invocation.getArgumentAt(0, MuutospyyntoRecord.class).getTila());
+            return 1;
+        });
+
         // Happy path
         when(authService.hasAnyRole(argThat(new StringVarargMatcher(OivaAccess.Role_Nimenkirjoittaja)))).thenReturn(true);
         service.executeAction(null, MuutospyyntoService.Action.LUO, muutospyynto, new HashMap<>());
@@ -264,15 +341,101 @@ public class MuutospyyntoServiceTest {
         when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
         service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.LAHETA);
 
-
+        assertEquals(Muutospyyntotila.AVOIN.toString(), muutospyynto.getTila());
         catchExpectedException(
                 ForbiddenException.class,
+                "Action is not allowed",
                 () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.TALLENNA, muutospyynto, new HashMap<>()));
 
         catchExpectedException(
                 ForbiddenException.class,
+                "Action is not allowed",
                 () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.LAHETA));
 
+    }
+
+    @Test
+    public void testEsittelijaCanDeleteMp() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        muutospyynto.setUuid(UUID.randomUUID());
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doNothing().when(service).delete(any(Muutospyynto.class));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Muutospyynto is created by KJ
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+        catchExpectedException(
+                ForbiddenException.class,
+                "Action is not allowed",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.toString());
+
+        // Wrong status
+        for (Muutospyyntotila tila : EnumSet.complementOf(EnumSet.of(Muutospyyntotila.VALMISTELUSSA))) {
+            muutospyynto.setTila(tila.toString());
+
+            catchExpectedException(
+                    ForbiddenException.class,
+                    "Action is not allowed",
+                    () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+        }
+        muutospyynto.setTila(Muutospyyntotila.VALMISTELUSSA.toString());
+
+        // Wrong role
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(false);
+        catchExpectedException(
+                ForbiddenException.class,
+                "User has no right",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Esittelija))).thenReturn(true);
+
+        // Correct rights
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA);
+        verify(service).delete(any(Muutospyynto.class));
+    }
+
+    @Test
+    public void testKJCanDeleteMp() throws Exception {
+        Muutospyynto muutospyynto = generateMuutospyynto();
+        setUserOrgToMuutospyyntoOrg("123", muutospyynto);
+        muutospyynto.setUuid(new UUID(2, 3));
+        doReturn(Optional.of(muutospyynto)).when(service).getByUuid(anyString());
+        doNothing().when(service).delete(any(Muutospyynto.class));
+
+        // Muutospyynto in wrong status
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
+        for (Muutospyyntotila tila : EnumSet.complementOf(EnumSet.of(Muutospyyntotila.LUONNOS))) {
+            muutospyynto.setTila(tila.toString());
+
+            catchExpectedException(
+                    ForbiddenException.class,
+                    "Action is not allowed",
+                    () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+        }
+
+        muutospyynto.setTila(Muutospyyntotila.LUONNOS.toString());
+
+        // Wrong organization
+        when(authService.getUserOrganisationOid()).thenReturn(lupa.getJarjestajaOid() + "123");
+        catchExpectedException(
+                ForbiddenException.class,
+                "User has no right",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+
+        setUserOrgToMuutospyyntoOrg("123", muutospyynto);
+
+        // Wrong role
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(false);
+        catchExpectedException(
+                ForbiddenException.class,
+                "User has no right",
+                () -> service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA));
+
+        when(authService.hasAnyRole(eq(OivaAccess.Role_Nimenkirjoittaja))).thenReturn(true);
+        // Happy case
+        service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA);
+        verify(service).delete(any(Muutospyynto.class));
     }
 
     private Muutospyynto generateMuutospyynto() {
@@ -280,15 +443,21 @@ public class MuutospyyntoServiceTest {
         muutospyynto.setLiitteet(new LinkedList<>());
         muutospyynto.setMuutokset(new LinkedList<>());
         muutospyynto.setJarjestajaYtunnus(lupa.getJarjestajaYtunnus());
+        muutospyynto.setLupaUuid(UUID.randomUUID().toString());
+        muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.KJ.toString());
         return muutospyynto;
     }
 
-    private void catchExpectedException(Class expected, ThrowableFunction fn) throws Exception {
+    private void catchExpectedException(Class<?> expected, String msg, ThrowableFunction fn) throws Exception {
         try {
             fn.apply();
+            fail("Exception is expected but not thrown");
         } catch (Exception e) {
             if (!expected.isInstance(e)) {
-                throw e;
+                throw new RuntimeException("Exception is wrong type: " + e.getClass().getSimpleName(), e);
+            }
+            else if (msg != null && !msg.equals(e.getMessage())) {
+                throw new RuntimeException("Exception message does not match " + msg + " != " + e.getMessage() , e);
             }
         }
     }

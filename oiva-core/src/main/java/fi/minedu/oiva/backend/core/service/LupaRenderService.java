@@ -26,19 +26,21 @@ public class LupaRenderService {
             try {
                 final Lupa lupa = lupaOpt.get();
                 final RenderOptions renderOptions = RenderOptions.pdfOptions(lupaService.renderLanguageFor(lupa));
-                lupaService.getAttachments(lupa.getId()).stream().forEach(attachment ->
-                    Optional.ofNullable(OivaTemplates.AttachmentType.convert(attachment.getTyyppi())).ifPresent(attachmentType ->
-                        renderOptions.addAttachment(attachmentType, attachment.getPolku())
-                    )
-                );
+                if (lupa.getId() != null) {
+                    lupaService.getAttachments(lupa.getId()).forEach(attachment ->
+                            Optional.ofNullable(OivaTemplates.AttachmentType.convert(attachment.getTyyppi())).ifPresent(attachmentType ->
+                                    renderOptions.addAttachment(attachmentType, attachment.getPolku())
+                            )
+                    );
+                }
                 // Tulostetaan nimenmuutosliite, mikäli luvassa on tutkintoja joiden nimi muuttuu.
                 // Lisäksi päätöksen tulee olla tehty ennen lokakuuta 2018.
                 final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 final Date attachmentLastDate = dateFormat.parse("01/10/2018");
-                if (lupaService.hasTutkintoNimenMuutos(lupa) && lupa.getPaatospvm().before(attachmentLastDate)) {
+                if (lupaService.hasTutkintoNimenMuutos(lupa) && lupa.getPaatospvm() != null && lupa.getPaatospvm().before(attachmentLastDate)) {
                     renderOptions.addAttachment(OivaTemplates.AttachmentType.tutkintoNimenMuutos, "LIITE-tutkintojen_nimien_muutokset.pdf");
                 }
-                return Optional.ofNullable(renderOptions);
+                return Optional.of(renderOptions);
             } catch (Exception e) {
                 logger.error("Failed to prepare default render options", e);
             }

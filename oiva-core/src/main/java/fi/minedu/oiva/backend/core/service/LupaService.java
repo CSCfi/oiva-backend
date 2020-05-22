@@ -15,6 +15,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Record1;
 import org.jooq.Result;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
@@ -88,6 +89,11 @@ public class LupaService extends BaseService {
     public Optional<Lupa> getById(final Long id) {
         return Optional.ofNullable(null != id ? dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id))
                 .fetchOneInto(Lupa.class) : null);
+    }
+
+    public Optional<Lupa> getById(final Long id, String... options) {
+        final SelectConditionStep<Record> query = dsl.select(LUPA.fields()).from(LUPA).where(LUPA.ID.eq(id));
+        return entity(query.fetchOne(), options);
     }
 
     protected Optional<Condition> baseLupaFilter() {
@@ -351,5 +357,19 @@ public class LupaService extends BaseService {
                             lukuunottamatta,
                             lisakielet);
                 });
+    }
+
+    public List<Organisaatio> getLupaorganisaatiot() {
+        SelectConditionStep<Record1<String>> query = dsl.selectDistinct(LUPA.JARJESTAJA_OID)
+                .from(LUPA)
+                .where(LUPA.ALKUPVM.le(DSL.currentDate()).
+                        and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+
+        return dsl.fetch(query).stream()
+                .map(result -> result.get(LUPA.JARJESTAJA_OID))
+                .map(oid -> organisaatioService.getWithLocation(oid))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 }

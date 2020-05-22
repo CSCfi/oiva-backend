@@ -6,6 +6,7 @@ import fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter;
 import fi.minedu.oiva.backend.core.extension.MuutosListFilter;
 import fi.minedu.oiva.backend.core.extension.MuutosTransformerFilter;
 import fi.minedu.oiva.backend.core.extension.OivaTemplateExtension;
+import fi.minedu.oiva.backend.core.extension.SortByOrganisationFilter;
 import fi.minedu.oiva.backend.core.extension.SortListFilter;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,6 +39,7 @@ public class OivaPebbleConfig extends PebbleConfig {
                 filters.put("sortMuutos", new SortListFilter(muutokset));
                 filters.put("filterMuutos", new MuutosListFilter());
                 filters.put("muutosYlakoodi", new MuutosTransformerFilter(muutosYlakoodi));
+                filters.put("sortByOrganizationName", new SortByOrganisationFilter());
                 return filters;
             }
         };

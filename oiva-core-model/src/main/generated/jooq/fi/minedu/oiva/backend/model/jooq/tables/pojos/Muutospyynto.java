@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -901117926;
+    private static final long serialVersionUID = 664809006;
 
     private Long      id;
     private Long      lupaId;
@@ -45,6 +45,11 @@ public class Muutospyynto implements Serializable {
     private Timestamp paivityspvm;
     private UUID      uuid;
     private JsonNode  meta;
+    private String    alkupera;
+    private String    asianumero;
+    private Date      paatospvm;
+    private String    diaarinumero;
+    private String    jarjestajaOid;
 
     public Muutospyynto() {}
 
@@ -63,6 +68,11 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
         this.meta = value.meta;
+        this.alkupera = value.alkupera;
+        this.asianumero = value.asianumero;
+        this.paatospvm = value.paatospvm;
+        this.diaarinumero = value.diaarinumero;
+        this.jarjestajaOid = value.jarjestajaOid;
     }
 
     public Muutospyynto(
@@ -79,7 +89,12 @@ public class Muutospyynto implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         UUID      uuid,
-        JsonNode  meta
+        JsonNode  meta,
+        String    alkupera,
+        String    asianumero,
+        Date      paatospvm,
+        String    diaarinumero,
+        String    jarjestajaOid
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -95,6 +110,11 @@ public class Muutospyynto implements Serializable {
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
         this.meta = meta;
+        this.alkupera = alkupera;
+        this.asianumero = asianumero;
+        this.paatospvm = paatospvm;
+        this.diaarinumero = diaarinumero;
+        this.jarjestajaOid = jarjestajaOid;
     }
 
     public Long getId() {
@@ -215,6 +235,50 @@ public class Muutospyynto implements Serializable {
         this.meta = meta;
     }
 
+    @NotNull
+    @Size(max = 10)
+    public String getAlkupera() {
+        return this.alkupera;
+    }
+
+    public void setAlkupera(String alkupera) {
+        this.alkupera = alkupera;
+    }
+
+    @Size(max = 16)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
+    public Date getPaatospvm() {
+        return this.paatospvm;
+    }
+
+    public void setPaatospvm(Date paatospvm) {
+        this.paatospvm = paatospvm;
+    }
+
+    @Size(max = 20)
+    public String getDiaarinumero() {
+        return this.diaarinumero;
+    }
+
+    public void setDiaarinumero(String diaarinumero) {
+        this.diaarinumero = diaarinumero;
+    }
+
+    public String getJarjestajaOid() {
+        return this.jarjestajaOid;
+    }
+
+    public void setJarjestajaOid(String jarjestajaOid) {
+        this.jarjestajaOid = jarjestajaOid;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -233,6 +297,11 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
         sb.append(", ").append(meta);
+        sb.append(", ").append(alkupera);
+        sb.append(", ").append(asianumero);
+        sb.append(", ").append(paatospvm);
+        sb.append(", ").append(diaarinumero);
+        sb.append(", ").append(jarjestajaOid);
 
         sb.append(")");
         return sb.toString();
