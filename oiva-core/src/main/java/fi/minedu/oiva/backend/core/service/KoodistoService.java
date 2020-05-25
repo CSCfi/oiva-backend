@@ -225,13 +225,12 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutustyypit().forEach(koulutustyyppiKoodi ->
-                getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
-                    if (getAmmatillinenKoulutustyyppiArvot().contains(koulutustyyppiKoodi.koodiArvo())) {
-                        map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo());
-                    }
-                })
-        );
+
+        getKoulutustyypit().stream()
+                .filter(koodi -> getAmmatillinenKoulutustyyppiArvot().contains(koodi.koodiArvo()))
+                .forEach(koulutustyyppi ->
+                        getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo())
+                                .forEach(koulutusKoodi -> map.put(koulutusKoodi.koodiArvo(), koulutustyyppi.koodiArvo())));
         return map;
     }
 
@@ -329,13 +328,13 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToTutkintotyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToTutkintotyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getTutkintotyypit().forEach(tutkintotyyppiKoodi ->
-                getTutkintotyyppiKoulutukset(tutkintotyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
-                    if (getAmmatillinenTutkintotyyppiArvot().contains(tutkintotyyppiKoodi.koodiArvo())) {
-                        map.put(koulutusKoodi.koodiArvo(), tutkintotyyppiKoodi.koodiArvo());
-                    }
-                })
-        );
+
+        getTutkintotyypit().stream()
+                .filter(koodi -> getAmmatillinenTutkintotyyppiArvot().contains(koodi.koodiArvo()))
+                .forEach(tutkintotyyppi ->
+                        getTutkintotyyppiKoulutukset(tutkintotyyppi.koodiArvo())
+                                .forEach(koulutusKoodi -> map.put(koulutusKoodi.koodiArvo(), tutkintotyyppi.koodiArvo())));
+
         return map;
     }
 }
