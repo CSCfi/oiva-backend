@@ -112,10 +112,30 @@ public class LupaService extends BaseService {
                                                  final String oppilaitostyyppi,
                                                  final String... options) {
         final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
-        Optional.ofNullable(koulutustyyppi).ifPresent(t -> query.where(LUPA.KOULUTUSTYYPPI.eq(t)));
+        Optional.ofNullable(koulutustyyppi).ifPresent(t -> {
+            query.where(LUPA.KOULUTUSTYYPPI.eq(t));
+            if (koulutustyyppi.equals("3")) {
+                // Fetch oppilaitos maarays for VST
+                query.getSelect().add(MAARAYS.KOODISTO);
+                query.getSelect().add(MAARAYS.ORG_OID);
+                query.leftJoin(MAARAYS).on(LUPA.ID.eq(MAARAYS.LUPA_ID));
+                query.where(MAARAYS.KOODISTO.eq("oppilaitos"));
+            }
+        });
         Optional.ofNullable(oppilaitostyyppi).ifPresent(t -> query.where(LUPA.OPPILAITOSTYYPPI.eq(t)));
         query.leftJoin(ASIATYYPPI).on(ASIATYYPPI.ID.eq(LUPA.ASIATYYPPI_ID));
-        return fetch(query, options);
+        return query.fetchGroups(r -> r.into(LUPA.fields()).into(Lupa.class), r -> r.into(MAARAYS.KOODISTO, MAARAYS.ORG_OID).into(Maarays.class))
+                .entrySet()
+                .stream()
+                .map(e -> {
+                    Lupa l = e.getKey();
+                    l.setMaaraykset(e.getValue().stream()
+                            .filter(m -> m.getOrgOid() != null)
+                            .peek(m -> m.setOrganisaatio(organisaatioService.getWithLocation(m.getOrgOid()).orElse(null)))
+                            .collect(Collectors.toList()));
+                    return with(Optional.of(l), options);
+                }).filter(Optional::isPresent)
+                .map(Optional::get).collect(Collectors.toList());
     }
 
     public Collection<Lupa> getAll(final String... withOptions) {
