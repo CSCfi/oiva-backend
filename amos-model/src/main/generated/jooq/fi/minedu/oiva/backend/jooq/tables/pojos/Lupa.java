@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = 1575830450;
+    private static final long serialVersionUID = 1053869184;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -49,6 +49,7 @@ public class Lupa implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private String    asianumero;
 
     public Lupa() {}
 
@@ -71,6 +72,7 @@ public class Lupa implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.asianumero = value.asianumero;
     }
 
     public Lupa(
@@ -91,7 +93,8 @@ public class Lupa implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        UUID      uuid
+        UUID      uuid,
+        String    asianumero
     ) {
         this.id = id;
         this.edellinenLupaId = edellinenLupaId;
@@ -111,6 +114,7 @@ public class Lupa implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.asianumero = asianumero;
     }
 
     public Long getId() {
@@ -266,6 +270,15 @@ public class Lupa implements Serializable {
         this.uuid = uuid;
     }
 
+    @Size(max = 16)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupa (");
@@ -288,6 +301,7 @@ public class Lupa implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(asianumero);
 
         sb.append(")");
         return sb.toString();
