@@ -30,8 +30,8 @@ with new_lupa as (
         where diaarinumero = '40/531/2018' returning *),
 
      copy_maaraykset as (
-         insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, koodistoversio, parent_id)
-             select new_lupa.id, m.kohde_id, m.koodisto, m.koodiarvo, m.maaraystyyppi_id, m.koodistoversio, parent_id
+         insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, arvo, maaraystyyppi_id, koodistoversio, parent_id)
+             select new_lupa.id, m.kohde_id, m.koodisto, m.koodiarvo, m.arvo, m.maaraystyyppi_id, m.koodistoversio, m.parent_id
              from maarays m,
                   new_lupa
              where lupa_id = (select id from lupa where diaarinumero = '40/531/2018')),
@@ -53,16 +53,6 @@ with new_lupa as (
                     id
              from lupa
              where diaarinumero = '40/531/2018'),
-
-     koulutus_ajoneuvo as (
-         insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, koodistoversio)
-             select new_lupa.id,
-                    (select id from kohde where tunniste = 'tutkinnotjakoulutukset'),
-                    'koulutus',
-                    '457341',
-                    (select id from maaraystyyppi where tunniste = 'OIKEUS'),
-                    '12'
-             from new_lupa),
 
      koulutus_elaintenhoito as (
          insert into maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, koodistoversio)
