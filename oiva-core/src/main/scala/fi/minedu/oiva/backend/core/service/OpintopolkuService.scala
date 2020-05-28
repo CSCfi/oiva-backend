@@ -15,6 +15,7 @@ import dispatch._
 import fi.minedu.oiva.backend.model.entity.json.ObjectMapperSingleton
 import org.glassfish.jersey.client.rx.RxClient
 import org.glassfish.jersey.client.rx.java8.RxCompletionStageInvoker
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.{Autowired, Value}
 import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.{Scope, ScopedProxyMode}
@@ -26,6 +27,8 @@ import scala.compat.java8.FutureConverters
 @Service
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON, proxyMode = ScopedProxyMode.TARGET_CLASS)
 class OpintopolkuService extends CacheAware {
+
+    private val logger = LoggerFactory.getLogger(getClass)
 
     @Value("${opintopolku.baseUrl}${opintopolku.organisaatio.restUrl}")
     private val organisaatioServiceUrl: String = null
@@ -95,7 +98,10 @@ class OpintopolkuService extends CacheAware {
 
     implicit def future2CS[T](future: Future[T]): CompletionStage[T] = FutureConverters.toJava(future)
 
-    def requestRx[T](url: String, clazz: Class[T]) = buildRequest(url).rx().get(clazz)
+    def requestRx[T](url: String, clazz: Class[T]) = {
+        logger.debug("Fetching " + url);
+        buildRequest(url).rx().get(clazz)
+    }
 
     def request[T](url: String, clazz: Class[T]) = buildRequest(url).get(clazz)
 

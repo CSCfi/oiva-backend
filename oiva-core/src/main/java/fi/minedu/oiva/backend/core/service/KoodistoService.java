@@ -5,6 +5,7 @@ import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoulutusKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Maakunta;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -225,13 +226,12 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToKoulutustyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToKoulutustyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getKoulutustyypit().forEach(koulutustyyppiKoodi ->
-                getKoulutustyyppiKoulutukset(koulutustyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
-                    if (getAmmatillinenKoulutustyyppiArvot().contains(koulutustyyppiKoodi.koodiArvo())) {
-                        map.put(koulutusKoodi.koodiArvo(), koulutustyyppiKoodi.koodiArvo());
-                    }
-                })
-        );
+
+        getKoulutustyypit().stream()
+                .filter(koodi -> getAmmatillinenKoulutustyyppiArvot().contains(koodi.koodiArvo()))
+                .forEach(koulutustyyppi ->
+                        getKoulutustyyppiKoulutukset(koulutustyyppi.koodiArvo())
+                                .forEach(koulutusKoodi -> map.put(koulutusKoodi.koodiArvo(), koulutustyyppi.koodiArvo())));
         return map;
     }
 
@@ -283,7 +283,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getAmmatillinenTutkinnot", key = "''")
     public List<KoulutusKoodi> getAmmatillinenTutkinnot() {
-        final List<KoulutusKoodi> koulutukset = new ArrayList<>();
+        final Map<String, KoulutusKoodi> koulutukset = new HashMap<>();
         final Map<String, String> koulutusToKoulutusala = getKoulutusToKoulutusalaRelation();
         final Map<String, String> koulutusToKoulutustyyppi = getKoulutusToKoulutustyyppiRelation();
         final Map<String, Set<KoodistoKoodi>> koulutusToOsaamisala = getKoulutusToOsaamisalatRelation();
@@ -299,16 +299,17 @@ public class KoodistoService {
                 // Erikoisammattitutkinnoilta kolmosalkuiset pois
                 if (!(koulutuskoodi.getKoodiArvo().startsWith("3") && koulutustyyppiKoodiArvo.equals("12"))) {
 
-                    // Tarkistetaan versio-duplikaatit
-                    if (koulutukset.stream().noneMatch(koulutusKoodi -> koulutusKoodi.getKoodiArvo().contains(koulutuskoodi.getKoodiArvo()))) {
-                        koulutukset.add(new KoulutusKoodi(koulutuskoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisalat));
+                    // Lisätään ja päivitetään vanhat uudemmilla koodeilla
+                    KoulutusKoodi existing = koulutukset.get(koulutuskoodi.getKoodiArvo());
+                    if (existing == null || existing.getVersio() < koulutuskoodi.getVersio()) {
+                        koulutukset.put(koulutuskoodi.getKoodiArvo(), new KoulutusKoodi(koulutuskoodi, koulutusalaKoodiArvo, koulutustyyppiKoodiArvo, osaamisalat));
                     }
                 }
             }
         };
 
         getAmmatillinenKoulutustyyppiArvot().forEach(koulutustyyppiKoodiArvo -> getKoulutustyyppiKoulutukset(koulutustyyppiKoodiArvo).forEach(includeKoulutus));
-        return koulutukset;
+        return Lists.newLinkedList(koulutukset.values());
     }
 
     @Cacheable(value = "KoodistoService:getTutkintotyypit", key = "''")
@@ -329,13 +330,13 @@ public class KoodistoService {
     @Cacheable(value = "KoodistoService:getKoulutusToTutkintotyyppiRelation", key = "''")
     public Map<String, String> getKoulutusToTutkintotyyppiRelation() {
         final Map<String, String> map = new HashMap<>();
-        getTutkintotyypit().forEach(tutkintotyyppiKoodi ->
-                getTutkintotyyppiKoulutukset(tutkintotyyppiKoodi.koodiArvo()).forEach(koulutusKoodi -> {
-                    if (getAmmatillinenTutkintotyyppiArvot().contains(tutkintotyyppiKoodi.koodiArvo())) {
-                        map.put(koulutusKoodi.koodiArvo(), tutkintotyyppiKoodi.koodiArvo());
-                    }
-                })
-        );
+
+        getTutkintotyypit().stream()
+                .filter(koodi -> getAmmatillinenTutkintotyyppiArvot().contains(koodi.koodiArvo()))
+                .forEach(tutkintotyyppi ->
+                        getTutkintotyyppiKoulutukset(tutkintotyyppi.koodiArvo())
+                                .forEach(koulutusKoodi -> map.put(koulutusKoodi.koodiArvo(), tutkintotyyppi.koodiArvo())));
+
         return map;
     }
 }
