@@ -113,7 +113,7 @@ set parent_id = (select new_parent.id
                  from maarays old_parent
                           join maarays new_parent
                                on old_parent.koodiarvo = new_parent.koodiarvo and
-                                  old_parent.koodiarvo = new_parent.koodiarvo
+                                  old_parent.koodisto = new_parent.koodisto
                  where child.lupa_id = new_parent.lupa_id
                    and child.parent_id = old_parent.id)
 from lupa
