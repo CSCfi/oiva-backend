@@ -45,5 +45,5 @@ class Lupa(
     def setMaaraykset(maaraykset: Collection[Maarays]): Unit = this.maaraykset = maaraykset
 
     @JsonIgnore def getUUIDValue = getUuid.toString
-    @JsonIgnore def getPDFFileName = "lupa-" + StringUtils.replaceAll(getDiaarinumero, "/", "-") + ".pdf"
+    @JsonIgnore def getPDFFileName = "lupa-" + StringUtils.replaceAll(Option(getAsianumero).getOrElse(getDiaarinumero), "/", "-") + ".pdf"
 }
