@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutos implements Serializable {
 
-    private static final long serialVersionUID = 1648887773;
+    private static final long serialVersionUID = -1672702744;
 
     private Long      id;
     private Long      muutospyyntoId;
@@ -49,6 +49,7 @@ public class Muutos implements Serializable {
     private String    paatosTila;
     private String    muutosperustelukoodiarvo;
     private String    orgOid;
+    private Long      parentMaaraysId;
 
     public Muutos() {}
 
@@ -72,6 +73,7 @@ public class Muutos implements Serializable {
         this.paatosTila = value.paatosTila;
         this.muutosperustelukoodiarvo = value.muutosperustelukoodiarvo;
         this.orgOid = value.orgOid;
+        this.parentMaaraysId = value.parentMaaraysId;
     }
 
     public Muutos(
@@ -93,7 +95,8 @@ public class Muutos implements Serializable {
         UUID      uuid,
         String    paatosTila,
         String    muutosperustelukoodiarvo,
-        String    orgOid
+        String    orgOid,
+        Long      parentMaaraysId
     ) {
         this.id = id;
         this.muutospyyntoId = muutospyyntoId;
@@ -114,6 +117,7 @@ public class Muutos implements Serializable {
         this.paatosTila = paatosTila;
         this.muutosperustelukoodiarvo = muutosperustelukoodiarvo;
         this.orgOid = orgOid;
+        this.parentMaaraysId = parentMaaraysId;
     }
 
     public Long getId() {
@@ -277,6 +281,14 @@ public class Muutos implements Serializable {
         this.orgOid = orgOid;
     }
 
+    public Long getParentMaaraysId() {
+        return this.parentMaaraysId;
+    }
+
+    public void setParentMaaraysId(Long parentMaaraysId) {
+        this.parentMaaraysId = parentMaaraysId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutos (");
@@ -300,6 +312,7 @@ public class Muutos implements Serializable {
         sb.append(", ").append(paatosTila);
         sb.append(", ").append(muutosperustelukoodiarvo);
         sb.append(", ").append(orgOid);
+        sb.append(", ").append(parentMaaraysId);
 
         sb.append(")");
         return sb.toString();
