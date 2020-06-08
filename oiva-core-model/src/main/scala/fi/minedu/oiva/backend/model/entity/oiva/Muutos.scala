@@ -23,10 +23,11 @@ class Muutos(@BeanProperty var kohde: pojos.Kohde,
              var maarays: Maarays,
              @BeanProperty var generatedId: String, // generated id
              @BeanProperty var parent: String, // reference to parents generated id
-             @BeanProperty var maaraysUuid: String // reference to (parent) maarays
+             @BeanProperty var maaraysUuid: String, // reference to maarays
+             @BeanProperty var parentMaaraysUuid: String // reference to parent maarays
             ) extends pojos.Muutos {
 
-  def this() = this(null, null, null, null, null, null, null, null, null, null, null)
+  def this() = this(null, null, null, null, null, null, null, null, null, null, null, null)
 
   @JsonIgnore def kohdeValue = if (null != kohde) kohde.getTunniste else null
 

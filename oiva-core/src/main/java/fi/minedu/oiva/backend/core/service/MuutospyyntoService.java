@@ -58,6 +58,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -338,13 +339,21 @@ public class MuutospyyntoService {
                     .filter(MuutospyyntoService::isPoisto)
                     .map(Muutos::getMaaraysId)
                     .collect(Collectors.toList());
-            Optional.ofNullable(oldLupa.getMaaraykset()).ifPresent(maaraykset ->
-                    maaraykset.forEach(maarays ->
-                            createMaaraysFromMaarays(lupa.getId(), maarays, null, removed)));
 
+            // Create new maaraykset based on old lupa
+            final Map<Long, Long> oldNewMaaraysMap = new HashMap<>();
+            Optional.ofNullable(oldLupa.getMaaraykset()).ifPresent(maaraykset ->
+                    maaraykset.forEach(maarays -> {
+                        final Map<Long, Long> map = createMaaraysFromMaarays(lupa.getId(), maarays, null, removed);
+                        oldNewMaaraysMap.putAll(map);
+                    }));
+
+            // Create new maaraykset based on muutokset
             Optional.ofNullable(muutospyynto.getMuutokset()).ifPresent(muutokset ->
-                    muutokset.forEach(muutos ->
-                            createMaaraysFromMuutos(lupa.getId(), muutos, null)));
+                    muutokset.forEach(muutos -> {
+                        Long id = muutos.getParentMaaraysId() != null ? oldNewMaaraysMap.get(muutos.getParentMaaraysId()) : null;
+                        createMaaraysFromMuutos(lupa.getId(), muutos, id);
+                    }));
 
             // Create history entry and set ending date for old lupa.
             createLupahistoria(oldLupa, lupa);
@@ -399,9 +408,10 @@ public class MuutospyyntoService {
                     .map(Muutos::getMaaraysId)
                     .collect(Collectors.toSet());
             // Copy maaraykset which are not removed
-            lupa.setMaaraykset(filterOutRemoved(oldLupa.getMaaraykset(), removed));
+            final Collection<Maarays> maaraykset = filterOutRemoved(oldLupa.getMaaraykset(), removed);
+            lupa.setMaaraykset(maaraykset);
             // Copy muutokset from muutospyynto and convert to maarays
-            lupa.getMaaraykset().addAll(convertToMaaraykset(mp.getMuutokset()));
+            lupa.getMaaraykset().addAll(convertToMaaraykset(mp.getMuutokset(), maaraykset));
 
             return Optional.of(lupa);
         });
@@ -423,7 +433,7 @@ public class MuutospyyntoService {
                 .collect(Collectors.toList());
     }
 
-    final Collection<Maarays> convertToMaaraykset(Collection<Muutos> muutokset) {
+    final Collection<Maarays> convertToMaaraykset(Collection<Muutos> muutokset, Collection<Maarays> maaraykset) {
         if (null == muutokset) {
             return Lists.newLinkedList();
         }
@@ -433,7 +443,19 @@ public class MuutospyyntoService {
                     Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
                     maarays.setId(null);
                     maarays.setUuid(null);
-                    maarays.setAliMaaraykset(this.convertToMaaraykset(m.getAliMaaraykset()));
+                    maarays.setAliMaaraykset(this.convertToMaaraykset(m.getAliMaaraykset(), maaraykset));
+                    if (m.getParentMaaraysUuid() != null) {
+                        // Add this muutos as alimaarays to correct existing maarays
+                        maaraykset.stream()
+                                .filter(ma -> m.getParentMaaraysUuid().equals(ma.getUuid().toString()))
+                                .forEach(ma -> {
+                                    if (ma.getAliMaaraykset() == null) {
+                                        ma.setAliMaaraykset(Lists.newLinkedList());
+                                    }
+                                    ma.getAliMaaraykset().add(maarays);
+                                });
+                    }
+
                     return maarays;
                 })
                 .collect(Collectors.toList());
@@ -441,6 +463,7 @@ public class MuutospyyntoService {
 
     /**
      * Delete muutospyynto and relating entities from db permanently
+     *
      * @param muutospyynto
      */
     protected void delete(Muutospyynto muutospyynto) {
@@ -459,7 +482,7 @@ public class MuutospyyntoService {
         Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
 
         // Koulutuksen järjestäjä can delete own organization's muutospyynto when its status is LUONNOS
-        if(Tyyppi.KJ.toString().equals(mp.getAlkupera())) {
+        if (Tyyppi.KJ.toString().equals(mp.getAlkupera())) {
 
             if (!Muutospyyntotila.LUONNOS.toString().equals(mp.getTila())) {
                 throw new ForbiddenException("Action is not allowed");
@@ -481,8 +504,7 @@ public class MuutospyyntoService {
             }
 
             delete(mp);
-        }
-        else {
+        } else {
             throw new ForbiddenException("Access rights cannot be defined for muutospyynto:\n" + mp);
         }
 
@@ -518,10 +540,20 @@ public class MuutospyyntoService {
         historiaRecord.store();
     }
 
-    private void createMaaraysFromMaarays(Long lupaId, Maarays maarays, Long parentMaaraysId, List<Long> removed) {
+    /**
+     * Creates maarays and alimaaraykset recursively based on old maarays if it is not removed from lupa.
+     *
+     * @param lupaId          Lupa id
+     * @param maarays         Old maarays
+     * @param parentMaaraysId Parent maarays id
+     * @param removed         List of removed maarays ids
+     * @return Map of old maarays ids and new created maarays ids
+     */
+    private Map<Long, Long> createMaaraysFromMaarays(Long lupaId, Maarays maarays, Long parentMaaraysId, List<Long> removed) {
         if (removed.contains(maarays.getId())) {
-            return;
+            return new HashMap<>();
         }
+        Map<Long, Long> oldNewMaaraysMap = new HashMap<>();
         final Maarays maaraysCopy = new Maarays();
         BeanUtils.copyNonNullProperties(maaraysCopy, maarays);
         maaraysCopy.setId(null);
@@ -532,9 +564,17 @@ public class MuutospyyntoService {
         maaraysRecord.setLuoja(authService.getUsername());
         maaraysRecord.setLupaId(lupaId);
         maaraysRecord.store();
-        Optional.ofNullable(maarays.getAliMaaraykset())
-                .ifPresent(maaraykset -> maaraykset.forEach(m ->
-                        createMaaraysFromMaarays(lupaId, m, maaraysRecord.getId(), removed)));
+        oldNewMaaraysMap.put(maarays.getId(), maaraysRecord.getId());
+        final Map<Long, Long> subMap = Optional.ofNullable(maarays.getAliMaaraykset())
+                .flatMap(maaraykset -> maaraykset.stream()
+                        .map(m -> createMaaraysFromMaarays(lupaId, m, maaraysRecord.getId(), removed))
+                        .reduce((map, map2) -> {
+                            map.putAll(map2);
+                            return map;
+                        })
+                ).orElse(new HashMap<>());
+        oldNewMaaraysMap.putAll(subMap);
+        return oldNewMaaraysMap;
     }
 
     private void createMaaraysFromMuutos(Long lupaId, Muutos muutos, Long parentMaaraysId) {
@@ -646,7 +686,7 @@ public class MuutospyyntoService {
 
         try {
             UUID.fromString(muutospyynto.getLupaUuid());
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new ForbiddenException("Muutospyynto should have a valid lupa uuid");
         }
     }
@@ -1116,6 +1156,9 @@ public class MuutospyyntoService {
             muutosRecord.setParentId(muutos.getParentId());
             if (muutos.getMaaraysUuid() != null) {
                 maaraysService.getByUuid(muutos.getMaaraysUuid()).ifPresent(m -> muutosRecord.setMaaraysId(m.getId()));
+            }
+            if (muutos.getParentMaaraysUuid() != null) {
+                maaraysService.getByUuid(muutos.getParentMaaraysUuid()).ifPresent(m -> muutosRecord.setParentMaaraysId(m.getId()));
             }
             muutosRecord.store();
 
