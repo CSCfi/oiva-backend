@@ -66,8 +66,9 @@ WITH old AS (
              FROM new_lupa l,
                   maarays m
                       JOIN old ON m.lupa_id = old.id
-             WHERE (koodisto != 'koulutus'
-                 OR (koodisto = 'koulutus' AND koodiarvo NOT IN ('351502', '341101')))
+             WHERE (koodisto NOT IN ('koulutus', 'oivamuutoikeudetvelvollisuudetehdotjatehtavat')
+                 OR (koodisto = 'koulutus' AND koodiarvo NOT IN ('351502', '341101'))
+                 OR (koodisto = 'oivamuutoikeudetvelvollisuudetehdotjatehtavat' AND koodiarvo != '7'))
              RETURNING id
      ),
      -- Rakennustuotealan at (tekniikan alat)
