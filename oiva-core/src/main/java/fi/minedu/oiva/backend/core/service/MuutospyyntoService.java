@@ -425,8 +425,6 @@ public class MuutospyyntoService {
                 .filter(m -> !removed.contains(m.getId()))
                 .map(m -> {
                     Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
-                    maarays.setId(null);
-                    maarays.setUuid(null);
                     maarays.setAliMaaraykset(this.filterOutRemoved(m.getAliMaaraykset(), removed));
                     return maarays;
                 })
@@ -444,10 +442,10 @@ public class MuutospyyntoService {
                     maarays.setId(null);
                     maarays.setUuid(null);
                     maarays.setAliMaaraykset(this.convertToMaaraykset(m.getAliMaaraykset(), maaraykset));
-                    if (m.getParentMaaraysUuid() != null) {
+                    if (m.getParentMaaraysId() != null) {
                         // Add this muutos as alimaarays to correct existing maarays
                         maaraykset.stream()
-                                .filter(ma -> m.getParentMaaraysUuid().equals(ma.getUuid().toString()))
+                                .filter(ma -> m.getParentMaaraysId().equals(ma.getId()))
                                 .forEach(ma -> {
                                     if (ma.getAliMaaraykset() == null) {
                                         ma.setAliMaaraykset(Lists.newLinkedList());
