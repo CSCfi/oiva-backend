@@ -8,6 +8,7 @@ import fi.minedu.oiva.backend.core.service.LupamuutosService;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.core.service.PrinceXMLService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
@@ -232,7 +233,8 @@ public class MuutospyyntoController {
                 final OivaTemplates.RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-                response.setHeader("Content-Disposition", "inline; filename=luonnos-" + lupaOpt.get().getPDFFileName());
+                final String tila = LupatilaValue.VALMIS.equals(lupaOpt.get().getLupatila().getTunniste()) ? "" : "luonnos-";
+                response.setHeader("Content-Disposition", "inline; filename=" + tila + lupaOpt.get().getPDFFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
                     response.getWriter().write("Failed to generate lupa with uuid " + uuid);
