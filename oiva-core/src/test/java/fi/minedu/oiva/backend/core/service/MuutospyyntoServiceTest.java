@@ -446,17 +446,17 @@ public class MuutospyyntoServiceTest {
 
     @Test
     public void testConvertToMaaraykset() {
-        final UUID uuid = UUID.randomUUID();
+        final Long id = 1L;
         List<Muutos> muutosList = new ArrayList<>();
         final Muutos muutos = new Muutos();
-        muutos.setParentMaaraysUuid(uuid.toString());
+        muutos.setParentMaaraysId(id);
         muutos.setKoodisto("kieli");
         muutos.setKoodiarvo("en");
         muutosList.add(muutos);
 
         List<Maarays> maaraysList = new ArrayList<>();
         final Maarays maarays = new Maarays();
-        maarays.setUuid(uuid);
+        maarays.setId(id);
         maaraysList.add(maarays);
 
         final Collection<Maarays> result = service.convertToMaaraykset(muutosList, maaraysList);
