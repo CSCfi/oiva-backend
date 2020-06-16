@@ -3,6 +3,8 @@ package fi.minedu.oiva.backend.core.service;
 import com.google.common.collect.Sets;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
+import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.jooq.Tables;
@@ -19,17 +21,21 @@ import org.mockito.internal.matchers.VarargMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -436,6 +442,31 @@ public class MuutospyyntoServiceTest {
         // Happy case
         service.executeAction(muutospyynto.getUuid().toString(), MuutospyyntoService.Action.POISTA);
         verify(service).delete(any(Muutospyynto.class));
+    }
+
+    @Test
+    public void testConvertToMaaraykset() {
+        final Long id = 1L;
+        List<Muutos> muutosList = new ArrayList<>();
+        final Muutos muutos = new Muutos();
+        muutos.setParentMaaraysId(id);
+        muutos.setKoodisto("kieli");
+        muutos.setKoodiarvo("en");
+        muutosList.add(muutos);
+
+        List<Maarays> maaraysList = new ArrayList<>();
+        final Maarays maarays = new Maarays();
+        maarays.setId(id);
+        maaraysList.add(maarays);
+
+        final Collection<Maarays> result = service.convertToMaaraykset(muutosList, maaraysList);
+        assertEquals("Maarays count should match", 1, result.size());
+        final Optional<Maarays> first = maaraysList.stream().findFirst();
+        assertEquals("Alimaarays count should match", Integer.valueOf(1), first.map(m -> m.getAliMaaraykset().size()).orElse(0));
+        final Optional<Maarays> firstAli = first.flatMap(m -> m.getAliMaaraykset().stream().findFirst());
+        assertTrue("There should be alimaarays", firstAli.isPresent());
+        assertEquals("Alimaarays should have right koodisto", "kieli", firstAli.get().getKoodisto());
+        assertEquals("Alimaarays should have right koodiarvo", "en", firstAli.get().getKoodiarvo());
     }
 
     private Muutospyynto generateMuutospyynto() {

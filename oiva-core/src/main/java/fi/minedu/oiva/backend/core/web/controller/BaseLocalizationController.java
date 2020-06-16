@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -27,13 +28,17 @@ public abstract class BaseLocalizationController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET)
-    @ApiOperation(notes = "Palauttaa kielikäännöksen opintopolun lokalisaatiopalvelusta", value = "")
-    public CompletableFuture<Map<String, String>> getTranslations(
-            final @RequestParam(defaultValue = "fi") String lang,
+    @ApiOperation(notes = "Palauttaa kielikäännökset suomeksi ja ruotsiksi opintopolun lokalisaatiopalvelusta", value = "")
+    public CompletableFuture<Map<String, Map<String, String>>> getTranslations(
             final @RequestParam(defaultValue = "false") Boolean refresh) {
         return async(() -> {
-            if (refresh) service.refreshTranslations();
-            return service.getTranslations(lang);
+            if (refresh) {
+                service.refreshTranslations();
+            }
+            Map<String,Map<String,String>> translations = new HashMap<>();
+            translations.put("fi", service.getTranslations("fi"));
+            translations.put("sv", service.getTranslations("sv"));
+            return translations;
         });
     }
 

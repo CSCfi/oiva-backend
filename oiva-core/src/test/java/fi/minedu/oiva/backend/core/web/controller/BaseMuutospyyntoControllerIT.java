@@ -219,12 +219,21 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1111111-1?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
         assertEquals("Lupa diaarinumero should match.", "20/531/2018", doc.read("$.diaarinumero"));
-        assertEquals("Maarays count should match!", 6, doc.read("$.maaraykset.length()",
+        assertEquals("Maarays count should match!", 5, doc.read("$.maaraykset.length()",
                 Integer.class).intValue());
-        assertEquals("AliMaarays count should match!", 4,
+        assertEquals("AliMaarays count should match!", 5,
                 doc.read("$..aliMaaraykset[*].uuid", stringRef).size());
         final List<String> koodiarvoList = doc.read("$.maaraykset[*].koodiarvo", stringRef);
         assertFalse("There should not be removed maarays.", koodiarvoList.contains("124"));
+
+        final TypeRef<List<Maarays>> maaraysRef = new TypeRef<List<Maarays>>() {
+        };
+        final List<Maarays> aliMaaraykset = doc.read("$.maaraykset[?(@.koodiarvo==123)].aliMaaraykset[*]", maaraysRef);
+        assertEquals("Koulutus 123 should have 2 alimaarays", 2, aliMaaraykset.size());
+        // Check that tutkintokieli is within alimaaraykset
+        final Optional<Maarays> tutkintoKieli = aliMaaraykset.stream().filter(m -> m.getKoodisto().equals("kieli")).findFirst();
+        assertTrue("There should be tutkinto kieli maarays", tutkintoKieli.isPresent());
+        assertEquals("Tutkintokieli is english", "en", tutkintoKieli.get().getKoodiarvo());
 
         // Check history
         assertEquals("There should be history row for old lupa", 1,
