@@ -73,7 +73,7 @@ WITH old AS (
      -- Kalatalouden at (maa- ja metsätalousalat)
      kalatalous_at AS (
          INSERT INTO maarays (lupa_id, kohde_id, koodisto, koodiarvo, maaraystyyppi_id, luoja, koodistoversio)
-             SELECT l.id, 1, 'koulutus', '361401', 1, 'oiva', 12 FROM new_lupa l
+             SELECT l.id, 1, 'koulutus', '364445', 1, 'oiva', 12 FROM new_lupa l
              RETURNING id
      ),
      -- Välinehuoltoalan pt (terveys- ja hyvinvointialat)
