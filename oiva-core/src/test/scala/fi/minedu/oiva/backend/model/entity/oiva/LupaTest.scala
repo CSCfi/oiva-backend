@@ -20,4 +20,24 @@ class LupaTest extends FunSuite {
     }
   }
 
+  test("testEquals") {
+    val lupa1 = new Lupa()
+    assertResult(true, "instances should match") {
+      lupa1.equals(lupa1)
+    }
+    val lupa2 = new Lupa()
+    assertResult(false, "different instances should not match") {
+      lupa1.equals(lupa2)
+    }
+    lupa1.setId(1L)
+    lupa2.setId(1L)
+    assertResult(true, "instances with same id should match") {
+      lupa1.equals(lupa2)
+    }
+    lupa2.setId(2L)
+    assertResult(false, "instances with different id should not match") {
+      lupa1.equals(lupa2)
+    }
+  }
+
 }
