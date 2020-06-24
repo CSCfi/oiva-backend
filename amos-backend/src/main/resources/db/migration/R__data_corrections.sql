@@ -11,3 +11,4 @@ update maarays set koodiarvo = '1', koodistoversio='2' where koodisto = 'kuljett
 update maarays set koodiarvo = '1', koodistoversio='3' where koodisto = 'kuljettajakoulutus' and koodiarvo='5';
 update maarays set koodiarvo = '2', koodistoversio='2' where koodisto = 'kuljettajakoulutus' and koodiarvo='4';
 update maarays set koodiarvo = '2', koodistoversio='3' where koodisto = 'kuljettajakoulutus' and koodiarvo='6';
+update maarays set koodistoversio = '1' where koodisto = 'kuljettajakoulutus' and koodistoversio is null;
