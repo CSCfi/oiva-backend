@@ -67,9 +67,9 @@ Asenna Java. Mikäli sinulla on jo ennestään jokin toinen Java-versio asennett
 Asenna Maven. Mavenin suhteen ei tarvitse tehdä mitään erikoisia temppuja. Riittää, että siitä on asennettuna tarpeeksi tuore versio.
 
 ## 4. PrinceXML
-Asenna PrinceXML. PrinceXML-kirjastoa käytetään PDF-tiedostojen generointiin. Projektissa on ollut tähän asti käytössä versio [Prince 10](https://www.princexml.com/releases/10/), mutta tuoreimman version käyttämiselle ei välttämättä ole esteitä. Asennuksen tehtyäsi varmista, että tiedoston `amos-backend/src/main/resources/config/application.yml` kohta `prince.exec.path` viittaa hakemistoon, johon PrinceXML on asennettu. Suorita tämän jälkeen seuraava komento:
+Asenna PrinceXML. PrinceXML-kirjastoa käytetään PDF-tiedostojen generointiin. Projektissa on toistaiseksi käytössä versio [Prince 13.5](https://www.princexml.com/releases/13/), mutta tuoreemman version käyttämiselle ei liene esteitä. Mikäli et tee asennusta hakemistoon `/usr/bin/prince`, voit määrittää ohjelman sijainnin käynnistysparametreilla `vars-username.sh`-tiedostoon. Esim:
 ```
-./install-prince.sh
+OIVA_JAVA_OPTS="-Dprince.exec.path=/usr/local/bin/prince"
 ```
 
 ## 5. IDE
