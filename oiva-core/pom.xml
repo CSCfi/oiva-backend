@@ -55,12 +55,6 @@
             </exclusions>
         </dependency>
 
-        <!-- run install-prince.sh to install this dependency locally -->
-        <dependency>
-            <groupId>com.princexml</groupId>
-            <artifactId>prince-java</artifactId>
-            <version>9</version>
-        </dependency>
         <dependency>
             <groupId>com.mitchellbosecke</groupId>
             <artifactId>pebble-spring4</artifactId>
