@@ -354,22 +354,5 @@
                 <module>yva-backend</module>
             </modules>
         </profile>
-        <profile>
-            <id>init-amos</id>
-            <properties>
-                <amos-db>true</amos-db>
-            </properties>
-            <modules>
-                <module>oiva-core</module>
-                <module>oiva-core-model</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>init-yva</id>
-            <modules>
-                <module>oiva-core</module>
-                <module>oiva-core-model</module>
-            </modules>
-        </profile>
     </profiles>
 </project>

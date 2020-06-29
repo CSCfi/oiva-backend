@@ -112,22 +112,21 @@ Suorita seuraava komento projektin juurihakemistossa:
 
 ## 8. Tietokanta
 Projektissa on käytössä [PostgreSQL](https://www.postgresql.org/)-tietokanta, joka pyörii Docker-kontissa, virtuaalikoneiden verkossa. Tietokantaa ei siis tarvitse asentaa omalle koneelle.
-
-### 8.1 Tietokantojen alustaminen
-Sinun ei tarvitse välttämättä suorittaa molempia alla olevista komennoista. Alustaminen toimii, mikäli olet kohdassa [7](#palveluiden-kaeynnistaeminen) käynnistänyt kyseisen puolen pavelut.
-
-#### 8.1.1 Amos
-    $ ./oiva-db.sh amos init
-
-#### 8.1.2 Yva
-    $ ./oiva-db.sh yva init
-
-Populoi tietokannat:
-
-    $ ./oiva-db.sh amos generate --clean --populate
-    $ ./oiva-db.sh yva generate --clean --populate
-
 Tietokannan ajantasaisuudesta vastaa [Flyway](https://flywaydb.org/)-migraatiotyökalu. Sinun ei tarvitse asentaa työkalua.
+
+Manuaalisia tietokantaoperaatioita varten on olemassa `oiva-data.sh`-skripti. Sen avulla on mahdollista tehdä mm. tietokannan palautus ja jooq-entiteettien luonti.
+
+Tietokannan palautus Oivalle ja Kujalle:
+```
+$ ./oiva-db.sh amos restore   ## amos - oiva
+$ ./oiva-db.sh yva restore   ## yva - kuja
+```
+Palautus toimii, mikäli olet kohdassa [7](#palveluiden-kaeynnistaeminen) käynnistänyt kyseisen puolen pavelut.
+
+Jooq-entitettien uudelleengenerointi:
+```
+$ ./oiva-db.sh amos generate
+```
 
 # Läpi käymättä olevat asennusohjeet
 
