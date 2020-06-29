@@ -55,6 +55,7 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -317,6 +318,9 @@ public class MuutospyyntoService {
         final Optional<Muutospyynto> optionalMuutospyynto = findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PAATETTY)
                 .flatMap(uuid_ -> getByUuid(uuid_.toString()));
         return optionalMuutospyynto.map(muutospyynto -> {
+            // TODO: Refactor to use same implementation as lupa preview
+            //       - save maaraykset from top to bottom for correct ids/structure
+
             final Lupatila tila = dsl.fetchOne(LUPATILA, LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS))
                     .into(Lupatila.class);
             final Asiatyyppi asiatyyppi = dsl.fetchOne(ASIATYYPPI, ASIATYYPPI.TUNNISTE.eq(AsiatyyppiValue.MUUTOS))
@@ -375,10 +379,6 @@ public class MuutospyyntoService {
         return this.getByUuid(uuid).flatMap(mp -> {
             withPaatoskierros(mp);
             withOrganization(mp);
-            mp.setMuutokset(mp.getMuutokset().stream()
-                    .map(this::withAll)
-                    .map(Optional::get)
-                    .collect(Collectors.toSet()));
 
             final String[] options = options(Maarays.class, Organisaatio.class, KoodistoKoodi.class);
             Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
@@ -427,9 +427,13 @@ public class MuutospyyntoService {
                 .filter(m -> !removed.contains(m.getId()))
                 .map(m -> {
                     Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
+                    maarays.setKoodistoversio(koodistoService.getLatestKoodistoVersio(maarays.getKoodisto()));
                     maarays.setAliMaaraykset(this.filterOutRemoved(m.getAliMaaraykset(), removed));
+                    maaraysService.withKoodisto(maarays);
                     return maarays;
                 })
+                // Filter out old koodit
+                .filter(maarays -> isCodeValid(maarays.getKoodi()))
                 .collect(Collectors.toList());
     }
 
@@ -441,6 +445,7 @@ public class MuutospyyntoService {
                 .filter(m -> !isPoisto(m))
                 .map(m -> {
                     Maarays maarays = BeanUtils.copyNonNullPropertiesAndReturn(new Maarays(), m);
+                    maarays.setKoodistoversio(koodistoService.getLatestKoodistoVersio(maarays.getKoodisto()));
                     maarays.setId(null);
                     maarays.setUuid(null);
                     maarays.setAliMaaraykset(this.convertToMaaraykset(m.getAliMaaraykset(), maaraykset));
@@ -455,10 +460,22 @@ public class MuutospyyntoService {
                                     ma.getAliMaaraykset().add(maarays);
                                 });
                     }
-
+                    maaraysService.withKoodisto(maarays);
                     return maarays;
                 })
+                // Filter out old koodit
+                .filter(maarays -> isCodeValid(maarays.getKoodi()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks that code is valid by checking no end date exists or it is in future
+     * @param koodi
+     * @return true, if code is valid
+     */
+    final boolean isCodeValid(KoodistoKoodi koodi) {
+        return koodi == null || koodi.getVoimassaLoppuPvm() == null ||
+                LocalDate.now().format(DateTimeFormatter.ISO_DATE).compareTo(koodi.getVoimassaLoppuPvm()) <= 0;
     }
 
     /**
