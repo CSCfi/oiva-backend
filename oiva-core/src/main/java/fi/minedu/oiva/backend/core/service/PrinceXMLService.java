@@ -1,7 +1,6 @@
 package fi.minedu.oiva.backend.core.service;
 
-import com.princexml.Prince;
-import com.princexml.PrinceEvents;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.util.PDFMergerUtility;
 import org.apache.tika.io.IOUtils;
 import org.apache.tika.io.NullOutputStream;
@@ -9,14 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
-
+import java.util.concurrent.atomic.AtomicReference;
 import static fi.minedu.oiva.backend.model.entity.OivaTemplates.AttachmentType;
 import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderLanguage;
 import static fi.minedu.oiva.backend.model.entity.OivaTemplates.RenderOptions;
@@ -32,12 +32,6 @@ public class PrinceXMLService {
     @Value("${prince.exec.path}")
     private String princeExecPath;
 
-    public boolean toPDF(final String html)  {
-        final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
-        if(generatePDF(html, basePDFStream)) return true;
-        return false;
-
-    }
     public boolean toPDF(final String html, final OutputStream output, final RenderOptions options)  {
         final ByteArrayOutputStream basePDFStream = new ByteArrayOutputStream();
         boolean succesfull = generatePDF(html, basePDFStream);
@@ -103,7 +97,7 @@ public class PrinceXMLService {
 
         String errorMsg = "Error using PrinceXML to generate PDF file. Make sure PrinceXML could be run manually: {} --version";
         try {
-            boolean result = getPrinceEngine().convert(IOUtils.toInputStream(html), output);
+            boolean result = convertXmlToPdf(IOUtils.toInputStream(html), output);
             if (result) {
                 return true;
             }
@@ -118,22 +112,50 @@ public class PrinceXMLService {
 
     }
 
-    protected Prince getPrinceEngine() {
-        PrinceEvents princeEvents = (msg1, msg2, msg3) -> {
-            if ("inf".equals(msg1)) {
-                logger.info("Prince data " + msg2 + " --- " + msg3);
-            } else if ("wrn".equals(msg1)) {
-                logger.warn("Prince data " + msg2 + " --- " + msg3);
-            } else if ("err".equals(msg1)) {
-                logger.error("Prince data " + msg2 + " --- " + msg3);
-            } else {
-                logger.error("Prince data Unknown level " + msg1 + " -- " + msg2 + " -- " + msg3);
-            }
-        };
-        return new Prince(princeExecPath, princeEvents);
+    protected boolean healthCheck()  {
+        return generatePDF("<html lang=\"fi\"><title>Health check</title></html>", NullOutputStream.NULL_OUTPUT_STREAM);
     }
 
-    protected boolean healthCheck()  {
-        return generatePDF("<html/>", NullOutputStream.NULL_OUTPUT_STREAM);
+    // Implementation copied and slightly modified from "official" library (methods convert and readMessages)
+    // https://github.com/yeslogic/prince-tools/blob/master/wrappers/java/Prince.java
+    public boolean convertXmlToPdf(InputStream xmlInput, OutputStream pdfOutput) throws IOException {
+        String[] cmdline = new String[]{
+                princeExecPath,
+                "--structured-log=buffered",
+                "--pdf-profile=PDF/UA-1",
+                "--verbose",
+                "-"
+        };
+
+        logger.debug("Running command: {}", StringUtils.join(cmdline, " "));
+        Process process = Runtime.getRuntime().exec(cmdline);
+        OutputStream inputToPrince = process.getOutputStream();
+        InputStream outputFromPrince = process.getInputStream();
+
+        // copy the XML input to Prince stdin
+        IOUtils.copy(xmlInput, inputToPrince);
+        inputToPrince.close();
+
+        // copy the PDF output from Prince stdout
+        IOUtils.copy(outputFromPrince, pdfOutput);
+        outputFromPrince.close();
+
+        // All logs are printed to stderr
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+        AtomicReference<String> lastLine = new AtomicReference<>("");
+        reader.lines().forEach(l -> {
+            if (l.contains("error:")) {
+                logger.error("PrinceXML: {}", l);
+            }
+            else if (l.contains("|err|")) {
+                logger.warn("PrinceXML: {}", l);
+            }
+            else {
+                logger.debug("PrinceXML: {}", l);
+            }
+            lastLine.set(l);
+        });
+
+        return lastLine.get().contains("success");
     }
 }
