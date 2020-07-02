@@ -1,6 +1,8 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
+import com.google.common.collect.Lists;
 import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.TypeRef;
 import fi.minedu.oiva.backend.core.it.BaseIT;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
@@ -26,16 +28,16 @@ public abstract class BaseLocalizationControllerIT extends BaseIT {
 
     @Override
     public void beforeTest() {
+        try {
+            mockLocalizationGetRequests();
+        } catch (IOException e) {
+            throw new RuntimeException("Init failed", e);
+        }
     }
 
     @Test
     public void getLocalizationFi() throws IOException {
         getLocalizations("fi", getExpectations("Testi käännös 1", "Testi käännös 2"));
-    }
-
-    @Test
-    public void getLocalizationEn() throws IOException {
-        getLocalizations("en", getExpectations("Test translation 1", "Test translation 2"));
     }
 
     @Test
@@ -62,7 +64,8 @@ public abstract class BaseLocalizationControllerIT extends BaseIT {
         loginAs("admin", "1.1.1.1111", OivaAccess.Context_Yllapitaja);
         mockLocalizationUpdateRequests(locale, expectations);
         final ResponseEntity<String> response = makeRequest(PUT, "/api/lokalisaatio/tallenna/" + locale, expectations, OK);
-        assertLocalizations(response, expectations);
+        Map<String, String> localizations = jsonPath.parse(response.getBody()).read("$", new TypeRef<Map<String, String>>() {});
+        assertLocalizations(localizations, expectations);
     }
 
     private Map<String, String> getExpectations(String... expectations) {
@@ -74,20 +77,20 @@ public abstract class BaseLocalizationControllerIT extends BaseIT {
     }
 
     private void getLocalizations(final String locale, Map<String, String> expectations) throws IOException {
-        mockLocalizationGetRequest(locale);
-        final ResponseEntity<String> response = makeRequest("/api/lokalisaatio?lang=" + locale, OK);
-        assertLocalizations(response, expectations);
+        final ResponseEntity<String> response = makeRequest("/api/lokalisaatio", OK);
+        Map<String, String> localizations = jsonPath.parse(response.getBody()).read("$." + locale, new TypeRef<Map<String, String>>() {});
+        assertLocalizations(localizations, expectations);
     }
 
-    private void assertLocalizations(ResponseEntity<String> response, Map<String, String> expectations) {
-        final DocumentContext doc = jsonPath.parse(response.getBody());
+    private void assertLocalizations(Map<String, String> response, Map<String, String> expectations) {
+        final DocumentContext doc = jsonPath.parse(response);
         expectations.forEach((key, value) -> {
             assertEquals(value, doc.read("$." + key));
         });
     }
 
     private void mockLocalizationUpdateRequests(String locale, Map<String, String> expectedLocalizations) throws IOException {
-        final MockServerClient mockClient = mockServerRule.getClient().reset();
+        final MockServerClient mockClient = mockServerRule.getClient();
         final StringBuilder json = new StringBuilder("[");
         expectedLocalizations.forEach((key, value) -> {
             json.append("{\"category\":\"oiva\",\"locale\":\"")
@@ -106,13 +109,14 @@ public abstract class BaseLocalizationControllerIT extends BaseIT {
                 .respond(response().withBody(readFileToString("json/localization_" + locale + ".json")));
     }
 
-    private void mockLocalizationGetRequest(String locale) throws IOException {
+    private void mockLocalizationGetRequests() throws IOException {
         final MockServerClient mockClient = mockServerRule.getClient().reset();
-        mockClient.when(request().withMethod("GET")
-                .withPath(localizationUrl)
-                .withQueryStringParameter("category", "oiva")
-                .withQueryStringParameter("locale", locale))
-                .respond(response().withBody(readFileToString("json/localization_" + locale + ".json")));
-
+        for (String kieli : Lists.newArrayList("fi", "sv")) {
+            mockClient.when(request().withMethod("GET")
+                    .withPath(localizationUrl)
+                    .withQueryStringParameter("category", "oiva")
+                    .withQueryStringParameter("locale", kieli))
+                    .respond(response().withBody(readFileToString("json/localization_" + kieli + ".json")));
+        }
     }
 }

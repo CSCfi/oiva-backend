@@ -89,6 +89,7 @@ public class KoodistoService {
      * @param koodisto Koodiston nimi
      * @return Koodiston versionumero
      */
+    @Cacheable(value = "KoodistoService:getLatestKoodistoVersio")
     public Integer getLatestKoodistoVersio(String koodisto) {
         return Optional.ofNullable(getKoodisto(koodisto, null))
                 .map(Koodisto::getVersio)
