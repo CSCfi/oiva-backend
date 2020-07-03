@@ -151,7 +151,10 @@ class OpintopolkuService extends CacheAware {
      */
     def getMaakuntaKunnat: java.util.List[Maakunta] =
         for (maakunta <- request(koodistoServiceUrl + maakuntaKoodiPath, classOf[Array[Maakunta]]).toList) yield {
-            maakunta.setKunta(request(koodistoServiceUrl + relaatioYlakoodiPath + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]]))
+            // Result contains codes from all versions containing multiple duplicates
+            val kunnat = request(koodistoServiceUrl + relaatioYlakoodiPath + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]])
+            // Keep only newest ones
+            maakunta.setKunta(kunnat.groupBy(_.koodiArvo).values.map(_.maxBy(_.versio)).toArray)
             maakunta
         }
 
