@@ -9,11 +9,12 @@ import scala.beans.BeanProperty
 @JsonInclude(Include.NON_NULL)
 case class Kunta(
     @BeanProperty var koodiArvo: String,
+    @BeanProperty var versio: Integer,
     @BeanProperty var metadata: Array[Metadata],
     @BeanProperty var tila: String,
     @BeanProperty var voimassaAlkuPvm: String,
     @BeanProperty var voimassaLoppuPvm: String,
     @BeanProperty var jarjestaja: Array[Jarjestaja]) {
 
-    def this() = this(null, null, null, null, null, null)
+    def this() = this(null, null, null, null, null, null, null)
 }
