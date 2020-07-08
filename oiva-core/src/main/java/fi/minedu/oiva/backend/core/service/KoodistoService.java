@@ -125,7 +125,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
     public List<Maakunta> getMaakuntaKunnat() {
-        return opintopolkuService.getMaakuntaKunnat();
+        return opintopolkuService.getMaakuntaKunnat(getLatestKoodistoVersio("kunta"));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutustoimijat", key = "''")
@@ -135,7 +135,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getMaakuntaJarjestajat", key = "''")
     public List<Maakunta> getMaakuntaJarjestajat() {
-        return opintopolkuService.getMaakuntaJarjestajat();
+        return opintopolkuService.getMaakuntaJarjestajat(getLatestKoodistoVersio("kunta"));
     }
 
     @Cacheable(value = "KoodistoService:getKunta")
