@@ -37,7 +37,7 @@ public class KoodistoService {
         this.opintopolkuService = opintopolkuService;
     }
 
-    private List<String> getAmmatillinenKoulutustyyppiArvot() {
+    public List<String> getAmmatillinenKoulutustyyppiArvot() {
         return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
     }
 
