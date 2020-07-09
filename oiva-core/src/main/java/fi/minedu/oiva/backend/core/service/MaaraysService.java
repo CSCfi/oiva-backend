@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,7 +56,8 @@ public class MaaraysService extends BaseService {
                           MaaraystyyppiService maaraystyyppiService,
                           OpintopolkuService opintopolkuService,
                           @Lazy LupaService lupaService,
-                          OrganisaatioService organisaatioService, KoodistoService koodistoService) {
+                          OrganisaatioService organisaatioService,
+                          KoodistoService koodistoService) {
         this.dsl = dsl;
         this.kohdeService = kohdeService;
         this.maaraystyyppiService = maaraystyyppiService;
@@ -138,11 +140,12 @@ public class MaaraysService extends BaseService {
                     // only oiva uses koulutus koodisto
                     if (koodi.isKoodisto("koulutus")) {
                         final String koodiArvo = koodi.koodiArvo();
+                        final List<String> ammatillinenKoulutustyyppiArvot = koodistoService.getAmmatillinenKoulutustyyppiArvot();
                         opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo)
                                 .map(Stream::of).orElse(Stream.empty())
                                 .flatMap(Collection::stream)
                                 // Keep only codes we are interested in
-                                .filter(tyyppi -> koodistoService.getAmmatillinenKoulutustyyppiArvot().contains(tyyppi.getKoodiArvo()))
+                                .filter(tyyppi -> ammatillinenKoulutustyyppiArvot.contains(tyyppi.getKoodiArvo()))
                                 .forEach(m::addYlaKoodi);
                         opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(m::addYlaKoodi);
                     }
