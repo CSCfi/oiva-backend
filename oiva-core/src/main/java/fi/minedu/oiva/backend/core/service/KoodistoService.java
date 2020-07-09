@@ -29,16 +29,16 @@ public class KoodistoService {
 
     private final OpintopolkuService opintopolkuService;
 
-    @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
-    private String ammatillinenKoulutustyyppiKoodiArvot;
+    @Value("#{'${koulutustyyppi.ammatillinen.koodiarvot:}'.split(',')}")
+    private List<String> ammatillinenKoulutustyyppiKoodiArvot;
 
     @Autowired
     public KoodistoService(OpintopolkuService opintopolkuService) {
         this.opintopolkuService = opintopolkuService;
     }
 
-    private List<String> getAmmatillinenKoulutustyyppiArvot() {
-        return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
+    public List<String> getAmmatillinenKoulutustyyppiArvot() {
+        return ammatillinenKoulutustyyppiKoodiArvot;
     }
 
     @Value("${tutkintotyyppi.ammatillinen.koodiarvot}")
@@ -89,6 +89,7 @@ public class KoodistoService {
      * @param koodisto Koodiston nimi
      * @return Koodiston versionumero
      */
+    @Cacheable(value = "KoodistoService:getLatestKoodistoVersio")
     public Integer getLatestKoodistoVersio(String koodisto) {
         return Optional.ofNullable(getKoodisto(koodisto, null))
                 .map(Koodisto::getVersio)
@@ -124,7 +125,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getMaakuntaKunnat", key = "''")
     public List<Maakunta> getMaakuntaKunnat() {
-        return opintopolkuService.getMaakuntaKunnat();
+        return opintopolkuService.getMaakuntaKunnat(getLatestKoodistoVersio("kunta"));
     }
 
     @Cacheable(value = "KoodistoService:getKoulutustoimijat", key = "''")
@@ -134,7 +135,7 @@ public class KoodistoService {
 
     @Cacheable(value = "KoodistoService:getMaakuntaJarjestajat", key = "''")
     public List<Maakunta> getMaakuntaJarjestajat() {
-        return opintopolkuService.getMaakuntaJarjestajat();
+        return opintopolkuService.getMaakuntaJarjestajat(getLatestKoodistoVersio("kunta"));
     }
 
     @Cacheable(value = "KoodistoService:getKunta")

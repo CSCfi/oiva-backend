@@ -1,5 +1,7 @@
 package fi.minedu.oiva.backend.core.service
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Optional
 import java.util.concurrent.CompletionStage
 
@@ -149,9 +151,14 @@ class OpintopolkuService extends CacheAware {
     /**
      * Hakee ja palauttaa maakunnat ja maakuntaan kuuluvat kaikki kunnat
      */
-    def getMaakuntaKunnat: java.util.List[Maakunta] =
+    def getMaakuntaKunnat(kuntakoodistoversio: Integer): java.util.List[Maakunta] =
         for (maakunta <- request(koodistoServiceUrl + maakuntaKoodiPath, classOf[Array[Maakunta]]).toList) yield {
-            maakunta.setKunta(request(koodistoServiceUrl + relaatioYlakoodiPath + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]]))
+            val now = LocalDate.now.format(DateTimeFormatter.ISO_DATE)
+            // Result contains codes from all versions containing multiple duplicates
+            val kunnat = request(koodistoServiceUrl + relaatioYlakoodiPath + maakuntaKoodiUri(maakunta.koodiArvo), classOf[Array[Kunta]])
+              .filter(_.versio == kuntakoodistoversio)
+              .filter(k => k.getVoimassaLoppuPvm == null || now.compareTo(k.getVoimassaLoppuPvm) <= 0)
+            maakunta.setKunta(kunnat)
             maakunta
         }
 
@@ -164,12 +171,12 @@ class OpintopolkuService extends CacheAware {
     /**
      * Muodostaa maakunta-jarjestajat tietueet
      */
-    def getMaakuntaJarjestajat: java.util.List[Maakunta] = {
+    def getMaakuntaJarjestajat(kuntakoodistoversio: Integer): java.util.List[Maakunta] = {
         val koulutustoimijat = getKoulutustoimijat
-        for(maakunta <- getMaakuntaKunnat) yield {
+        for(maakunta <- getMaakuntaKunnat(kuntakoodistoversio)) yield {
             maakunta.setKunta(for(kunta <- maakunta.getKunnat) yield {
                 val jarjestajat = for(koulutustoimija <- koulutustoimijat if koulutustoimija.isKunta(kunta)) yield Jarjestaja(koulutustoimija)
-                if(!jarjestajat.isEmpty) kunta.setJarjestaja(jarjestajat.toArray)
+                if(jarjestajat.nonEmpty) kunta.setJarjestaja(jarjestajat.toArray)
                 kunta
             })
             maakunta

@@ -1,11 +1,13 @@
 package fi.minedu.oiva.backend.core.service;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import fi.minedu.oiva.backend.model.jooq.Tables;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
@@ -18,9 +20,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.internal.matchers.VarargMatcher;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,6 +48,7 @@ import static org.mockito.Matchers.anyMap;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
@@ -460,13 +466,76 @@ public class MuutospyyntoServiceTest {
         maaraysList.add(maarays);
 
         final Collection<Maarays> result = service.convertToMaaraykset(muutosList, maaraysList);
-        assertEquals("Maarays count should match", 1, result.size());
+        assertEquals("Count should be 0 because muutos is alimaarays to existing maarays", 0, result.size());
+        assertEquals("Existing maarays should have 1 alimaarays created from muutos", 1, maarays.getAliMaaraykset().size());
         final Optional<Maarays> first = maaraysList.stream().findFirst();
         assertEquals("Alimaarays count should match", Integer.valueOf(1), first.map(m -> m.getAliMaaraykset().size()).orElse(0));
         final Optional<Maarays> firstAli = first.flatMap(m -> m.getAliMaaraykset().stream().findFirst());
         assertTrue("There should be alimaarays", firstAli.isPresent());
         assertEquals("Alimaarays should have right koodisto", "kieli", firstAli.get().getKoodisto());
         assertEquals("Alimaarays should have right koodiarvo", "en", firstAli.get().getKoodiarvo());
+    }
+
+    @Test
+    public void testFilterOldMaaraykset() {
+        Maarays maarays = new Maarays();
+        Collection<Maarays> maaraykset = service.filterOutRemoved(Lists.newArrayList(maarays), Lists.newLinkedList());
+
+        // ### Case no koodisto nor koodiarvo => no filtering ###
+        assertEquals(1, maaraykset.size());
+
+        // Set loppupvm to yesterday
+        final KoodistoKoodi koodistoKoodi = new KoodistoKoodi();
+        koodistoKoodi.setVoimassaLoppuPvm(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
+
+        doAnswer((Answer<Void>) invocation -> {
+            Maarays m = (Maarays) invocation.getArguments()[0];
+            m.setKoodi(koodistoKoodi);
+            return null;
+        }).when(maaraysService).withKoodisto(any(Maarays.class));
+        maarays.setKoodisto("old");
+        maarays.setKoodiarvo("1");
+
+        maaraykset = service.filterOutRemoved(Lists.newArrayList(maarays), Lists.newLinkedList());
+
+        // ### Case old koodisto => filtered ###
+        assertEquals("Old koodi should be filtered out", 0, maaraykset.size());
+
+        // ### Case today valid koodisto => no filtering ###
+        koodistoKoodi.setVoimassaLoppuPvm(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+        maaraykset = service.filterOutRemoved(Lists.newArrayList(maarays), Lists.newLinkedList());
+        assertEquals(1, maaraykset.size());
+    }
+
+    @Test
+    public void testFilterOldMuutokset() {
+        Muutos muutos = new Muutos();
+        Collection<Maarays> maaraykset = service.convertToMaaraykset(Lists.newArrayList(muutos), Lists.newLinkedList());
+
+        // ### Case no koodisto nor koodiarvo => no filtering ###
+        assertEquals(1, maaraykset.size());
+
+        // Set loppupvm to yesterday
+        final KoodistoKoodi koodistoKoodi = new KoodistoKoodi();
+        koodistoKoodi.setVoimassaLoppuPvm(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
+
+        doAnswer((Answer<Void>) invocation -> {
+            Maarays m = (Maarays) invocation.getArguments()[0];
+            m.setKoodi(koodistoKoodi);
+            return null;
+        }).when(maaraysService).withKoodisto(any(Maarays.class));
+        muutos.setKoodisto("old");
+        muutos.setKoodiarvo("1");
+
+        maaraykset = service.convertToMaaraykset(Lists.newArrayList(muutos), Lists.newLinkedList());
+
+        // ### Case old koodisto => filtered ###
+        assertEquals("Old koodi should be filtered out", 0, maaraykset.size());
+
+        // ### Case today valid koodisto => no filtering ###
+        koodistoKoodi.setVoimassaLoppuPvm(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+        maaraykset = service.convertToMaaraykset(Lists.newArrayList(muutos), Lists.newLinkedList());
+        assertEquals(1, maaraykset.size());
     }
 
     private Muutospyynto generateMuutospyynto() {

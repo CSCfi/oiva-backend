@@ -18,11 +18,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static fi.minedu.oiva.backend.model.jooq.Tables.KOHDE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA;
@@ -47,18 +49,22 @@ public class MaaraysService extends BaseService {
 
     private final OrganisaatioService organisaatioService;
 
+    private final KoodistoService koodistoService;
+
     @Autowired
     public MaaraysService(DSLContext dsl, KohdeService kohdeService,
                           MaaraystyyppiService maaraystyyppiService,
                           OpintopolkuService opintopolkuService,
                           @Lazy LupaService lupaService,
-                          OrganisaatioService organisaatioService) {
+                          OrganisaatioService organisaatioService,
+                          KoodistoService koodistoService) {
         this.dsl = dsl;
         this.kohdeService = kohdeService;
         this.maaraystyyppiService = maaraystyyppiService;
         this.opintopolkuService = opintopolkuService;
         this.lupaService = lupaService;
         this.organisaatioService = organisaatioService;
+        this.koodistoService = koodistoService;
     }
 
     protected SelectJoinStep baseMaaraysQuery() {
@@ -131,10 +137,16 @@ public class MaaraysService extends BaseService {
             if (m.hasKoodistoAndKoodiArvo()) {
                 getKoodi.apply(m).ifPresent(koodi -> {
                     m.setKoodi(koodi);
+                    // only oiva uses koulutus koodisto
                     if (koodi.isKoodisto("koulutus")) {
                         final String koodiArvo = koodi.koodiArvo();
+                        final List<String> ammatillinenKoulutustyyppiArvot = koodistoService.getAmmatillinenKoulutustyyppiArvot();
                         opintopolkuService.getKoulutustyyppiKoodiForKoulutus(koodiArvo)
-                                .ifPresent(koulutustyyppiKoodit -> koulutustyyppiKoodit.forEach(m::addYlaKoodi));
+                                .map(Stream::of).orElse(Stream.empty())
+                                .flatMap(Collection::stream)
+                                // Keep only codes we are interested in
+                                .filter(tyyppi -> ammatillinenKoulutustyyppiArvot.contains(tyyppi.getKoodiArvo()))
+                                .forEach(m::addYlaKoodi);
                         opintopolkuService.getKoulutusalaKoodiForKoulutus(koodiArvo).ifPresent(m::addYlaKoodi);
                     }
                 });
