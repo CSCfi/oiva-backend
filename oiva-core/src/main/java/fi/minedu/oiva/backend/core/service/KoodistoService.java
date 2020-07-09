@@ -29,8 +29,8 @@ public class KoodistoService {
 
     private final OpintopolkuService opintopolkuService;
 
-    @Value("${koulutustyyppi.ammatillinen.koodiarvot}")
-    private String ammatillinenKoulutustyyppiKoodiArvot;
+    @Value("#{'${koulutustyyppi.ammatillinen.koodiarvot:}'.split(',')}")
+    private List<String> ammatillinenKoulutustyyppiKoodiArvot;
 
     @Autowired
     public KoodistoService(OpintopolkuService opintopolkuService) {
@@ -38,7 +38,7 @@ public class KoodistoService {
     }
 
     public List<String> getAmmatillinenKoulutustyyppiArvot() {
-        return StringUtils.isNotBlank(ammatillinenKoulutustyyppiKoodiArvot) ? Arrays.asList(StringUtils.split(ammatillinenKoulutustyyppiKoodiArvot, ",")) : Collections.emptyList();
+        return ammatillinenKoulutustyyppiKoodiArvot;
     }
 
     @Value("${tutkintotyyppi.ammatillinen.koodiarvot}")
