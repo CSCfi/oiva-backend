@@ -130,9 +130,13 @@ public class MaaraysService extends BaseService {
     }
 
     protected void withKoodisto(final Maarays maarays) {
+        withKoodisto(maarays, true);
+    }
+
+    protected void withKoodisto(final Maarays maarays, final Boolean useKoodistoVersion) {
         final Function<Maarays, Optional<KoodistoKoodi>> getKoodi = m ->
                 Optional.ofNullable(opintopolkuService.getKoodi(m.getKoodisto(), m.getKoodiarvo(),
-                        m.getKoodistoversio()));
+                        useKoodistoVersion ? m.getKoodistoversio() : null));
         Optional.ofNullable(maarays).ifPresent(m -> {
             if (m.hasKoodistoAndKoodiArvo()) {
                 getKoodi.apply(m).ifPresent(koodi -> {
