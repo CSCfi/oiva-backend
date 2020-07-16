@@ -37,7 +37,7 @@ opintopolku:
 
 koulutustyyppi:
   ammatillinen:
-    koodiarvot: 1,11,12
+    koodiarvot: 1,5,11,12,18,19
 
 tutkintotyyppi:
   ammatillinen:
