@@ -63,9 +63,6 @@ logging:
         org.springframework.security.web.util.matcher: ERROR
         org.springframework.security.cas.web.CasAuthenticationFilter: ERROR
 
-koulutustyyppi:
-    ammatillinen.koodiarvot: 1,11,12
-
 api:
     basicauth:
         username: kuja
