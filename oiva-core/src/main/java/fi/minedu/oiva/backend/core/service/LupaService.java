@@ -163,17 +163,21 @@ public class LupaService extends BaseService {
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
-        return getByYtunnus(ytunnus, null, null, withOptions);
+        return getByYtunnus(ytunnus, null, null, true, withOptions );
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, String koulutustyyppi, String oppilaitostyyppi,
-                                       final String[] withOptions) {
+    public Optional<Lupa> getByYtunnus(final String ytunnus, final Boolean useKoodistoVersions, final String[] withOptions) {
+        return getByYtunnus(ytunnus, null, null, useKoodistoVersions, withOptions);
+    }
+
+    public Optional<Lupa> getByYtunnus(final String ytunnus, final String koulutustyyppi, final String oppilaitostyyppi,
+                                       final Boolean useKoodistoVersions, final String[] withOptions) {
         final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
         Optional.ofNullable(koulutustyyppi).ifPresent(tyyppi -> query.and(LUPA.KOULUTUSTYYPPI.eq(tyyppi)));
         Optional.ofNullable(oppilaitostyyppi).ifPresent(tyyppi -> query.and(LUPA.OPPILAITOSTYYPPI.eq(tyyppi)));
-        return get(query, withOptions);
+        return get(query, useKoodistoVersions, withOptions);
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
@@ -182,10 +186,19 @@ public class LupaService extends BaseService {
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
         baseLupaFilter().ifPresent(query::and);
-        return entity(query.fetchOne(), withOptions);
+        return entity(query.fetchOne(), true, withOptions);
+    }
+
+    protected Optional<Lupa> get(final SelectConditionStep<Record> query, final Boolean useKoodistoVersions, final String... withOptions) {
+        baseLupaFilter().ifPresent(query::and);
+        return entity(query.fetchOne(), useKoodistoVersions, withOptions);
     }
 
     protected Optional<Lupa> entity(final Record record, final String... with) {
+        return entity(record, true, with);
+    }
+
+    protected Optional<Lupa> entity(final Record record, final Boolean useKoodistoVersions, final String... with) {
         if (null != record) {
             final Lupa lupa = record.into(Lupa.class);
             paatoskierrosService.forLupa(lupa).ifPresent(paatoskierros -> {
@@ -194,15 +207,19 @@ public class LupaService extends BaseService {
             });
             asiatyyppiService.forLupa(lupa).ifPresent(lupa::setAsiatyyppi);
             lupatilaService.forLupa(lupa).ifPresent(lupa::setLupatila);
-            return with(Optional.of(lupa), with);
+            return with(Optional.of(lupa), useKoodistoVersions, with);
         }
         return Optional.empty();
     }
 
     protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final String... with) {
+        return with(lupaOpt, true, with);
+    }
+
+    protected Optional<Lupa> with(final Optional<Lupa> lupaOpt, final Boolean useKoodistoVersions, final String... with) {
         if (withOption(Organisaatio.class, with)) withOrganization(lupaOpt);
         if (withOption(Maarays.class, with)) withMaaraykset(lupaOpt, with);
-        if (withOption(KoodistoKoodi.class, with)) withKoodisto(lupaOpt);
+        if (withOption(KoodistoKoodi.class, with)) withKoodisto(lupaOpt, useKoodistoVersions);
         return lupaOpt;
     }
 
@@ -214,9 +231,9 @@ public class LupaService extends BaseService {
         lupaOpt.ifPresent(lupa -> lupa.setMaaraykset(maaraysService.getByLupa(lupa.getId(), with)));
     }
 
-    protected void withKoodisto(final Optional<Lupa> lupaOpt) {
+    protected void withKoodisto(final Optional<Lupa> lupaOpt, final Boolean useKoodistoVersions) {
         lupaOpt.ifPresent(lupa -> {
-            if (null != lupa.maaraykset()) lupa.maaraykset().forEach(maaraysService::withKoodisto);
+            if (null != lupa.maaraykset()) lupa.maaraykset().forEach(m -> maaraysService.withKoodisto(m, useKoodistoVersions));
         });
     }
 

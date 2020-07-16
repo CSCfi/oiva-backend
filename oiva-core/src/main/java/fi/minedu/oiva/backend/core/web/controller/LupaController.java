@@ -72,8 +72,10 @@ public class LupaController {
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}")
     @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus, final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.getByYtunnus(ytunnus, options(with))));
+    public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus,
+                                                            final @RequestParam(value = "with", required = false) String with,
+                                                            final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, useKoodistoVersions, options(with))));
     }
 
     @OivaAccess_Public
@@ -82,8 +84,9 @@ public class LupaController {
     public CompletableFuture<HttpEntity<Lupa>> getByYtunnusAndKoulutustyyppi(final @PathVariable String ytunnus,
                                                                              @PathVariable String koulutustyyppi,
                                                                              @PathVariable String oppilaitostyyppi,
-                                                                             final @RequestParam(value = "with", required = false) String with) {
-        return getOr404(async(() -> service.getByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, options(with))));
+                                                                             final @RequestParam(value = "with", required = false) String with,
+                                                                             final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, useKoodistoVersions, options(with))));
     }
 
     @OivaAccess_Public
