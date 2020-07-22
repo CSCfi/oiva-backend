@@ -235,10 +235,6 @@ public class Muutospyynto implements Serializable {
         this.meta = meta;
     }
 
-    public String getUuidString() {
-        return getUuid() != null ? getUuid().toString() : null;
-    }
-
     @NotNull
     @Size(max = 10)
     public String getAlkupera() {

@@ -643,12 +643,13 @@ public class MuutospyyntoService {
 
     // VALIDOINNIT
     protected final void assertValidMuutospyynto(Muutospyynto muutospyynto) {
+        String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                !duplicateAsianumeroExists(muutospyynto.getUuidString(), muutospyynto.getAsianumero()) &&
+                !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) &&
                 validAsianumero(muutospyynto.getAsianumero());
 
         if (!isValid) {
