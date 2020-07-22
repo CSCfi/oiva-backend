@@ -34,7 +34,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Produces;
-import java.io.ByteArrayOutputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -247,6 +246,12 @@ public class MuutospyyntoController {
             logger.error("Failed to generate muutospyynto lupa pdf with uuid {}", uuid, e);
             response.setStatus(get500().getStatusCode().value());
         }
+    }
+
+    @ApiOperation(notes = "Tarkistaa onko järjestelmässä muutospyynnölle syötetty asianumero", value = "")
+    @RequestMapping(method = POST, value = "/duplikaattiasianumero")
+    public Boolean duplicateAsianumeroExists(@RequestPart(value = "uuid", required = false) String uuid, @RequestPart(value = "asianumero") String asianumero) {
+        return muutospyyntoService.duplicateAsianumeroExists(uuid, asianumero);
     }
 
     /*
