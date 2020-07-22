@@ -40,6 +40,7 @@ import java.util.UUID;
 import static fi.minedu.oiva.backend.core.service.MuutospyyntoService.Muutospyyntotila;
 import static fi.minedu.oiva.backend.model.jooq.Tables.MUUTOSPYYNTO;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
@@ -536,6 +537,36 @@ public class MuutospyyntoServiceTest {
         koodistoKoodi.setVoimassaLoppuPvm(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         maaraykset = service.convertToMaaraykset(Lists.newArrayList(muutos), Lists.newLinkedList());
         assertEquals(1, maaraykset.size());
+    }
+
+    @Test
+    public void testValidAsianumero() {
+        assertFalse(service.validAsianumero("VN/1234/123"));
+        assertFalse(service.validAsianumero("VN/1456/1234T"));
+        assertFalse(service.validAsianumero("VN//1234"));
+        assertFalse(service.validAsianumero("VN/1234567/1234"));
+        assertFalse(service.validAsianumero("VL/1234/1234"));
+        assertTrue(service.validAsianumero("VN/1/1234"));
+        assertTrue(service.validAsianumero("VN/123456/1234"));
+        assertTrue(service.validAsianumero("VN/1234/1234"));
+    }
+
+    @Test
+    public void testDuplicateAsianumeroExists() {
+        Muutospyynto muutospyynto = new Muutospyynto();
+        muutospyynto.setUuid(UUID.fromString("163d370c-cc1a-11ea-87d0-0242ac130003"));
+
+        doReturn(Optional.of(muutospyynto)).when(service).getByAsianumero("1234");
+        doReturn(Optional.empty()).when(service).getByAsianumero("DoesNotExist");
+
+        // Muutospyynto found UUIDs match
+        assertFalse(service.duplicateAsianumeroExists("163d370c-cc1a-11ea-87d0-0242ac130003", "1234"));
+        // Muutospyynto found UUIDs do not match
+        assertTrue(service.duplicateAsianumeroExists("d50b1a45-96ab-44b5-bba4-7eadcde0c0da", "1234"));
+        // Muutospyynto found while creating new Muutospyynto (UUID null)
+        assertTrue(service.duplicateAsianumeroExists(null, "1234"));
+        // Muutospyynto not found by asianumero
+        assertFalse(service.duplicateAsianumeroExists(null, "DoesNotExist"));
     }
 
     private Muutospyynto generateMuutospyynto() {

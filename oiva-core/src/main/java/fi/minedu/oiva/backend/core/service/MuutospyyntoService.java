@@ -663,7 +663,7 @@ public class MuutospyyntoService {
         }
     }
 
-    private boolean validAsianumero(String asianumero) {
+    protected boolean validAsianumero(String asianumero) {
         return asianumero.matches("^VN/[0-9]{1,6}/[0-9]{4}$");
     }
 
