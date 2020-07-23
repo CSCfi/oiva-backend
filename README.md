@@ -12,38 +12,47 @@
 
 # Buildaus- ja kehitysympäristön asentaminen
 
-Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista saada projekti nopeastikin käyntiin, mutta älä lannistu, jos koet vastoinkäymisiä asennuksia tehdessäsi. Ohjeita päivitetään tarpeen vaatiessa, mutta toisinaan paras apu kipakka, kehittäjien suunnattu, kysymys.
+Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista saada projekti nopeastikin käyntiin. Älä kuitenkaan lannistu, jos koet vastoinkäymisiä asennuksia tehdessäsi. Toisinaan paras apu on kipakka kehittäjille suunnattu kysymys. Vastauksen saatuasi voit täydentää ohjeiden puutteita.
 
 - [Buildaus- ja kehitysympäristön asentaminen](#Buildaus--ja-kehitysymp%C3%A4rist%C3%B6n-asentaminen)
+  - [Pikaohje](#pikaohje)
   - [Alkuvalmistelut](#Alkuvalmistelut)
-  - [1. Docker](#1-Docker)
-  - [2. Java](#2-Java)
-  - [3. Maven](#3-Maven)
-  - [4. PrinceXML](#4-PrinceXML)
-  - [5. IDE](#5-IDE)
-  - [6. Projektin kääntäminen](#6-Projektin-k%C3%A4%C3%A4nt%C3%A4minen)
-  - [6.1 Huomioita](#61-Huomioita)
-  - [7. Palveluiden käynnistäminen](#7-Palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.1 Oiva-puolen palveluiden käynnistäminen](#71-Oiva-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.2 Kuja-puolen palveluiden käynnistäminen](#72-Kuja-puolen-palveluiden-k%C3%A4ynnist%C3%A4minen)
-    - [7.3 Huomioita](#73-Huomioita)
-  - [8. Tietokanta](#8-Tietokanta)
-    - [8.1 Tietokantojen alustaminen](#81-Tietokantojen-alustaminen)
-      - [8.1.1 Amos](#811-Amos)
-      - [8.1.2 Yva](#812-Yva)
-- [Läpi käymättä olevat asennusohjeet](#L%C3%A4pi-k%C3%A4ym%C3%A4tt%C3%A4-olevat-asennusohjeet)
-  - [Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi](#Flyway-migraatioiden-ajaminen-Mavenilla-ja-JOOQ-tietokantaluokkien-generointi)
-  - [Tietokannan puhdistus ja populointi Maven SQL pluginilla](#Tietokannan-puhdistus-ja-populointi-Maven-SQL-pluginilla)
-      - [Pudota flyway-migraatiokanta ja sovelluksen skeemat](#Pudota-flyway-migraatiokanta-ja-sovelluksen-skeemat)
-      - [Entityjen luominen](#Entityjen-luominen)
-      - [Populoi tietokanta alustavalla datasetillä](#Populoi-tietokanta-alustavalla-datasetill%C3%A4)
-  - [Aja kehitysversiota lokaali-Mavenilla](#Aja-kehitysversiota-lokaali-Mavenilla)
-  - [PDF-exportin konfiguroiminen [TODO: UPDATE]](#PDF-exportin-konfiguroiminen-TODO-UPDATE)
-  - [Sananen konfiguraatiosta](#Sananen-konfiguraatiosta)
-  - [Testit](#Testit)
+    - [1. Docker](#1-Docker)
+    - [2. Java](#2-Java)
+    - [3. Maven](#3-Maven)
+    - [4. PrinceXML](#4-PrinceXML)
+    - [5. IDE](#5-IDE)
+    - [6. Projektin kääntäminen](#6-Projektin-k%C3%A4%C3%A4nt%C3%A4minen)
+        - [6.1 Huomioita](#61-Huomioita)
+    - [7. Tietokanta](#7-Tietokanta)
+    - [8. Palveluiden käynnistäminen](#8-Palveluiden-k%C3%A4ynnist%C3%A4minen)
+        - [8.1 Docker-palvelut](#81-Docker-palvelut)
+        - [8.2 Sovelluspalvelin](#82-Sovelluspalvelin)
+        - [8.3 Huomioita](#83-Huomioita)
+- [Lisätietoa ja tarkempia kuvauksia](#lisätietoa-ja-tarkempia-kuvauksia)
+  - [Debuggaus](#debuggaus)
+  - [Apuskriptit](#apuskriptit)
+  - [Testien ajaminen](#testien-ajaminen)
+      - [Yksikkötestit](#yksikkötestit)
+      - [Integraatiotestit](#integraatiotestit)
+  - [Pebblen ja PrinceXML:n käyttö](#pebblen-ja-princexmln-käyttö)
   - [Debug ja JRebel](#Debug-ja-JRebel)
+  - [Sananen konfiguraatiosta](#Sananen-konfiguraatiosta)
   - [Paketointi serveriympäristöihin](#Paketointi-serveriymp%C3%A4rist%C3%B6ihin)
   - [Serverillä manuaalinen backendin käynnistys stagingissa:](#Serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
+
+## Pikaohje
+Amos = Oiva, Yva = Kuja
+
+Ohjeet Oiva-palvelun käynnistykseen tilanteessa, jossa kaikki tarvittavat riippuvuuudet on asennettu ja tietokanta importattu jo aikaisemmin:
+* Docker-konttien käynnistys: `./oiva-docker.sh start --amos`
+* Koodien kääntäminen: `mvn clean install`
+* Sovelluspalvelimen käynnistys: `./oiva-backend.sh amos -c`
+* Käyttöliittymäkoodit: oiva-frontend-repositoryn juuressa `npm install && npm start`
+
+Oiva-palvelu vastaa osoitteesta https://localhost
+
+Kuja-palvelu vastaa osoitteesta https://localhost:4433
 
 ## Alkuvalmistelut
 
@@ -58,16 +67,20 @@ Mikäli käytät VS Code:a, kannattaa siihen asentaa hyödyllisiä lisäosia, ku
 * Markdown All in One.
 
 ## 1. Docker
-Asenna Docker. Dockeria käytetään virtuaalikoneiden verkon luontiin. Verkon myötä kehittäjillä on käytössään yhtenevä kehitysympäristö. Tässä vaiheessa riittää, että saat Dockerin asennettua. Sen käyttöön palataan näissä ohjeissa myöhemmin.
+Asenna [Docker](https://www.docker.com/get-started). Dockeria käytetään virtuaalikoneiden verkon luontiin. Verkon myötä kehittäjillä on käytössään yhtenevä kehitysympäristö. Tässä vaiheessa riittää, että saat Dockerin asennettua. Sen käyttöön palataan näissä ohjeissa myöhemmin.
+
+Asenna myös [docker-machine](https://docs.docker.com/machine/install-machine/). Sitä tarvitaan integraatiotestien ajoon.
 
 ## 2. Java
-Asenna Java. Mikäli sinulla on jo ennestään jokin toinen Java-versio asennettuna ja käytät Mac:ia, voit hallinnoida versioasennuksia [Jenv](http://www.jenv.be/):llä.
+Asenna Java 8. Mikäli sinulla on jo ennestään jokin toinen Java-versio asennettuna ja käytät Mac:ia, voit hallinnoida versioasennuksia [Jenv](http://www.jenv.be/):llä.
 
 ## 3. Maven
-Asenna Maven. Mavenin suhteen ei tarvitse tehdä mitään erikoisia temppuja. Riittää, että siitä on asennettuna tarpeeksi tuore versio.
+Asenna Maven. Mavenin suhteen ei tarvitse tehdä mitään erikoisia temppuja. Riittää, että siitä on asennettuna tarpeeksi tuore versio esim. >= 3.6
 
 ## 4. PrinceXML
-Asenna PrinceXML. PrinceXML-kirjastoa käytetään PDF-tiedostojen generointiin. Projektissa on toistaiseksi käytössä versio [Prince 13.5](https://www.princexml.com/releases/13/), mutta tuoreemman version käyttämiselle ei liene esteitä. Mikäli et tee asennusta hakemistoon `/usr/bin/prince`, voit määrittää ohjelman sijainnin käynnistysparametreilla `vars-username.sh`-tiedostoon. Esim:
+Asenna PrinceXML. PrinceXML-kirjastoa käytetään PDF-tiedostojen generointiin. Projektissa on toistaiseksi käytössä versio [Prince 13.5](https://www.princexml.com/releases/13/), mutta tuoreemman version käyttämiselle ei liene esteitä.
+
+Mikäli et tee asennusta hakemistoon `/usr/bin/prince`, voit määrittää ohjelman sijainnin käynnistysparametreilla `vars-username.sh`-tiedostoon. Tarkempi kuvaus vars-tiedostosta on kohdassa [8.2 Sovelluspalvelin](#82-Sovelluspalvelin). Esim:
 ```
 OIVA_JAVA_OPTS="-Dprince.exec.path=/usr/local/bin/prince"
 ```
@@ -83,175 +96,158 @@ mvn clean install
 
 ## 6.1 Huomioita
 
-* Sovellusta käännettäessä täytyy konfiguraatioiden olla halutun profiilin mukaisessa, `application.yml` tai `application-dev.yml`, tiedostossa. Muuten konfiguraatiot luetaan projektin sisältä.
 * Pakettiin mukaan tuleviin resursseihin voi vaikuttaa käyttämällä joko Maven-profiilia -P dev tai -P prod. Oletusasetus on -P dev.
 * Kun backendiin tehdään muutoksia, joudut todennäköisesti rakentamaan paketit uudestaan ja tyhjentämään Redisin
 ````
 mvn clean install
-docker exec -it oiva-backend_amos-redis_1 redis-cli (avaa promptin)
-FLUSHALL
+docker exec oiva-backend_amos-redis_1 bash -c "redis-cli FLUSHALL"
 ````
 
-## 7. Palveluiden käynnistäminen
-Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
-
-### 7.1 Oiva-puolen palveluiden käynnistäminen
-Suorita seuraava komento projektin juurihakemistossa:
-```
-./oiva-docker.sh start --amos
-```
-### 7.2 Kuja-puolen palveluiden käynnistäminen
-Suorita seuraava komento projektin juurihakemistossa:
-```
-./oiva-docker.sh start --yva
-```
-
-### 7.3 Huomioita
-* Projektin juurihakemistossa sijaitsevaan `oiva-docker.sh`-tiedostoon on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Tyypillistä `docker-compose up` -komentoa ei siis tarvitse tässä projektissa käsin ajaa.
-* Mikäli haluat käynnistää myös sekä Oiva- että Kuja-puolen backend-palvelut samanaikaisesti, suorita komento `./oiva-docker.sh start` ilman yllä mainittuja lippuja.
-
-## 8. Tietokanta
+## 7. Tietokanta
 Projektissa on käytössä [PostgreSQL](https://www.postgresql.org/)-tietokanta, joka pyörii Docker-kontissa, virtuaalikoneiden verkossa. Tietokantaa ei siis tarvitse asentaa omalle koneelle.
 Tietokannan ajantasaisuudesta vastaa [Flyway](https://flywaydb.org/)-migraatiotyökalu. Sinun ei tarvitse asentaa työkalua.
 
-Manuaalisia tietokantaoperaatioita varten on olemassa `oiva-data.sh`-skripti. Sen avulla on mahdollista tehdä mm. tietokannan palautus ja jooq-entiteettien luonti.
+Manuaalisia tietokantaoperaatioita varten on olemassa `oiva-db.sh`-skripti. Sen avulla on mahdollista tehdä mm. tietokannan palautus ja [jOOQ](https://www.jooq.org/)-entiteettien luonti.
+
+Palautusta varten Docker-kontit pitää olla ajossa. Näiden käynnistäminen on ohjeistettu kohdassa [8.1](#81-Docker-palvelut). Lisäksi oiva-deplyment-repository pitää olla kloonattuna oiva-backend-hakemiston rinnalla. Tämä yksityinen repository sisältää oivan ja kujan todellisen lupadatan.
 
 Tietokannan palautus Oivalle ja Kujalle:
 ```
 $ ./oiva-db.sh amos restore   ## amos - oiva
 $ ./oiva-db.sh yva restore   ## yva - kuja
 ```
-Palautus toimii, mikäli olet kohdassa [7](#palveluiden-kaeynnistaeminen) käynnistänyt kyseisen puolen pavelut.
-
-Jooq-entitettien uudelleengenerointi:
+jOOQ-entitettien uudelleengenerointi:
 ```
 $ ./oiva-db.sh amos generate
 ```
+Jos tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen. Uudelleengeneroinnissa käännetään oiva-core-model-moduuli, joka sisältää tietokantarakenteeseen vaikuttavat tietokantamigraatiot. Migraatiot ajetaan tietokantaa vasten, jonka sen hetkisen rakenteen perusteella muodostetaan DAO- ja entiteettiluokat java-koodina.
 
-# Läpi käymättä olevat asennusohjeet
+## 8. Palveluiden käynnistäminen
 
-## Flyway-migraatioiden ajaminen Mavenilla ja JOOQ-tietokantaluokkien generointi
+Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
 
-Maven Flyway plugin vie migraatioista löytyvät tietokantarakenteet (aluksi: ``resources/db/migration/V1__Baseline.sql``) 
-käännöksen yhteydessä tietokantaan jos Mavenin generate-db -profiili enabloidaan.
-
-Projektissa käytössä oleva JOOQ generoi suoraan tietokannasta käytettäviä DAO- ja entiteettiluokkia. Jos 
-tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen. JOOQ-luokat generoidaan
-generate-db -profiiilin ajon yhteydessä.
-
-**Aja Flyway ja JOOQ:**
-
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD compile -Pgenerate-db
-
-
-## Tietokannan puhdistus ja populointi Maven SQL pluginilla
-
-#### Pudota flyway-migraatiokanta ja sovelluksen skeemat
-
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD initialize sql:execute@clean-db
-   
-#### Entityjen luominen 
-
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD compile -Pgenerate-db
-
-#### Populoi tietokanta alustavalla datasetillä
-
-Tietojoukko sisältää alkuvaiheen realistista lupadataa. Huom! pohjadata on yksityisessä oiva-deployment repository:ssa johon plugin viittaa.
-    
-    $ mvn -Doiva.dbhost=$POSTGRES_IP -Doiva.dbport=$POSTGRES_PORT -Doiva.dbname=$DBNAME -Doiva.dbusername=$DBUSER -Doiva.dbpassword=$DBPASSWORD initialize sql:execute@populate-db
-
-
-## Aja kehitysversiota lokaali-Mavenilla
+### 8.1 Docker-palvelut
 
 Käynnistä docker:
 
-    $ ./oiva-docker.sh start
+    $ ./oiva-docker.sh start            # oiva ja kuja
+    $ ./oiva-docker.sh start  --amos    # vain oiva
+    $ ./oiva-docker.sh start  --yva     # vain kuja
     
-Docker-compose luo kuusi palvelua: amos-postgres, amos-redis, yva-postgres, yva-redis, yva-nginx ja nginx.
+Projektin juurihakemistossa sijaitsevaan `oiva-docker.sh`-tiedostoon on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Tyypillistä `docker-compose up` -komentoa ei siis tarvitse tässä projektissa käsin ajaa.
+    
+Docker-compose luo kuusi palvelua riippuen käynnistysparametreista: amos-postgres, amos-redis, yva-postgres, yva-redis, yva-nginx ja nginx.
 
+### 8.2 Sovelluspalvelin
+
+Konfiguraatioihin pitää lisätä kehittäjäkohtaiset JVM-argumentit backend-palvelulle. Luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Käyttäjänimen saa selville ajamalla terminaalissa komennon `whoami`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `oiva-backend.sh` suoritetaan.
+
+Syötä tiedostoon testi-opintopolun tarvitsemat käyttäjätunnus ja salasana. Nämä tiedot voi kysyä muilta kehittäjiltä.
+ 
+    OIVA_JAVA_OPTS="-Dopintopolku.username='käyttäjätunnus' -Dopintopolku.password='salasana'"
+    
 Backend-palvelun käynnistäminen kehityskäyttöön:
 
     $ ./oiva-backend.sh amos -c
     $ ./oiva-backend.sh yva -c
 
-Mikäli haluat syöttää kehittäjäkohtaisia JVM-argumentteja backend-palvelulle niin luo `vars-KÄYTTÄJÄNIMESI.sh` tiedosto, esimerkiksi `vars-aheikkinen.sh`. Tiedosto voi sisältää bash-muuttujia jotka ladataan automaattisesti mukaan kun `launch-dev-backend.sh` suoritetaan.
-Syötä tiedostoon testi opintopolun tarvitsemat käyttäjätunnus ja salasana. Nämä tiedot voi kysyä muilta kehittäjiltä.
- 
-    OIVA_JAVA_OPTS="-Dopintopolku.username='käyttäjätunnus' -Dopintopolku.password='salasana'"
+Backendin lisäksi yleensä tarvitaan frontendin käynnistys. Se tapahtuu oiva-frontend- ja kuja-frontend-repositoryjen juuressa:
 
-## PDF-exportin konfiguroiminen [TODO: UPDATE]
+    $ npm install && npm start
 
-PrinceXML tuottaa PDF-tiedostoja HTML-lähteistä jotka on muodostettu Pebble-frameworkillä (http://www.mitchellbosecke.com/pebble).
-- Pebblen kontekstit muodostetaan fi.minedu.oiva.backend.core.service.TemplateRenderingService luokassa.
-- Pebblen templatet ja resurssit on määritetty omassa git-respositoryssa (/oiva/template). Hanki templatet koneelle jolla ajat backendiä
+Tämän jälkeen Oivaa voi käyttää osoitteessa https://localhost
 
-Pebble-templateihin viitataan absoluuttisilla poluilla, esimerkiksi:
+Kujaa voi käyttää osoitteessa https://localhost:4433
 
-``/opt/oiva/backend/template/default/hakemus/hakemustemplate_fi.html``
-``/opt/oiva/backend/template/valitus/vali_fi.PDF``
+**Huom**
 
-Polut muodostuvat kolmesta osasta: juuripolku, versiopolku ja templaattitiedosto. Yo. esimerkeissä 
-- juuripolku on ``/opt/oiva/backend/``
-- versiopolku on ``template/default/``
-- templaattitiedosto on ``hakemus/hakemustemplate_fi.html``
+Https-liikenne edellyttää sertifikaattia. Kehitysympäristössä eli localhost-osoitteissa käytetään self signed -sertifikaattia, jota ei ole varmennettu luotettavasti. Selain varoittaa invalidista sertifikaatista, mutta varoituksen voi ohittaa.
 
-Juuripolku tulee määrittää sovelluksen konfiguraatioissa (ks. alla) ja versiopolku voidaan valinnaisesti määrittää hakukierros-kohtaisesti tietokannassa (ks. alla)
+### 8.3 Huomioita
 
-Määritä sovelluksen application.yml tiedoston ``templates.base.path`` osoittamaan juurikansioon josta templatet löytyvät (tämä on templaten **juuripolku**). Esimerkiksi jos templatet löytyvät
-polusta /opt/oiva/backend/template niin ko. asetuksen tulee olla ``templates.base.path: /opt/oiva/backend/``
+Oivan backend-sovellus käynnistyy porttiin 8099 ja vastaa swagger-rajapintadokumentaatiolla osoitteesta http://localhost:8099. Kujalle vastaava portti on 8100.
 
-Joissain tilanteissa ``oiva.hakukierros`` tietokantatauluun on voitu määritetty omat templatepolut ``templatepath`` sarakeeseen (tämä on templaten **versiopolku**). Tämä ei ole pakollista, sillä mikäli
-ko. kenttä on tyhjä niin sovellus käyttää oletustemplateja (template/default/). 
+Dockerin avulla käynnistettyä nginx-palvelinta käytetään reverse proxyna kehitysympäristössä. Sen avulla ohjataan https-liikenne oikeisiin kohdeosoitteisiin seuraavasti:
 
-Kokeile tuottaa PDF-tiedosto seuraavan rajapinnan kautta: http://localhost:8099/pdf/esikatselu/hakemus/xx jossa xx on hakemuksen id
+Oivan ohjaukset
+
+|Selaimen osoite|Kohde|
+|-----------------|---------------------|
+|https://localhost|http://localhost:3000|
+|https://localhost/api|http://localhost:8099|
 
 
-## Sananen konfiguraatiosta
+# Lisätietoa ja tarkempia kuvauksia
 
-Konfiguraatiot otetaan käyttöön seuraavassa järjestyksessä:
+## Debuggaus
 
-1. Suorat komentoriviargumentit Mavenille (esim: ``-Dredis.host=myredishost.com``)
-2. Profiilispesifiset konfiguraatiot jar-paketin ulkopuolella (ei käytössä toistaiseksi)
-3. Profiilispesifiset konfiguraatiot (``<project-root>/src/main/resources/config/application-{profile}.yml``)
-4. Yleiskonfiguraatio jar-paketin ulkopuolella (kehittäessä ``<project-root>/application.yml`, tai jar-paketin ulkopuolella palvelimella)
-5. Yleiskonfiguraatio jar-paketissa (``<project-root>/src/main/resources/config/application.yml``)
+Sovelluksen voi ajaa debug-moodissa lisäämällä d-parametrin käynnistyskomentoon, esim: 
 
-Konfiguraatiotiedostojen Maven-filtteröintiä (e.g. ${placeholder}:ien korvausta) voi käyttää jar-paketin sisällä 
-oleville konfiguraatioille.
+`./oiva-backend.sh amos -c -d`
 
+Yhteys otetaan Javan remote debuggerilla porttiin 5005. Toistaiseksi Oivaa ja Kujaa ei voi debugata samanaikaisesti, koska debug-porttina käytetään samaa porttia.
 
-## Testit
+## Apuskriptit
 
-Testeihin käytetään ScalaTest-kirjastoa ja Springin tarjoamia apuvälineitä. Yksikkö- ja integraatiotestit erotellaan
+Muun muassa sovelluksen käynnistykseen ja testien ajoon liittyen on olemassa .sh-loppuisia skriptejä. Skriptien lyhyet infot saa näkyviin ajamalla skriptejä parametrilla `--help`. 
+
+## Testien ajaminen
+
+Yksikkötesteihin käytetään ScalaTest-kirjastoa ja Springin tarjoamia apuvälineitä. Yksikkö- ja integraatiotestit erotellaan
 tiedostopäätteellä. Yksikkötestit ovat muotoa \*Test, esim: *MinunHienoTest*, ja integraatiotestit ovat muotoa \*IT, esim:
 *MinunHienoIntegroivaIT*.
 
-Ennen testien ajoa luo backend-projektin juureen `application-test.yml` konfiguraatiotiedosto jossa määrittelet ainakin seuraavat arvot:
-- `opintopolku.apiCredentials.username`
-- `opintopolku.apiCredentials.password`
-
-sekä mahdollisesti myös:
-- `spring.datasource`
-
-**HUOM!** Nykyinen tietokantojen luontiskripti ei luo tarvittavaa testi-tietokantaa joten se tulee luoda manuaalisesti:
-    $ CREATE DATABASE "oiva-test" WITH OWNER oiva;
+### Yksikkötestit
 
 Aja yksikkötestit: 
     
-    $ mvn test
-    
+    $ mvn test -DskipJavaUnitTests=false
+
+Toistaiseksi muut kuin scalan yksikkötestit on asetettu oletuksena ohitettavaksi CI-ympäristön konfiguraatioista johtuen.  
+
+### Integraatiotestit
+
+Esiehtona integraatiotestien ajamiseen on docker-machinen asennus. Docker-machinen sisällä ajetaan redis-välimuistia ja postgresql-tietokantaa, joten niitä ei tarvitse itse käynnistää.
+
 Aja integraatiotestit:
     
-    $ mvn integration-test # huom, lisää kanta-IP:t jos tarvitsee
+    $ ./run-integration-tests.sh
 
-**HUOM!** Varmista että src/test/resources/application-test.yml konfiguraation ``opintopolku.apiOrganization.oid`` arvo vastaa testikäyttäjän organisaatiota.
-Testikäyttäjän tunnukset syötetään seuraavien konfiguraatioiden kautta ``opintopolku.apiCredentials.username`` ja ``opintopolku.apiCredentials.password``.
-Helpoin tapa organisaatio OID:n tarkastamiseen on kirjautua OIVA:n DEV-ympäristöön testikäyttäjän tunnuksilla ja tarkastaa minkä organisaation tiedot sovellus lataa.
+Integraatiotestit ajetaan aina sekä Oivalle että Kujalle.
 
-Yksittäisen testin voi ajaa seuraavasti:
+- Testit on mahdollista ajaa debug-moodissa käyttämällä parametria `--debug`, jolloin testiajo jää odottamaan debuggerin yhdistämistä ennen varsinaisten testien ajoa. Remote debuggerin portti on oletuksena 5005.
+- Yksittäisen luokan testien ajaminen on mahdollista esim. `--tests '*MuutospyyntoControllerIT'`. Kaikki MuutospyyntoControllerIT-loppuisten luokkien testit ajetaan.
+- Jos halutaan ajaa yksittäinen testi, niin loppuun pitää lisätä testifunktion nimi risuaidalla eroteltuna, esim. saveWithoutLogin-funktion ajaminen `--tests '*MuutospyyntoControllerIT#saveWithoutLogin'`
 
-    $ mvn -DwildcardSuites=fi.minedu.oiva.backend.test.SortingTest test
+Mikäli testien ajo päätyy porttivirheeseen, esim. `Bind for 0.0.0.0:15432 failed: port is already allocated`, niin helpoimmalla pääsee poistamalla docker-machinen luoman virtuaalikoneen komennolla `docker-machine rm test-db-machine`.
+Virtuaaliympäristön pystytys kestää hieman aikaa, joten samaa ympäristöä kierrätetään eri testiajojen välillä.
 
+## Pebblen ja PrinceXML:n käyttö
+
+PrinceXML tuottaa PDF-tiedostoja HTML-lähteistä jotka on muodostettu [Pebble-frameworkillä](http://www.mitchellbosecke.com/pebble).
+- Pebblen templatet ja resurssit on määritetty omissa git-respositoryissaan (oiva-template ja kuja-template). Hanki templatet koneelle jolla ajat backendiä
+
+Pebblen käyttämät template-tiedostot määräytyvät kolmen polun mukaisesti: juuripolku, versiopolku ja templaattitiedosto. 
+- juuripolku (base path) on ``/opt/oiva/backend/``
+- versiopolku on ``template/default/``
+- templaattitiedosto on ``hakemus/hakemustemplate_fi.html``
+
+Pebble-templateihin viitataan absoluuttisilla tai suhteellisilla poluilla.
+
+Esimerkki dev-profiililla luettavasta konfiguraatiosta (application-dev.yml) ja **juuripolusta**
+```
+templates:
+  base.path: ../../oiva-template
+```
+
+**Versiopolku** voidaan valinnaisesti määrittää hakukierros-kohtaisesti tietokannassa (ks. alla)
+
+Joissain tilanteissa ``oiva.esitysmalli`` tietokantatauluun on voitu määritetty omat templatepolut ``templatepath`` sarakeeseen (tämä on templaten **versiopolku**). Tämä ei ole pakollista, sillä mikäli
+ko. kenttä on tyhjä niin sovellus käyttää oletustemplateja (template/default/).
+
+Käytettävä **templaattitiedosto** määräytyy templaattitiedostojen välisten kutsujen perusteella.
+
+Kokeile tuottaa PDF-tiedosto seuraavan rajapinnan kautta: http://localhost:8099/pdf/esikatsele/{uuid}, jossa {uuid} on luvan uuid.
 
 ## Debug ja JRebel
 
@@ -267,7 +263,19 @@ Esimerkki (yhdelle riville):
     
     
 **HUOM:** ``<jvmArguments>``-blokki forkkaa uuden JVM-prosessin Spring bootille.
-        
+
+## Sananen konfiguraatiosta
+
+Konfiguraatiot otetaan käyttöön seuraavassa järjestyksessä:
+
+1. Suorat komentoriviargumentit Mavenille (esim: ``-Dredis.host=myredishost.com``)
+2. Profiilispesifiset konfiguraatiot jar-paketin ulkopuolella (ei käytössä toistaiseksi)
+3. Profiilispesifiset konfiguraatiot (``<project-root>/src/main/resources/config/application-{profile}.yml``)
+4. Yleiskonfiguraatio jar-paketin ulkopuolella (kehittäessä ``<project-root>/application.yml`, tai jar-paketin ulkopuolella palvelimella)
+5. Yleiskonfiguraatio jar-paketissa (``<project-root>/src/main/resources/config/application.yml``)
+
+Konfiguraatiotiedostojen Maven-filtteröintiä (e.g. ${placeholder}:ien korvausta) voi käyttää jar-paketin sisällä 
+oleville konfiguraatioille.        
     
 ## Paketointi serveriympäristöihin
 
