@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa extends TableImpl<LupaRecord> {
 
-    private static final long serialVersionUID = -1247351184;
+    private static final long serialVersionUID = -514240721;
 
     /**
      * The reference instance of <code>lupa</code>
@@ -148,6 +148,11 @@ public class Lupa extends TableImpl<LupaRecord> {
     public final TableField<LupaRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
 
     /**
+     * The column <code>lupa.asianumero</code>.
+     */
+    public final TableField<LupaRecord, String> ASIANUMERO = createField("asianumero", org.jooq.impl.SQLDataType.VARCHAR.length(17).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
      * The column <code>lupa.koulutustyyppi</code>.
      */
     public final TableField<LupaRecord, String> KOULUTUSTYYPPI = createField("koulutustyyppi", org.jooq.impl.SQLDataType.VARCHAR, this, "");
@@ -156,11 +161,6 @@ public class Lupa extends TableImpl<LupaRecord> {
      * The column <code>lupa.oppilaitostyyppi</code>.
      */
     public final TableField<LupaRecord, String> OPPILAITOSTYYPPI = createField("oppilaitostyyppi", org.jooq.impl.SQLDataType.VARCHAR, this, "");
-
-    /**
-     * The column <code>lupa.asianumero</code>.
-     */
-    public final TableField<LupaRecord, String> ASIANUMERO = createField("asianumero", org.jooq.impl.SQLDataType.VARCHAR.length(16).defaultValue(org.jooq.impl.DSL.field("NULL::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>lupa</code> table reference
