@@ -154,7 +154,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final List<Boolean> list = doc.read("$.liitteet[?(@.nimi == 'muutospyynto_liite2')].salainen", boolRef);
         assertTrue("Muutospyynto liite 2 should be secret!", list.get(0));
-        
+
         final List<String> names = doc.read("$..meta.liitteet[?(@.nimi == '" + changeName + "')].nimi", stringRef);
         assertEquals("Muutos liite 4 name should be match!", changeName, names.get(0));
 
@@ -409,7 +409,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         // ----- UPDATE EXISTING -----
         final String newEndDate = "2020-02-20";
-        final String asianumero = "VNK/123/2020";
+        final String asianumero = "VN/123/2020";
         doc.put("$", "voimassaalkupvm", newEndDate)
                 .put("$", "paatospvm", newEndDate)
                 .put("$", "asianumero", asianumero);
@@ -486,6 +486,29 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals(0, lupa.getMaaraykset().stream().filter(m -> "koodisto".equals(m.getKoodisto()) && "1231".equals(m.getKoodiarvo())).count());
     }
 
+    @Test
+    public void testDuplikaattiasianumero() throws IOException {
+        // Saves muutospyyntö with asianumero VN/1234/123456
+        setUpDb("sql/muutospyynto_data.sql");
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+
+        // Asianumero exists with same uuid -> not duplicate
+        String resp = requestDuplikaattiasianumero(prepareMultipartForDuplikaattiAsianumero("2b02c730-ebef-11e9-8d25-0242ac110023", "VN/1234/123456"));
+        assertEquals("false", resp);
+
+        // Asianumero exists with different uuid -> duplicate
+        resp = requestDuplikaattiasianumero(prepareMultipartForDuplikaattiAsianumero("d2a86c5b-0721-4dfa-adf9-f6e4f3f9f084", "VN/1234/123456"));
+        assertEquals("true", resp);
+
+        // Asianumero exists when uuid is null -> duplicate
+        resp = requestDuplikaattiasianumero(prepareMultipartForDuplikaattiAsianumero(null, "VN/1234/123456"));
+        assertEquals("true", resp);
+
+        // Asianumero does not exist -> not duplicate
+        resp = requestDuplikaattiasianumero(prepareMultipartForDuplikaattiAsianumero(null, "VN/1/123456"));
+        assertEquals("false", resp);
+    }
+
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
         return restTemplate
                 .postForEntity(createURLWithPort("/api/muutospyynnot/tallenna"), requestEntity, String.class);
@@ -494,6 +517,10 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     private ResponseEntity<String> requestLiitteet(String uuid) {
         return restTemplate
                 .getForEntity(createURLWithPort("/api/muutospyynnot/" + uuid + "/liitteet/"), String.class);
+    }
+
+    private String requestDuplikaattiasianumero(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
+        return restTemplate.postForObject(createURLWithPort("/api/muutospyynnot/duplikaattiasianumero"), requestEntity, String.class);
     }
 
     private HttpEntity<MultiValueMap<String, Object>> prepareMultipartEntity(String json, String... fileIds) {
@@ -509,6 +536,24 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         Arrays.stream(fileIds)
                 .forEachOrdered(i ->
                         parts.add(i, new HttpEntity<>(getResource("attachments/test.pdf"), pdfHeader)));
+
+        final HttpHeaders multipartHeaders = new HttpHeaders();
+        multipartHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        multipartHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+        return new HttpEntity<>(parts, multipartHeaders);
+    }
+
+    private HttpEntity<MultiValueMap<String, Object>> prepareMultipartForDuplikaattiAsianumero(String uuid, String asianumero) {
+        MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        final HttpEntity<String> uuidEntity = new HttpEntity<>(uuid, jsonHeaders);
+        final HttpEntity<String> asianumeroEntity = new HttpEntity<>(asianumero, jsonHeaders);
+        if (uuid != null) {
+            parts.add("uuid", uuidEntity);
+        }
+        parts.add("asianumero", asianumeroEntity);
 
         final HttpHeaders multipartHeaders = new HttpHeaders();
         multipartHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

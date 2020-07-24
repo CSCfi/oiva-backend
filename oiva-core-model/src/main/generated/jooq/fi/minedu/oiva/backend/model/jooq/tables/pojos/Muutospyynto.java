@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 664809006;
+    private static final long serialVersionUID = -432829491;
 
     private Long      id;
     private Long      lupaId;
@@ -245,7 +245,7 @@ public class Muutospyynto implements Serializable {
         this.alkupera = alkupera;
     }
 
-    @Size(max = 16)
+    @Size(max = 17)
     public String getAsianumero() {
         return this.asianumero;
     }

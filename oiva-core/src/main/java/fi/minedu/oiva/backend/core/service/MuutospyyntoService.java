@@ -643,11 +643,14 @@ public class MuutospyyntoService {
 
     // VALIDOINNIT
     protected final void assertValidMuutospyynto(Muutospyynto muutospyynto) {
+        String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
-                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true);
+                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
+                !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) &&
+                validAsianumero(muutospyynto.getAsianumero());
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
@@ -660,6 +663,15 @@ public class MuutospyyntoService {
         }
     }
 
+    protected boolean validAsianumero(String asianumero) {
+        return asianumero.matches("^VN/[0-9]{1,9}/[0-9]{4}$");
+    }
+
+    public Boolean duplicateAsianumeroExists(String uuid, String asianumero) {
+        Optional<Muutospyynto> muutospyyntoFromDb = getByAsianumero(asianumero);
+        return muutospyyntoFromDb.filter(muutospyynto -> uuid == null || !UUID.fromString(uuid).equals(muutospyynto.getUuid())).isPresent();
+    }
+
     // hakee yksittäinen muutospyynnön perusteluineen uuid:llä
     public Optional<Muutospyynto> getByUuid(String uuid) {
         return getBaseSelect()
@@ -668,6 +680,11 @@ public class MuutospyyntoService {
                 .fetchOptionalInto(Muutospyynto.class)
                 .map(muutospyynto -> with(muutospyynto, "yksi"))
                 .filter(Optional::isPresent).map(Optional::get);
+    }
+
+    public Optional<Muutospyynto> getByAsianumero(String asianumero) {
+        return dsl.select(MUUTOSPYYNTO.fields()).from(MUUTOSPYYNTO)
+                .where(MUUTOSPYYNTO.ASIANUMERO.eq(asianumero)).fetchOptionalInto(Muutospyynto.class);
     }
 
     // Hakee muutospyyntöön liittyvät muutokset
