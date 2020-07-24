@@ -544,10 +544,10 @@ public class MuutospyyntoServiceTest {
         assertFalse(service.validAsianumero("VN/1234/123"));
         assertFalse(service.validAsianumero("VN/1456/1234T"));
         assertFalse(service.validAsianumero("VN//1234"));
-        assertFalse(service.validAsianumero("VN/1234567/1234"));
+        assertFalse(service.validAsianumero("VN/1234567890/1234"));
         assertFalse(service.validAsianumero("VL/1234/1234"));
         assertTrue(service.validAsianumero("VN/1/1234"));
-        assertTrue(service.validAsianumero("VN/123456/1234"));
+        assertTrue(service.validAsianumero("VN/123456789/1234"));
         assertTrue(service.validAsianumero("VN/1234/1234"));
     }
 

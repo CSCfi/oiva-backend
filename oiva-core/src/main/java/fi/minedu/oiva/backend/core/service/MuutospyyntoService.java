@@ -664,7 +664,7 @@ public class MuutospyyntoService {
     }
 
     protected boolean validAsianumero(String asianumero) {
-        return asianumero.matches("^VN/[0-9]{1,6}/[0-9]{4}$");
+        return asianumero.matches("^VN/[0-9]{1,9}/[0-9]{4}$");
     }
 
     public Boolean duplicateAsianumeroExists(String uuid, String asianumero) {
