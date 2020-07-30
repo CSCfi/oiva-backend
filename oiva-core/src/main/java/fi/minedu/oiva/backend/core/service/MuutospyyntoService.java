@@ -53,6 +53,7 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -718,6 +719,22 @@ public class MuutospyyntoService {
         } catch (Exception e) {
             throw new DataAccessException("Failed to save muutospyynto!", e);
         }
+    }
+    public String getMuutospyyntoPreviewPdfName(Lupa lupa, Muutospyynto muutospyynto) {
+        String name = "";
+        Muutospyyntotila muutospyyntotila = Muutospyyntotila.valueOf(muutospyynto.getTila());
+        if (muutospyyntotila.equals(Muutospyyntotila.VALMISTELUSSA)) {
+            name += lupa.getJarjestaja().getNimi().getFirstOfOrEmpty("fi", "sv") + " järjestämislupaluonnos";
+        }
+        if (muutospyyntotila.equals(Muutospyyntotila.ESITTELYSSA) || muutospyyntotila.equals(Muutospyyntotila.PAATETTY)) {
+            name += lupa.getJarjestaja().getNimi().getFirstOfOrEmpty("fi", "sv") + " järjestämislupa";
+        }
+        if (muutospyynto.getVoimassaalkupvm() != null) {
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            name += " " + dateFormat.format(muutospyynto.getVoimassaalkupvm());
+        }
+        name += ".pdf";
+        return name;
     }
 
     @Transactional
