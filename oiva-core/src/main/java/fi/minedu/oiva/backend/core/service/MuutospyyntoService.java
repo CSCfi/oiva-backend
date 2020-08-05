@@ -639,19 +639,20 @@ public class MuutospyyntoService {
             throw new ForbiddenException("Invalid object type");
         }
 
-        this.assertValidMuutospyynto(muutospyynto);
+        this.assertValidMuutospyynto(muutospyynto, false);
     }
 
     // VALIDOINNIT
-    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto) {
+    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroValidity) {
         String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
+        boolean asianumeroIsValid = !checkAsianumeroValidity ||
+                (!duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) && validAsianumero(muutospyynto.getAsianumero()));
+
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
-                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) &&
-                validAsianumero(muutospyynto.getAsianumero());
+                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) && asianumeroIsValid;
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
