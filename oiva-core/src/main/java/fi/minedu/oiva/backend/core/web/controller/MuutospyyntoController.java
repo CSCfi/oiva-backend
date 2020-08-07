@@ -232,7 +232,7 @@ public class MuutospyyntoController {
                 final OivaTemplates.RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-                final String filename = muutospyyntoService.getMuutospyyntoPreviewPdfName(lupaOpt.get(), muutospyyntoOpt.get());
+                final String filename = '"' + muutospyyntoService.getMuutospyyntoPreviewPdfName(lupaOpt.get(), muutospyyntoOpt.get()) + '"';
                 response.setHeader("Content-Disposition", "inline; filename=" + filename);
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
