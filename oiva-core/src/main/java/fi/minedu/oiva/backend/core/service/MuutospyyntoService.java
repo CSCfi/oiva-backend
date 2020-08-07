@@ -364,7 +364,8 @@ public class MuutospyyntoService {
             Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
                     .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
 
-            LupatilaValue lupaTila = Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ?
+            LupatilaValue lupaTila = (Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ||
+                    Muutospyyntotila.PAATETTY.toString().equals(mp.getTila())) ?
                     LupatilaValue.VALMIS : LupatilaValue.LUONNOS;
             final Lupatila tila = dsl.fetchOne(LUPATILA, LUPATILA.TUNNISTE.eq(lupaTila))
                     .into(Lupatila.class);
