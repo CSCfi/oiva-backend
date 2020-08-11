@@ -78,6 +78,6 @@ public class LupamuutosService {
             throw new ForbiddenException("Invalid object type");
         }
 
-        muutospyyntoService.assertValidMuutospyynto(muutospyynto);
+        muutospyyntoService.assertValidMuutospyynto(muutospyynto, true);
     }
 }

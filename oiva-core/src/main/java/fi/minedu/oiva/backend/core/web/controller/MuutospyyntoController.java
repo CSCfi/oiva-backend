@@ -8,7 +8,6 @@ import fi.minedu.oiva.backend.core.service.LupamuutosService;
 import fi.minedu.oiva.backend.core.service.MuutospyyntoService;
 import fi.minedu.oiva.backend.core.service.PrinceXMLService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
-import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
@@ -226,14 +225,15 @@ public class MuutospyyntoController {
     @ResponseBody
     @ApiOperation(notes = "Tuottaa muutospyynnön mukaisen luonnoksen tulevasta luvasta PDF-muodossa", value = "")
     public void previewPdf(final @PathVariable String uuid, final HttpServletResponse response, final HttpServletRequest request) {
+        Optional<Muutospyynto> muutospyyntoOpt = muutospyyntoService.getByUuid(uuid);
         Optional<Lupa> lupaOpt = muutospyyntoService.generateLupaFromMuutospyynto(uuid);
         try {
-            if (lupaOpt.isPresent()) {
+            if (lupaOpt.isPresent() && muutospyyntoOpt.isPresent()) {
                 final OivaTemplates.RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(MediaType.APPLICATION_PDF_VALUE);
-                final String tila = LupatilaValue.VALMIS.equals(lupaOpt.get().getLupatila().getTunniste()) ? "" : "luonnos-";
-                response.setHeader("Content-Disposition", "inline; filename=" + tila + lupaOpt.get().getPDFFileName());
+                final String filename = '"' + muutospyyntoService.getMuutospyyntoPreviewPdfName(lupaOpt.get(), muutospyyntoOpt.get()) + '"';
+                response.setHeader("Content-Disposition", "inline; filename=" + filename);
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
                     response.getWriter().write("Failed to generate lupa with uuid " + uuid);

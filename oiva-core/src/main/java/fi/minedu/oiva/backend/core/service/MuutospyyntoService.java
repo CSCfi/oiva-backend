@@ -53,6 +53,7 @@ import javax.validation.ValidationException;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -363,7 +364,8 @@ public class MuutospyyntoService {
             Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
                     .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
 
-            LupatilaValue lupaTila = Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ?
+            LupatilaValue lupaTila = (Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ||
+                    Muutospyyntotila.PAATETTY.toString().equals(mp.getTila())) ?
                     LupatilaValue.VALMIS : LupatilaValue.LUONNOS;
             final Lupatila tila = dsl.fetchOne(LUPATILA, LUPATILA.TUNNISTE.eq(lupaTila))
                     .into(Lupatila.class);
@@ -533,6 +535,7 @@ public class MuutospyyntoService {
         historiaRecord.setTila(oldLupa.getLupatila().getTunniste().name());
         historiaRecord.setVoimassaoloalkupvm(oldLupaRecord.getAlkupvm());
         historiaRecord.setVoimassaololoppupvm(oldLupaRecord.getLoppupvm());
+        historiaRecord.setAsianumero(oldLupaRecord.getAsianumero());
         if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
             // Old lupa was never affective
             historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));
@@ -638,19 +641,20 @@ public class MuutospyyntoService {
             throw new ForbiddenException("Invalid object type");
         }
 
-        this.assertValidMuutospyynto(muutospyynto);
+        this.assertValidMuutospyynto(muutospyynto, false);
     }
 
     // VALIDOINNIT
-    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto) {
+    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroValidity) {
         String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
+        boolean asianumeroIsValid = !checkAsianumeroValidity ||
+                (!duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) && validAsianumero(muutospyynto.getAsianumero()));
+
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
-                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) &&
-                validAsianumero(muutospyynto.getAsianumero());
+                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) && asianumeroIsValid;
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
@@ -718,6 +722,22 @@ public class MuutospyyntoService {
         } catch (Exception e) {
             throw new DataAccessException("Failed to save muutospyynto!", e);
         }
+    }
+    public String getMuutospyyntoPreviewPdfName(Lupa lupa, Muutospyynto muutospyynto) {
+        String name = "";
+        Muutospyyntotila muutospyyntotila = Muutospyyntotila.valueOf(muutospyynto.getTila());
+        if (muutospyyntotila.equals(Muutospyyntotila.VALMISTELUSSA)) {
+            name += lupa.getJarjestaja().getNimi().getFirstOfOrEmpty("fi", "sv") + " järjestämislupaluonnos";
+        }
+        if (muutospyyntotila.equals(Muutospyyntotila.ESITTELYSSA) || muutospyyntotila.equals(Muutospyyntotila.PAATETTY)) {
+            name += lupa.getJarjestaja().getNimi().getFirstOfOrEmpty("fi", "sv") + " järjestämislupa";
+        }
+        if (muutospyynto.getVoimassaalkupvm() != null) {
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            name += " " + dateFormat.format(muutospyynto.getVoimassaalkupvm());
+        }
+        name += ".pdf";
+        return name;
     }
 
     @Transactional
