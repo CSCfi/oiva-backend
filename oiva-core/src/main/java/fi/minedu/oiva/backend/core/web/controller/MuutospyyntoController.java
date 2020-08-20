@@ -173,6 +173,19 @@ public class MuutospyyntoController {
         return getOr400(result);
     }
 
+    @RequestMapping(method = POST, value = "{muutospyyntoUuid}/liitteet/paatoskirje")
+    @ApiOperation(
+            notes = "Asettaa annetun päätöskirje PDF tiedoston muutospyynnön liitteeksi",
+            value = "",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CompletableFuture<HttpEntity<Muutospyynto>> setPaatoskirjeAttachment(
+            @RequestPart(value = "muutospyynto") Muutospyynto muutospyynto,
+            MultipartHttpServletRequest request,
+            @PathVariable String muutospyyntoUuid) {
+
+        return getOr404(async(() -> muutospyyntoService.setPaatoskirjeLiite(muutospyynto, request.getFileMap() )));
+    }
+
     @RequestMapping(method = GET, value = "{muutospyyntoUuid}/liitteet/")
     @ApiOperation(notes = "Palauttaa kaikki muutospyynnön liitteet", value = "")
     public CompletableFuture<HttpEntity<Collection<Liite>>> getLiitteetByMuutospyyntoUuid(final @PathVariable String muutospyyntoUuid) {

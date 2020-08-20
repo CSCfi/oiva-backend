@@ -1030,6 +1030,26 @@ public class MuutospyyntoService {
                 ));
     }
 
+    public Optional<Muutospyynto> setPaatoskirjeLiite(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
+        if(Muutospyyntotila.PAATETTY.toString().equals(muutospyynto.getTila())) {
+            throw new ValidationException("Muutospyynto state should be before PAATETTY to add Paatoskirje");
+        }
+
+        Liite paatoskirjeLiite = muutospyynto.getLiitteet().stream()
+                .filter(liite -> liite.getTyyppi().equals("paatosKirje"))
+                .findAny()
+                .orElseThrow(() -> new ValidationException("Muutospyynto does not contain a paatoskirje Liite"));
+
+        MultipartFile paatoskirjeFile = fileMap.getOrDefault(paatoskirjeLiite.getTiedostoId(), null);
+
+        if(paatoskirjeFile == null) {
+            throw new ValidationException("MultipartFile matching Muutospyynto paatoskirje Liite not found");
+        }
+
+        createMuutospyyntoLiite(muutospyynto.getId(), paatoskirjeLiite, paatoskirjeFile);
+        return Optional.of(muutospyynto);
+    }
+
     private void createMuutospyyntoLiite(Long muutospyyntoId, Liite liite, MultipartFile file) {
         // Remove old if exists and replace it with new one
         liiteService.delete(liite);
