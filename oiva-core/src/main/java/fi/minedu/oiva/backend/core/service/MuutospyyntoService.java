@@ -1057,7 +1057,7 @@ public class MuutospyyntoService {
     private void createMuutospyyntoLiite(Long muutospyyntoId, Liite liite, MultipartFile file) {
         // Remove old if exists and replace it with new one
         liiteService.delete(liite);
-        liiteService.save(file, liite)
+        liiteService.saveFileAndLiite(file, liite)
                 .ifPresent(l -> {
                     final MuutospyyntoLiite link = new MuutospyyntoLiite();
                     link.setLiiteId(l.getId());
@@ -1214,7 +1214,7 @@ public class MuutospyyntoService {
     private void createMuutosLiite(Long muutosId, Liite liite, MultipartFile file) {
         // Remove old if exists and replace it with new one.
         liiteService.delete(liite);
-        liiteService.save(file, liite)
+        liiteService.saveFileAndLiite(file, liite)
                 .ifPresent(l -> {
                     final MuutosLiite link = new MuutosLiite();
                     link.setLiiteId(l.getId());
@@ -1241,7 +1241,7 @@ public class MuutospyyntoService {
                 .stream().map(l -> {
                     final Optional<MultipartFile> file = Optional.ofNullable(fileMap.get(l.getTiedostoId()));
                     if (file.isPresent()) {
-                        liiteService.save(file.get(), l);
+                        liiteService.saveFileAndLiite(file.get(), l);
                         return mapper.valueToTree(liiteService.get(l.getId()).orElse(null));
                     } else if (l.getUuid() != null) {
                         // Only update liite information to database.

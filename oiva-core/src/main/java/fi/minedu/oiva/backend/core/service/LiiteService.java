@@ -123,7 +123,7 @@ public class LiiteService {
         });
     }
 
-    public Optional<Liite> save(MultipartFile file, Liite liite) {
+    public Optional<Liite> saveFileAndLiite(MultipartFile file, Liite liite) {
         Optional<Path> pathToFile = createFile(file, liite);
         return pathToFile.map(path -> createDbRecord(liite)
                 .map(newId -> {
@@ -208,7 +208,7 @@ public class LiiteService {
                     Map<String, String> metadataMap = metadata2Map(metadata);
                     liite.setMeta(mapper.valueToTree(metadataMap));
 
-                    return saveLiite(file, liite, lupaId)
+                    return saveLiiteAndFileForLupa(file, liite, lupaId)
                             .map(mapper::valueToTree)
                             .orElse(error(liite.getNimi(), "File save failed"));
 
@@ -216,7 +216,7 @@ public class LiiteService {
         ).orElse(error(file.getOriginalFilename(), "Metadata extraction failed"));
     }
 
-    private Optional<Liite> saveLiite(MultipartFile file, Liite liite, Long lupaId) {
+    private Optional<Liite> saveLiiteAndFileForLupa(MultipartFile file, Liite liite, Long lupaId) {
         final Optional<Path> pathToFile = createFile(file, liite);
         if (!pathToFile.isPresent()) {
             return Optional.empty();
