@@ -1030,15 +1030,19 @@ public class MuutospyyntoService {
                 ));
     }
 
+    private Liite findPaatoskirjeLiite(Collection<Liite> liitteet) {
+        return liitteet.stream()
+                .filter(liite -> liite.getTyyppi().equals("paatosKirje"))
+                .findAny()
+                .orElseThrow(() -> new ValidationException("Muutospyynto does not contain a paatoskirje Liite"));
+    }
+
     public Optional<Muutospyynto> setPaatoskirjeLiite(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
         if(Muutospyyntotila.PAATETTY.toString().equals(muutospyynto.getTila())) {
             throw new ValidationException("Muutospyynto state should be before PAATETTY to add Paatoskirje");
         }
 
-        Liite paatoskirjeLiite = muutospyynto.getLiitteet().stream()
-                .filter(liite -> liite.getTyyppi().equals("paatosKirje"))
-                .findAny()
-                .orElseThrow(() -> new ValidationException("Muutospyynto does not contain a paatoskirje Liite"));
+        Liite paatoskirjeLiite = findPaatoskirjeLiite(muutospyynto.getLiitteet());
 
         MultipartFile paatoskirjeFile = fileMap.getOrDefault(paatoskirjeLiite.getTiedostoId(), null);
 
