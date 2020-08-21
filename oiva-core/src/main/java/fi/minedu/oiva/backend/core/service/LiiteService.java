@@ -248,7 +248,7 @@ public class LiiteService {
         return Optional.ofNullable(rcrd.getId());
     }
 
-    private void createLupaLinkDbRecord(Long id, Long lupaId) {
+    public void createLupaLinkDbRecord(Long id, Long lupaId) {
         LupaLiite lupaLiite = new LupaLiite();
         lupaLiite.setLiiteId(id);
         lupaLiite.setLupaId(lupaId);

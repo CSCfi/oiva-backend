@@ -342,6 +342,9 @@ public class MuutospyyntoService {
                     // Create history entry and set ending date for old lupa.
                     createLupahistoria(oldLupa, lupaRecord);
 
+                    // Attach Päätöskirje from Muutospyyntö to new lupa
+                    liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(),lupaRecord.getId());
+
                     // Generate PDF for new lupa
                     lupaService.getById(lupaRecord.getId(), With.all)
                             .ifPresent(l -> {
