@@ -111,16 +111,16 @@ Manuaalisia tietokantaoperaatioita varten on olemassa `oiva-db.sh`-skripti. Sen 
 
 Palautusta varten Docker-kontit pitää olla ajossa. Näiden käynnistäminen on ohjeistettu kohdassa [8.1](#81-Docker-palvelut). Lisäksi oiva-deplyment-repository pitää olla kloonattuna oiva-backend-hakemiston rinnalla. Tämä yksityinen repository sisältää oivan ja kujan todellisen lupadatan.
 
-Tietokannan palautus Oivalle ja Kujalle:
+Tietokannan luonti tai resetointi Oivalle ja Kujalle:
 ```
-$ ./oiva-db.sh amos restore   ## amos - oiva
-$ ./oiva-db.sh yva restore   ## yva - kuja
+$ ./oiva-db.sh amos create   ## amos - oiva
+$ ./oiva-db.sh yva create   ## yva - kuja
 ```
-jOOQ-entitettien uudelleengenerointi:
+
+Jos tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen. Uudelleengeneroinnissa käännetään oiva-core-model-moduuli, joka sisältää tietokantarakenteeseen vaikuttavat tietokantamigraatiot. Migraatiot ajetaan tietokantaa vasten, jonka sen hetkisen rakenteen perusteella muodostetaan DAO- ja entiteettiluokat java-koodina.
 ```
 $ ./oiva-db.sh amos generate
 ```
-Jos tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen. Uudelleengeneroinnissa käännetään oiva-core-model-moduuli, joka sisältää tietokantarakenteeseen vaikuttavat tietokantamigraatiot. Migraatiot ajetaan tietokantaa vasten, jonka sen hetkisen rakenteen perusteella muodostetaan DAO- ja entiteettiluokat java-koodina.
 
 ## 8. Palveluiden käynnistäminen
 

@@ -15,14 +15,15 @@ optionsArg=$@
 
 function showHelp() {
     echo "Usage: ./docker-db.sh amos|yva [CMD] [ARGS]"
-    echo -e "amos      Apply to amos database"
-    echo -e "yva       Apply to yva database"
+    echo -e "amos        Apply to amos database"
+    echo -e "yva         Apply to yva database"
     echo -e ""
     echo -e "CMD options:"
-    echo -e "drop      Remove database schema"
-    echo -e "generate  Run major migrations if necessary, recreate Jooq-entities"
-    echo -e "connect   Connect to database in docker"
-    echo -e "restore   Drop db, restore schema and data from sql dump"
+    echo -e "create      Use to (re-)create local database from scratch. Runs drop and populate in sequence"
+    echo -e "drop        Remove database data and schema"
+    echo -e "generate    Regenerate JOOQ sources and create database schema with major migrations"
+    echo -e "populate    Populate database with seed data"
+    echo -e "connect     Connect to database in docker"
     echo -e ""
     echo -e "ARGS options:"
     echo -e "-o        Use maven offline mode"
@@ -70,14 +71,26 @@ function dropDatabase() {
     mvn $OIVA_MVN_OPTS initialize sql:execute@clean-db
 }
 
+function populate() {
+    mvn $OIVA_MVN_OPTS initialize sql:execute@populate-db
+}
+
+function generate() {
+    rm -rf src/main/generated
+    mvn $OIVA_MVN_OPTS compile -Pgenerate-db
+}
+
 if [[ $cmdArg == "drop" ]]; then
+    echo "Dropping existing database..."
     dropDatabase
 
 elif [[ $cmdArg == "generate" ]]; then
-    echo "Deleting generated sources"
-    rm -rf src/main/generated
-    echo "Regenerating"
-    mvn $OIVA_MVN_OPTS compile -Pgenerate-db
+    echo "Regenerating JOOQ sources and generating database schema..."
+    generate
+
+elif [[ $cmdArg == "populate" ]]; then
+    echo "Seeding database..."
+    populate
 
 elif [[ $cmdArg == "connect" ]]; then
   if [[ $envArg == "amos" ]]; then
@@ -86,10 +99,18 @@ elif [[ $cmdArg == "connect" ]]; then
     docker exec -it oiva-backend_yva-postgres_1 bash -c "psql -U kuja"
   fi
 
-elif [[ $cmdArg == "restore" ]]; then
-    echo "Dropping existing db and restoring from sql dump"
+
+elif [[ $cmdArg == "initialize" ]]; then
+    echo "Regenerating JOOQ sources and generating database schema..."
+    generate
+    echo "Seeding database..."
+    populate
+
+elif [[ $cmdArg == "create" ]]; then
+    echo "Dropping existing database..."
     dropDatabase
-    mvn $OIVA_MVN_OPTS initialize sql:execute@populate-db
+    echo "Seeding database..."
+    populate
 
 else
   abort
