@@ -19,7 +19,7 @@ function showHelp() {
     echo -e "yva         Apply to yva database"
     echo -e ""
     echo -e "CMD options:"
-    echo -e "create      Use to (re-)create local database from scratch. Runs drop, generate and populate in sequence"
+    echo -e "create      Use to (re-)create local database from scratch. Runs drop and populate in sequence"
     echo -e "drop        Remove database data and schema"
     echo -e "generate    Regenerate JOOQ sources and create database schema with major migrations"
     echo -e "populate    Populate database with seed data"
@@ -109,8 +109,6 @@ elif [[ $cmdArg == "initialize" ]]; then
 elif [[ $cmdArg == "create" ]]; then
     echo "Dropping existing database..."
     dropDatabase
-    echo "Regenerating JOOQ sources and generating database schema..."
-    generate
     echo "Seeding database..."
     populate
 
