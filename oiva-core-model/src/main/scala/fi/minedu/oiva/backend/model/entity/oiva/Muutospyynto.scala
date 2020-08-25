@@ -25,8 +25,7 @@ class Muutospyynto(
 
   def this() = this(null,null,null,null,null,null,null)
 
-  // exclude from json
-  @JsonIgnore override def getId: lang.Long = super.getId
+  override def getId: lang.Long = super.getId
 
   def getLupaUuid: String = lupa_uuid
   def setLupaUuid(lupaUuid: String): Unit = this.lupa_uuid = lupaUuid
