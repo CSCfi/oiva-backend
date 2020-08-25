@@ -997,6 +997,7 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+            muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
                 throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
