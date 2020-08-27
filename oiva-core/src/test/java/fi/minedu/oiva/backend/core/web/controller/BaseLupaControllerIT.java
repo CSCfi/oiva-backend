@@ -2,25 +2,21 @@ package fi.minedu.oiva.backend.core.web.controller;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.MapFunction;
 import com.jayway.jsonpath.Option;
 import fi.minedu.oiva.backend.core.it.BaseIT;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
-import org.assertj.core.util.Lists;
+import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -67,6 +63,15 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         // With oppilaitostyyppi 1
         params.remove(PARAM_KOULUTUSTYYPPI);
         getLuvat(params, 2);
+    }
+
+    @Test
+    public void getLatestByYtunnus() {
+        setUpDb("sql/extra_lupa_data.sql");
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin", HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(response.getBody());
+        assertEquals("23/223/2020", doc.read("$.diaarinumero"));
     }
 
     @Test

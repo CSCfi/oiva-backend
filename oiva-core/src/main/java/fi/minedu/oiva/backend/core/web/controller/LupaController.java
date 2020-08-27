@@ -1,17 +1,17 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
-import fi.minedu.oiva.backend.model.entity.oiva.Lupahistoria;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.LupaService;
 import fi.minedu.oiva.backend.core.service.LupahistoriaService;
 import fi.minedu.oiva.backend.core.util.RequestUtils;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
+import fi.minedu.oiva.backend.model.entity.oiva.Lupahistoria;
+import fi.minedu.oiva.backend.model.entity.opintopolku.Organisaatio;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,9 +34,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
         produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Lupien hallinta")
 public class LupaController {
-
-    @Value("${templates.base.path}")
-    private String templateBasePath;
 
     public static final String path = "/luvat";
 
@@ -71,11 +68,20 @@ public class LupaController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}")
-    @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen perusteella", value = "")
+    @ApiOperation(notes = "Palauttaa voimassa olevan luvan järjestäjän ytunnuksen perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus,
                                                             final @RequestParam(value = "with", required = false) String with,
                                                             final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
         return getOr404(async(() -> service.getByYtunnus(ytunnus, useKoodistoVersions, options(with))));
+    }
+
+    @OivaAccess_Esittelija
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/viimeisin")
+    @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen perusteella", value = "")
+    public CompletableFuture<HttpEntity<Lupa>> getLatestByYtunnus(final @PathVariable String ytunnus,
+                                                                  final @RequestParam(value = "with", required = false) String with,
+                                                                  final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
+        return getOr404(async(() -> service.getLatestByYtunnus(ytunnus, useKoodistoVersions, options(with))));
     }
 
     @OivaAccess_Public
