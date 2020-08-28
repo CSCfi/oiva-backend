@@ -61,10 +61,6 @@ public class PrinceXMLService {
                 merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.hallintolakiKorjaus2017).getPath());
             }
 
-            if(options.hasAttachment(AttachmentType.paatosKirje)) {
-                merger.addSource(templateBasePath + "/liitteet/" + options.getAttachment(AttachmentType.paatosKirje).getPath());
-            }
-
             merger.addSource(base);
 
             if(options.hasAttachment(AttachmentType.tutkintoNimenMuutos)) {

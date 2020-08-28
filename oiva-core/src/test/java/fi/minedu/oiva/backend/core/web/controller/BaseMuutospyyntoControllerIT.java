@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +56,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     @Test
     public void saveWithoutLogin() throws IOException {
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
         assertEquals("Response code should match!", HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
@@ -63,7 +64,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void saveWithoutProperRole() throws IOException {
         loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Katselija);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
         assertEquals("Response code should match!", HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
@@ -71,7 +72,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void saveWithoutProperOrganisation() throws IOException {
         loginAs("testuser", "1.2.3.4", OivaAccess.Context_Kayttaja);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
         assertEquals("Response code should match! Response was\n" + response, HttpStatus.FORBIDDEN, response.getStatusCode());
     }
 
@@ -79,7 +80,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void saveWithSuperiorRole() throws IOException {
         loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Nimenkirjoittaja);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
         assertEquals("Response code should match!", OK, response.getStatusCode());
     }
 
@@ -93,7 +94,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Create new
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json"),
-                "file0", "file1", "file2", "file3", "file4", "file5"));
+                "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/tallenna");
         assertEquals("Response status should match", OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
@@ -142,7 +143,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final String changeName = "muutos_liite4_changed";
         doc.set("$..meta.liitteet[?(@.nimi == 'muutos_liite4')].nimi", changeName);
 
-        final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()));
+        final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()), "/api/muutospyynnot/tallenna");
 
         assertEquals("Update response code should match!", OK, updateResponse.getStatusCode());
 
@@ -185,7 +186,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Create new muutospyynto
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json"),
-                "file0", "file1", "file2", "file3", "file4", "file5"));
+                "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/tallenna");
         assertEquals("Response status should match", OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
         final String uuid = doc.read("$.uuid", String.class);
@@ -207,6 +208,18 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 "/api/muutospyynnot/tila/esittelyssa/" + uuid,
                 null, OK).getBody();
 
+        // Add paatoskirje
+        Map<String, String> paatosKirje = new HashMap<>();
+        paatosKirje.put("nimi", "paatoskirje");
+        paatosKirje.put("tiedostoId", "paatoskirje");
+        paatosKirje.put("tyyppi", "paatosKirje");
+        paatosKirje.put("kieli", "fi");
+        doc.add("$.liitteet", paatosKirje);
+        final ResponseEntity<String> paatoskirjeResponse = requestSave(prepareMultipartEntity(doc.jsonString(), "paatoskirje"),
+                "api/muutospyynnot/" + uuid + "/liitteet/paatoskirje");
+
+        assertEquals("Paatoskirje save should have been success!", OK, paatoskirjeResponse.getStatusCode());
+
         // Change muutospyynto tila to "PAATETTY"
         final String response = makeRequest(POST,
                 "/api/muutospyynnot/tila/paatetty/" + uuid,
@@ -218,7 +231,10 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1111111-1?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
-        assertEquals("Lupa diaarinumero should match.", "20/531/2018", doc.read("$.diaarinumero"));
+        final String asianumero = doc.read("$.asianumero", String.class);
+        assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);
+        assertEquals("Lupa asianumero should match!", "VN/123456/1234", asianumero);
+
         assertEquals("Maarays count should match!", 5, doc.read("$.maaraykset.length()",
                 Integer.class).intValue());
         assertEquals("AliMaarays count should match!", 5,
@@ -248,7 +264,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Create new
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json"),
-                "file0", "file1", "file2", "file3", "file4", "file5"));
+                "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/tallenna");
         assertEquals("Response status should match", OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
@@ -258,7 +274,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Remove all changes from update
         doc.set("$.muutokset", Collections.EMPTY_LIST);
 
-        final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()));
+        final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()), "/api/muutospyynnot/tallenna");
         assertEquals("Update response code should match!", OK, updateResponse.getStatusCode());
 
         assertEquals("Liite table count should match!", 2,
@@ -295,7 +311,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
 
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
 
         DocumentContext doc = jsonPath.parse(response.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
@@ -319,7 +335,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
 
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
 
         DocumentContext doc = jsonPath.parse(response.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
@@ -340,7 +356,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Nimenkirjoittaja);
 
         ResponseEntity<String> response = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json")));
+                readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
 
         DocumentContext doc = jsonPath.parse(response.getBody());
         log.info("Muutospyynto createResponse: {}", doc.jsonString());
@@ -382,11 +398,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
         // ----- CREATE NEW -----
         ResponseEntity<String> createResponse =
-                restTemplate.postForEntity(
-                        createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
-                        prepareMultipartEntity(readFileToString("json/muutospyynto.json"),
-                                "file0", "file1", "file2", "file3", "file4", "file5"),
-                        String.class);
+                requestSave(prepareMultipartEntity(readFileToString("json/muutospyynto.json"),
+                        "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/esittelija/tallenna");
 
         assertEquals("Response status should match", HttpStatus.OK, createResponse.getStatusCode());
         DocumentContext doc = jsonPath.parse(createResponse.getBody());
@@ -415,10 +428,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 .put("$", "asianumero", asianumero);
 
         final ResponseEntity<String> updateResponse =
-                restTemplate.postForEntity(
-                        createURLWithPort("/api/muutospyynnot/esittelija/tallenna"),
-                        prepareMultipartEntity(doc.jsonString()),
-                        String.class);
+                requestSave(prepareMultipartEntity(doc.jsonString()), "/api/muutospyynnot/esittelija/tallenna");
 
         assertEquals("Update response code should match!", HttpStatus.OK, updateResponse.getStatusCode());
         doc = jsonPath.parse(updateResponse.getBody());
@@ -509,9 +519,9 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("false", resp);
     }
 
-    private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity) {
+    private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity, String uri) {
         return restTemplate
-                .postForEntity(createURLWithPort("/api/muutospyynnot/tallenna"), requestEntity, String.class);
+                .postForEntity(createURLWithPort(uri), requestEntity, String.class);
     }
 
     private ResponseEntity<String> requestLiitteet(String uuid) {
