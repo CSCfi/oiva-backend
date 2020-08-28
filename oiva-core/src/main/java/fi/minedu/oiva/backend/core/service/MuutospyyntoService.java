@@ -329,6 +329,7 @@ public class MuutospyyntoService {
                             .orElseThrow(() -> new RuntimeException("Cannot find muutospyynto"));
                     lupaDTO.setLupatila(tila);
                     lupaDTO.setAsiatyyppi(asiatyyppi);
+                    lupaDTO.setDiaarinumero(lupaDTO.getAsianumero());
 
                     final LupaRecord lupaRecord = dsl.newRecord(LUPA, lupaDTO);
                     lupaRecord.setLupatilaId(tila.getId());
