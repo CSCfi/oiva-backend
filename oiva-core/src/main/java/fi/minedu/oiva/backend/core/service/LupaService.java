@@ -220,6 +220,7 @@ public class LupaService extends BaseService {
         if (withOption(Organisaatio.class, with)) withOrganization(lupaOpt);
         if (withOption(Maarays.class, with)) withMaaraykset(lupaOpt, with);
         if (withOption(KoodistoKoodi.class, with)) withKoodisto(lupaOpt, useKoodistoVersions);
+        if (withOption(Liite.class, with)) withLiitteet(lupaOpt);
         return lupaOpt;
     }
 
@@ -235,6 +236,10 @@ public class LupaService extends BaseService {
         lupaOpt.ifPresent(lupa -> {
             if (null != lupa.maaraykset()) lupa.maaraykset().forEach(m -> maaraysService.withKoodisto(m, useKoodistoVersions));
         });
+    }
+
+    protected void withLiitteet(final Optional<Lupa> lupaOpt) {
+        lupaOpt.ifPresent(lupa -> lupa.setLiitteet(getAttachments(lupaOpt.get().getId())));
     }
 
     public boolean hasTutkintoNimenMuutos(final Lupa lupa) {
@@ -255,7 +260,7 @@ public class LupaService extends BaseService {
     }
 
     public Collection<Liite> getAttachments(final long lupaId) { // TODO: Add baseLupaFilter here
-        return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI).from(LIITE, LUPA_LIITE)
+        return dsl.select(LIITE.POLKU, LIITE.NIMI, LIITE.TYYPPI, LIITE.UUID).from(LIITE, LUPA_LIITE)
                 .where((LUPA_LIITE.LIITE_ID.eq((LIITE.ID))).and(LUPA_LIITE.LUPA_ID.eq(lupaId))).fetchInto(Liite.class);
     }
 
