@@ -329,6 +329,7 @@ public class MuutospyyntoService {
                             .orElseThrow(() -> new RuntimeException("Cannot find muutospyynto"));
                     lupaDTO.setLupatila(tila);
                     lupaDTO.setAsiatyyppi(asiatyyppi);
+                    lupaDTO.setDiaarinumero(lupaDTO.getAsianumero());
 
                     final LupaRecord lupaRecord = dsl.newRecord(LUPA, lupaDTO);
                     lupaRecord.setLupatilaId(tila.getId());
@@ -341,6 +342,9 @@ public class MuutospyyntoService {
 
                     // Create history entry and set ending date for old lupa.
                     createLupahistoria(oldLupa, lupaRecord);
+
+                    // Attach Päätöskirje from Muutospyyntö to new lupa
+                    liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(),lupaRecord.getId());
 
                     // Generate PDF for new lupa
                     lupaService.getById(lupaRecord.getId(), With.all)
@@ -997,6 +1001,7 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+            muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
                 throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
@@ -1030,10 +1035,34 @@ public class MuutospyyntoService {
                 ));
     }
 
+    private Liite findPaatoskirjeLiite(Collection<Liite> liitteet) {
+        return liitteet.stream()
+                .filter(liite -> liite.getTyyppi().equals("paatosKirje"))
+                .findAny()
+                .orElseThrow(() -> new ValidationException("Muutospyynto does not contain a paatoskirje Liite"));
+    }
+
+    public Optional<Muutospyynto> setPaatoskirjeLiite(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
+        if(Muutospyyntotila.PAATETTY.toString().equals(muutospyynto.getTila())) {
+            throw new ValidationException("Muutospyynto state should be before PAATETTY to add Paatoskirje");
+        }
+
+        Liite paatoskirjeLiite = findPaatoskirjeLiite(muutospyynto.getLiitteet());
+
+        MultipartFile paatoskirjeFile = fileMap.getOrDefault(paatoskirjeLiite.getTiedostoId(), null);
+
+        if(paatoskirjeFile == null) {
+            throw new ValidationException("MultipartFile matching Muutospyynto paatoskirje Liite not found");
+        }
+
+        createMuutospyyntoLiite(muutospyynto.getId(), paatoskirjeLiite, paatoskirjeFile);
+        return Optional.of(muutospyynto);
+    }
+
     private void createMuutospyyntoLiite(Long muutospyyntoId, Liite liite, MultipartFile file) {
         // Remove old if exists and replace it with new one
         liiteService.delete(liite);
-        liiteService.save(file, liite)
+        liiteService.saveFileAndLiite(file, liite)
                 .ifPresent(l -> {
                     final MuutospyyntoLiite link = new MuutospyyntoLiite();
                     link.setLiiteId(l.getId());
@@ -1190,7 +1219,7 @@ public class MuutospyyntoService {
     private void createMuutosLiite(Long muutosId, Liite liite, MultipartFile file) {
         // Remove old if exists and replace it with new one.
         liiteService.delete(liite);
-        liiteService.save(file, liite)
+        liiteService.saveFileAndLiite(file, liite)
                 .ifPresent(l -> {
                     final MuutosLiite link = new MuutosLiite();
                     link.setLiiteId(l.getId());
@@ -1217,7 +1246,7 @@ public class MuutospyyntoService {
                 .stream().map(l -> {
                     final Optional<MultipartFile> file = Optional.ofNullable(fileMap.get(l.getTiedostoId()));
                     if (file.isPresent()) {
-                        liiteService.save(file.get(), l);
+                        liiteService.saveFileAndLiite(file.get(), l);
                         return mapper.valueToTree(liiteService.get(l.getId()).orElse(null));
                     } else if (l.getUuid() != null) {
                         // Only update liite information to database.

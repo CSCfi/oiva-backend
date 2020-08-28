@@ -15,9 +15,10 @@ class Lupa(
     var asiatyyppi: Asiatyyppi,
     var lupatila: Lupatila,
     var jarjestaja: Organisaatio,
-    var maaraykset: Collection[Maarays]) extends pojos.Lupa {
+    var maaraykset: Collection[Maarays],
+    var liitteet: Collection[Liite]) extends pojos.Lupa {
 
-    def this() = this(null, null, null, null, null)
+    def this() = this(null, null, null, null, null, null)
 
     // exclude from json
     @JsonIgnore override def getId = super.getId
@@ -47,6 +48,9 @@ class Lupa(
 
     @JsonIgnore def getUUIDValue = getUuid.toString
     @JsonIgnore def getPDFFileName = "lupa-" + RegExUtils.replaceAll(Option(getAsianumero).getOrElse(getDiaarinumero), "/", "-") + ".pdf"
+
+    def getLiitteet = liitteet
+    def setLiitteet(liitteet: Collection[Liite]): Unit = this.liitteet = liitteet
 
     def canEqual(other: Any): Boolean = other.isInstanceOf[Lupa]
 
