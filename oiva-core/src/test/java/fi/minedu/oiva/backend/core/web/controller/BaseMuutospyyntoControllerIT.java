@@ -46,7 +46,6 @@ import static org.springframework.http.HttpStatus.OK;
 public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     private final String lupaJarjestajaOid = "1.1.111.111.11.11111111111";
-    private final String okmOid = "1.1.111.111.11.22222222";
 
     @Override
     public void beforeTest() {
