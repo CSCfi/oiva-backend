@@ -38,7 +38,7 @@ public interface OivaAccess {
     String Yllapitaja = Application + " and hasAuthority('" + Role_Yllapitaja + "')";
     String Esittelija = Application + " and hasAuthority('" + Role_Esittelija + "')";
     String Nimenkirjoittaja = Application + " and hasAuthority('" + Role_Nimenkirjoittaja + "')";
-    String Kayttaja = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "')";
+    String Kayttaja = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "," + Role_Esittelija + "')";
     String Katselija = Application + " and hasAnyAuthority('" + Role_Nimenkirjoittaja + "," + Role_Kayttaja + "," +
             Role_Katselija + "')";
 

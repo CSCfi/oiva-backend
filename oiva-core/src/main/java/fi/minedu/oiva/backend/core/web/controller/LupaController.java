@@ -1,7 +1,7 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Kayttaja;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.LupaService;
 import fi.minedu.oiva.backend.core.service.LupahistoriaService;
@@ -75,7 +75,7 @@ public class LupaController {
         return getOr404(async(() -> service.getByYtunnus(ytunnus, useKoodistoVersions, options(with))));
     }
 
-    @OivaAccess_Esittelija
+    @OivaAccess_Kayttaja
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/viimeisin")
     @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getLatestByYtunnus(final @PathVariable String ytunnus,
