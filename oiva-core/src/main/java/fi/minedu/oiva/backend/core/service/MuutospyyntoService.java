@@ -665,7 +665,9 @@ public class MuutospyyntoService {
         }
 
         try {
-            UUID.fromString(muutospyynto.getLupaUuid());
+            if (muutospyynto.getLupaUuid() != null) {
+                UUID.fromString(muutospyynto.getLupaUuid());
+            }
         } catch (IllegalArgumentException e) {
             throw new ForbiddenException("Muutospyynto should have a valid lupa uuid");
         }
@@ -831,9 +833,9 @@ public class MuutospyyntoService {
                         .ifPresent(m::setPaatoskierros));
     }
 
-    private Optional<String> getLupaUuid(long id) {
-        return dsl.select(LUPA.UUID).from(LUPA)
-                .where(LUPA.ID.eq(id)).fetchOptionalInto(String.class);
+    private Optional<String> getLupaUuid(Long id) {
+        return Optional.ofNullable(id).flatMap(lupaId -> dsl.select(LUPA.UUID).from(LUPA)
+                .where(LUPA.ID.eq(lupaId)).fetchOptionalInto(String.class));
     }
 
     private Optional<Long> getKohdeId(UUID uuid) {
@@ -1006,7 +1008,7 @@ public class MuutospyyntoService {
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
                 throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
             }
-            muutospyyntoRecord.setLupaId(lupa.get().getId());
+            muutospyyntoRecord.setLupaId(lupa.map(Lupa::getId).orElse(null));
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();
