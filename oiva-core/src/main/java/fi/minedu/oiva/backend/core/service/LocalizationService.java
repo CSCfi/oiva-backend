@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -29,6 +32,10 @@ public class LocalizationService {
 
     @Value("${opintopolku.baseUrl}${opintopolku.lokalisaatio.restUrl}")
     private String localizationUrl;
+    @Value("${opintopolku.apiCaller.header}")
+    private String callerHeader;
+    @Value("${opintopolku.apiCaller.id}")
+    private String callerId;
 
     private final RestTemplate restTemplate;
 
@@ -39,9 +46,11 @@ public class LocalizationService {
 
     @Cacheable(value = "LocalizationService:get", key = "#lang")
     public Map<String, String> getTranslations(final String lang) {
-        final String body = restTemplate.getForObject(String.
-                format(localizationUrl + urlSuffix, lang), String.class);
-        return parseTranslations(body);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(callerHeader, callerId);
+        final ResponseEntity<String> response = restTemplate.exchange(String.format(localizationUrl + urlSuffix, lang),
+                HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        return parseTranslations(response.getBody());
     }
 
     @CacheEvict(value = "LocalizationService", allEntries = true)
@@ -55,7 +64,10 @@ public class LocalizationService {
             data.add(localization);
         });
         try {
-            final ResponseEntity<String> response = restTemplate.postForEntity(localizationUrl + "/update", data,
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(callerHeader, callerId);
+            final ResponseEntity<String> response = restTemplate.exchange(localizationUrl + "/update",
+                    HttpMethod.POST, new HttpEntity<>(data, headers),
                     String.class);
             return new ResponseEntity<>(parseTranslations(response.getBody()), response.getStatusCode());
         } catch (HttpClientErrorException e) {
