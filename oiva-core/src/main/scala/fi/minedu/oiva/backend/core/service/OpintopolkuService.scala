@@ -114,7 +114,8 @@ class OpintopolkuService extends CacheAware {
 
     def requestWithCasTicket(serviceUrl: String)(httpRequest: dispatch.Req) =
         casClient.getTicket(serviceUrl, opintopolkuApiUsername, opintopolkuApiPassword)
-            .flatMap { ticket => Http(httpRequest.addQueryParameter("ticket", ticket) OK as.String) }.apply()
+            .flatMap { ticket => Http(httpRequest.addHeader(callerHeader, callerId)
+              .addQueryParameter("ticket", ticket) OK as.String) }.apply()
 
     /**
       * Käyttöoikeus-palvelu
@@ -124,7 +125,8 @@ class OpintopolkuService extends CacheAware {
       */
     def getKayttajaKayttooikeus(username: String): Optional[KayttajaKayttooikeus] = {
         val response = requestWithCasTicket(kayttooikeusServiceUrl) {
-            url(kayttooikeusServiceUrl + "/kayttooikeus/kayttaja?username=" + username).GET
+            url(kayttooikeusServiceUrl + "/kayttooikeus/kayttaja?username=" + username)
+              .addHeader(callerHeader, callerId).GET
         }
         def toEntityList(response: String): java.util.List[KayttajaKayttooikeus] =
             ObjectMapperSingleton.mapper.readValue(response, new TypeReference[java.util.List[KayttajaKayttooikeus]](){})
