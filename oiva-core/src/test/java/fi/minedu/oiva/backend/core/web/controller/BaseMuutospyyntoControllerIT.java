@@ -446,6 +446,19 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         makeRequest(GET, "/api/muutospyynnot/id/" + uuid, null, NOT_FOUND);
     }
 
+    @Test
+    public void esittelijaCreatesNewOrganizationLupa() throws IOException {
+        loginAs("elli esittelija", "", OivaAccess.Context_Esittelija);
+        final DocumentContext doc = jsonPath.parse(readFileToString("json/muutospyynto.json"));
+        // Remove lupa uuid and change jarjesta information for KJ that has no existing lupa.
+        doc.delete("$.lupaUuid");
+        doc.set("$.jarjestajaOid", "1.2.3.4.111111");
+        doc.set("$.jarjestajaYtunnus", "12345-1");
+        final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+                doc.jsonString()), "/api/muutospyynnot/esittelija/tallenna");
+        assertEquals("Response code should match!", OK, response.getStatusCode());
+    }
+
     /**
      * Test generated lupa object based on existing lupa and muutospyynto.
      * Templates used to generate html files are in another repository so html and pdf generation are mocked

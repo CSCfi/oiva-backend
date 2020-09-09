@@ -187,7 +187,8 @@ public class LupaService extends BaseService {
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.UUID.equal(UUID.fromString(uuid))), withOptions);
+        return Optional.ofNullable(uuid).map(UUID::fromString)
+                .flatMap(u -> get(baseLupaSelect().where(LUPA.UUID.equal(u)), withOptions));
     }
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {
