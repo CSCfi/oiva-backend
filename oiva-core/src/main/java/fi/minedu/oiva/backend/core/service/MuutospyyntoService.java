@@ -649,16 +649,15 @@ public class MuutospyyntoService {
     }
 
     // VALIDOINNIT
-    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroValidity) {
+    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroDuplicates) {
         String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
-        boolean asianumeroIsValid = !checkAsianumeroValidity ||
-                (!duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) && validAsianumero(muutospyynto.getAsianumero()));
-
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
-                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) && asianumeroIsValid;
+                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
+                validAsianumero(muutospyynto.getAsianumero()) &&
+                (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()));
 
         if (!isValid) {
             throw new ValidationException("Invalid object");

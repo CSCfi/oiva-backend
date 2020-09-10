@@ -167,6 +167,7 @@ public class LupamuutosServiceTest {
         muutospyynto.setMuutokset(new LinkedList<>());
         muutospyynto.setJarjestajaYtunnus(lupa.getJarjestajaYtunnus());
         muutospyynto.setLupaUuid(UUID.randomUUID().toString());
+        muutospyynto.setAsianumero("VN/1234/1234");
         return muutospyynto;
     }
 
