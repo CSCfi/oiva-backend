@@ -75,7 +75,7 @@ spring:
         initialize: false
     mvc:
       async:
-        request-timeout: 60000 # Async request timeout 60 seconds.
+        request-timeout: 180000 # Async request timeout 180 seconds.
 
 redis:
     host: override_this_in_local_application_yml

@@ -62,6 +62,8 @@ public class ExportController extends BaseExportController {
     @ApiOperation(notes = "Tarjoaa kustannustiedot kaikista luvista jotka ovat olleet / ovat voimassa annetulla aikavälillä.", value = "",
             authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<ResponseEntity<Collection<Lupa>>> getKustannustiedot(
+            @ApiParam(value = "Koulutustyyppi (jos ei annettu haetaan ammatilliset koulutuksen kustannustiedot")
+            @RequestParam(required = false) String koulutustyyppi,
             @ApiParam(value = "Aloituspäivämäärä ISO formaatissa. Esim. 2018-01-01")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @ApiParam(value = "Loppupäivämäärä ISO formaatissa. Esim. 2018-12-31")
@@ -69,6 +71,6 @@ public class ExportController extends BaseExportController {
         if (startDate.isAfter(endDate)) {
             return async(() -> new ResponseEntity<>(Collections.emptyList(), HttpStatus.BAD_REQUEST));
         }
-        return async(() -> new ResponseEntity<>(service.getKustannusTiedot(startDate, endDate), HttpStatus.OK));
+        return async(() -> new ResponseEntity<>(service.getKustannusTiedot(koulutustyyppi, startDate, endDate), HttpStatus.OK));
     }
 }

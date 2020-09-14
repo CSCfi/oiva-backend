@@ -20,7 +20,13 @@ public class KohdeService {
     private DSLContext dsl;
 
     public Collection<Kohde> getAll() {
-        return dsl.select(KOHDE.fields()).from(KOHDE).fetchInto(Kohde.class);
+        return getAll(null);
+    }
+
+    public Collection<Kohde> getAll(String koulutustyyppi) {
+        return dsl.select(KOHDE.fields()).from(KOHDE)
+                .where(koulutustyyppi == null ? KOHDE.KOULUTUSTYYPPI.isNull() : KOHDE.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .fetchInto(Kohde.class);
     }
 
     public Optional<Long> idForTunniste(final String tunniste) {

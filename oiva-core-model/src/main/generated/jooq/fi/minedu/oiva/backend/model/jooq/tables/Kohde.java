@@ -40,7 +40,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Kohde extends TableImpl<KohdeRecord> {
 
-    private static final long serialVersionUID = -197627573;
+    private static final long serialVersionUID = 1111028144;
 
     /**
      * The reference instance of <code>kohde</code>
@@ -94,6 +94,11 @@ public class Kohde extends TableImpl<KohdeRecord> {
      * The column <code>kohde.uuid</code>.
      */
     public final TableField<KohdeRecord, UUID> UUID = createField("uuid", org.jooq.impl.SQLDataType.UUID.nullable(false).defaultValue(org.jooq.impl.DSL.field("uuid_generate_v1()", org.jooq.impl.SQLDataType.UUID)), this, "");
+
+    /**
+     * The column <code>kohde.koulutustyyppi</code>.
+     */
+    public final TableField<KohdeRecord, String> KOULUTUSTYYPPI = createField("koulutustyyppi", org.jooq.impl.SQLDataType.VARCHAR, this, "");
 
     /**
      * Create a <code>kohde</code> table reference

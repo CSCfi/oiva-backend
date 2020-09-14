@@ -127,7 +127,7 @@ public class LupaController {
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/organisaatiot")
     @ApiOperation(notes = "Palauttaa kaikki organisaatiot, joille löytyy voimassa oleva lupa järjestelmästä", value = "")
-    public CompletableFuture<Collection<Organisaatio>> getLupaorganisaatiot() {
-        return async(() -> service.getLupaorganisaatiot());
+    public CompletableFuture<Collection<Organisaatio>> getLupaorganisaatiot(@RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi) {
+        return async(() -> service.getLupaorganisaatiot(koulutustyyppi));
     }
 }

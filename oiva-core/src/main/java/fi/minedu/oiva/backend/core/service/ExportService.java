@@ -67,8 +67,9 @@ public class ExportService {
      *
      * @return Lista kaikista luvista
      */
-    public Collection<Lupa> getKustannusTiedot(LocalDate start, LocalDate end) {
+    public Collection<Lupa> getKustannusTiedot(String koulutustyyppi, LocalDate start, LocalDate end) {
         final Condition filter = LUPA.ALKUPVM.lessOrEqual(Date.valueOf(end))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.greaterThan(Date.valueOf(start))));
         return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class, KoodistoKoodi.class));
     }

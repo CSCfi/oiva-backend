@@ -34,7 +34,7 @@ server:
 spring:
     mvc:
       async:
-        request-timeout: 120000
+        request-timeout: 180000
 
 redis:
    host: localhost
