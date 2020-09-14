@@ -308,7 +308,7 @@ public class MuutospyyntoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
         final String[] options = options(Maarays.class, Organisaatio.class);
         Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
-                .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+                .orElse(null);
         if (!Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila())) {
             throw new ForbiddenException("Action is not allowed");
         }
@@ -365,8 +365,7 @@ public class MuutospyyntoService {
             withOrganization(mp);
 
             final String[] options = options(Maarays.class, Organisaatio.class, KoodistoKoodi.class);
-            Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
-                    .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+            Optional<Lupa> oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options);
 
             LupatilaValue lupaTila = (Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ||
                     Muutospyyntotila.PAATETTY.toString().equals(mp.getTila())) ?
@@ -388,14 +387,15 @@ public class MuutospyyntoService {
             lupa.setLuoja(authService.getUsername());
             lupa.setAlkupvm(mp.getVoimassaalkupvm());
             lupa.setLoppupvm(mp.getVoimassaloppupvm());
-            lupa.setEdellinenLupaId(oldLupa.getId());
+            lupa.setEdellinenLupaId(oldLupa.map(Lupa::getId).orElse(null));
 
             final Set<Long> removed = getMuutoksetRecursively(mp.getMuutokset())
                     .filter(MuutospyyntoService::isPoisto)
                     .map(Muutos::getMaaraysId)
                     .collect(Collectors.toSet());
             // Copy maaraykset which are not removed
-            final Collection<Maarays> maaraykset = filterOutRemoved(oldLupa.getMaaraykset(), removed);
+            final Collection<Maarays> maaraykset = oldLupa.map(l -> filterOutRemoved(l.getMaaraykset(), removed))
+                    .orElse(new ArrayList<>());
             lupa.setMaaraykset(maaraykset);
             // Copy muutokset from muutospyynto and convert to maarays
             lupa.getMaaraykset().addAll(convertToMaaraykset(mp.getMuutokset(), maaraykset));
@@ -518,6 +518,9 @@ public class MuutospyyntoService {
     }
 
     private void createLupahistoria(Lupa oldLupa, LupaRecord lupa) {
+        if (oldLupa == null) {
+            return;
+        }
         final LupaRecord oldLupaRecord = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getId()));
         final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
         oldLupaRecord.setLoppupvm(Date.valueOf(loppupvm));

@@ -449,14 +449,46 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     @Test
     public void esittelijaCreatesNewOrganizationLupa() throws IOException {
         loginAs("elli esittelija", "", OivaAccess.Context_Esittelija);
-        final DocumentContext doc = jsonPath.parse(readFileToString("json/muutospyynto.json"));
+        DocumentContext doc = jsonPath.parse(readFileToString("json/muutospyynto.json"));
         // Remove lupa uuid and change jarjesta information for KJ that has no existing lupa.
         doc.delete("$.lupaUuid");
         doc.set("$.jarjestajaOid", "1.2.3.4.111111");
         doc.set("$.jarjestajaYtunnus", "12345-1");
-        final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+        final ResponseEntity<String> createdResponse = requestSave(prepareMultipartEntity(
                 doc.jsonString()), "/api/muutospyynnot/esittelija/tallenna");
-        assertEquals("Response code should match!", OK, response.getStatusCode());
+        assertEquals("Response code should match!", OK, createdResponse.getStatusCode());
+        doc = jsonPath.parse(createdResponse.getBody());
+        final String uuid = doc.read("$.uuid", String.class);
+
+        // Change tila to "ESITTELYSSA"
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/esittelyssa/" + uuid,
+                null, OK).getBody();
+
+        // Add paatoskirje
+        Map<String, String> paatosKirje = new HashMap<>();
+        paatosKirje.put("nimi", "paatoskirje");
+        paatosKirje.put("tiedostoId", "paatoskirje");
+        paatosKirje.put("tyyppi", "paatosKirje");
+        paatosKirje.put("kieli", "fi");
+        doc.add("$.liitteet", paatosKirje);
+        final ResponseEntity<String> paatoskirjeResponse = requestSave(prepareMultipartEntity(doc.jsonString(), "paatoskirje"),
+                "api/muutospyynnot/" + uuid + "/liitteet/paatoskirje");
+
+        assertEquals("Paatoskirje save should have been success!", OK, paatoskirjeResponse.getStatusCode());
+
+        // Change muutospyynto tila to "PAATETTY"
+        final String response = makeRequest(POST,
+                "/api/muutospyynnot/tila/paatetty/" + uuid,
+                null, OK).getBody();
+        assertEquals("\"" + uuid + "\"", response);
+
+        // Fetch the latest lupa for jarjestaja
+        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/12345-1?with=all", OK);
+        doc = jsonPath.parse(lupaJson.getBody());
+        final String asianumero = doc.read("$.asianumero", String.class);
+        assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);
+        assertEquals("Lupa asianumero should match!", "VN/123456/1234", asianumero);
     }
 
     /**
