@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter.Type.htmlClass;
 import static fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter.Type.toimintaAlueArvo;
+import static fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter.Type.tutkintokieliGroup;
 import static fi.minedu.oiva.backend.core.extension.MaaraysTransformerFilter.Type.ylakoodi;
 import static fi.minedu.oiva.backend.core.extension.MuutosTransformerFilter.Type.muutosYlakoodi;
 import static fi.minedu.oiva.backend.core.extension.SortListFilter.SortTarget.luvat;
@@ -34,6 +35,7 @@ public class OivaPebbleConfig extends PebbleConfig {
                 filters.put("muutosToimintaAlueArvo", new MuutosTransformerFilter(MuutosTransformerFilter.Type.toimintaAlueArvo));
                 filters.put("ylakoodi", new MaaraysTransformerFilter(ylakoodi));
                 filters.put("htmlClass", new MaaraysTransformerFilter(htmlClass));
+                filters.put("groupTutkintokielet", new MaaraysTransformerFilter(tutkintokieliGroup));
                 filters.put("sortLupa", new SortListFilter(luvat));
                 filters.put("sortMaarays", new SortListFilter(maaraykset));
                 filters.put("sortMuutos", new SortListFilter(muutokset));
