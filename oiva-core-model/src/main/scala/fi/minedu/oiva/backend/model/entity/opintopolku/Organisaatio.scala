@@ -15,6 +15,7 @@ import scala.collection.JavaConversions._
 @JsonInclude(Include.NON_NULL)
 case class Organisaatio(
                          @BeanProperty var oid: String,
+                         @BeanProperty var status: String,
                          @BeanProperty var ytunnus: String,
                          @BeanProperty var parentOid: String,
                          @BeanProperty var parentOidPath: String,
@@ -28,7 +29,7 @@ case class Organisaatio(
                          @BeanProperty var muutKotipaikatUris: util.Collection[String],
                          @BeanProperty var muutKuntaKoodit: util.Collection[KoodistoKoodi]) {
 
-  def this() = this(null, null, null, null, null, null, null, null, null, null, null, null, null)
+  def this() = this(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
   @JsonIgnore def kuntaKoodiArvo = parseKuntaKoodi(kotipaikkaUri)
 
@@ -93,7 +94,7 @@ object Organisaatio {
     def this() = this(null, null, null)
   }
 
-  def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null, null, null, null, null, null)
+  def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null, null, null, null, null, null, null)
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
