@@ -2,8 +2,11 @@ package fi.minedu.oiva.backend.core.web.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import fi.minedu.oiva.backend.core.config.OivaMediaTypes;
+import fi.minedu.oiva.backend.core.exception.ResourceNotFoundException;
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Esittelija;
 import fi.minedu.oiva.backend.model.entity.oiva.Liite;
 import fi.minedu.oiva.backend.core.service.LiiteService;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.activation.MimetypesFileTypeMap;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static fi.minedu.oiva.backend.model.util.ControllerUtil.getOr404;
@@ -52,12 +56,12 @@ public class LiiteController {
     public void index() {
     }
 
-    @RequestMapping(value = "/{uuid}", produces = {MediaType.APPLICATION_JSON_VALUE, OivaMediaTypes.APPLICATION_VND_JSON_VALUE})
+    @RequestMapping(value = "/{uuid}", method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, OivaMediaTypes.APPLICATION_VND_JSON_VALUE})
     public HttpEntity<Liite> get(@PathVariable String uuid) {
         return getOr404_(liiteService.getByUuid(UUID.fromString(uuid)), item -> item.setLink(apiUrlPrefix + path + "/" + uuid + rawPath));
     }
 
-    @RequestMapping(value = "/{uuid}" + rawPath)
+    @RequestMapping(value = "/{uuid}" + rawPath,  method = RequestMethod.GET)
     public HttpEntity<Resource> getRawFile(@PathVariable String uuid) {
         return getOr404(liiteService.getByUuid(UUID.fromString(uuid)),
                 item -> liiteService.getFileFrom(item)
@@ -68,6 +72,19 @@ public class LiiteController {
                             return new HttpEntity<>(liiteService.convertToHttpResource(f), headers);
                         })
                         .orElse(notFound()));
+    }
+
+    @OivaAccess_Esittelija
+    @RequestMapping(value = "/{uuid}", method = RequestMethod.DELETE)
+    @ApiOperation(notes = "Poistaa liitteen uuid:n perusteella", value = "")
+    public void deleteFile(@PathVariable String uuid) {
+        Optional<Liite> liite = liiteService.getByUuid(UUID.fromString(uuid));
+        if (!liite.isPresent()) {
+            throw new ResourceNotFoundException("Liite not found with uuid " + uuid);
+        }
+        else {
+            liiteService.delete(liite.get());
+        }
     }
 
     /**
