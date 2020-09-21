@@ -6,9 +6,9 @@ import fi.minedu.oiva.backend.model.jooq.tables._
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-class Lupahistoria(var lupahistoria: Lupahistoria) extends pojos.Lupahistoria  {
+class Lupahistoria(var lupahistoria: Lupahistoria, var paatoskirje: Liite) extends pojos.Lupahistoria  {
 
-  def this() = this(null)
+  def this() = this(null, null)
 
   // exclude from json
   @JsonIgnore override def getId = super.getId
@@ -16,4 +16,7 @@ class Lupahistoria(var lupahistoria: Lupahistoria) extends pojos.Lupahistoria  {
 
   def getEsitysmalli = lupahistoria
   def setEsitysmalli(esitysmalli: Esitysmalli): Unit = this.lupahistoria = lupahistoria
+
+  def getPaatoskirje = paatoskirje
+  def setPaatoskirje(paatoskirje: Liite): Unit = this.paatoskirje = paatoskirje
 }
