@@ -162,6 +162,12 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
+    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus));
+        query.orderBy(LUPA.LUONTIPVM.desc()).limit(1);
+        return get(query, useKoodistoVersions, withOptions);
+    }
+
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
         return getByYtunnus(ytunnus, null, null, true, withOptions );
     }
@@ -181,7 +187,8 @@ public class LupaService extends BaseService {
     }
 
     public Optional<Lupa> getByUuid(final String uuid, final String... withOptions) {
-        return get(baseLupaSelect().where(LUPA.UUID.equal(UUID.fromString(uuid))), withOptions);
+        return Optional.ofNullable(uuid).map(UUID::fromString)
+                .flatMap(u -> get(baseLupaSelect().where(LUPA.UUID.equal(u)), withOptions));
     }
 
     protected Optional<Lupa> get(final SelectConditionStep<Record> query, final String... withOptions) {

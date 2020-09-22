@@ -1,0 +1,1 @@
+ALTER TABLE muutospyynto ALTER COLUMN lupa_id DROP NOT NULL;

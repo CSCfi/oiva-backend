@@ -2,16 +2,21 @@ package fi.minedu.oiva.backend.core.extension;
 
 import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
+import fi.minedu.oiva.backend.model.entity.opintopolku.Metadata;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class MaaraysTransformerFilter extends OivaFilter {
@@ -28,7 +33,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
     public enum Type {
         toimintaAlueArvo,
         htmlClass,
-        ylakoodi
+        ylakoodi,
+        tutkintokieliGroup
     }
 
     public MaaraysTransformerFilter(final Type type) {
@@ -44,6 +50,8 @@ public class MaaraysTransformerFilter extends OivaFilter {
             return toHtmlClasses(maarayksetOpt);
         } else if(type == Type.ylakoodi) {
             return toYlakoodi(maarayksetOpt, map);
+        } else if(type == Type.tutkintokieliGroup) {
+            return groupTutkintokielet(maarayksetOpt, map);
         } else return "";
     }
 
@@ -73,7 +81,55 @@ public class MaaraysTransformerFilter extends OivaFilter {
             } else if (maarayksetOpt.get().stream().anyMatch(this::isNotDefined)) {
                 return toimintaAlueEiArvoa;
             }
-        } return null;
+        }
+        return null;
+    }
+
+    public Map<String, List<String>> groupTutkintokielet(final Optional<Collection<Maarays>> tutkintokieliMaaraykset, final Map<String, Object> map) {
+        if (tutkintokieliMaaraykset.isPresent()) {
+            String langCode = getContextScopeLanguage(map).map(String::toUpperCase).orElse("FI");
+            Map<String, KoodistoKoodi> koodistoKooditMap = (HashMap<String, KoodistoKoodi>) map.get(argOne);
+            // Sort maaraykset by tutkintokoodi
+            List<Maarays> maaraykset = new ArrayList<>(tutkintokieliMaaraykset.get());
+            maaraykset.sort(Comparator.comparing(a -> a.getKoodi().getKoodiArvo()));
+            // Find all tutkintokielilanguages used in maaraykset
+            final List<String> kielet = new ArrayList<>();
+            maaraykset.forEach(m -> m.aliMaaraykset().forEach(alimaarays -> kielet.add(alimaarays.getKoodiarvo().toUpperCase())));
+            ArrayList<String> distinctKielet = kielet.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
+
+            // Group tutkinnot by kieli
+            Map<String, List<String>> groupedByKieli = new HashMap<>(Collections.emptyMap());
+            distinctKielet.forEach(kieli -> {
+                KoodistoKoodi kieliObj = koodistoKooditMap.get(kieli);
+                List<String> tutkinnot = getTutkinnotByTutkintokieliLanguage(maaraykset, kieli, langCode);
+                for (int i = 0; i < kieliObj.getMetadata().length; i++) {
+                    if (kieliObj.getMetadata()[i].getKieli().equals(langCode)) {
+                        groupedByKieli.put(kieliObj.getMetadata()[i].getNimi(), tutkinnot);
+                        break;
+                    }
+                }
+            });
+            // Sort by key
+            return new TreeMap<>(groupedByKieli);
+        }
+        return null;
+    }
+
+    private List<String> getTutkinnotByTutkintokieliLanguage(List<Maarays> maaraykset, String kieli, String templateLang) {
+        List<String> tutkinnot = new ArrayList<>();
+        maaraykset.forEach(m -> {
+            if (m.aliMaaraykset().stream().anyMatch(alimaarays -> alimaarays.getKoodiarvo().toUpperCase().equals(kieli))) {
+                Metadata metadata = new Metadata();
+                for (int i = 0; i < m.getKoodi().metadata().length; i++) {
+                    if (m.getKoodi().metadata()[i].getKieli().toUpperCase().equals(templateLang)) {
+                        metadata = m.getKoodi().metadata()[i];
+                        break;
+                    }
+                }
+                tutkinnot.add(m.getKoodiarvo() + " " + metadata.getNimi());
+            }
+        });
+        return tutkinnot;
     }
 
     private boolean isValtakunnallinen(final Maarays maarays) {

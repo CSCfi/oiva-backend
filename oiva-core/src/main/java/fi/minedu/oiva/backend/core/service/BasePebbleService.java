@@ -8,12 +8,12 @@ import fi.minedu.oiva.backend.core.config.PebbleConfig;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
+import fi.minedu.oiva.backend.model.entity.opintopolku.KoodistoKoodi;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fi.minedu.oiva.backend.model.entity.OivaTemplates.*;
 
@@ -32,6 +33,9 @@ public abstract class BasePebbleService {
     private static final Logger logger = LoggerFactory.getLogger(BasePebbleService.class);
 
     private final PebbleConfig pebble;
+
+    @Autowired
+    public KoodistoService koodistoService;
 
     @Autowired
     public BasePebbleService(PebbleConfig pebble) {
@@ -71,6 +75,7 @@ public abstract class BasePebbleService {
         final Map<String, Object> context = defaultContext(options, contextPath, templatePath);
         context.put("lupa", nonNullVersion(lupa));
         context.put("jarjestaja", lupa.jarjestaja());
+        context.put("kielet", koodistoService.getKielet().stream().collect(Collectors.toMap(KoodistoKoodi::getKoodiArvo, v -> v)));
 
         return writeHTML(templatePath, context);
     }

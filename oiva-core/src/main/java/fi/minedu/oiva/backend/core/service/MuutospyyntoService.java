@@ -308,7 +308,7 @@ public class MuutospyyntoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
         final String[] options = options(Maarays.class, Organisaatio.class);
         Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
-                .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+                .orElse(null);
         if (!Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila())) {
             throw new ForbiddenException("Action is not allowed");
         }
@@ -365,8 +365,7 @@ public class MuutospyyntoService {
             withOrganization(mp);
 
             final String[] options = options(Maarays.class, Organisaatio.class, KoodistoKoodi.class);
-            Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
-                    .orElseThrow(() -> new ResourceNotFoundException("Old lupa is not found with uuid " + mp.getLupaUuid()));
+            Optional<Lupa> oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options);
 
             LupatilaValue lupaTila = (Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) ||
                     Muutospyyntotila.PAATETTY.toString().equals(mp.getTila())) ?
@@ -388,14 +387,15 @@ public class MuutospyyntoService {
             lupa.setLuoja(authService.getUsername());
             lupa.setAlkupvm(mp.getVoimassaalkupvm());
             lupa.setLoppupvm(mp.getVoimassaloppupvm());
-            lupa.setEdellinenLupaId(oldLupa.getId());
+            lupa.setEdellinenLupaId(oldLupa.map(Lupa::getId).orElse(null));
 
             final Set<Long> removed = getMuutoksetRecursively(mp.getMuutokset())
                     .filter(MuutospyyntoService::isPoisto)
                     .map(Muutos::getMaaraysId)
                     .collect(Collectors.toSet());
             // Copy maaraykset which are not removed
-            final Collection<Maarays> maaraykset = filterOutRemoved(oldLupa.getMaaraykset(), removed);
+            final Collection<Maarays> maaraykset = oldLupa.map(l -> filterOutRemoved(l.getMaaraykset(), removed))
+                    .orElse(new ArrayList<>());
             lupa.setMaaraykset(maaraykset);
             // Copy muutokset from muutospyynto and convert to maarays
             lupa.getMaaraykset().addAll(convertToMaaraykset(mp.getMuutokset(), maaraykset));
@@ -518,6 +518,9 @@ public class MuutospyyntoService {
     }
 
     private void createLupahistoria(Lupa oldLupa, LupaRecord lupa) {
+        if (oldLupa == null) {
+            return;
+        }
         final LupaRecord oldLupaRecord = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getId()));
         final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
         oldLupaRecord.setLoppupvm(Date.valueOf(loppupvm));
@@ -649,23 +652,24 @@ public class MuutospyyntoService {
     }
 
     // VALIDOINNIT
-    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroValidity) {
+    protected final void assertValidMuutospyynto(Muutospyynto muutospyynto, boolean checkAsianumeroDuplicates) {
         String uuidString = muutospyynto.getUuid() != null ? muutospyynto.getUuid().toString() : null;
-        boolean asianumeroIsValid = !checkAsianumeroValidity ||
-                (!duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()) && validAsianumero(muutospyynto.getAsianumero()));
-
         boolean isValid = muutospyynto != null &&
                 Optional.ofNullable(muutospyynto.getLiitteet())
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
-                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) && asianumeroIsValid;
+                        .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
+                validAsianumero(muutospyynto.getAsianumero()) &&
+                (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()));
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
         }
 
         try {
-            UUID.fromString(muutospyynto.getLupaUuid());
+            if (muutospyynto.getLupaUuid() != null) {
+                UUID.fromString(muutospyynto.getLupaUuid());
+            }
         } catch (IllegalArgumentException e) {
             throw new ForbiddenException("Muutospyynto should have a valid lupa uuid");
         }
@@ -831,9 +835,9 @@ public class MuutospyyntoService {
                         .ifPresent(m::setPaatoskierros));
     }
 
-    private Optional<String> getLupaUuid(long id) {
-        return dsl.select(LUPA.UUID).from(LUPA)
-                .where(LUPA.ID.eq(id)).fetchOptionalInto(String.class);
+    private Optional<String> getLupaUuid(Long id) {
+        return Optional.ofNullable(id).flatMap(lupaId -> dsl.select(LUPA.UUID).from(LUPA)
+                .where(LUPA.ID.eq(lupaId)).fetchOptionalInto(String.class));
     }
 
     private Optional<Long> getKohdeId(UUID uuid) {
@@ -1006,7 +1010,7 @@ public class MuutospyyntoService {
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
                 throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
             }
-            muutospyyntoRecord.setLupaId(lupa.get().getId());
+            muutospyyntoRecord.setLupaId(lupa.map(Lupa::getId).orElse(null));
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);
             logger.debug("Create muutospyynto: " + muutospyyntoRecord.toString());
             muutospyyntoRecord.store();

@@ -72,6 +72,7 @@ import static org.springframework.http.HttpMethod.GET;
 @ActiveProfiles("it")
 abstract public class BaseIT {
 
+    protected final String okmOid = "1.1.111.111.11.22222222";
     protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
