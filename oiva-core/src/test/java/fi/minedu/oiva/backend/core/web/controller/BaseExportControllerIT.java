@@ -20,22 +20,29 @@ public abstract class BaseExportControllerIT extends BaseIT {
     @Test
     public void getKustannustiedot() {
         // Setup
+        jdbcTemplate.update("UPDATE lupa SET koulutustyyppi = null WHERE id in (1, 3, 4, 5, 6, 7)");
         jdbcTemplate.batchUpdate(
                 createLupaUpdateQuery("2017-01-01", null, 1),
                 createLupaUpdateQuery("2017-12-31", "2018-01-01", 2),
                 createLupaUpdateQuery("2018-01-01", "2018-01-31", 3),
                 createLupaUpdateQuery("2018-02-01", "2018-12-31", 4),
-                createLupaUpdateQuery("2019-03-01", "2020-12-31", 5)
+                createLupaUpdateQuery("2019-03-01", "2020-12-31", 5),
+                createLupaUpdateQuery("2017-01-01", null, 6),
+                createLupaUpdateQuery("2017-01-01", null, 7)
         );
 
         DocumentContext doc = requestKustannustiedot("2017-01-01", "2020-12-31", HttpStatus.OK);
-        assertIds("All should return", doc, 1, 2, 3, 4, 5);
+        assertIds("All except 2 should return", doc, 1, 3, 4, 5, 6, 7);
 
         doc = requestKustannustiedot("2018-01-01", "2018-02-01", HttpStatus.OK);
-        assertIds("The first, third and fourth should return", doc, 1, 3, 4);
+        assertIds("The first, third, fourth, sixth and seventh should return", doc, 1, 3, 4, 6, 7);
 
         doc = requestKustannustiedot("2018-02-01", "2019-12-31", HttpStatus.OK);
-        assertIds("The first, fourth and fifth should return", doc, 1, 4, 5);
+        assertIds("The first, fourth, fifth, sixth and seventh should return", doc, 1, 4, 5, 6, 7);
+
+        // Get with koulutustyyppi
+        doc = requestKustannustiedot("1", "2017-01-01", "2020-12-31", HttpStatus.OK);
+        assertIds("Only second should return", doc, 2);
     }
 
     @Test
@@ -67,7 +74,14 @@ public abstract class BaseExportControllerIT extends BaseIT {
     }
 
     private DocumentContext requestKustannustiedot(String startDate, String endDate, HttpStatus status) {
+        return requestKustannustiedot(null, startDate, endDate, status);
+    }
+
+    private DocumentContext requestKustannustiedot(String koulutustyyppi, String startDate, String endDate, HttpStatus status) {
         final UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("/api/export/kustannustiedot");
+        if (StringUtils.isNotEmpty(koulutustyyppi)) {
+            uriBuilder.queryParam("koulutustyyppi", koulutustyyppi);
+        }
         if (StringUtils.isNotEmpty(startDate)) {
             uriBuilder.queryParam("startDate", startDate);
         }
