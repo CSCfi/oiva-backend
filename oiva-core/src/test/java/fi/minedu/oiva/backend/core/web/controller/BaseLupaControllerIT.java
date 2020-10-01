@@ -38,19 +38,19 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         ResponseEntity<String> response = makeRequest("/api/luvat", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         log.info(doc.jsonString());
-        assertEquals(5, doc.read("$.length()", Integer.class).intValue());
+        assertEquals(7, doc.read("$.length()", Integer.class).intValue());
     }
 
     @Test
     public void getAllWithJarjestaja() {
-        getLuvat(null, 4);
+        getLuvat(null, 6);
     }
 
     @Test
     public void getAllWithJarjestajaParameters() {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         // Without parameters
-        getLuvat(params, 4);
+        getLuvat(params, 6);
 
         // With koulutustyyppi 1
         params.put(PARAM_KOULUTUSTYYPPI, Collections.singletonList("1"));
@@ -86,7 +86,7 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     public void getAllLupaOrganizations() {
         ResponseEntity<String> response = makeRequest("/api/luvat/organisaatiot", HttpStatus.OK);
         DocumentContext doc = jsonPath.parse(response.getBody());
-        final Integer organizations = 5;
+        final Integer organizations = 7;
         log.debug("Response was " + doc.jsonString());
         assertEquals("Result should have " + organizations + " items", organizations, doc.read("$.length()"));
         assertTrue("Result item should have oid field", (doc.read("$[0].oid") + "").length() > 0);
