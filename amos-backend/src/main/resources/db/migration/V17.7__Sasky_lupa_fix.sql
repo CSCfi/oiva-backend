@@ -14,9 +14,8 @@ WITH cur_lupa AS (
            AND koodiarvo = '354245'
      ),
      kylmaasennus AS (
-         UPDATE maarays SET parent_id = (SELECT tta.id
-                                         FROM talotekniikan_at tta)
-             WHERE koodisto = 'osaamisala' AND koodiarvo = '2387' RETURNING id
+         UPDATE maarays m SET parent_id = tta.id FROM cur_lupa cu, talotekniikan_at tta
+             WHERE lupa_id = cu.id AND koodisto = 'osaamisala' AND koodiarvo = '2387' RETURNING m.id
      )
 
 SELECT *
