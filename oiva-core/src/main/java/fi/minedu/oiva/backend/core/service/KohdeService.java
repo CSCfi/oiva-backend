@@ -3,6 +3,8 @@ package fi.minedu.oiva.backend.core.service;
 import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectJoinStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,9 +26,11 @@ public class KohdeService {
     }
 
     public Collection<Kohde> getAll(String koulutustyyppi) {
-        return dsl.select(KOHDE.fields()).from(KOHDE)
-                .where(koulutustyyppi == null ? KOHDE.KOULUTUSTYYPPI.isNull() : KOHDE.KOULUTUSTYYPPI.eq(koulutustyyppi))
-                .fetchInto(Kohde.class);
+        final SelectJoinStep<Record> query = dsl.select(KOHDE.fields()).from(KOHDE);
+        if (StringUtils.isNotBlank(koulutustyyppi)) {
+            query.where(KOHDE.KOULUTUSTYYPPI.eq(koulutustyyppi));
+        }
+        return query.fetchInto(Kohde.class);
     }
 
     public Optional<Long> idForTunniste(final String tunniste) {
