@@ -2538,8 +2538,8 @@ WITH kuja_kohteet AS (
                 FROM export_lupa el RETURNING id, kuja_id
      ),
      kuja_maaraykset AS (
-         INSERT INTO maarays (parent_id, lupa_id, kohde_id, koodisto, koodiarvo, arvo, maaraystyyppi_id, meta, luoja, paivittaja, paivityspvm, koodistoversio)
-            SELECT parent_id, kl.id, kk.id, koodisto, koodiarvo, arvo, maaraystyyppi_id, meta, luoja, paivittaja, paivityspvm, koodistoversio
+         INSERT INTO maarays (parent_id, lupa_id, kohde_id, koodisto, koodiarvo, arvo, maaraystyyppi_id, meta, luoja, paivittaja, paivityspvm, koodistoversio, org_oid)
+            SELECT parent_id, kl.id, kk.id, koodisto, koodiarvo, arvo, maaraystyyppi_id, meta, luoja, paivittaja, paivityspvm, koodistoversio, org_oid
                 FROM export_maarays em, kuja_luvat kl, kuja_kohteet kk WHERE kk.kuja_id = em.kohde_id AND kl.kuja_id = em.lupa_id
      )
 
