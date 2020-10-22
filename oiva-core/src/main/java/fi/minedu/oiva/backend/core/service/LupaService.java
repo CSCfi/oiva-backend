@@ -301,12 +301,14 @@ public class LupaService extends BaseService {
 
         SelectConditionStep<Record> query = dsl.select(ArrayUtils.addAll(LUPA.fields(), MAARAYS.fields()))
                 .from(LUPA)
+                .join(LUPATILA).on(LUPA.LUPATILA_ID.eq(LUPATILA.ID))
                 .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
                 .where(MAARAYS.KOODISTO.eq("koulutus")
                         .and(LUPA.KOULUTUSTYYPPI.isNull())
                         .and(MAARAYS.KOODIARVO.in(except)).not()
                         .and(LUPA.ALKUPVM.lessOrEqual(currentDate).or(LUPA.ALKUPVM.isNull()))
-                        .and(LUPA.LOPPUPVM.greaterOrEqual(currentDate).or(LUPA.LOPPUPVM.isNull())));
+                        .and(LUPA.LOPPUPVM.greaterOrEqual(currentDate).or(LUPA.LOPPUPVM.isNull()))
+                        .and(LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS)));
 
         logger.debug(query.getSQL());
 

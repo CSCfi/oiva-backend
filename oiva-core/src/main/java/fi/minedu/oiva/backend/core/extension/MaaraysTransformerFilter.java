@@ -94,7 +94,9 @@ public class MaaraysTransformerFilter extends OivaFilter {
             maaraykset.sort(Comparator.comparing(a -> a.getKoodi().getKoodiArvo()));
             // Find all tutkintokielilanguages used in maaraykset
             final List<String> kielet = new ArrayList<>();
-            maaraykset.forEach(m -> m.aliMaaraykset().forEach(alimaarays -> kielet.add(alimaarays.getKoodiarvo().toUpperCase())));
+            maaraykset.forEach(m -> m.aliMaaraykset().stream()
+                    .filter(alimaarays -> "kieli".equals(alimaarays.getKoodisto()))
+                    .forEach(alimaarays -> kielet.add(alimaarays.getKoodiarvo().toUpperCase())));
             ArrayList<String> distinctKielet = kielet.stream().distinct().collect(Collectors.toCollection(ArrayList::new));
 
             // Group tutkinnot by kieli
