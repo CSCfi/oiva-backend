@@ -27,7 +27,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Kohde implements Serializable {
 
-    private static final long serialVersionUID = -2004962290;
+    private static final long serialVersionUID = -1513860767;
 
     private Long      id;
     private String    tunniste;
@@ -37,6 +37,7 @@ public class Kohde implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private String    koulutustyyppi;
 
     public Kohde() {}
 
@@ -49,6 +50,7 @@ public class Kohde implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.koulutustyyppi = value.koulutustyyppi;
     }
 
     public Kohde(
@@ -59,7 +61,8 @@ public class Kohde implements Serializable {
         Timestamp luontipvm,
         String    paivittaja,
         Timestamp paivityspvm,
-        UUID      uuid
+        UUID      uuid,
+        String    koulutustyyppi
     ) {
         this.id = id;
         this.tunniste = tunniste;
@@ -69,6 +72,7 @@ public class Kohde implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.koulutustyyppi = koulutustyyppi;
     }
 
     public Long getId() {
@@ -136,6 +140,14 @@ public class Kohde implements Serializable {
         this.uuid = uuid;
     }
 
+    public String getKoulutustyyppi() {
+        return this.koulutustyyppi;
+    }
+
+    public void setKoulutustyyppi(String koulutustyyppi) {
+        this.koulutustyyppi = koulutustyyppi;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Kohde (");
@@ -148,6 +160,7 @@ public class Kohde implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(koulutustyyppi);
 
         sb.append(")");
         return sb.toString();
