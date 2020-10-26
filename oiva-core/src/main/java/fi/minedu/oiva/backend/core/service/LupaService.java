@@ -168,6 +168,15 @@ public class LupaService extends BaseService {
         return get(query, useKoodistoVersions, withOptions);
     }
 
+    public Collection<Lupa> getFutureByYtunnus(String ytunnus, String koulutustyyppi, String[] options) {
+        final SelectOnConditionStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        query.where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+                .and(LUPA.ALKUPVM.ge(DSL.currentDate()))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi)));
+        return fetch(query, options);
+    }
+
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
         return getByYtunnus(ytunnus, null, null, true, withOptions );
     }
