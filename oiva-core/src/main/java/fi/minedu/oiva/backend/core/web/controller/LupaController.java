@@ -77,11 +77,12 @@ public class LupaController {
 
     @OivaAccess_Kayttaja
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/viimeisin")
-    @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen perusteella", value = "")
+    @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getLatestByYtunnus(final @PathVariable String ytunnus,
                                                                   final @RequestParam(value = "with", required = false) String with,
-                                                                  final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
-        return getOr404(async(() -> service.getLatestByYtunnus(ytunnus, useKoodistoVersions, options(with))));
+                                                                  final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions,
+                                                                  final @RequestParam(required = false) String koulutustyyppi) {
+        return getOr404(async(() -> service.getLatestByYtunnus(ytunnus, useKoodistoVersions, koulutustyyppi, options(with))));
     }
 
     @OivaAccess_Public

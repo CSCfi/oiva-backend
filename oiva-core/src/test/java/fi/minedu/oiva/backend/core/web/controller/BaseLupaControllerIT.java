@@ -71,7 +71,32 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
         final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
-        assertEquals("23/223/2020", doc.read("$.diaarinumero"));
+        final String diaarinumero = "23/223/2020";
+        assertEquals(diaarinumero, doc.read("$.diaarinumero"));
+
+        // If latest lupa is already ended, response should be 404 not found.
+        jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), diaarinumero);
+        makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin", HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void getLatestByYtunnusAndKoulutustyyppi() {
+        setUpDb("sql/extra_lupa_data.sql");
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.OK);
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        final String diaarinumero = "22/222/2020";
+        assertEquals(diaarinumero, doc.read("$.diaarinumero"));
+
+        // Get latest not ended lupa.
+        jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), diaarinumero);
+        response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.OK);
+        doc = jsonPath.parse(response.getBody());
+        assertEquals("11/111/2020", doc.read("$.diaarinumero"));
+
+        // If all lupas are already ended, response should be 404 not found.
+        jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), "11/111/2020");
+        makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.NOT_FOUND);
     }
 
     @Test
