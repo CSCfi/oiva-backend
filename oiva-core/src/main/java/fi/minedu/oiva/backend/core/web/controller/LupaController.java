@@ -52,7 +52,7 @@ public class LupaController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestajilla")
-    @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla. " +
+    @ApiOperation(notes = "Palauttaa kaikki voimassaolevat luvat järjestäjän tiedoilla. " +
             "Voidaan myös rajata koulutustyypin ja oppilaitostyypin mukaan.", value = "")
     public CompletableFuture<Collection<Lupa>> getAllWithJarjestaja(@RequestParam(required = false) String koulutustyyppi,
                                                                     @RequestParam(required = false) String oppilaitostyyppi) {
@@ -64,6 +64,15 @@ public class LupaController {
     @ApiOperation(notes = "Palauttaa luvan uuid:n perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByUuid(final @PathVariable String uuid, final @RequestParam(value = "with", required = false) String with) {
         return getOr404(async(() -> service.getByUuid(uuid, options(with))));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/tulevaisuus")
+    @ApiOperation(notes = "Palauttaa tulevaisuudessa voimaan tulevat luvat järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
+    public CompletableFuture<Collection<Lupa>> getFutureByYtunnus(final @PathVariable String ytunnus,
+                                                            final @RequestParam(value = "with", required = false) String with,
+                                                            final @RequestParam(required = false) String koulutustyyppi) {
+        return async(() -> service.getFutureByYtunnus(ytunnus, koulutustyyppi, options(with)));
     }
 
     @OivaAccess_Public

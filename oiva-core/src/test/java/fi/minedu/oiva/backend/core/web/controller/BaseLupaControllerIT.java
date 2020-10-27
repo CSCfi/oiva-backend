@@ -16,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,6 +81,30 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/koulutustyyppi/2/oppilaitostyyppi/1", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         assertEquals("11/111/2020", doc.read("$.diaarinumero"));
+    }
+
+    @Test
+    public void getFutureByYtunnus() {
+        setUpDb("sql/extra_lupa_data.sql");
+        jdbcTemplate.update("update lupa set alkupvm = ?, koulutustyyppi = null, oppilaitostyyppi = null where diaarinumero = ?",
+                LocalDate.now().plusDays(3), "22/222/2020");
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(response.getBody());
+        final List<String> diaariList = doc.read("$.[*].diaarinumero");
+        assertEquals(2, diaariList.size());
+        assertTrue(diaariList.containsAll(Arrays.asList("22/222/2020", "23/223/2020")));
+    }
+
+    @Test
+    public void getFutureByYtunnusAndKoulutustyyppi() {
+        setUpDb("sql/extra_lupa_data.sql");
+        jdbcTemplate.update("update lupa set alkupvm = ? where diaarinumero = ?",
+                LocalDate.now().plusDays(3), "22/222/2020");
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus?koulutustyyppi=2", HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(response.getBody());
+        final List<String> diaariList = doc.read("$.[*].diaarinumero");
+        assertEquals(1, diaariList.size());
+        assertTrue(diaariList.contains("22/222/2020"));
     }
 
     @Test
