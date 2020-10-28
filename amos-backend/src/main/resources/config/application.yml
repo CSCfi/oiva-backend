@@ -50,10 +50,6 @@ cas:
     url.logout: /logout
     service.url: /login/cas
 
-multipart:
-    maxFileSize: 512MB
-    maxRequestSize: 512MB
-
 server:
     port: override_this_in_local_application_yml
     tomcat:
@@ -79,8 +75,8 @@ spring:
 
     http:
       multipart:
-        max-file-size: 25MB
-        max-request-size: 25MB
+        max-file-size: 512MB
+        max-request-size: 512MB
 
 redis:
     host: override_this_in_local_application_yml
