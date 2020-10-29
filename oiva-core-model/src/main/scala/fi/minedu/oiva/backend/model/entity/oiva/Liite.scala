@@ -18,7 +18,6 @@ class Liite() extends pojos.Liite  {
 
     // exclude from json
     @JsonIgnore override def getId: lang.Long = super.getId
-    @JsonIgnore override def getLuoja: String = super.getLuoja
     @JsonIgnore override def getPaivittaja: String = super.getPaivittaja
     @JsonIgnore override def getPaivityspvm: Timestamp = super.getPaivityspvm
 
