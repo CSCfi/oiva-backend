@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = 1783848954;
+    private static final long serialVersionUID = 670793122;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -49,9 +49,9 @@ public class Lupa implements Serializable {
     private String    paivittaja;
     private Timestamp paivityspvm;
     private UUID      uuid;
+    private String    asianumero;
     private String    koulutustyyppi;
     private String    oppilaitostyyppi;
-    private String    asianumero;
 
     public Lupa() {}
 
@@ -74,9 +74,9 @@ public class Lupa implements Serializable {
         this.paivittaja = value.paivittaja;
         this.paivityspvm = value.paivityspvm;
         this.uuid = value.uuid;
+        this.asianumero = value.asianumero;
         this.koulutustyyppi = value.koulutustyyppi;
         this.oppilaitostyyppi = value.oppilaitostyyppi;
-        this.asianumero = value.asianumero;
     }
 
     public Lupa(
@@ -98,9 +98,9 @@ public class Lupa implements Serializable {
         String    paivittaja,
         Timestamp paivityspvm,
         UUID      uuid,
+        String    asianumero,
         String    koulutustyyppi,
-        String    oppilaitostyyppi,
-        String    asianumero
+        String    oppilaitostyyppi
     ) {
         this.id = id;
         this.edellinenLupaId = edellinenLupaId;
@@ -120,9 +120,9 @@ public class Lupa implements Serializable {
         this.paivittaja = paivittaja;
         this.paivityspvm = paivityspvm;
         this.uuid = uuid;
+        this.asianumero = asianumero;
         this.koulutustyyppi = koulutustyyppi;
         this.oppilaitostyyppi = oppilaitostyyppi;
-        this.asianumero = asianumero;
     }
 
     public Long getId() {
@@ -278,6 +278,15 @@ public class Lupa implements Serializable {
         this.uuid = uuid;
     }
 
+    @Size(max = 17)
+    public String getAsianumero() {
+        return this.asianumero;
+    }
+
+    public void setAsianumero(String asianumero) {
+        this.asianumero = asianumero;
+    }
+
     public String getKoulutustyyppi() {
         return this.koulutustyyppi;
     }
@@ -292,15 +301,6 @@ public class Lupa implements Serializable {
 
     public void setOppilaitostyyppi(String oppilaitostyyppi) {
         this.oppilaitostyyppi = oppilaitostyyppi;
-    }
-
-    @Size(max = 17)
-    public String getAsianumero() {
-        return this.asianumero;
-    }
-
-    public void setAsianumero(String asianumero) {
-        this.asianumero = asianumero;
     }
 
     @Override
@@ -325,9 +325,9 @@ public class Lupa implements Serializable {
         sb.append(", ").append(paivittaja);
         sb.append(", ").append(paivityspvm);
         sb.append(", ").append(uuid);
+        sb.append(", ").append(asianumero);
         sb.append(", ").append(koulutustyyppi);
         sb.append(", ").append(oppilaitostyyppi);
-        sb.append(", ").append(asianumero);
 
         sb.append(")");
         return sb.toString();

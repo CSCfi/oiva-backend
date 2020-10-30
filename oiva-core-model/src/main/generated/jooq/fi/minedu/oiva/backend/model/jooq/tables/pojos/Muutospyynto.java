@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -432829491;
+    private static final long serialVersionUID = -1714692169;
 
     private Long      id;
     private Long      lupaId;
@@ -125,7 +125,6 @@ public class Muutospyynto implements Serializable {
         this.id = id;
     }
 
-    @NotNull
     public Long getLupaId() {
         return this.lupaId;
     }
