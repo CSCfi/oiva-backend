@@ -50,10 +50,6 @@ cas:
     url.logout: /logout
     service.url: /login/cas
 
-multipart:
-    maxFileSize: 512MB
-    maxRequestSize: 512MB
-
 server:
     port: override_this_in_local_application_yml
     tomcat:
@@ -76,6 +72,11 @@ spring:
     mvc:
       async:
         request-timeout: 60000 # Async request timeout 60 seconds.
+
+    http:
+      multipart:
+        max-file-size: 512MB
+        max-request-size: 512MB
 
 redis:
     host: override_this_in_local_application_yml
