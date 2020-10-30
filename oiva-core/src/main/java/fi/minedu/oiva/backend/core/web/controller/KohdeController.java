@@ -1,8 +1,8 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
-import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_Public;
 import fi.minedu.oiva.backend.core.service.KohdeService;
+import fi.minedu.oiva.backend.model.entity.oiva.Kohde;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @RestController
 @RequestMapping(
-    value = "${api.url.prefix}" + KohdeController.path,
-    produces = { MediaType.APPLICATION_JSON_VALUE })
+        value = "${api.url.prefix}" + KohdeController.path,
+        produces = {MediaType.APPLICATION_JSON_VALUE})
 @Api(description = "Kohteiden hallinta")
 public class KohdeController {
 

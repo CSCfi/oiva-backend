@@ -162,10 +162,22 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String[] withOptions) {
-        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus));
+    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
+        baseLupaFilter().ifPresent(query::and);
         query.orderBy(LUPA.LUONTIPVM.desc()).limit(1);
         return get(query, useKoodistoVersions, withOptions);
+    }
+
+    public Collection<Lupa> getFutureByYtunnus(String ytunnus, String koulutustyyppi, String[] options) {
+        final SelectOnConditionStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        query.where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+                .and(LUPA.ALKUPVM.ge(DSL.currentDate()))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi)));
+        return fetch(query, options);
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
