@@ -36,7 +36,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Record21<Long, Long, Long, Long, Long, String, String, String, Date, Date, Date, JsonNode, Boolean, String, Timestamp, String, Timestamp, UUID, String, String, String> {
 
-    private static final long serialVersionUID = 1991010548;
+    private static final long serialVersionUID = -1059473752;
 
     /**
      * Setter for <code>lupa.id</code>.
@@ -300,10 +300,38 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
     }
 
     /**
+     * Setter for <code>lupa.koulutustyyppi</code>.
+     */
+    public void setKoulutustyyppi(String value) {
+        set(18, value);
+    }
+
+    /**
+     * Getter for <code>lupa.koulutustyyppi</code>.
+     */
+    public String getKoulutustyyppi() {
+        return (String) get(18);
+    }
+
+    /**
+     * Setter for <code>lupa.oppilaitostyyppi</code>.
+     */
+    public void setOppilaitostyyppi(String value) {
+        set(19, value);
+    }
+
+    /**
+     * Getter for <code>lupa.oppilaitostyyppi</code>.
+     */
+    public String getOppilaitostyyppi() {
+        return (String) get(19);
+    }
+
+    /**
      * Setter for <code>lupa.asianumero</code>.
      */
     public void setAsianumero(String value) {
-        set(18, value);
+        set(20, value);
     }
 
     /**
@@ -311,34 +339,6 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      */
     @Size(max = 17)
     public String getAsianumero() {
-        return (String) get(18);
-    }
-
-    /**
-     * Setter for <code>lupa.koulutustyyppi</code>.
-     */
-    public void setKoulutustyyppi(String value) {
-        set(19, value);
-    }
-
-    /**
-     * Getter for <code>lupa.koulutustyyppi</code>.
-     */
-    public String getKoulutustyyppi() {
-        return (String) get(19);
-    }
-
-    /**
-     * Setter for <code>lupa.oppilaitostyyppi</code>.
-     */
-    public void setOppilaitostyyppi(String value) {
-        set(20, value);
-    }
-
-    /**
-     * Getter for <code>lupa.oppilaitostyyppi</code>.
-     */
-    public String getOppilaitostyyppi() {
         return (String) get(20);
     }
 
@@ -523,14 +523,6 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      */
     @Override
     public Field<String> field19() {
-        return Lupa.LUPA.ASIANUMERO;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Field<String> field20() {
         return Lupa.LUPA.KOULUTUSTYYPPI;
     }
 
@@ -538,8 +530,16 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      * {@inheritDoc}
      */
     @Override
-    public Field<String> field21() {
+    public Field<String> field20() {
         return Lupa.LUPA.OPPILAITOSTYYPPI;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Field<String> field21() {
+        return Lupa.LUPA.ASIANUMERO;
     }
 
     /**
@@ -691,14 +691,6 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      */
     @Override
     public String value19() {
-        return getAsianumero();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String value20() {
         return getKoulutustyyppi();
     }
 
@@ -706,8 +698,16 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      * {@inheritDoc}
      */
     @Override
-    public String value21() {
+    public String value20() {
         return getOppilaitostyyppi();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String value21() {
+        return getAsianumero();
     }
 
     /**
@@ -877,15 +877,6 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      */
     @Override
     public LupaRecord value19(String value) {
-        setAsianumero(value);
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LupaRecord value20(String value) {
         setKoulutustyyppi(value);
         return this;
     }
@@ -894,8 +885,17 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
      * {@inheritDoc}
      */
     @Override
-    public LupaRecord value21(String value) {
+    public LupaRecord value20(String value) {
         setOppilaitostyyppi(value);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public LupaRecord value21(String value) {
+        setAsianumero(value);
         return this;
     }
 
@@ -942,7 +942,7 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
     /**
      * Create a detached, initialised LupaRecord
      */
-    public LupaRecord(Long id, Long edellinenLupaId, Long paatoskierrosId, Long lupatilaId, Long asiatyyppiId, String diaarinumero, String jarjestajaYtunnus, String jarjestajaOid, Date alkupvm, Date loppupvm, Date paatospvm, JsonNode meta, Boolean maksu, String luoja, Timestamp luontipvm, String paivittaja, Timestamp paivityspvm, UUID uuid, String asianumero, String koulutustyyppi, String oppilaitostyyppi) {
+    public LupaRecord(Long id, Long edellinenLupaId, Long paatoskierrosId, Long lupatilaId, Long asiatyyppiId, String diaarinumero, String jarjestajaYtunnus, String jarjestajaOid, Date alkupvm, Date loppupvm, Date paatospvm, JsonNode meta, Boolean maksu, String luoja, Timestamp luontipvm, String paivittaja, Timestamp paivityspvm, UUID uuid, String koulutustyyppi, String oppilaitostyyppi, String asianumero) {
         super(Lupa.LUPA);
 
         set(0, id);
@@ -963,8 +963,8 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
         set(15, paivittaja);
         set(16, paivityspvm);
         set(17, uuid);
-        set(18, asianumero);
-        set(19, koulutustyyppi);
-        set(20, oppilaitostyyppi);
+        set(18, koulutustyyppi);
+        set(19, oppilaitostyyppi);
+        set(20, asianumero);
     }
 }

@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,22 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     @Override
     public void beforeTest() {
         setUpDb("sql/lupa_data.sql", "sql/maarays_data.sql");
+    }
+
+    @Test
+    public void getMuutospyynnot() {
+        setUpDb("sql/muutospyynto_data.sql");
+        loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Esittelija);
+        String response = requestBody("/api/muutospyynnot?tilat=LUONNOS", GET);
+        DocumentContext doc = jsonPath.parse(response);
+        assertEquals(Integer.valueOf(1), doc.read("$.length()"));
+        assertEquals("VN/1234/123456", doc.read("$[0].asianumero", String.class));
+
+        // Get with koulutustyyppi
+        response = requestBody("/api/muutospyynnot?tilat=LUONNOS&koulutustyyppi=2", GET);
+        doc = jsonPath.parse(response);
+        assertEquals(Integer.valueOf(1), doc.read("$.length()"));
+        assertEquals("VN/1234/123457", doc.read("$[0].asianumero", String.class));
     }
 
     @Test
@@ -194,18 +211,18 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         loginAs("testNimenkirjoittaja", lupaJarjestajaOid, OivaAccess.Context_Nimenkirjoittaja);
         makeRequest(POST,
                 "/api/muutospyynnot/tila/avoin/" + uuid,
-                null, OK).getBody();
+                null, OK);
         logout();
         // Change muutospyynto tila to "VALMISTELUSSA"
         loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
         makeRequest(POST,
                 "/api/muutospyynnot/tila/valmistelussa/" + uuid,
-                null, OK).getBody();
+                null, OK);
 
         // Change tila to "ESITTELYSSA"
         makeRequest(POST,
                 "/api/muutospyynnot/tila/esittelyssa/" + uuid,
-                null, OK).getBody();
+                null, OK);
 
         // Add paatoskirje
         Map<String, String> paatosKirje = new HashMap<>();
