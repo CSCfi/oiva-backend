@@ -173,15 +173,11 @@ public class MuutospyyntoService {
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
-    // Muutospyyntölistaus (hakemukset) esittelijälle
-    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila, boolean vainOmat) {
-        return getMuutospyynnot(Lists.newArrayList(tila), vainOmat);
-    }
-
-    public Collection<Muutospyynto> getMuutospyynnot(List<Muutospyyntotila> tilat, boolean vainOmat) {
+    public Collection<Muutospyynto> getMuutospyynnot(List<Muutospyyntotila> tilat, boolean vainOmat, String koulutustyyppi) {
         return getBaseSelect()
                 .where(baseFilter())
                 .and(MUUTOSPYYNTO.TILA.in(tilat.stream().map(Muutospyyntotila::toString).collect(Collectors.toList())))
+                .and(koulutustyyppi == null ? MUUTOSPYYNTO.KOULUTUSTYYPPI.isNull() : MUUTOSPYYNTO.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))
