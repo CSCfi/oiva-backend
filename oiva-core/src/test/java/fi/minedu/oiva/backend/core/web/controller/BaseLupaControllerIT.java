@@ -109,11 +109,20 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         setUpDb("sql/extra_lupa_data.sql");
         jdbcTemplate.update("update lupa set alkupvm = ?, koulutustyyppi = null, oppilaitostyyppi = null where diaarinumero = ?",
                 LocalDate.now().plusDays(3), "22/222/2020");
-        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
-        final DocumentContext doc = jsonPath.parse(response.getBody());
-        final List<String> diaariList = doc.read("$.[*].diaarinumero");
+        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        List<String> diaariList = doc.read("$.[*].diaarinumero");
         assertEquals(2, diaariList.size());
         assertTrue(diaariList.containsAll(Arrays.asList("22/222/2020", "23/223/2020")));
+
+        // Should not return lupa which is started in the same day.
+        jdbcTemplate.update("update lupa set alkupvm = ?, koulutustyyppi = null, oppilaitostyyppi = null where diaarinumero = ?",
+                LocalDate.now(), "22/222/2020");
+        response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
+        doc = jsonPath.parse(response.getBody());
+        diaariList = doc.read("$.[*].diaarinumero");
+        assertEquals(1, diaariList.size());
+        assertTrue(diaariList.contains("23/223/2020"));
     }
 
     @Test
