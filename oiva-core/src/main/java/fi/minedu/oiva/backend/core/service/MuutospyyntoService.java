@@ -342,8 +342,9 @@ public class MuutospyyntoService {
                     // Attach Päätöskirje from Muutospyyntö to new lupa
                     liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(),lupaRecord.getId());
 
-                    // Generate PDF for new lupa
+                    // Generate PDF for new lupa (Only for ammattillinenkoulutus)
                     lupaService.getById(lupaRecord.getId(), With.all)
+                            .filter(l -> l.getKoulutustyyppi() == null)
                             .ifPresent(l -> {
                                 try {
                                     fileStorageService.writeLupaPDF(l);

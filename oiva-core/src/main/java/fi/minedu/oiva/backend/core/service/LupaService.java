@@ -175,7 +175,7 @@ public class LupaService extends BaseService {
         final SelectOnConditionStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
         query.where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
-                .and(LUPA.ALKUPVM.ge(DSL.currentDate()))
+                .and(LUPA.ALKUPVM.gt(DSL.currentDate()))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi)));
         return fetch(query, options);
     }
@@ -193,8 +193,8 @@ public class LupaService extends BaseService {
         final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
-        Optional.ofNullable(koulutustyyppi).ifPresent(tyyppi -> query.and(LUPA.KOULUTUSTYYPPI.eq(tyyppi)));
-        Optional.ofNullable(oppilaitostyyppi).ifPresent(tyyppi -> query.and(LUPA.OPPILAITOSTYYPPI.eq(tyyppi)));
+        query.and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi));
+        query.and(oppilaitostyyppi == null ? LUPA.OPPILAITOSTYYPPI.isNull() : LUPA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi));
         return get(query, useKoodistoVersions, withOptions);
     }
 
