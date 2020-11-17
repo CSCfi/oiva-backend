@@ -978,6 +978,7 @@ public class MuutospyyntoService {
     private Optional<Muutospyynto> updateMuutospyynto(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
         return getByUuid(muutospyynto.getUuid().toString()).map(muutospyyntoRecord -> {
             muutospyynto.setId(muutospyyntoRecord.getId());
+            muutospyynto.setLupaId(muutospyyntoRecord.getLupaId());
             muutospyynto.setPaivittaja(authService.getUsername());
             muutospyynto.setPaivityspvm(Timestamp.from(Instant.now()));
             MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);

@@ -158,8 +158,14 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Change meta muutos_liite4 name
         final String changeName = "muutos_liite4_changed";
         doc.set("$..meta.liitteet[?(@.nimi == 'muutos_liite4')].nimi", changeName);
+        // Remove lupa id from request #CSCOIVA-1648
+        doc.delete("$.lupaId");
 
         final ResponseEntity<String> updateResponse = requestSave(prepareMultipartEntity(doc.jsonString()), "/api/muutospyynnot/tallenna");
+
+        // Check that lupa id is not null #CSCOIVA-1648
+        final Long lupaId = jdbcTemplate.queryForObject("select lupa_id from muutospyynto where uuid = '"+ uuid +"'", Long.class);
+        assertNotNull("LupaId should not be null!", lupaId);
 
         assertEquals("Update response code should match!", OK, updateResponse.getStatusCode());
 
