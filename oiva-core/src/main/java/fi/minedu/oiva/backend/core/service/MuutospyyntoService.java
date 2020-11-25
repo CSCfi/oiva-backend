@@ -37,6 +37,7 @@ import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -656,8 +657,8 @@ public class MuutospyyntoService {
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                validAsianumero(muutospyynto.getAsianumero()) &&
-                (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()));
+                (StringUtils.isNotEmpty(muutospyynto.getDiaarinumero()) || (validAsianumero(muutospyynto.getAsianumero()) &&
+                        (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()))));
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
@@ -981,6 +982,12 @@ public class MuutospyyntoService {
             muutospyynto.setLupaId(muutospyyntoRecord.getLupaId());
             muutospyynto.setPaivittaja(authService.getUsername());
             muutospyynto.setPaivityspvm(Timestamp.from(Instant.now()));
+            muutospyynto.setLuoja(muutospyyntoRecord.getLuoja());
+            muutospyynto.setLuontipvm(muutospyyntoRecord.getLuontipvm());
+            muutospyynto.setAsianumero(StringUtils.isEmpty(muutospyynto.getAsianumero()) ? null :
+                    muutospyynto.getAsianumero());
+            muutospyynto.setDiaarinumero(StringUtils.isEmpty(muutospyynto.getDiaarinumero()) ? null :
+                    muutospyynto.getDiaarinumero());
             MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
             dsl.executeUpdate(muutospyyntoRecordUp);
 
@@ -1003,6 +1010,12 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+            muutospyyntoRecord.setPaivittaja(null);
+            muutospyyntoRecord.setPaivityspvm(null);
+            muutospyyntoRecord.setAsianumero(StringUtils.isEmpty(muutospyyntoRecord.getAsianumero()) ? null :
+                    muutospyyntoRecord.getAsianumero());
+            muutospyyntoRecord.setDiaarinumero(StringUtils.isEmpty(muutospyyntoRecord.getDiaarinumero()) ? null :
+                    muutospyyntoRecord.getDiaarinumero());
             muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
