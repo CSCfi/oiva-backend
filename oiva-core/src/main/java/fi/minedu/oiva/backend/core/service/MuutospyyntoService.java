@@ -657,7 +657,8 @@ public class MuutospyyntoService {
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                (StringUtils.isNotEmpty(muutospyynto.getDiaarinumero()) || (validAsianumero(muutospyynto.getAsianumero()) &&
+                ((StringUtils.isNotEmpty(muutospyynto.getDiaarinumero()) && muutospyynto.getKoulutustyyppi() != null)
+                        || (validAsianumero(muutospyynto.getAsianumero()) &&
                         (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()))));
 
         if (!isValid) {
