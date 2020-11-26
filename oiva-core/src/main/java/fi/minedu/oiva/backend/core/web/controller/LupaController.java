@@ -99,15 +99,19 @@ public class LupaController {
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/historia/{oid}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän oid:n perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @PathVariable String oid, final HttpServletRequest request) {
-        return async(() -> lhservice.getHistoriaByOid(RequestUtils.getPathVariable(request, oid)));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @PathVariable String oid,
+                                                                            final @RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi,
+                                                                            final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> lhservice.getHistoriaByOid(oid, koulutustyyppi, oppilaitostyyppi));
     }
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/historiaytunnuksella/{ytunnus}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän ytunnuksen perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus, final HttpServletRequest request) {
-        return async(() -> lhservice.getHistoriaByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus,
+                                                                                final @RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi,
+                                                                                final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> lhservice.getHistoriaByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi));
     }
 
     @Deprecated
