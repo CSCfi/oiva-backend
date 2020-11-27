@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.core.service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
+import fi.minedu.oiva.backend.core.util.Koulutustyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
@@ -593,7 +594,7 @@ public class MuutospyyntoServiceTest {
         final Muutospyynto muutospyynto = new Muutospyynto();
         muutospyynto.setDiaarinumero("30/40/2020");
         muutospyynto.setAsianumero("invalid");
-        muutospyynto.setKoulutustyyppi("3");
+        muutospyynto.setKoulutustyyppi(Koulutustyyppi.VAPAASIVISTYSTYO.getValue());
         // Should not validate Asianumero and pass
         service.assertValidMuutospyynto(muutospyynto, false);
     }

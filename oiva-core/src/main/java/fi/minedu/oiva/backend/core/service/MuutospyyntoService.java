@@ -541,6 +541,8 @@ public class MuutospyyntoService {
         historiaRecord.setVoimassaoloalkupvm(oldLupaRecord.getAlkupvm());
         historiaRecord.setVoimassaololoppupvm(oldLupaRecord.getLoppupvm());
         historiaRecord.setAsianumero(oldLupaRecord.getAsianumero());
+        historiaRecord.setKoulutustyyppi(oldLupa.getKoulutustyyppi());
+        historiaRecord.setOppilaitostyyppi(oldLupa.getOppilaitostyyppi());
         if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
             // Old lupa was never affective
             historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));

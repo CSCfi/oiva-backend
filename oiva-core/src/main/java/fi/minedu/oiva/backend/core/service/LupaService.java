@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.extension.MaaraysListFilter;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.core.util.Koulutustyyppi;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
@@ -114,7 +115,7 @@ public class LupaService extends BaseService {
         final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
         query.where(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi));
         Optional.ofNullable(koulutustyyppi).ifPresent(t -> {
-            if (t.equals("3")) {
+            if (t.equals(Koulutustyyppi.VAPAASIVISTYSTYO.getValue())) {
                 // Fetch oppilaitos maarays for VST
                 query.getSelect().add(MAARAYS.KOODISTO);
                 query.getSelect().add(MAARAYS.ORG_OID);
