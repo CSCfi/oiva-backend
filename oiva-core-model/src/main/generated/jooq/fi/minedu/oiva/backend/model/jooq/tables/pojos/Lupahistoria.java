@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -296004993;
+    private static final long serialVersionUID = -1257978369;
 
     private Long   id;
     private String diaarinumero;
@@ -111,7 +111,7 @@ public class Lupahistoria implements Serializable {
     }
 
     @NotNull
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return this.diaarinumero;
     }

@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = 1783848954;
+    private static final long serialVersionUID = 800708240;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -168,7 +168,7 @@ public class Lupa implements Serializable {
         this.asiatyyppiId = asiatyyppiId;
     }
 
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return this.diaarinumero;
     }
