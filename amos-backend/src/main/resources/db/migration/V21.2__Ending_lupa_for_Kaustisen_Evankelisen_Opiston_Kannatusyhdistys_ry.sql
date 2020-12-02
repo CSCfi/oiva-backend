@@ -4,11 +4,12 @@ WITH cur_lupa AS (
         SET loppupvm = '2020-12-31'
         WHERE jarjestaja_ytunnus = '0178980-8'
             AND
-              diaarinumero = '8/532/2013' RETURNING diaarinumero, jarjestaja_ytunnus, jarjestaja_oid, alkupvm, loppupvm, paatospvm, meta
+              diaarinumero = '8/532/2013' RETURNING diaarinumero, jarjestaja_ytunnus,
+                  jarjestaja_oid, alkupvm, loppupvm, paatospvm, meta, koulutustyyppi, oppilaitostyyppi
 ),
      historia AS (
          INSERT INTO lupahistoria (diaarinumero, ytunnus, oid, maakunta, tila, voimassaoloalkupvm, voimassaololoppupvm,
-                                   paatospvm, filename)
+                                   paatospvm, filename, koulutustyyppi, oppilaitostyyppi)
              SELECT diaarinumero,
                     jarjestaja_ytunnus,
                     jarjestaja_oid,
@@ -17,7 +18,9 @@ WITH cur_lupa AS (
                     alkupvm,
                     loppupvm,
                     paatospvm,
-                    meta->>'liitetiedosto'
+                    meta->>'liitetiedosto',
+                    koulutustyyppi,
+                    oppilaitostyyppi
              FROM cur_lupa
      )
 
