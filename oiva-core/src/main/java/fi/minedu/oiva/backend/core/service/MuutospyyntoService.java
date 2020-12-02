@@ -326,7 +326,6 @@ public class MuutospyyntoService {
                             .orElseThrow(() -> new RuntimeException("Cannot find muutospyynto"));
                     lupaDTO.setLupatila(tila);
                     lupaDTO.setAsiatyyppi(asiatyyppi);
-                    lupaDTO.setDiaarinumero(lupaDTO.getAsianumero());
 
                     final LupaRecord lupaRecord = dsl.newRecord(LUPA, lupaDTO);
                     lupaRecord.setLupatilaId(tila.getId());
@@ -386,6 +385,7 @@ public class MuutospyyntoService {
             lupa.setAlkupvm(mp.getVoimassaalkupvm());
             lupa.setLoppupvm(mp.getVoimassaloppupvm());
             lupa.setEdellinenLupaId(oldLupa.map(Lupa::getId).orElse(null));
+            lupa.setDiaarinumero(StringUtils.isEmpty(lupa.getDiaarinumero()) ? lupa.getAsianumero() : lupa.getDiaarinumero());
 
             final Set<Long> removed = getMuutoksetRecursively(mp.getMuutokset())
                     .filter(MuutospyyntoService::isPoisto)

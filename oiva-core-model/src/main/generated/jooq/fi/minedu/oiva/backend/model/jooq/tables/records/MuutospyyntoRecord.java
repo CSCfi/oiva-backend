@@ -36,7 +36,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class MuutospyyntoRecord extends UpdatableRecordImpl<MuutospyyntoRecord> implements Record20<Long, Long, Date, Date, Date, Long, String, String, String, Timestamp, String, Timestamp, UUID, JsonNode, String, String, Date, String, String, String> {
 
-    private static final long serialVersionUID = 299894228;
+    private static final long serialVersionUID = -1689445066;
 
     /**
      * Setter for <code>muutospyynto.id</code>.
@@ -294,7 +294,7 @@ public class MuutospyyntoRecord extends UpdatableRecordImpl<MuutospyyntoRecord> 
     /**
      * Getter for <code>muutospyynto.diaarinumero</code>.
      */
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return (String) get(17);
     }
