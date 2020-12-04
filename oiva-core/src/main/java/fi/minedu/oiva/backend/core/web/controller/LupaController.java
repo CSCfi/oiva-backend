@@ -70,9 +70,10 @@ public class LupaController {
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/tulevaisuus")
     @ApiOperation(notes = "Palauttaa tulevaisuudessa voimaan tulevat luvat järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
     public CompletableFuture<Collection<Lupa>> getFutureByYtunnus(final @PathVariable String ytunnus,
-                                                            final @RequestParam(value = "with", required = false) String with,
-                                                            final @RequestParam(required = false) String koulutustyyppi) {
-        return async(() -> service.getFutureByYtunnus(ytunnus, koulutustyyppi, options(with)));
+                                                                  final @RequestParam(value = "with", required = false) String with,
+                                                                  final @RequestParam(required = false) String koulutustyyppi,
+                                                                  final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> service.getFutureByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, options(with)));
     }
 
     @OivaAccess_Public

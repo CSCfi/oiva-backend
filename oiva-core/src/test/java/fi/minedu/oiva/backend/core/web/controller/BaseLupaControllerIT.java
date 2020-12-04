@@ -126,11 +126,12 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     }
 
     @Test
-    public void getFutureByYtunnusAndKoulutustyyppi() {
+    public void getFutureByYtunnusAndKoulutustyyppiAndOppilaitostyyppi() {
         setUpDb("sql/extra_lupa_data.sql");
         jdbcTemplate.update("update lupa set alkupvm = ? where diaarinumero = ?",
                 LocalDate.now().plusDays(3), "22/222/2020");
-        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus?koulutustyyppi=2", HttpStatus.OK);
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus?koulutustyyppi=2&oppilaitostyyppi=2",
+                HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         final List<String> diaariList = doc.read("$.[*].diaarinumero");
         assertEquals(1, diaariList.size());
