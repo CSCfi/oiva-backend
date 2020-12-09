@@ -3,6 +3,7 @@ package fi.minedu.oiva.backend.core.service;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fi.minedu.oiva.backend.core.exception.ForbiddenException;
+import fi.minedu.oiva.backend.core.util.Koulutustyyppi;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Maarays;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutos;
@@ -24,6 +25,7 @@ import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -567,6 +569,34 @@ public class MuutospyyntoServiceTest {
         assertTrue(service.duplicateAsianumeroExists(null, "1234"));
         // Muutospyynto not found by asianumero
         assertFalse(service.duplicateAsianumeroExists(null, "DoesNotExist"));
+    }
+
+    @Test(expected = ValidationException.class)
+    public void testAssertValidMuutospyyntoWithDiaariAndInvalidAsianumero() {
+        final Muutospyynto muutospyynto = new Muutospyynto();
+        muutospyynto.setDiaarinumero("30/40/2020");
+        muutospyynto.setAsianumero("invalid");
+        // Should validate Asianumero and fail
+        service.assertValidMuutospyynto(muutospyynto, false);
+    }
+
+    @Test()
+    public void testAssertValidMuutospyyntoWithDiaariAndAsianumero() {
+        final Muutospyynto muutospyynto = new Muutospyynto();
+        muutospyynto.setDiaarinumero("30/40/2020");
+        muutospyynto.setAsianumero("VN/1/2020");
+        // Should validate Asianumero and pass
+        service.assertValidMuutospyynto(muutospyynto, false);
+    }
+
+    @Test()
+    public void testAssertValidMuutospyyntoWithDiaariAndKoulutustyyppi() {
+        final Muutospyynto muutospyynto = new Muutospyynto();
+        muutospyynto.setDiaarinumero("30/40/2020");
+        muutospyynto.setAsianumero("invalid");
+        muutospyynto.setKoulutustyyppi(Koulutustyyppi.VAPAASIVISTYSTYO.getValue());
+        // Should not validate Asianumero and pass
+        service.assertValidMuutospyynto(muutospyynto, false);
     }
 
     private Muutospyynto generateMuutospyynto() {

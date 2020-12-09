@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.web.controller;
 
 import fi.minedu.oiva.backend.core.service.DefaultPebbleService;
 import fi.minedu.oiva.backend.core.service.LupahistoriaService;
+import fi.minedu.oiva.backend.core.util.Koulutustyyppi;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
 import fi.minedu.oiva.backend.model.entity.oiva.Muutospyynto;
@@ -135,7 +136,8 @@ public class PrinceXMLController {
                         }
                         location = apiPrefix + PrinceXMLController.path + "/" + lupa.get().getUUIDValue();
                     } else {
-                        location = apiPrefix + BasePebbleController.path + "/resources/liitteet/lupahistoria/" + ControllerUtil.encode(historia.getFilename());
+                        final String dir = Koulutustyyppi.VAPAASIVISTYSTYO.getValue().equals(historia.getKoulutustyyppi()) ? "vst" : "lupahistoria";
+                        location = apiPrefix + BasePebbleController.path + "/resources/liitteet/" + dir + "/" + ControllerUtil.encode(historia.getFilename());
                     }
                     HttpHeaders headers = new HttpHeaders();
                     headers.add("Location", location);

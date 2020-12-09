@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa extends TableImpl<LupaRecord> {
 
-    private static final long serialVersionUID = -221890737;
+    private static final long serialVersionUID = -374932391;
 
     /**
      * The reference instance of <code>lupa</code>
@@ -85,7 +85,7 @@ public class Lupa extends TableImpl<LupaRecord> {
     /**
      * The column <code>lupa.diaarinumero</code>.
      */
-    public final TableField<LupaRecord, String> DIAARINUMERO = createField("diaarinumero", org.jooq.impl.SQLDataType.VARCHAR.length(20).nullable(false).defaultValue(org.jooq.impl.DSL.field("concat(nextval('diaarinumero_seq'::regclass), '/999/', date_part('year'::text, (now())::date))", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<LupaRecord, String> DIAARINUMERO = createField("diaarinumero", org.jooq.impl.SQLDataType.VARCHAR.length(255).nullable(false).defaultValue(org.jooq.impl.DSL.field("concat(nextval('diaarinumero_seq'::regclass), '/999/', date_part('year'::text, (now())::date))", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>lupa.jarjestaja_ytunnus</code>.

@@ -36,7 +36,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Record21<Long, Long, Long, Long, Long, String, String, String, Date, Date, Date, JsonNode, Boolean, String, Timestamp, String, Timestamp, UUID, String, String, String> {
 
-    private static final long serialVersionUID = -1059473752;
+    private static final long serialVersionUID = -163837526;
 
     /**
      * Setter for <code>lupa.id</code>.
@@ -121,7 +121,7 @@ public class LupaRecord extends UpdatableRecordImpl<LupaRecord> implements Recor
     /**
      * Getter for <code>lupa.diaarinumero</code>.
      */
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return (String) get(5);
     }

@@ -52,7 +52,7 @@ public class LupaController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestajilla")
-    @ApiOperation(notes = "Palauttaa kaikki luvat järjestäjän tiedoilla. " +
+    @ApiOperation(notes = "Palauttaa kaikki voimassaolevat luvat järjestäjän tiedoilla. " +
             "Voidaan myös rajata koulutustyypin ja oppilaitostyypin mukaan.", value = "")
     public CompletableFuture<Collection<Lupa>> getAllWithJarjestaja(@RequestParam(required = false) String koulutustyyppi,
                                                                     @RequestParam(required = false) String oppilaitostyyppi) {
@@ -67,46 +67,52 @@ public class LupaController {
     }
 
     @OivaAccess_Public
+    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/tulevaisuus")
+    @ApiOperation(notes = "Palauttaa tulevaisuudessa voimaan tulevat luvat järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
+    public CompletableFuture<Collection<Lupa>> getFutureByYtunnus(final @PathVariable String ytunnus,
+                                                                  final @RequestParam(value = "with", required = false) String with,
+                                                                  final @RequestParam(required = false) String koulutustyyppi,
+                                                                  final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> service.getFutureByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, options(with)));
+    }
+
+    @OivaAccess_Public
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}")
-    @ApiOperation(notes = "Palauttaa voimassa olevan luvan järjestäjän ytunnuksen perusteella", value = "")
+    @ApiOperation(notes = "Palauttaa voimassa olevan luvan järjestäjän ytunnuksen, koulutustyypin ja oppilaitostyypin perusteella.", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getByYtunnus(final @PathVariable String ytunnus,
                                                             final @RequestParam(value = "with", required = false) String with,
-                                                            final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
-        return getOr404(async(() -> service.getByYtunnus(ytunnus, useKoodistoVersions, options(with))));
+                                                            final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions,
+                                                            final @RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi,
+                                                            final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return getOr404(async(() -> service.getByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, useKoodistoVersions, options(with))));
     }
 
     @OivaAccess_Kayttaja
     @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/viimeisin")
-    @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen perusteella", value = "")
+    @ApiOperation(notes = "Palauttaa viimeisimmäksi luodun luvan järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
     public CompletableFuture<HttpEntity<Lupa>> getLatestByYtunnus(final @PathVariable String ytunnus,
                                                                   final @RequestParam(value = "with", required = false) String with,
-                                                                  final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
-        return getOr404(async(() -> service.getLatestByYtunnus(ytunnus, useKoodistoVersions, options(with))));
-    }
-
-    @OivaAccess_Public
-    @RequestMapping(method = GET, value = "/jarjestaja/{ytunnus}/koulutustyyppi/{koulutustyyppi}/oppilaitostyyppi/{oppilaitostyyppi}")
-    @ApiOperation(notes = "Palauttaa luvan järjestäjän ytunnuksen ja koulutustyypin perusteella", value = "")
-    public CompletableFuture<HttpEntity<Lupa>> getByYtunnusAndKoulutustyyppi(final @PathVariable String ytunnus,
-                                                                             @PathVariable String koulutustyyppi,
-                                                                             @PathVariable String oppilaitostyyppi,
-                                                                             final @RequestParam(value = "with", required = false) String with,
-                                                                             final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions) {
-        return getOr404(async(() -> service.getByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi, useKoodistoVersions, options(with))));
+                                                                  final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions,
+                                                                  final @RequestParam(required = false) String koulutustyyppi) {
+        return getOr404(async(() -> service.getLatestByYtunnus(ytunnus, useKoodistoVersions, koulutustyyppi, options(with))));
     }
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/historia/{oid}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän oid:n perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @PathVariable String oid, final HttpServletRequest request) {
-        return async(() -> lhservice.getHistoriaByOid(RequestUtils.getPathVariable(request, oid)));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByOid(final @PathVariable String oid,
+                                                                            final @RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi,
+                                                                            final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> lhservice.getHistoriaByOid(oid, koulutustyyppi, oppilaitostyyppi));
     }
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/historiaytunnuksella/{ytunnus}/**")
     @ApiOperation(notes = "Palauttaa lupahistorian koulutuksen järjestäjän ytunnuksen perusteella", value = "")
-    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus, final HttpServletRequest request) {
-        return async(() -> lhservice.getHistoriaByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
+    public CompletableFuture<Collection<Lupahistoria>> getLupahistoriaByYtunnus(final @PathVariable String ytunnus,
+                                                                                final @RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi,
+                                                                                final @RequestParam(value = "oppilaitostyyppi", required = false) String oppilaitostyyppi) {
+        return async(() -> lhservice.getHistoriaByYtunnus(ytunnus, koulutustyyppi, oppilaitostyyppi));
     }
 
     @Deprecated
@@ -127,7 +133,7 @@ public class LupaController {
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/organisaatiot")
     @ApiOperation(notes = "Palauttaa kaikki organisaatiot, joille löytyy voimassa oleva lupa järjestelmästä", value = "")
-    public CompletableFuture<Collection<Organisaatio>> getLupaorganisaatiot() {
-        return async(() -> service.getLupaorganisaatiot());
+    public CompletableFuture<Collection<Organisaatio>> getLupaorganisaatiot(@RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi) {
+        return async(() -> service.getLupaorganisaatiot(koulutustyyppi));
     }
 }

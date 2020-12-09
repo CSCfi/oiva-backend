@@ -62,9 +62,6 @@ public class MuutospyyntoController {
 
     private static final Logger logger = LoggerFactory.getLogger(MuutospyyntoController.class);
 
-    @Value("${templates.base.path}")
-    private String templateBasePath;
-
     public static final String path = "/muutospyynnot";
 
     private final MuutospyyntoService muutospyyntoService;
@@ -75,7 +72,8 @@ public class MuutospyyntoController {
 
     @Autowired
     public MuutospyyntoController(MuutospyyntoService muutospyyntoService, LupamuutosService lupamuutosService,
-                                  DefaultPebbleService pebbleService, LupaRenderService lupaRenderService, PrinceXMLService princeXMLService) {
+                                  DefaultPebbleService pebbleService, LupaRenderService lupaRenderService,
+                                  PrinceXMLService princeXMLService) {
         this.muutospyyntoService = muutospyyntoService;
         this.lupamuutosService = lupamuutosService;
         this.pebbleService = pebbleService;
@@ -92,41 +90,14 @@ public class MuutospyyntoController {
         return async(() -> muutospyyntoService.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
     }
 
-    // Will be replaced by getMuutospyynnot
-    @Deprecated
-    @OivaAccess_Esittelija
-    @RequestMapping(method = GET, value = "/avoimet")
-    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getAvoimetMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.AVOIN, false));
-    }
-
-    // Will be replaced by getMuutospyynnot
-    @Deprecated
-    @OivaAccess_Esittelija
-    @RequestMapping(method = GET, value = "/valmistelussa")
-    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getValmistelussaMuutospyynnot(
-            @RequestParam(required = false, defaultValue = "false") boolean vainOmat) {
-        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.VALMISTELUSSA, vainOmat));
-    }
-
-    // Will be replaced by getMuutospyynnot
-    @Deprecated
-    @OivaAccess_Esittelija
-    @RequestMapping(method = GET, value = "/paatetyt")
-    @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijän perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getPaatetytMuutospyynnot(final HttpServletRequest request) {
-        return async(() -> muutospyyntoService.getMuutospyynnot(Muutospyyntotila.PAATETTY, false));
-    }
-
     @OivaAccess_Esittelija
     @RequestMapping(method = GET, value = "")
     @ApiOperation(notes = "Palauttaa muutospyynnöt esittelijälle.", value = "")
     public CompletableFuture<Collection<Muutospyynto>> getMuutospyynnot(
             @RequestParam() List<Muutospyyntotila> tilat,
-            @RequestParam(required = false, defaultValue = "false") boolean vainOmat) {
-        return async(() -> muutospyyntoService.getMuutospyynnot(tilat, vainOmat));
+            @RequestParam(required = false, defaultValue = "false") boolean vainOmat,
+            @RequestParam(required = false) String koulutustyyppi) {
+        return async(() -> muutospyyntoService.getMuutospyynnot(tilat, vainOmat, koulutustyyppi));
     }
 
 
@@ -266,24 +237,4 @@ public class MuutospyyntoController {
     public Boolean duplicateAsianumeroExists(@RequestPart(value = "uuid", required = false) String uuid, @RequestPart(value = "asianumero") String asianumero) {
         return muutospyyntoService.duplicateAsianumeroExists(uuid, asianumero);
     }
-
-    /*
-
-    TODO: Commented out because these have missing access rules
-
-    // Vaihda muutospyynnön tilaa ->  passivoi
-    @ApiOperation(notes = "Passivoi muutospyyntö", value = "")
-    @RequestMapping(method = POST, value = "/passivoi/{uuid}")
-    public HttpEntity<UUID> passivoi(final @PathVariable String uuid) {
-        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.PASSIVOITU));
-    }
-
-    // Vaihda muutospyynnön tilaa -> palauta täydennettäväksi
-    @ApiOperation(notes = "Palauta järjestäjän täydennettäväksi", value = "")
-    @RequestMapping(method = POST, value = "/tila/taydennettava/{uuid}")
-    public HttpEntity<UUID> taydennettava(final @PathVariable String uuid) {
-        return getOr404(service.findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.TAYDENNETTAVA));
-    }
-
- */
 }

@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -432829491;
+    private static final long serialVersionUID = 643516868;
 
     private Long      id;
     private Long      lupaId;
@@ -50,6 +50,7 @@ public class Muutospyynto implements Serializable {
     private Date      paatospvm;
     private String    diaarinumero;
     private String    jarjestajaOid;
+    private String    koulutustyyppi;
 
     public Muutospyynto() {}
 
@@ -73,6 +74,7 @@ public class Muutospyynto implements Serializable {
         this.paatospvm = value.paatospvm;
         this.diaarinumero = value.diaarinumero;
         this.jarjestajaOid = value.jarjestajaOid;
+        this.koulutustyyppi = value.koulutustyyppi;
     }
 
     public Muutospyynto(
@@ -94,7 +96,8 @@ public class Muutospyynto implements Serializable {
         String    asianumero,
         Date      paatospvm,
         String    diaarinumero,
-        String    jarjestajaOid
+        String    jarjestajaOid,
+        String    koulutustyyppi
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -115,6 +118,7 @@ public class Muutospyynto implements Serializable {
         this.paatospvm = paatospvm;
         this.diaarinumero = diaarinumero;
         this.jarjestajaOid = jarjestajaOid;
+        this.koulutustyyppi = koulutustyyppi;
     }
 
     public Long getId() {
@@ -125,7 +129,6 @@ public class Muutospyynto implements Serializable {
         this.id = id;
     }
 
-    @NotNull
     public Long getLupaId() {
         return this.lupaId;
     }
@@ -262,7 +265,7 @@ public class Muutospyynto implements Serializable {
         this.paatospvm = paatospvm;
     }
 
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return this.diaarinumero;
     }
@@ -277,6 +280,14 @@ public class Muutospyynto implements Serializable {
 
     public void setJarjestajaOid(String jarjestajaOid) {
         this.jarjestajaOid = jarjestajaOid;
+    }
+
+    public String getKoulutustyyppi() {
+        return this.koulutustyyppi;
+    }
+
+    public void setKoulutustyyppi(String koulutustyyppi) {
+        this.koulutustyyppi = koulutustyyppi;
     }
 
     @Override
@@ -302,6 +313,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(paatospvm);
         sb.append(", ").append(diaarinumero);
         sb.append(", ").append(jarjestajaOid);
+        sb.append(", ").append(koulutustyyppi);
 
         sb.append(")");
         return sb.toString();

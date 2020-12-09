@@ -2,6 +2,7 @@ package fi.minedu.oiva.backend.core.service;
 
 import fi.minedu.oiva.backend.core.extension.MaaraysListFilter;
 import fi.minedu.oiva.backend.core.security.OivaPermission;
+import fi.minedu.oiva.backend.core.util.Koulutustyyppi;
 import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.OivaTemplates;
@@ -112,9 +113,9 @@ public class LupaService extends BaseService {
                                                  final String oppilaitostyyppi,
                                                  final String... options) {
         final SelectJoinStep<Record> query = getAllQuery(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS));
+        query.where(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi));
         Optional.ofNullable(koulutustyyppi).ifPresent(t -> {
-            query.where(LUPA.KOULUTUSTYYPPI.eq(t));
-            if (koulutustyyppi.equals("3")) {
+            if (t.equals(Koulutustyyppi.VAPAASIVISTYSTYO.getValue())) {
                 // Fetch oppilaitos maarays for VST
                 query.getSelect().add(MAARAYS.KOODISTO);
                 query.getSelect().add(MAARAYS.ORG_OID);
@@ -162,10 +163,23 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String[] withOptions) {
-        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus));
+    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
+        baseLupaFilter().ifPresent(query::and);
         query.orderBy(LUPA.LUONTIPVM.desc()).limit(1);
         return get(query, useKoodistoVersions, withOptions);
+    }
+
+    public Collection<Lupa> getFutureByYtunnus(String ytunnus, String koulutustyyppi, String oppilaitostyyppi, String[] options) {
+        final SelectOnConditionStep<Record> query = baseLupaSelect();
+        baseLupaFilter().ifPresent(query::where);
+        query.where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+                .and(LUPA.ALKUPVM.gt(DSL.currentDate()))
+                .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .and(oppilaitostyyppi == null ? LUPA.OPPILAITOSTYYPPI.isNull() : LUPA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi)));
+        return fetch(query, options);
     }
 
     public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
@@ -181,8 +195,8 @@ public class LupaService extends BaseService {
         final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
-        Optional.ofNullable(koulutustyyppi).ifPresent(tyyppi -> query.and(LUPA.KOULUTUSTYYPPI.eq(tyyppi)));
-        Optional.ofNullable(oppilaitostyyppi).ifPresent(tyyppi -> query.and(LUPA.OPPILAITOSTYYPPI.eq(tyyppi)));
+        query.and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi));
+        query.and(oppilaitostyyppi == null ? LUPA.OPPILAITOSTYYPPI.isNull() : LUPA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi));
         return get(query, useKoodistoVersions, withOptions);
     }
 
@@ -304,6 +318,7 @@ public class LupaService extends BaseService {
                 .join(LUPATILA).on(LUPA.LUPATILA_ID.eq(LUPATILA.ID))
                 .join(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
                 .where(MAARAYS.KOODISTO.eq("koulutus")
+                        .and(LUPA.KOULUTUSTYYPPI.isNull())
                         .and(MAARAYS.KOODIARVO.in(except)).not()
                         .and(LUPA.ALKUPVM.lessOrEqual(currentDate).or(LUPA.ALKUPVM.isNull()))
                         .and(LUPA.LOPPUPVM.greaterOrEqual(currentDate).or(LUPA.LOPPUPVM.isNull()))
@@ -410,11 +425,12 @@ public class LupaService extends BaseService {
                 });
     }
 
-    public List<Organisaatio> getLupaorganisaatiot() {
+    public List<Organisaatio> getLupaorganisaatiot(String koulutustyyppi) {
         SelectConditionStep<Record1<String>> query = dsl.selectDistinct(LUPA.JARJESTAJA_OID)
                 .from(LUPA)
-                .where(LUPA.ALKUPVM.le(DSL.currentDate()).
-                        and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+                .where(LUPA.ALKUPVM.le(DSL.currentDate())
+                        .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                        .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
 
         return dsl.fetch(query).stream()
                 .map(result -> result.get(LUPA.JARJESTAJA_OID))

@@ -37,6 +37,7 @@ import fi.minedu.oiva.backend.model.jooq.tables.records.MuutosRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoLiiteRecord;
 import fi.minedu.oiva.backend.model.jooq.tables.records.MuutospyyntoRecord;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
+import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -173,15 +174,11 @@ public class MuutospyyntoService {
                 .filter(Optional::isPresent).map(Optional::get);
     }
 
-    // Muutospyyntölistaus (hakemukset) esittelijälle
-    public Collection<Muutospyynto> getMuutospyynnot(Muutospyyntotila tila, boolean vainOmat) {
-        return getMuutospyynnot(Lists.newArrayList(tila), vainOmat);
-    }
-
-    public Collection<Muutospyynto> getMuutospyynnot(List<Muutospyyntotila> tilat, boolean vainOmat) {
+    public Collection<Muutospyynto> getMuutospyynnot(List<Muutospyyntotila> tilat, boolean vainOmat, String koulutustyyppi) {
         return getBaseSelect()
                 .where(baseFilter())
                 .and(MUUTOSPYYNTO.TILA.in(tilat.stream().map(Muutospyyntotila::toString).collect(Collectors.toList())))
+                .and(koulutustyyppi == null ? MUUTOSPYYNTO.KOULUTUSTYYPPI.isNull() : MUUTOSPYYNTO.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "esittelija"))
@@ -329,7 +326,6 @@ public class MuutospyyntoService {
                             .orElseThrow(() -> new RuntimeException("Cannot find muutospyynto"));
                     lupaDTO.setLupatila(tila);
                     lupaDTO.setAsiatyyppi(asiatyyppi);
-                    lupaDTO.setDiaarinumero(lupaDTO.getAsianumero());
 
                     final LupaRecord lupaRecord = dsl.newRecord(LUPA, lupaDTO);
                     lupaRecord.setLupatilaId(tila.getId());
@@ -346,8 +342,9 @@ public class MuutospyyntoService {
                     // Attach Päätöskirje from Muutospyyntö to new lupa
                     liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(),lupaRecord.getId());
 
-                    // Generate PDF for new lupa
+                    // Generate PDF for new lupa (Only for ammattillinenkoulutus)
                     lupaService.getById(lupaRecord.getId(), With.all)
+                            .filter(l -> l.getKoulutustyyppi() == null)
                             .ifPresent(l -> {
                                 try {
                                     fileStorageService.writeLupaPDF(l);
@@ -388,6 +385,7 @@ public class MuutospyyntoService {
             lupa.setAlkupvm(mp.getVoimassaalkupvm());
             lupa.setLoppupvm(mp.getVoimassaloppupvm());
             lupa.setEdellinenLupaId(oldLupa.map(Lupa::getId).orElse(null));
+            lupa.setDiaarinumero(StringUtils.isEmpty(lupa.getDiaarinumero()) ? lupa.getAsianumero() : lupa.getDiaarinumero());
 
             final Set<Long> removed = getMuutoksetRecursively(mp.getMuutokset())
                     .filter(MuutospyyntoService::isPoisto)
@@ -543,6 +541,8 @@ public class MuutospyyntoService {
         historiaRecord.setVoimassaoloalkupvm(oldLupaRecord.getAlkupvm());
         historiaRecord.setVoimassaololoppupvm(oldLupaRecord.getLoppupvm());
         historiaRecord.setAsianumero(oldLupaRecord.getAsianumero());
+        historiaRecord.setKoulutustyyppi(oldLupa.getKoulutustyyppi());
+        historiaRecord.setOppilaitostyyppi(oldLupa.getOppilaitostyyppi());
         if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
             // Old lupa was never affective
             historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));
@@ -659,8 +659,9 @@ public class MuutospyyntoService {
                         .map(liitteet -> liitteet.stream().allMatch(this::validate)).orElse(true) &&
                 Optional.ofNullable(muutospyynto.getMuutokset())
                         .map(muutokset -> muutokset.stream().allMatch(this::validate)).orElse(true) &&
-                validAsianumero(muutospyynto.getAsianumero()) &&
-                (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()));
+                ((StringUtils.isNotEmpty(muutospyynto.getDiaarinumero()) && muutospyynto.getKoulutustyyppi() != null)
+                        || (validAsianumero(muutospyynto.getAsianumero()) &&
+                        (!checkAsianumeroDuplicates || !duplicateAsianumeroExists(uuidString, muutospyynto.getAsianumero()))));
 
         if (!isValid) {
             throw new ValidationException("Invalid object");
@@ -981,8 +982,15 @@ public class MuutospyyntoService {
     private Optional<Muutospyynto> updateMuutospyynto(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
         return getByUuid(muutospyynto.getUuid().toString()).map(muutospyyntoRecord -> {
             muutospyynto.setId(muutospyyntoRecord.getId());
+            muutospyynto.setLupaId(muutospyyntoRecord.getLupaId());
             muutospyynto.setPaivittaja(authService.getUsername());
             muutospyynto.setPaivityspvm(Timestamp.from(Instant.now()));
+            muutospyynto.setLuoja(muutospyyntoRecord.getLuoja());
+            muutospyynto.setLuontipvm(muutospyyntoRecord.getLuontipvm());
+            muutospyynto.setAsianumero(StringUtils.isEmpty(muutospyynto.getAsianumero()) ? null :
+                    muutospyynto.getAsianumero());
+            muutospyynto.setDiaarinumero(StringUtils.isEmpty(muutospyynto.getDiaarinumero()) ? null :
+                    muutospyynto.getDiaarinumero());
             MuutospyyntoRecord muutospyyntoRecordUp = dsl.newRecord(MUUTOSPYYNTO, muutospyynto);
             dsl.executeUpdate(muutospyyntoRecordUp);
 
@@ -1005,6 +1013,12 @@ public class MuutospyyntoService {
 
             muutospyyntoRecord.setLuoja(authService.getUsername());
             muutospyyntoRecord.setLuontipvm(Timestamp.from(Instant.now()));
+            muutospyyntoRecord.setPaivittaja(null);
+            muutospyyntoRecord.setPaivityspvm(null);
+            muutospyyntoRecord.setAsianumero(StringUtils.isEmpty(muutospyyntoRecord.getAsianumero()) ? null :
+                    muutospyyntoRecord.getAsianumero());
+            muutospyyntoRecord.setDiaarinumero(StringUtils.isEmpty(muutospyyntoRecord.getDiaarinumero()) ? null :
+                    muutospyyntoRecord.getDiaarinumero());
             muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
             if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {

@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -375823495;
+    private static final long serialVersionUID = -1257978369;
 
     private Long   id;
     private String diaarinumero;
@@ -42,6 +42,8 @@ public class Lupahistoria implements Serializable {
     private String asianumero;
     private Date   kumottupvm;
     private Long   lupaId;
+    private String koulutustyyppi;
+    private String oppilaitostyyppi;
 
     public Lupahistoria() {}
 
@@ -60,6 +62,8 @@ public class Lupahistoria implements Serializable {
         this.asianumero = value.asianumero;
         this.kumottupvm = value.kumottupvm;
         this.lupaId = value.lupaId;
+        this.koulutustyyppi = value.koulutustyyppi;
+        this.oppilaitostyyppi = value.oppilaitostyyppi;
     }
 
     public Lupahistoria(
@@ -76,7 +80,9 @@ public class Lupahistoria implements Serializable {
         UUID   uuid,
         String asianumero,
         Date   kumottupvm,
-        Long   lupaId
+        Long   lupaId,
+        String koulutustyyppi,
+        String oppilaitostyyppi
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -92,6 +98,8 @@ public class Lupahistoria implements Serializable {
         this.asianumero = asianumero;
         this.kumottupvm = kumottupvm;
         this.lupaId = lupaId;
+        this.koulutustyyppi = koulutustyyppi;
+        this.oppilaitostyyppi = oppilaitostyyppi;
     }
 
     public Long getId() {
@@ -103,7 +111,7 @@ public class Lupahistoria implements Serializable {
     }
 
     @NotNull
-    @Size(max = 20)
+    @Size(max = 255)
     public String getDiaarinumero() {
         return this.diaarinumero;
     }
@@ -222,6 +230,22 @@ public class Lupahistoria implements Serializable {
         this.lupaId = lupaId;
     }
 
+    public String getKoulutustyyppi() {
+        return this.koulutustyyppi;
+    }
+
+    public void setKoulutustyyppi(String koulutustyyppi) {
+        this.koulutustyyppi = koulutustyyppi;
+    }
+
+    public String getOppilaitostyyppi() {
+        return this.oppilaitostyyppi;
+    }
+
+    public void setOppilaitostyyppi(String oppilaitostyyppi) {
+        this.oppilaitostyyppi = oppilaitostyyppi;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -240,6 +264,8 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(asianumero);
         sb.append(", ").append(kumottupvm);
         sb.append(", ").append(lupaId);
+        sb.append(", ").append(koulutustyyppi);
+        sb.append(", ").append(oppilaitostyyppi);
 
         sb.append(")");
         return sb.toString();
