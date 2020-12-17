@@ -75,16 +75,16 @@ public class ExportService {
     }
 
     /**
-     * Tarjoaa kaikki koulutustiedot
+     * Tarjoaa kaikki ammatillisenkoulutuksen koulutustiedot
      * Käyttäjä: Arvo
      *
-     * @return Lista kaikista koulutusluvista
+     * @return Lista kaikista ammatillisistakoulutusluvista
      */
     public Collection<KoulutusLupa> getKoulutusLuvat() {
         final Function<Long, Collection<String>> koulutusKoodiArvot = (lupaId) -> dsl.select(MAARAYS.KOODIARVO).from(LUPA)
             .leftOuterJoin(MAARAYS).on(MAARAYS.LUPA_ID.eq(LUPA.ID))
             .leftOuterJoin(KOHDE).on(KOHDE.ID.eq(MAARAYS.KOHDE_ID))
-            .where(LUPA.ID.eq(lupaId))
+            .where(LUPA.ID.eq(lupaId)).and(LUPA.KOULUTUSTYYPPI.isNull())
             .and(KOHDE.TUNNISTE.eq("tutkinnotjakoulutukset"))
             .and(MAARAYS.KOODISTO.eq("koulutus"))
             .fetchInto(String.class);
@@ -99,6 +99,7 @@ public class ExportService {
                 .fetchOptionalInto(String.class);
 
         return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM, LUPA.LOPPUPVM).from(LUPA)
+                .where(LUPA.KOULUTUSTYYPPI.isNull())
             .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM).fetchInto(KoulutusLupa.class).stream().map(koulutusLupa -> {
                 koulutusLupa.setKoulutukset(koulutusKoodiArvot.apply(koulutusLupa.getId()));
                 if(oppisopimuskoulutus.apply(koulutusLupa.getId()).isPresent()) {
@@ -109,10 +110,10 @@ public class ExportService {
     }
 
     /**
-     * Tarjoaa julkiset koulutustiedot
+     * Tarjoaa julkiset ammatillisetkoulutustiedot
      * Käyttäjä: OPH
      *
-     * @return Lista koulutustarjonnasta
+     * @return Lista ammatillisestakoulutustarjonnasta
      */
     public Collection<Koulutustarjonta> getKoulutustarjonta() {
 
@@ -199,7 +200,7 @@ public class ExportService {
 
         return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.JARJESTAJA_OID, LUPA.DIAARINUMERO, LUPA.ALKUPVM, LUPA.LOPPUPVM, LUPA.PAATOSPVM).from(LUPA)
             .leftOuterJoin(LUPATILA).on(LUPATILA.ID.eq(LUPA.LUPATILA_ID))
-            .where(LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS))
+            .where(LUPATILA.TUNNISTE.eq(LupatilaValue.VALMIS)).and(LUPA.KOULUTUSTYYPPI.isNull())
             .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.PAATOSPVM)
             .fetchInto(Koulutustarjonta.class).stream().map(koulutustarjonta -> {
                 final Long lupaId = koulutustarjonta.getId();
