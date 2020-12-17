@@ -1,10 +1,10 @@
 package fi.minedu.oiva.backend.core.web.controller;
 
+import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
+import fi.minedu.oiva.backend.core.service.ExportService;
 import fi.minedu.oiva.backend.model.entity.export.KoulutusLupa;
 import fi.minedu.oiva.backend.model.entity.export.Koulutustarjonta;
 import fi.minedu.oiva.backend.model.entity.oiva.Lupa;
-import fi.minedu.oiva.backend.core.security.annotations.OivaAccess_BasicAuth;
-import fi.minedu.oiva.backend.core.service.ExportService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,14 +45,14 @@ public class ExportController extends BaseExportController {
 
     @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/koulutusluvat")
-    @ApiOperation(notes = "Palauttaa kaikkien lupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
+    @ApiOperation(notes = "Palauttaa kaikkien ammatillistenlupien alkupäivämäärä, loppupäivämäärä-, koulutusjärjestäjä- ja koulutustiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<Collection<KoulutusLupa>> getKoulutusLuvat() {
         return async(service::getKoulutusLuvat);
     }
 
     @OivaAccess_BasicAuth
     @RequestMapping(method = GET, value = "/koulutustarjonta")
-    @ApiOperation(notes = "Palauttaa julkisten lupien koulutustarjonta tiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
+    @ApiOperation(notes = "Palauttaa julkisten ammatillistenlupien koulutustarjonta tiedot", value = "", authorizations = @Authorization(value = "BasicAuth"))
     public CompletableFuture<Collection<Koulutustarjonta>> getKoulutustarjonta() {
         return async(service::getKoulutustarjonta);
     }

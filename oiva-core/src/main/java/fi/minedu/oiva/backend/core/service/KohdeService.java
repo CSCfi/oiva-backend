@@ -27,9 +27,7 @@ public class KohdeService {
 
     public Collection<Kohde> getAll(String koulutustyyppi) {
         final SelectJoinStep<Record> query = dsl.select(KOHDE.fields()).from(KOHDE);
-        if (StringUtils.isNotBlank(koulutustyyppi)) {
-            query.where(KOHDE.KOULUTUSTYYPPI.eq(koulutustyyppi));
-        }
+            query.where(koulutustyyppi == null ? KOHDE.KOULUTUSTYYPPI.isNull() : KOHDE.KOULUTUSTYYPPI.eq(koulutustyyppi));
         return query.fetchInto(Kohde.class);
     }
 
