@@ -36,6 +36,9 @@ public class KohdeService {
     }
 
     public Map<Long, Kohde> mapAll() {
-        return getAll().stream().collect(Collectors.toMap(Kohde::getId, kohde -> kohde));
+        return dsl.select(KOHDE.fields()).from(KOHDE)
+                .fetchInto(Kohde.class)
+                .stream()
+                .collect(Collectors.toMap(Kohde::getId, kohde -> kohde));
     }
 }
