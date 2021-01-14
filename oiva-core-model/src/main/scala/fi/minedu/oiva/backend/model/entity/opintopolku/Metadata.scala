@@ -13,7 +13,8 @@ case class Metadata(
     @BeanProperty var kuvaus: String,
     @BeanProperty var kasite: String,
     @BeanProperty var huomioitavaKoodi: String,
-    @BeanProperty var sisaltaaMerkityksen: String) {
+    @BeanProperty var sisaltaaMerkityksen: String,
+    @BeanProperty var kayttoohje: String) {
 
-    def this() = this(null, null, null, null, null, null)
+    def this() = this(null, null, null, null, null, null, null)
 }
