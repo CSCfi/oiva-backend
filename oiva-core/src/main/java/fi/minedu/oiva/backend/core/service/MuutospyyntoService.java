@@ -189,10 +189,10 @@ public class MuutospyyntoService {
     }
 
     // Muutospyyntölistaus (hakemukset) koulutuksen järjestäjälle
-    public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
+    public Collection<Muutospyynto> getByOid(String oid) {
         return getBaseSelect()
                 .where(baseFilter())
-                .and(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
+                .and(MUUTOSPYYNTO.JARJESTAJA_OID.eq(oid))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "listaus"))

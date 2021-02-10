@@ -251,7 +251,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Fetch the latest lupa for jarjestaja
         final TypeRef<List<String>> stringRef = new TypeRef<List<String>>() {
         };
-        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1111111-1?with=all", OK);
+        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
         final String asianumero = doc.read("$.asianumero", String.class);
         assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);
@@ -507,7 +507,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals("\"" + uuid + "\"", response);
 
         // Fetch the latest lupa for jarjestaja
-        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/12345-1?with=all", OK);
+        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.2.3.4.111111?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
         final String asianumero = doc.read("$.asianumero", String.class);
         assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);

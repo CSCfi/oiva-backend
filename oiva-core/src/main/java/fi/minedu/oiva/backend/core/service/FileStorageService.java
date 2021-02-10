@@ -141,7 +141,7 @@ public class FileStorageService {
             return Collections.singleton(executorName + "does not exist");
         }
 
-        final Function<Lupa, Optional<Lupa>> toLupa = lupa -> lupaService.getByYtunnus(lupa.getJarjestajaYtunnus(), options(With.all));
+        final Function<Lupa, Optional<Lupa>> toLupa = lupa -> lupaService.getByOid(lupa.getJarjestajaOid(), options(With.all));
         final Consumer<String> addExecutorState = state -> asyncService.addState(writeAllPDFs, state);
         if (existingExecutorContext.isPresent()) {
             return existingExecutorContext.get().reversedStates();
