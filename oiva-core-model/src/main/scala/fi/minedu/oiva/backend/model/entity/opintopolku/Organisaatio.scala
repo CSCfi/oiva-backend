@@ -21,17 +21,19 @@ case class Organisaatio(
                          @BeanProperty var parentOidPath: String,
                          @BeanProperty var kotipaikkaUri: String,
                          @BeanProperty var nimi: TranslatedString,
+                         @BeanProperty var oppilaitostyyppi: String,
                          @BeanProperty var postiosoite: Organisaatio.Osoite,
                          @BeanProperty var kayntiosoite: Organisaatio.Osoite,
                          @BeanProperty var yhteystiedot: util.Collection[Organisaatio.Yhteystieto],
                          @BeanProperty var kuntaKoodi: KoodistoKoodi,
                          @BeanProperty var maakuntaKoodi: KoodistoKoodi,
                          @BeanProperty var muutKotipaikatUris: util.Collection[String],
-                         @BeanProperty var muutKuntaKoodit: util.Collection[KoodistoKoodi]) {
+                         @BeanProperty var muutKuntaKoodit: util.Collection[KoodistoKoodi],
+                         @BeanProperty var children: util.Collection[Organisaatio]) {
 
-  def this() = this(null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+  def this() = this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 
-  @JsonIgnore def kuntaKoodiArvo = parseKuntaKoodi(kotipaikkaUri)
+  @JsonIgnore def kuntaKoodiArvo: String = parseKuntaKoodi(kotipaikkaUri)
 
   def parseKuntaKoodi(kuntaUri: String): String = {
     if (null != kuntaUri && kuntaUri.startsWith("kunta_")) kuntaUri.substring(6) else null
@@ -49,9 +51,9 @@ case class Organisaatio(
     all
   }
 
-  @JsonIgnore def isKunta(k: Kunta) = isKuntaKoodi(k.koodiArvo)
+  @JsonIgnore def isKunta(k: Kunta): Boolean = isKuntaKoodi(k.koodiArvo)
 
-  @JsonIgnore def isKuntaKoodi(k: String) = kuntaKoodiArvo == k && null != k
+  @JsonIgnore def isKuntaKoodi(k: String): Boolean = kuntaKoodiArvo == k && null != k
 
   @JsonIgnore def getKuntaKoodiOpt: java.util.Optional[KoodistoKoodi] = Optional.ofNullable(kuntaKoodi)
 
@@ -81,7 +83,7 @@ object Organisaatio {
 
     def this() = this(null, null, null, null)
 
-    @JsonIgnore def postiKoodi = if (null != postinumeroUri && postinumeroUri.startsWith("posti_")) postinumeroUri.substring(6) else null
+    @JsonIgnore def postiKoodi: String = if (null != postinumeroUri && postinumeroUri.startsWith("posti_")) postinumeroUri.substring(6) else null
   }
 
   @JsonIgnoreProperties(ignoreUnknown = true)
@@ -94,7 +96,7 @@ object Organisaatio {
     def this() = this(null, null, null)
   }
 
-  def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null, null, null, null, null, null, null)
+  def apply(oid: String, ytunnus: String) = new Organisaatio(oid, ytunnus, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
