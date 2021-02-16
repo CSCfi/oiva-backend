@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +28,11 @@ public class OrganisaatioService {
             withMaakunta(organisaatio);
             return organisaatio;
         });
+    }
+
+    @Cacheable(value = {"OrganisaatioService:getOppilaitokset"}, condition = "#oid != null", key = "#oid")
+    public Optional<List<Organisaatio>> getOppilaitokset(final String oid) {
+        return Optional.ofNullable(oid).map(opintopolkuService::getOrganisaatioOppilaitokset);
     }
 
     private void withMuutKunnat(Organisaatio organisaatio) {
