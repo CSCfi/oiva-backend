@@ -39,18 +39,6 @@ public class LupahistoriaService {
                 .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
-    public Collection<Lupahistoria> getHistoriaByYtunnus(String ytunnus, String koulutustyyppi, String oppilaitostyyppi) {
-        return dsl.select(LUPAHISTORIA.fields())
-                .from(LUPAHISTORIA)
-                .where(LUPAHISTORIA.YTUNNUS.eq(ytunnus)
-                        .and(koulutustyyppi == null ? LUPAHISTORIA.KOULUTUSTYYPPI.isNull() : LUPAHISTORIA.KOULUTUSTYYPPI.eq(koulutustyyppi))
-                        .and(oppilaitostyyppi == null ? LUPAHISTORIA.OPPILAITOSTYYPPI.isNull() : LUPAHISTORIA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi))
-                        .and(LUPAHISTORIA.VOIMASSAOLOLOPPUPVM.lessThan(DSL.currentDate())))
-                .orderBy(LUPAHISTORIA.PAATOSPVM).fetchInto(Lupahistoria.class).stream()
-                .map(this::withPaatoskirje)
-                .filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
-    }
-
     public Optional<LupahistoriaRecord> getByUuid(String uuid) {
         return dsl.select(LUPAHISTORIA.fields())
                 .from(LUPAHISTORIA)

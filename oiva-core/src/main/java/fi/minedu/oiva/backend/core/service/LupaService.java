@@ -163,8 +163,8 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getLatestByYtunnus(String ytunnus, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
-        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus))
+    public Optional<Lupa> getLatestByOid(String oid, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_OID.eq(oid))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
         baseLupaFilter().ifPresent(query::and);
@@ -172,27 +172,27 @@ public class LupaService extends BaseService {
         return get(query, useKoodistoVersions, withOptions);
     }
 
-    public Collection<Lupa> getFutureByYtunnus(String ytunnus, String koulutustyyppi, String oppilaitostyyppi, String[] options) {
+    public Collection<Lupa> getFutureByOid(String oid, String koulutustyyppi, String oppilaitostyyppi, String[] options) {
         final SelectOnConditionStep<Record> query = baseLupaSelect();
         baseLupaFilter().ifPresent(query::where);
-        query.where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+        query.where(LUPA.JARJESTAJA_OID.eq(oid)
                 .and(LUPA.ALKUPVM.gt(DSL.currentDate()))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .and(oppilaitostyyppi == null ? LUPA.OPPILAITOSTYYPPI.isNull() : LUPA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi)));
         return fetch(query, options);
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, final String[] withOptions) {
-        return getByYtunnus(ytunnus, null, null, true, withOptions );
+    public Optional<Lupa> getByOid(final String oid, final String[] withOptions) {
+        return getByOid(oid, null, null, true, withOptions );
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, final Boolean useKoodistoVersions, final String[] withOptions) {
-        return getByYtunnus(ytunnus, null, null, useKoodistoVersions, withOptions);
+    public Optional<Lupa> getByOid(final String oid, final Boolean useKoodistoVersions, final String[] withOptions) {
+        return getByOid(oid, null, null, useKoodistoVersions, withOptions);
     }
 
-    public Optional<Lupa> getByYtunnus(final String ytunnus, final String koulutustyyppi, final String oppilaitostyyppi,
-                                       final Boolean useKoodistoVersions, final String[] withOptions) {
-        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_YTUNNUS.eq(ytunnus)
+    public Optional<Lupa> getByOid(final String oid, final String koulutustyyppi, final String oppilaitostyyppi,
+                                   final Boolean useKoodistoVersions, final String[] withOptions) {
+        final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_OID.eq(oid)
                 .and(LUPA.ALKUPVM.le(DSL.currentDate()))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
         query.and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi));
