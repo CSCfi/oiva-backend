@@ -66,7 +66,7 @@ class OpintopolkuService extends CacheAware {
     def koodistoKooditPath(koodistoUri: String) = s"/$koodistoUri/koodi"
     def koodistoUrl(koodistoUri: String): String = koodistoServiceUrl + s"/$koodistoUri"
     def koodistoKoodiUrl(koodistoUri: String): String = koodistoServiceUrl + koodistoKooditPath(koodistoUri)
-    def koodiUri(koodistoUri: String, koodiArvo: String): String = s"${koodistoUri}_$koodiArvo"
+    def koodiUri(koodistoUri: String, koodiArvo: String = ""): String = s"${koodistoUri}_${koodiArvo.toLowerCase}"
 
     // Koodi urit
     def aluehallintovirastoKoodiUri(koodiArvo: String) = s"aluehallintovirasto_$koodiArvo"

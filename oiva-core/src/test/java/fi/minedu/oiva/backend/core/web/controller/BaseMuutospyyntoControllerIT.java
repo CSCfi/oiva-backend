@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -97,6 +96,17 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Nimenkirjoittaja);
         final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
                 readFileToString("json/muutospyynto.json")), "/api/muutospyynnot/tallenna");
+        assertEquals("Response code should match!", OK, response.getStatusCode());
+    }
+
+    @Test
+    public void saveWithoutYtunnus() throws IOException {
+        loginAs("testuser", lupaJarjestajaOid, OivaAccess.Context_Kayttaja);
+        final String json = readFileToString("json/muutospyynto.json");
+        final DocumentContext doc = jsonPath.parse(json);
+        doc.set("$.jarjestajaYtunnus", null);
+        final ResponseEntity<String> response = requestSave(prepareMultipartEntity(
+                doc.jsonString()), "/api/muutospyynnot/tallenna");
         assertEquals("Response code should match!", OK, response.getStatusCode());
     }
 
@@ -205,12 +215,15 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
     public void testHappyPath() throws IOException {
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Kayttaja);
-        // Create new muutospyynto
+        // Create new muutospyynto without ytunnus
+        final String json = readFileToString("json/muutospyynto.json");
+        DocumentContext doc = jsonPath.parse(json);
+        doc.set("$.jarjestajaYtunnus", null);
         ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
-                readFileToString("json/muutospyynto.json"),
+                doc.jsonString(),
                 "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/tallenna");
         assertEquals("Response status should match", OK, createResponse.getStatusCode());
-        DocumentContext doc = jsonPath.parse(createResponse.getBody());
+        doc = jsonPath.parse(createResponse.getBody());
         final String uuid = doc.read("$.uuid", String.class);
         logout();
         // Change muutospyynto tila to "KASITTELYSSA"

@@ -27,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class BaseLupaControllerIT extends BaseIT {
 
-    private static String PARAM_KOULUTUSTYYPPI = "koulutustyyppi";
-    private static String PARAM_OPPILAITOSTYYPPI = "oppilaitostyyppi";
+    private static final String PARAM_KOULUTUSTYYPPI = "koulutustyyppi";
+    private static final String PARAM_OPPILAITOSTYYPPI = "oppilaitostyyppi";
 
     @Autowired
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")

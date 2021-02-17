@@ -64,20 +64,20 @@ import static org.mockito.Mockito.when;
 
 public class MuutospyyntoServiceTest {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
 
-    private DSLContext dsl = mock(DSLContext.class);
-    private AuthService authService = mock(AuthService.class);
-    private OrganisaatioService organisaatioService = mock(OrganisaatioService.class);
-    private LiiteService liiteService = mock(LiiteService.class);
-    private OpintopolkuService opintopolkuService = mock(OpintopolkuService.class);
-    private MaaraysService maaraysService = mock(MaaraysService.class);
-    private FileStorageService fileStorageService = mock(FileStorageService.class);
-    private AsiatilamuutosService asiatilamuutosService = mock(AsiatilamuutosService.class);
-    private LupaService lupaService = mock(LupaService.class);
-    private KoodistoService koodistoService = mock(KoodistoService.class);
-    private EsitysmalliService esitysmalliService = mock(EsitysmalliService.class);
+    private final DSLContext dsl = mock(DSLContext.class);
+    private final AuthService authService = mock(AuthService.class);
+    private final OrganisaatioService organisaatioService = mock(OrganisaatioService.class);
+    private final LiiteService liiteService = mock(LiiteService.class);
+    private final OpintopolkuService opintopolkuService = mock(OpintopolkuService.class);
+    private final MaaraysService maaraysService = mock(MaaraysService.class);
+    private final FileStorageService fileStorageService = mock(FileStorageService.class);
+    private final AsiatilamuutosService asiatilamuutosService = mock(AsiatilamuutosService.class);
+    private final LupaService lupaService = mock(LupaService.class);
+    private final KoodistoService koodistoService = mock(KoodistoService.class);
+    private final EsitysmalliService esitysmalliService = mock(EsitysmalliService.class);
 
     private MuutospyyntoService service;
     private Lupa lupa;
@@ -88,7 +88,7 @@ public class MuutospyyntoServiceTest {
                 opintopolkuService, maaraysService, fileStorageService, asiatilamuutosService, lupaService, koodistoService, esitysmalliService));
 
         this.lupa = new Lupa();
-        this.lupa.setJarjestajaYtunnus("123");
+        this.lupa.setJarjestajaOid("123");
         when(lupaService.getByUuid(anyString())).thenReturn(Optional.of(lupa));
     }
 
@@ -631,7 +631,7 @@ public class MuutospyyntoServiceTest {
     private void setUserOrgToMuutospyyntoOrg(String oid, Muutospyynto muutospyynto) {
         Organisaatio organisaatio = new Organisaatio();
         organisaatio.setOid(oid);
-        muutospyynto.setJarjestajaYtunnus(this.lupa.getJarjestajaYtunnus());
+        muutospyynto.setJarjestajaOid(this.lupa.getJarjestajaOid());
         this.lupa.setJarjestajaOid(oid);
         when(authService.getUserOrganisationOid()).thenReturn(oid);
     }
