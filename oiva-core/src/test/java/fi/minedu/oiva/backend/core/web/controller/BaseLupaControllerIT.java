@@ -27,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class BaseLupaControllerIT extends BaseIT {
 
-    private static String PARAM_KOULUTUSTYYPPI = "koulutustyyppi";
-    private static String PARAM_OPPILAITOSTYYPPI = "oppilaitostyyppi";
+    private static final String PARAM_KOULUTUSTYYPPI = "koulutustyyppi";
+    private static final String PARAM_OPPILAITOSTYYPPI = "oppilaitostyyppi";
 
     @Autowired
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -63,53 +63,53 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     }
 
     @Test
-    public void getLatestByYtunnus() {
+    public void getLatestByOid() {
         setUpDb("sql/extra_lupa_data.sql");
         loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
-        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin", HttpStatus.OK);
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         final String diaarinumero = "23/223/2020";
         assertEquals(diaarinumero, doc.read("$.diaarinumero"));
 
         // If latest lupa is already ended, response should be 404 not found.
         jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), diaarinumero);
-        makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin", HttpStatus.NOT_FOUND);
+        makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin", HttpStatus.NOT_FOUND);
     }
 
     @Test
-    public void getLatestByYtunnusAndKoulutustyyppi() {
+    public void getLatestByOidAndKoulutustyyppi() {
         setUpDb("sql/extra_lupa_data.sql");
         loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
-        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.OK);
+        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin?koulutustyyppi=2", HttpStatus.OK);
         DocumentContext doc = jsonPath.parse(response.getBody());
         final String diaarinumero = "22/222/2020";
         assertEquals(diaarinumero, doc.read("$.diaarinumero"));
 
         // Get latest not ended lupa.
         jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), diaarinumero);
-        response = makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.OK);
+        response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin?koulutustyyppi=2", HttpStatus.OK);
         doc = jsonPath.parse(response.getBody());
         assertEquals("11/111/2020", doc.read("$.diaarinumero"));
 
         // If all lupas are already ended, response should be 404 not found.
         jdbcTemplate.update("update lupa set loppupvm = ? where diaarinumero = ?", LocalDate.now().minusDays(2), "11/111/2020");
-        makeRequest("/api/luvat/jarjestaja/1111111-1/viimeisin?koulutustyyppi=2", HttpStatus.NOT_FOUND);
+        makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin?koulutustyyppi=2", HttpStatus.NOT_FOUND);
     }
 
     @Test
-    public void getByYtunnusAndKoulutustyyppi() {
+    public void getByOidAndKoulutustyyppi() {
         setUpDb("sql/extra_lupa_data.sql");
-        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1?koulutustyyppi=2&oppilaitostyyppi=1", HttpStatus.OK);
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?koulutustyyppi=2&oppilaitostyyppi=1", HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         assertEquals("11/111/2020", doc.read("$.diaarinumero"));
     }
 
     @Test
-    public void getFutureByYtunnus() {
+    public void getFutureByOid() {
         setUpDb("sql/extra_lupa_data.sql");
         jdbcTemplate.update("update lupa set alkupvm = ?, koulutustyyppi = null, oppilaitostyyppi = null where diaarinumero = ?",
                 LocalDate.now().plusDays(3), "22/222/2020");
-        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
+        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/tulevaisuus", HttpStatus.OK);
         DocumentContext doc = jsonPath.parse(response.getBody());
         List<String> diaariList = doc.read("$.[*].diaarinumero");
         assertEquals(2, diaariList.size());
@@ -118,7 +118,7 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         // Should not return lupa which is started in the same day.
         jdbcTemplate.update("update lupa set alkupvm = ?, koulutustyyppi = null, oppilaitostyyppi = null where diaarinumero = ?",
                 LocalDate.now(), "22/222/2020");
-        response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus", HttpStatus.OK);
+        response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/tulevaisuus", HttpStatus.OK);
         doc = jsonPath.parse(response.getBody());
         diaariList = doc.read("$.[*].diaarinumero");
         assertEquals(1, diaariList.size());
@@ -126,11 +126,11 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     }
 
     @Test
-    public void getFutureByYtunnusAndKoulutustyyppiAndOppilaitostyyppi() {
+    public void getFutureByOidAndKoulutustyyppiAndOppilaitostyyppi() {
         setUpDb("sql/extra_lupa_data.sql");
         jdbcTemplate.update("update lupa set alkupvm = ? where diaarinumero = ?",
                 LocalDate.now().plusDays(3), "22/222/2020");
-        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1111111-1/tulevaisuus?koulutustyyppi=2&oppilaitostyyppi=2",
+        final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/tulevaisuus?koulutustyyppi=2&oppilaitostyyppi=2",
                 HttpStatus.OK);
         final DocumentContext doc = jsonPath.parse(response.getBody());
         final List<String> diaariList = doc.read("$.[*].diaarinumero");
@@ -166,13 +166,11 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         assertEquals(1, updateCount);
 
         DocumentContext doc = jsonPath.parse(makeRequest("/api/luvat/historia/1.1.111.111.11.11111111111", HttpStatus.OK).getBody());
-        DocumentContext doc2 = jsonPath.parse(makeRequest("/api/luvat/historiaytunnuksella/1111111-1", HttpStatus.OK).getBody());
         assertEquals(new Integer(1), doc.read("$.length()"));
         assertEquals("1.1.111.111.11.11111111111", doc.read("$[0].oid"));
         doc = JsonPath.using(doc.configuration().addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(doc.jsonString());
         assertNull(doc.read("$[0].id"));
         assertNull(doc.read("$[0].lupaId"));
-        assertEquals(doc.jsonString(), doc2.jsonString());
     }
 
     @Test

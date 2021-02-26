@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import static fi.minedu.oiva.backend.core.util.AsyncUtil.async;
@@ -25,5 +26,11 @@ public abstract class BaseOrganisaatioController {
     @RequestMapping(value = "/{oid:.+}", method = GET)
     public CompletableFuture<HttpEntity<Organisaatio>> getWithLocation(final @PathVariable String oid) {
         return getOr404(async(() -> service.getWithLocation(oid)));
+    }
+
+    @OivaAccess_Public
+    @RequestMapping(value = "/{oid}/oppilaitokset", method = GET)
+    public CompletableFuture<HttpEntity<List<Organisaatio>>> getOppilaitokset(final @PathVariable String oid) {
+        return getOr404(async(() -> service.getOppilaitokset(oid)));
     }
 }

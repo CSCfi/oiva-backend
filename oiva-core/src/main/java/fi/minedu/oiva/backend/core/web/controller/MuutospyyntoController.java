@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,11 +82,11 @@ public class MuutospyyntoController {
 
 
     // palauttaa kaikki järjestäjän muutospyynnöt
-    @RequestMapping(method = GET, value = "/{ytunnus}")
-    @ApiOperation(notes = "Palauttaa muutospyynnöt järjestäjän ytunnuksen perusteella", value = "")
-    public CompletableFuture<Collection<Muutospyynto>> getByYtunnus(final @PathVariable String ytunnus,
-                                                                    final HttpServletRequest request) {
-        return async(() -> muutospyyntoService.getByYtunnus(RequestUtils.getPathVariable(request, ytunnus)));
+    @RequestMapping(method = GET, value = "/{oid}/**")
+    @ApiOperation(notes = "Palauttaa muutospyynnöt järjestäjän oid:n perusteella", value = "")
+    public CompletableFuture<Collection<Muutospyynto>> getByOid(final @PathVariable String oid,
+                                                                final HttpServletRequest request) {
+        return async(() -> muutospyyntoService.getByOid(RequestUtils.getPathVariable(request, oid)));
     }
 
     @OivaAccess_Esittelija

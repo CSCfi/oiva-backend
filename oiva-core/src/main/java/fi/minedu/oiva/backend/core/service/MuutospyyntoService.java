@@ -189,10 +189,10 @@ public class MuutospyyntoService {
     }
 
     // Muutospyyntölistaus (hakemukset) koulutuksen järjestäjälle
-    public Collection<Muutospyynto> getByYtunnus(String ytunnus) {
+    public Collection<Muutospyynto> getByOid(String oid) {
         return getBaseSelect()
                 .where(baseFilter())
-                .and(MUUTOSPYYNTO.JARJESTAJA_YTUNNUS.eq(ytunnus))
+                .and(MUUTOSPYYNTO.JARJESTAJA_OID.eq(oid))
                 .orderBy(MUUTOSPYYNTO.HAKUPVM).fetchInto(Muutospyynto.class)
                 .stream()
                 .map(muutospyynto -> with(muutospyynto, "listaus"))
@@ -577,7 +577,7 @@ public class MuutospyyntoService {
 
     // Check that muutospyynto and lupa organizations match each other
     private boolean lupaAndMuutospyyntoOrganizationsMatch(final Muutospyynto toBeSaved) {
-        return lupaService.getByUuid(toBeSaved.getLupaUuid()).map(l -> l.getJarjestajaYtunnus().equals(toBeSaved.getJarjestajaYtunnus())).orElse(false);
+        return lupaService.getByUuid(toBeSaved.getLupaUuid()).map(l -> l.getJarjestajaOid().equals(toBeSaved.getJarjestajaOid())).orElse(false);
     }
 
     // Check that user is in same org than muutospyynto
@@ -886,7 +886,7 @@ public class MuutospyyntoService {
 
     private void withOrganization(final Muutospyynto muutospyynto) {
         Optional.ofNullable(muutospyynto)
-                .ifPresent(m -> organisaatioService.getWithLocation(m.getJarjestajaYtunnus())
+                .ifPresent(m -> organisaatioService.getWithLocation(m.getJarjestajaOid())
                         .ifPresent(m::setJarjestaja));
     }
 
@@ -1021,8 +1021,8 @@ public class MuutospyyntoService {
                     muutospyyntoRecord.getDiaarinumero());
             muutospyyntoRecord.setPaivityspvm(Timestamp.from(Instant.now()));
             Optional<Lupa> lupa = lupaService.getByUuid(muutospyynto.getLupaUuid());
-            if (lupa.map(m -> !m.getJarjestajaYtunnus().equals(muutospyynto.getJarjestajaYtunnus())).orElse(false)) {
-                throw new ForbiddenException("Muutospyynto jarjestajaYTunnus must be equal to lupa jarjestaja y-tunnus");
+            if (lupa.map(l -> !l.getJarjestajaOid().equals(muutospyynto.getJarjestajaOid())).orElse(false)) {
+                throw new ForbiddenException("Muutospyynto jarjestajaOid must be equal to lupa jarjestaja oid");
             }
             muutospyyntoRecord.setLupaId(lupa.map(Lupa::getId).orElse(null));
             muutospyyntoRecord.setPaatoskierrosId(paatoskierrosId);

@@ -35,19 +35,19 @@ import static org.mockito.Mockito.when;
 
 public class LupamuutosServiceTest {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private LupamuutosService lupamuutosService;
-    private AuthService authService = mock(AuthService.class);
-    private LupaService lupaService = mock(LupaService.class);
+    private final AuthService authService = mock(AuthService.class);
+    private final LupaService lupaService = mock(LupaService.class);
 
-    private MuutospyyntoService service = mock(MuutospyyntoService.class);
+    private final MuutospyyntoService service = mock(MuutospyyntoService.class);
     private Lupa lupa;
 
     @Before
     public void setUp() {
         this.lupamuutosService = new LupamuutosService(service, authService);
         this.lupa = new Lupa();
-        this.lupa.setJarjestajaYtunnus("123");
+        this.lupa.setJarjestajaOid("123");
         when(lupaService.getByUuid(anyString())).thenReturn(Optional.of(lupa));
         Answer<Optional<Muutospyynto>> firstArgument = invocationOnMock -> {
             Muutospyynto mp = (Muutospyynto) invocationOnMock.getArguments()[0];
@@ -58,6 +58,7 @@ public class LupamuutosServiceTest {
         };
         when(service.save(any(Muutospyynto.class), anyMap())).thenAnswer(firstArgument);
         when(service.update(any(Muutospyynto.class), anyMap())).thenAnswer(firstArgument);
+        when(service.validAsianumero(anyString())).thenCallRealMethod();
     }
 
     @Test
@@ -165,7 +166,7 @@ public class LupamuutosServiceTest {
         Muutospyynto muutospyynto = new Muutospyynto();
         muutospyynto.setLiitteet(new LinkedList<>());
         muutospyynto.setMuutokset(new LinkedList<>());
-        muutospyynto.setJarjestajaYtunnus(lupa.getJarjestajaYtunnus());
+        muutospyynto.setJarjestajaOid(lupa.getJarjestajaOid());
         muutospyynto.setLupaUuid(UUID.randomUUID().toString());
         muutospyynto.setAsianumero("VN/1234/1234");
         return muutospyynto;
@@ -174,7 +175,7 @@ public class LupamuutosServiceTest {
     private void setUserOrgToMuutospyyntoOrg(String oid, Muutospyynto muutospyynto) {
         Organisaatio organisaatio = new Organisaatio();
         organisaatio.setOid(oid);
-        muutospyynto.setJarjestajaYtunnus(this.lupa.getJarjestajaYtunnus());
+        muutospyynto.setJarjestajaOid(this.lupa.getJarjestajaOid());
         this.lupa.setJarjestajaOid(oid);
         when(authService.getUserOrganisationOid()).thenReturn(oid);
     }
