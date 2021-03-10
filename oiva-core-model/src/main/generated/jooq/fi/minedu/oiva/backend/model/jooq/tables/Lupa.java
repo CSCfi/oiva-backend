@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa extends TableImpl<LupaRecord> {
 
-    private static final long serialVersionUID = -374932391;
+    private static final long serialVersionUID = 1718952122;
 
     /**
      * The reference instance of <code>lupa</code>
@@ -90,7 +90,7 @@ public class Lupa extends TableImpl<LupaRecord> {
     /**
      * The column <code>lupa.jarjestaja_ytunnus</code>.
      */
-    public final TableField<LupaRecord, String> JARJESTAJA_YTUNNUS = createField("jarjestaja_ytunnus", org.jooq.impl.SQLDataType.VARCHAR.length(10).nullable(false), this, "");
+    public final TableField<LupaRecord, String> JARJESTAJA_YTUNNUS = createField("jarjestaja_ytunnus", org.jooq.impl.SQLDataType.VARCHAR.length(10), this, "");
 
     /**
      * The column <code>lupa.jarjestaja_oid</code>.
