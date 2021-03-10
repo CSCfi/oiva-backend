@@ -1,0 +1,1 @@
+ALTER TABLE lupahistoria ALTER COLUMN ytunnus DROP NOT NULL;
