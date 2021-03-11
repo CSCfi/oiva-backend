@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
 
-    private static final long serialVersionUID = 1166214938;
+    private static final long serialVersionUID = 1809598139;
 
     /**
      * The reference instance of <code>muutospyynto</code>
@@ -95,7 +95,7 @@ public class Muutospyynto extends TableImpl<MuutospyyntoRecord> {
     /**
      * The column <code>muutospyynto.jarjestaja_ytunnus</code>.
      */
-    public final TableField<MuutospyyntoRecord, String> JARJESTAJA_YTUNNUS = createField("jarjestaja_ytunnus", org.jooq.impl.SQLDataType.VARCHAR.length(10).nullable(false), this, "");
+    public final TableField<MuutospyyntoRecord, String> JARJESTAJA_YTUNNUS = createField("jarjestaja_ytunnus", org.jooq.impl.SQLDataType.VARCHAR.length(10), this, "");
 
     /**
      * The column <code>muutospyynto.luoja</code>.
