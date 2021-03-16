@@ -1,9 +1,0 @@
-FROM openjdk:8-jre
-MAINTAINER Kuja dev <aki.heikkinen@valamis.com>
-
-EXPOSE 7099
-
-COPY yva-backend/target/kuja-backend.jar /opt/kuja/backend/kuja-backend.jar
-COPY application-dev.yml /opt/kuja/backend/application.yml
-WORKDIR /opt/kuja/backend
-CMD java -jar kuja-backend.jar --oiva.dbhost=postgres --redis.host=redis --templates.base.path=/opt/kuja/template --spring.profiles.active=dev

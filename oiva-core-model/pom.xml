@@ -218,22 +218,6 @@
 
     <profiles>
         <profile>
-            <id>yva-db</id>
-            <activation>
-                <property>
-                    <name>yva-db</name>
-                </property>
-            </activation>
-            <properties>
-                <oiva.dbhost>localhost</oiva.dbhost>
-                <oiva.schema>kuja</oiva.schema>
-                <oiva.dbport>7432</oiva.dbport>
-                <oiva.dbname>kuja</oiva.dbname>
-                <oiva.dbusername>kuja</oiva.dbusername>
-                <oiva.dbpassword>kuja</oiva.dbpassword>
-            </properties>
-        </profile>
-        <profile>
             <id>generate-db</id>
             <build>
                 <plugins>

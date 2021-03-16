@@ -42,17 +42,14 @@ Tervetuloa Oiva-projektin pariin! Näiden ohjeiden myötä sinun on mahdollista 
   - [Serverillä manuaalinen backendin käynnistys stagingissa:](#Serverill%C3%A4-manuaalinen-backendin-k%C3%A4ynnistys-stagingissa)
 
 ## Pikaohje
-Amos = Oiva, Yva = Kuja
 
 Ohjeet Oiva-palvelun käynnistykseen tilanteessa, jossa kaikki tarvittavat riippuvuuudet on asennettu ja tietokanta importattu jo aikaisemmin:
-* Docker-konttien käynnistys: `./oiva-docker.sh start --amos`
+* Docker-konttien käynnistys: `./oiva-docker.sh start`
 * Koodien kääntäminen: `mvn clean install`
-* Sovelluspalvelimen käynnistys: `./oiva-backend.sh amos -c`
+* Sovelluspalvelimen käynnistys: `./oiva-backend.sh -c`
 * Käyttöliittymäkoodit: oiva-frontend-repositoryn juuressa `npm install && npm start`
 
 Oiva-palvelu vastaa osoitteesta https://localhost
-
-Kuja-palvelu vastaa osoitteesta https://localhost:4433
 
 ## Alkuvalmistelut
 
@@ -109,12 +106,11 @@ Tietokannan ajantasaisuudesta vastaa [Flyway](https://flywaydb.org/)-migraatioty
 
 Manuaalisia tietokantaoperaatioita varten on olemassa `oiva-db.sh`-skripti. Sen avulla on mahdollista tehdä mm. tietokannan palautus ja [jOOQ](https://www.jooq.org/)-entiteettien luonti.
 
-Palautusta varten Docker-kontit pitää olla ajossa. Näiden käynnistäminen on ohjeistettu kohdassa [8.1](#81-Docker-palvelut). Lisäksi oiva-deplyment-repository pitää olla kloonattuna oiva-backend-hakemiston rinnalla. Tämä yksityinen repository sisältää oivan ja kujan todellisen lupadatan.
+Palautusta varten Docker-kontit pitää olla ajossa. Näiden käynnistäminen on ohjeistettu kohdassa [8.1](#81-Docker-palvelut). Lisäksi oiva-deplyment-repository pitää olla kloonattuna oiva-backend-hakemiston rinnalla. Tämä yksityinen repository sisältää oivan todellisen lupadatan.
 
-Tietokannan luonti tai resetointi Oivalle ja Kujalle:
+Tietokannan luonti tai resetointi Oivalle:
 ```
-$ ./oiva-db.sh amos create   ## amos - oiva
-$ ./oiva-db.sh yva create   ## yva - kuja
+$ ./oiva-db.sh create
 ```
 
 Jos tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen. Uudelleengeneroinnissa käännetään oiva-core-model-moduuli, joka sisältää tietokantarakenteeseen vaikuttavat tietokantamigraatiot. Migraatiot ajetaan tietokantaa vasten, jonka sen hetkisen rakenteen perusteella muodostetaan DAO- ja entiteettiluokat java-koodina.
@@ -122,21 +118,19 @@ Jos tietokantatauluihin tulee muutoksia, JOOQ-luokat pitää generoida uudelleen
 $ ./oiva-db.sh amos generate
 ```
 
-## 8. Palveluiden käynnistäminen
+## 8. Palvelun käynnistäminen
 
-Palvelut on jaettu kahteen osaan: AMOS ja YVA. AMOS tarkoittaa käytännössä Oiva-puolen palveluja ja Yva:ssa on kyse Kuja-puolen palveluista. Eli vaikka tämä projekti onkin nimellä Oiva Backend, on projektiin sisällytetty myös Kuja-puolen palvelut.
+Palvelu voidaan käynnistää docker-palveluna tai lokaalina sovelluspalvelimena (suositeltu kehityskäyttöön).
 
-### 8.1 Docker-palvelut
+### 8.1 Docker-palvelu
 
 Käynnistä docker:
 
-    $ ./oiva-docker.sh start            # oiva ja kuja
-    $ ./oiva-docker.sh start  --amos    # vain oiva
-    $ ./oiva-docker.sh start  --yva     # vain kuja
+    $ ./oiva-docker.sh start
     
 Projektin juurihakemistossa sijaitsevaan `oiva-docker.sh`-tiedostoon on sisäänleivottu komento, jota usein käytetään käynnistämään Docker-kontit. Tyypillistä `docker-compose up` -komentoa ei siis tarvitse tässä projektissa käsin ajaa.
     
-Docker-compose luo kuusi palvelua riippuen käynnistysparametreista: amos-postgres, amos-redis, yva-postgres, yva-redis, yva-nginx ja nginx.
+Docker-compose luo 3 palvelua: amos-postgres, amos-redis ja nginx.
 
 ### 8.2 Sovelluspalvelin
 
@@ -148,16 +142,13 @@ Syötä tiedostoon testi-opintopolun tarvitsemat käyttäjätunnus ja salasana. 
     
 Backend-palvelun käynnistäminen kehityskäyttöön:
 
-    $ ./oiva-backend.sh amos -c
-    $ ./oiva-backend.sh yva -c
+    $ ./oiva-backend.sh -c
 
-Backendin lisäksi yleensä tarvitaan frontendin käynnistys. Se tapahtuu oiva-frontend- ja kuja-frontend-repositoryjen juuressa:
+Backendin lisäksi yleensä tarvitaan frontendin käynnistys. Se tapahtuu oiva-frontend repositoryn juuressa:
 
     $ npm install && npm start
 
 Tämän jälkeen Oivaa voi käyttää osoitteessa https://localhost
-
-Kujaa voi käyttää osoitteessa https://localhost:4433
 
 **Huom**
 
@@ -165,7 +156,7 @@ Https-liikenne edellyttää sertifikaattia. Kehitysympäristössä eli localhost
 
 ### 8.3 Huomioita
 
-Oivan backend-sovellus käynnistyy porttiin 8099 ja vastaa swagger-rajapintadokumentaatiolla osoitteesta http://localhost:8099. Kujalle vastaava portti on 8100.
+Oivan backend-sovellus käynnistyy porttiin 8099 ja vastaa swagger-rajapintadokumentaatiolla osoitteesta http://localhost:8099.
 
 Dockerin avulla käynnistettyä nginx-palvelinta käytetään reverse proxyna kehitysympäristössä. Sen avulla ohjataan https-liikenne oikeisiin kohdeosoitteisiin seuraavasti:
 
@@ -185,7 +176,7 @@ Sovelluksen voi ajaa debug-moodissa lisäämällä d-parametrin käynnistyskomen
 
 `./oiva-backend.sh amos -c -d`
 
-Yhteys otetaan Javan remote debuggerilla porttiin 5005. Toistaiseksi Oivaa ja Kujaa ei voi debugata samanaikaisesti, koska debug-porttina käytetään samaa porttia.
+Yhteys otetaan Javan remote debuggerilla porttiin 5005.
 
 ## Apuskriptit
 
@@ -213,8 +204,6 @@ Aja integraatiotestit:
     
     $ ./run-integration-tests.sh
 
-Integraatiotestit ajetaan aina sekä Oivalle että Kujalle.
-
 - Testit on mahdollista ajaa debug-moodissa käyttämällä parametria `--debug`, jolloin testiajo jää odottamaan debuggerin yhdistämistä ennen varsinaisten testien ajoa. Remote debuggerin portti on oletuksena 5005.
 - Yksittäisen luokan testien ajaminen on mahdollista esim. `--tests '*MuutospyyntoControllerIT'`. Kaikki MuutospyyntoControllerIT-loppuisten luokkien testit ajetaan.
 - Jos halutaan ajaa yksittäinen testi, niin loppuun pitää lisätä testifunktion nimi risuaidalla eroteltuna, esim. saveWithoutLogin-funktion ajaminen `--tests '*MuutospyyntoControllerIT#saveWithoutLogin'`
@@ -225,7 +214,7 @@ Virtuaaliympäristön pystytys kestää hieman aikaa, joten samaa ympäristöä 
 ## Pebblen ja PrinceXML:n käyttö
 
 PrinceXML tuottaa PDF-tiedostoja HTML-lähteistä jotka on muodostettu [Pebble-frameworkillä](http://www.mitchellbosecke.com/pebble).
-- Pebblen templatet ja resurssit on määritetty omissa git-respositoryissaan (oiva-template ja kuja-template). Hanki templatet koneelle jolla ajat backendiä
+- Pebblen templatet ja resurssit on määritetty omassa git-respositoryssaan (oiva-template). Hanki templatet koneelle jolla ajat backendiä
 
 Pebblen käyttämät template-tiedostot määräytyvät kolmen polun mukaisesti: juuripolku, versiopolku ja templaattitiedosto. 
 - juuripolku (base path) on ``/opt/oiva/backend/``

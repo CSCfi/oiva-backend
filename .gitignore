@@ -12,6 +12,5 @@ pom.xml.releaseBackup
 
 logs
 **/oiva-backend.log*
-**/kuja-backend.log*
 vars-*.sh
 backend-error.*.log
