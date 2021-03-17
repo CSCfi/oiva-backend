@@ -324,37 +324,10 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>oiva-core</module>
-                <module>oiva-core-model</module>
-                <module>amos-backend</module>
-                <module>yva-backend</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>amos</id>
-            <modules>
-                <module>oiva-core</module>
-                <module>oiva-core-model</module>
-                <module>amos-backend</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>yva</id>
-            <properties>
-                <yva-db>true</yva-db>
-            </properties>
-            <modules>
-                <module>oiva-core</module>
-                <module>oiva-core-model</module>
-                <module>yva-backend</module>
-            </modules>
-        </profile>
-    </profiles>
+    <modules>
+        <module>oiva-core</module>
+        <module>oiva-core-model</module>
+        <module>amos-backend</module>
+    </modules>
+
 </project>
