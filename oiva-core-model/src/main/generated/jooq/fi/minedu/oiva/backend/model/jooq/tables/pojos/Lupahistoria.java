@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupahistoria implements Serializable {
 
-    private static final long serialVersionUID = -2012999709;
+    private static final long serialVersionUID = -280982187;
 
     private Long   id;
     private String diaarinumero;
@@ -44,6 +44,7 @@ public class Lupahistoria implements Serializable {
     private Long   lupaId;
     private String koulutustyyppi;
     private String oppilaitostyyppi;
+    private String kieli;
 
     public Lupahistoria() {}
 
@@ -64,6 +65,7 @@ public class Lupahistoria implements Serializable {
         this.lupaId = value.lupaId;
         this.koulutustyyppi = value.koulutustyyppi;
         this.oppilaitostyyppi = value.oppilaitostyyppi;
+        this.kieli = value.kieli;
     }
 
     public Lupahistoria(
@@ -82,7 +84,8 @@ public class Lupahistoria implements Serializable {
         Date   kumottupvm,
         Long   lupaId,
         String koulutustyyppi,
-        String oppilaitostyyppi
+        String oppilaitostyyppi,
+        String kieli
     ) {
         this.id = id;
         this.diaarinumero = diaarinumero;
@@ -100,6 +103,7 @@ public class Lupahistoria implements Serializable {
         this.lupaId = lupaId;
         this.koulutustyyppi = koulutustyyppi;
         this.oppilaitostyyppi = oppilaitostyyppi;
+        this.kieli = kieli;
     }
 
     public Long getId() {
@@ -245,6 +249,14 @@ public class Lupahistoria implements Serializable {
         this.oppilaitostyyppi = oppilaitostyyppi;
     }
 
+    public String getKieli() {
+        return this.kieli;
+    }
+
+    public void setKieli(String kieli) {
+        this.kieli = kieli;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupahistoria (");
@@ -265,6 +277,7 @@ public class Lupahistoria implements Serializable {
         sb.append(", ").append(lupaId);
         sb.append(", ").append(koulutustyyppi);
         sb.append(", ").append(oppilaitostyyppi);
+        sb.append(", ").append(kieli);
 
         sb.append(")");
         return sb.toString();
