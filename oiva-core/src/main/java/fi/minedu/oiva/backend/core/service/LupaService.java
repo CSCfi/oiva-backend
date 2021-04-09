@@ -163,9 +163,11 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getLatestByOid(String oid, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
+    public Optional<Lupa> getLatestByOid(String oid, boolean useKoodistoVersions, String koulutustyyppi, String kieli,
+                                         String[] withOptions) {
         final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_OID.eq(oid))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .and(kieli == null ? LUPA.KIELI.isNull() : LUPA.KIELI.eq(kieli))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
         baseLupaFilter().ifPresent(query::and);
         query.orderBy(LUPA.LUONTIPVM.desc()).limit(1);

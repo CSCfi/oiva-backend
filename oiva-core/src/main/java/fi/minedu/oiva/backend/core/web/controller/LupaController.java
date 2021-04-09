@@ -91,8 +91,9 @@ public class LupaController {
     public CompletableFuture<HttpEntity<Lupa>> getLatestByOid(final @PathVariable String oid,
                                                               final @RequestParam(value = "with", required = false) String with,
                                                               final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions,
-                                                              final @RequestParam(required = false) String koulutustyyppi) {
-        return getOr404(async(() -> service.getLatestByOid(oid, useKoodistoVersions, koulutustyyppi, options(with))));
+                                                              final @RequestParam(required = false) String koulutustyyppi,
+                                                              final @RequestParam(required = false) String kieli) {
+        return getOr404(async(() -> service.getLatestByOid(oid, useKoodistoVersions, koulutustyyppi, kieli, options(with))));
     }
 
     @OivaAccess_Public

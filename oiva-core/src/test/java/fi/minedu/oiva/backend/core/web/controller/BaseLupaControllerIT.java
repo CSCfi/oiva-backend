@@ -97,6 +97,17 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     }
 
     @Test
+    public void getLatestByOidAndKoulutustyyppiAndKieli() {
+        setUpDb("sql/extra_lupa_data.sql");
+        jdbcTemplate.update("UPDATE lupa SET kieli = 'sv' WHERE id = 9");
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+        ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin?koulutustyyppi=2&kieli=sv", HttpStatus.OK);
+        DocumentContext doc = jsonPath.parse(response.getBody());
+        final String diaarinumero = "22/222/2020";
+        assertEquals(diaarinumero, doc.read("$.diaarinumero"));
+    }
+
+    @Test
     public void getByOidAndKoulutustyyppi() {
         setUpDb("sql/extra_lupa_data.sql");
         final ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?koulutustyyppi=2&oppilaitostyyppi=1", HttpStatus.OK);

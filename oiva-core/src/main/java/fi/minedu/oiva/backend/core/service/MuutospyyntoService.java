@@ -543,6 +543,7 @@ public class MuutospyyntoService {
         historiaRecord.setAsianumero(oldLupaRecord.getAsianumero());
         historiaRecord.setKoulutustyyppi(oldLupa.getKoulutustyyppi());
         historiaRecord.setOppilaitostyyppi(oldLupa.getOppilaitostyyppi());
+        historiaRecord.setKieli(oldLupa.getKieli());
         if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
             // Old lupa was never affective
             historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));

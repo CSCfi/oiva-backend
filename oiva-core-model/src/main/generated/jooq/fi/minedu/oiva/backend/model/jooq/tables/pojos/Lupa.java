@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Lupa implements Serializable {
 
-    private static final long serialVersionUID = 368112278;
+    private static final long serialVersionUID = -458992962;
 
     private Long      id;
     private Long      edellinenLupaId;
@@ -52,6 +52,7 @@ public class Lupa implements Serializable {
     private String    koulutustyyppi;
     private String    oppilaitostyyppi;
     private String    asianumero;
+    private String    kieli;
 
     public Lupa() {}
 
@@ -77,6 +78,7 @@ public class Lupa implements Serializable {
         this.koulutustyyppi = value.koulutustyyppi;
         this.oppilaitostyyppi = value.oppilaitostyyppi;
         this.asianumero = value.asianumero;
+        this.kieli = value.kieli;
     }
 
     public Lupa(
@@ -100,7 +102,8 @@ public class Lupa implements Serializable {
         UUID      uuid,
         String    koulutustyyppi,
         String    oppilaitostyyppi,
-        String    asianumero
+        String    asianumero,
+        String    kieli
     ) {
         this.id = id;
         this.edellinenLupaId = edellinenLupaId;
@@ -123,6 +126,7 @@ public class Lupa implements Serializable {
         this.koulutustyyppi = koulutustyyppi;
         this.oppilaitostyyppi = oppilaitostyyppi;
         this.asianumero = asianumero;
+        this.kieli = kieli;
     }
 
     public Long getId() {
@@ -302,6 +306,14 @@ public class Lupa implements Serializable {
         this.asianumero = asianumero;
     }
 
+    public String getKieli() {
+        return this.kieli;
+    }
+
+    public void setKieli(String kieli) {
+        this.kieli = kieli;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Lupa (");
@@ -327,6 +339,7 @@ public class Lupa implements Serializable {
         sb.append(", ").append(koulutustyyppi);
         sb.append(", ").append(oppilaitostyyppi);
         sb.append(", ").append(asianumero);
+        sb.append(", ").append(kieli);
 
         sb.append(")");
         return sb.toString();
