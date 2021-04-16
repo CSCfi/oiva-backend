@@ -430,9 +430,8 @@ public class LupaService extends BaseService {
     public List<Organisaatio> getLupaorganisaatiot(String koulutustyyppi) {
         SelectConditionStep<Record1<String>> query = dsl.selectDistinct(LUPA.JARJESTAJA_OID)
                 .from(LUPA)
-                .where(LUPA.ALKUPVM.le(DSL.currentDate())
-                        .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
-                        .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+                .where(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                        .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
 
         return dsl.fetch(query).stream()
                 .map(result -> result.get(LUPA.JARJESTAJA_OID))

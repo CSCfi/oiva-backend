@@ -99,7 +99,7 @@ public abstract class BaseLupaControllerIT extends BaseIT {
     @Test
     public void getLatestByOidAndKoulutustyyppiAndKieli() {
         setUpDb("sql/extra_lupa_data.sql");
-        jdbcTemplate.update("UPDATE lupa SET kieli = 'sv' WHERE id = 9");
+        jdbcTemplate.update("update lupa set kieli = 'sv' where id = 9");
         loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
         ResponseEntity<String> response = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111/viimeisin?koulutustyyppi=2&kieli=sv", HttpStatus.OK);
         DocumentContext doc = jsonPath.parse(response.getBody());
@@ -163,8 +163,17 @@ public abstract class BaseLupaControllerIT extends BaseIT {
         setUpDb("sql/organisaatio_lupa_data.sql");
         response = makeRequest("/api/luvat/organisaatiot", HttpStatus.OK);
         doc = jsonPath.parse(response.getBody());
-        // Result should be same as before
-        assertEquals(organizations, doc.read("$.length()"));
+        Integer result = organizations + 1;
+        assertEquals(result, doc.read("$.length()"));
+
+        // Check that also future lupa is taken account (add new organization)
+        jdbcTemplate.update("update lupa set alkupvm = ?, loppupvm = null, jarjestaja_oid = '8.88.88.8888888888' where id = 17",
+                LocalDate.now().plusDays(3));
+        response = makeRequest("/api/luvat/organisaatiot", HttpStatus.OK);
+        doc = jsonPath.parse(response.getBody());
+
+        result = result + 1;
+        assertEquals(result, doc.read("$.length()"));
     }
 
     @Test
