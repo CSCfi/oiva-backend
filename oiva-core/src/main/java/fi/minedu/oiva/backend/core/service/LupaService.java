@@ -148,12 +148,9 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) {
-        return getAllJarjestamisluvat(null, withOptions);
-    }
-
     public Collection<Lupa> getAllJarjestamisluvat(final Condition filter, final String... withOptions) {
-        final SelectJoinStep<Record> query = baseLupaSelect();
+        final SelectJoinStep<Record> query = baseLupaSelect()
+                .leftJoin(ASIATYYPPI).on(LUPA.ASIATYYPPI_ID.eq(ASIATYYPPI.ID));
         baseLupaFilter().ifPresent(query::where);
         Optional.ofNullable(filter).ifPresent(query::where);
         // filteröidään pois lisäkouluttajat

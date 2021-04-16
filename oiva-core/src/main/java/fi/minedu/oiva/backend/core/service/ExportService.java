@@ -1,5 +1,6 @@
 package fi.minedu.oiva.backend.core.service;
 
+import fi.minedu.oiva.backend.model.entity.AsiatyyppiValue;
 import fi.minedu.oiva.backend.model.entity.LupatilaValue;
 import fi.minedu.oiva.backend.model.entity.MaaraystyyppiValue;
 import fi.minedu.oiva.backend.model.entity.export.KoulutusLupa;
@@ -29,6 +30,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static fi.minedu.oiva.backend.model.jooq.Tables.ASIATYYPPI;
 import static fi.minedu.oiva.backend.model.jooq.Tables.KOHDE;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPA;
 import static fi.minedu.oiva.backend.model.jooq.Tables.LUPATILA;
@@ -58,7 +60,8 @@ public class ExportService {
      * @return Lista kaikista luvista
      */
     public Collection<Lupa> getJarjestysluvat() {
-        return lupaService.getAllJarjestamisluvat(options(Maarays.class));
+        final Condition filter = ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS);
+        return lupaService.getAllJarjestamisluvat(filter, options(Maarays.class));
     }
 
     /**
@@ -99,14 +102,16 @@ public class ExportService {
                 .fetchOptionalInto(String.class);
 
         return dsl.select(LUPA.ID, LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM, LUPA.LOPPUPVM).from(LUPA)
+                .leftJoin(ASIATYYPPI).on(LUPA.ASIATYYPPI_ID.eq(ASIATYYPPI.ID))
                 .where(LUPA.KOULUTUSTYYPPI.isNull())
-            .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM).fetchInto(KoulutusLupa.class).stream().map(koulutusLupa -> {
+                .and(ASIATYYPPI.TUNNISTE.ne(AsiatyyppiValue.PERUUTUS))
+                .orderBy(LUPA.JARJESTAJA_YTUNNUS, LUPA.ALKUPVM).fetchInto(KoulutusLupa.class)
+                .stream().peek(koulutusLupa -> {
                 koulutusLupa.setKoulutukset(koulutusKoodiArvot.apply(koulutusLupa.getId()));
                 if(oppisopimuskoulutus.apply(koulutusLupa.getId()).isPresent()) {
                     koulutusLupa.setLaajaOppisopimuskoulutus(oppisopimuskoulutus.apply(koulutusLupa.getId()).get());
                 }
-                return koulutusLupa;
-            }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
     }
 
     /**
