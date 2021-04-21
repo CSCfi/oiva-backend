@@ -4,6 +4,7 @@ import com.jayway.jsonpath.DocumentContext;
 import fi.minedu.oiva.backend.core.it.BaseIT;
 import fi.minedu.oiva.backend.model.security.annotations.OivaAccess;
 import org.junit.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,20 @@ public abstract class BaseLiiteControllerIT extends BaseIT {
         log.info(doc.jsonString());
         assertEquals("Testi_liite_2", doc.read("$.nimi"));
         assertFalse(doc.read("$.salainen", Boolean.class));
+    }
+
+    @Test
+    public void getRaw() {
+        ResponseEntity<String> response = makeRequest("/api/liitteet/cc3962e0-43b6-11e8-b2ef-005056aa0e61/raw", HttpStatus.OK);
+        HttpHeaders headers = response.getHeaders();
+        assertTrue("Content-Disposition header should include", headers.get("Content-Disposition")
+                .get(0).contains("attachment"));
+
+        // Inline content-disposition
+        response = makeRequest("/api/liitteet/cc3962e0-43b6-11e8-b2ef-005056aa0e61/raw?inline=true", HttpStatus.OK);
+        headers = response.getHeaders();
+        assertTrue("Content-Disposition header should include", headers.get("Content-Disposition")
+                .get(0).contains("inline"));
     }
 
     @Test
