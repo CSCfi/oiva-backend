@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.QueryParam;
@@ -67,7 +68,9 @@ public abstract class BasePebbleController<T extends BasePebbleService> {
     @OivaAccess_Public
     @RequestMapping(value = "/resources/{filename}/**", method = GET)
     @ApiOperation(notes = "Palauttaa pebble-resurssin", value = "")
-    public ResponseEntity<Resource> resource(final @PathVariable String filename, final HttpServletRequest request) {
+    public ResponseEntity<Resource> resource(final @PathVariable String filename,
+                                             final @RequestParam(required = false, defaultValue = "true") boolean inline,
+                                             final HttpServletRequest request) {
         final String resourcePath = RequestUtils.getPathVariable(request, filename);
         final Optional<ByteArrayResource> resourceOpt = service.getResource(resourcePath);
         if (resourceOpt.isPresent()) {
@@ -76,6 +79,7 @@ public abstract class BasePebbleController<T extends BasePebbleService> {
             headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
             headers.add("Pragma", "no-cache");
             headers.add("Expires", "0");
+            headers.add("Content-Disposition", (inline ? "inline" : "attachment"));
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentLength(bar.contentLength())

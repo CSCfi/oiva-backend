@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,13 +63,14 @@ public class LiiteController {
     }
 
     @RequestMapping(value = "/{uuid}" + rawPath,  method = RequestMethod.GET)
-    public HttpEntity<Resource> getRawFile(@PathVariable String uuid) {
+    public HttpEntity<Resource> getRawFile(@PathVariable String uuid,
+                                           @RequestParam(required = false, defaultValue = "false") boolean inline) {
         return getOr404(liiteService.getByUuid(UUID.fromString(uuid)),
                 item -> liiteService.getFileFrom(item)
                         .map(f -> {
                             final HttpHeaders headers = new HttpHeaders();
                             headers.setContentType(MediaType.valueOf(getContentTypeFromAttachment(item)));
-                            headers.setContentDispositionFormData("attachment", f.getName());
+                            headers.set("Content-Disposition", (inline ? "inline" : "attachment") + "; filename=" + f.getName());
                             return new HttpEntity<>(liiteService.convertToHttpResource(f), headers);
                         })
                         .orElse(notFound()));

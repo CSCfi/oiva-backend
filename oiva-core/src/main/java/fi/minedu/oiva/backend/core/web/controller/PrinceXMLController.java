@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +96,8 @@ public class PrinceXMLController {
     @OivaAccess_Public
     @RequestMapping(value = "/{uuid}", method = GET)
     @ApiOperation(notes = "Tarjoaa luvan PDF-muodossa", value = "")
-    public ResponseEntity<Resource> providePdf(final @PathVariable String uuid) {
+    public ResponseEntity<Resource> providePdf(final @PathVariable String uuid,
+                                               final @RequestParam(required = false, defaultValue = "true") boolean inline) {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
             if (lupaOpt.isPresent()) {
@@ -104,7 +106,7 @@ public class PrinceXMLController {
                     final ByteArrayResource lupaBar = new ByteArrayResource(Files.readAllBytes(lupaPath));
                     return ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_PDF)
-                            .header("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName())
+                            .header("Content-Disposition", (inline ? "inline" : "attachment") + "; filename=" + lupaOpt.get().getPDFFileName())
                             .contentLength(lupaBar.contentLength())
                             .body(lupaBar);
                 } else {
@@ -154,14 +156,17 @@ public class PrinceXMLController {
     @Produces({ PrinceXMLController.APPLICATION_PDF })
     @ResponseBody
     @ApiOperation(notes = "Tuottaa luvan PDF-muodossa", value = "")
-    public void previewPdf(final @PathVariable String uuid, final HttpServletResponse response, final HttpServletRequest request) {
+    public void previewPdf(final @PathVariable String uuid,
+                           final @RequestParam(required = false, defaultValue = "true") boolean inline,
+                           final HttpServletResponse response,
+                           final HttpServletRequest request) {
         try {
             final Optional<Lupa> lupaOpt = lupaService.getByUuid(uuid, With.all);
             if(lupaOpt.isPresent()) {
                 final RenderOptions renderOptions = lupaRenderService.getLupaRenderOptions(lupaOpt).orElseThrow(IllegalStateException::new);
                 final String lupaHtml = pebbleService.toHTML(lupaOpt.get(), renderOptions).orElseThrow(IllegalStateException::new);
                 response.setContentType(APPLICATION_PDF);
-                response.setHeader("Content-Disposition", "inline; filename=" + lupaOpt.get().getPDFFileName());
+                response.setHeader("Content-Disposition", (inline ? "inline" : "attachment") + "; filename=" + lupaOpt.get().getPDFFileName());
                 if (!princeXMLService.toPDF(lupaHtml, response.getOutputStream(), renderOptions)) {
                     response.setStatus(get500().getStatusCode().value());
                     response.getWriter().write("Failed to generate Lupa with uuid " + uuid);
