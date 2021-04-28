@@ -135,6 +135,7 @@ public class MuutospyyntoService {
         OTA_KASITTELYYN,
         ESITTELE,
         PAATA,
+        KORJAA,
         POISTA
     }
 
@@ -150,7 +151,8 @@ public class MuutospyyntoService {
         TAYDENNETTAVA,      // Esittelijä palauttanut täydennettäväksi
         ESITTELYSSA,        // Esittelijä on siirtänyt esittelyyn
         PAATETTY,           // Valmis allekirjoitettu lupa
-        PASSIVOITU         // Lupa poistettu
+        KORJAUKSESSA,       // Viimeisin päätetty lupa korjataan
+        PASSIVOITU          // Lupa poistettu
     }
 
     public enum MuutosPaatostila {
@@ -220,10 +222,6 @@ public class MuutospyyntoService {
 
     private Stream<Muutos> getAlimaaraykset(Muutos muutos) {
         return Stream.concat(Stream.of(muutos), muutos.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
-    }
-
-    private Stream<Maarays> getAlimaaraykset(Maarays maarays) {
-        return Stream.concat(Stream.of(maarays), maarays.getAliMaaraykset().stream().flatMap(this::getAlimaaraykset));
     }
 
     private Optional<Muutospyynto> luo(final Muutospyynto muutospyynto, final Map<String, MultipartFile> fileMap) {
@@ -306,7 +304,8 @@ public class MuutospyyntoService {
         final String[] options = options(Maarays.class, Organisaatio.class);
         Lupa oldLupa = lupaService.getByUuid(mp.getLupaUuid(), options)
                 .orElse(null);
-        if (!Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila())) {
+        final boolean korjausMuutos = isKorjausMuutos(mp);
+        if (!Muutospyyntotila.ESITTELYSSA.toString().equals(mp.getTila()) && !korjausMuutos) {
             throw new ForbiddenException("Action is not allowed");
         }
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
@@ -321,6 +320,10 @@ public class MuutospyyntoService {
                             .into(Lupatila.class);
                     final Asiatyyppi asiatyyppi = dsl.fetchOne(ASIATYYPPI, ASIATYYPPI.TUNNISTE.eq(AsiatyyppiValue.MUUTOS))
                             .into(Asiatyyppi.class);
+                    if (korjausMuutos) {
+                        // Clean previously generated lupa
+                        cleanPreviouslyGeneratedLupa(muutospyynto.getLuotuLupaId());
+                    }
 
                     Lupa lupaDTO = generateLupaFromMuutospyynto(muutospyynto.getUuid().toString())
                             .orElseThrow(() -> new RuntimeException("Cannot find muutospyynto"));
@@ -332,6 +335,12 @@ public class MuutospyyntoService {
                     lupaRecord.setAsiatyyppiId(asiatyyppi.getId());
                     lupaRecord.store();
 
+                    // Update muutospyynto with created lupa id.
+                    dsl.update(MUUTOSPYYNTO)
+                            .set(MUUTOSPYYNTO.LUOTU_LUPA_ID, lupaRecord.getId())
+                            .where(MUUTOSPYYNTO.ID.eq(muutospyynto.getId()))
+                            .execute();
+
                     // Create new maaraykset
                     lupaDTO.getMaaraykset().forEach(maarays ->
                             createAndSaveMaaraykset(lupaRecord.getId(), maarays, null));
@@ -340,7 +349,7 @@ public class MuutospyyntoService {
                     createLupahistoria(oldLupa, lupaRecord);
 
                     // Attach Päätöskirje from Muutospyyntö to new lupa
-                    liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(),lupaRecord.getId());
+                    liiteService.createLupaLinkDbRecord(findPaatoskirjeLiite(muutospyynto.getLiitteet()).getId(), lupaRecord.getId());
 
                     // Generate PDF for new lupa (Only for ammattillinenkoulutus)
                     lupaService.getById(lupaRecord.getId(), With.all)
@@ -354,6 +363,27 @@ public class MuutospyyntoService {
                             });
                     return muutospyynto;
                 });
+    }
+
+    private void cleanPreviouslyGeneratedLupa(Long lupaId) {
+        dsl.deleteFrom(LUPA).where(LUPA.ID.eq(lupaId))
+                .execute();
+    }
+
+    private boolean isKorjausMuutos(Muutospyynto mp) {
+        return Muutospyyntotila.KORJAUKSESSA.toString().equals(mp.getTila());
+    }
+
+    private Optional<Muutospyynto> korjaa(String uuid) {
+        Muutospyynto mp = getByUuid(uuid).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + uuid));
+        if (!Muutospyyntotila.PAATETTY.toString().equals(mp.getTila())) {
+            throw new ForbiddenException("Action is not allowed");
+        }
+        if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {
+            throw new ForbiddenException("User has no right");
+        }
+        return findMuutospyyntoAndSetTila(uuid, Muutospyyntotila.KORJAUKSESSA)
+                .flatMap(uuid_ -> getByUuid(uuid_.toString()));
     }
 
     public Optional<Lupa> generateLupaFromMuutospyynto(String uuid) {
@@ -457,6 +487,7 @@ public class MuutospyyntoService {
 
     /**
      * Checks that code is valid by checking no end date exists or it is in future
+     *
      * @param koodi
      * @return true, if code is valid
      */
@@ -608,6 +639,8 @@ public class MuutospyyntoService {
                     return esittele(uuid);
                 case PAATA:
                     return paata(uuid);
+                case KORJAA:
+                    return korjaa(uuid);
                 case POISTA:
                     return poista(uuid);
                 default:
@@ -733,6 +766,7 @@ public class MuutospyyntoService {
             throw new DataAccessException("Failed to save muutospyynto!", e);
         }
     }
+
     public String getMuutospyyntoPreviewPdfName(Lupa lupa, Muutospyynto muutospyynto) {
         String name = "";
         Muutospyyntotila muutospyyntotila = Muutospyyntotila.valueOf(muutospyynto.getTila());
@@ -1062,7 +1096,7 @@ public class MuutospyyntoService {
     }
 
     public Optional<Muutospyynto> setPaatoskirjeLiite(Muutospyynto muutospyynto, Map<String, MultipartFile> fileMap) {
-        if(Muutospyyntotila.PAATETTY.toString().equals(muutospyynto.getTila())) {
+        if (Muutospyyntotila.PAATETTY.toString().equals(muutospyynto.getTila())) {
             throw new ValidationException("Muutospyynto state should be before PAATETTY to add Paatoskirje");
         }
 
@@ -1070,7 +1104,7 @@ public class MuutospyyntoService {
 
         MultipartFile paatoskirjeFile = fileMap.getOrDefault(paatoskirjeLiite.getTiedostoId(), null);
 
-        if(paatoskirjeFile == null) {
+        if (paatoskirjeFile == null) {
             throw new ValidationException("MultipartFile matching Muutospyynto paatoskirje Liite not found");
         }
 

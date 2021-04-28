@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -267,10 +268,17 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         };
         final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
+        final String oldLupaUuid = doc.read("$.uuid", String.class);
         final String asianumero = doc.read("$.asianumero", String.class);
         assertEquals("Lupa kieli should match!", "sv", doc.read("$.kieli", String.class));
         assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);
-        assertEquals("Lupa asianumero should match!", "VN/123456/1234", asianumero);
+        final String oldAsianumero = "VN/123456/1234";
+        assertEquals("Lupa asianumero should match!", oldAsianumero, asianumero);
+
+        // Check that created lupa id is in muutospyynto table
+        final Long lupa_id = jdbcTemplate.queryForObject("select luotu_lupa_id from muutospyynto where uuid = ?",
+                new Object[] {UUID.fromString(uuid)}, Long.class);
+        assertNotNull("Created lupa id in muutospyynto should not be null!", lupa_id);
 
         assertEquals("Maarays count should match!", 5, doc.read("$.maaraykset.length()",
                 Integer.class).intValue());
@@ -293,6 +301,38 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lupahistoria", "lupa_id = 1"));
         final String kieli = jdbcTemplate.queryForObject("SELECT kieli FROM lupahistoria WHERE lupa_id = 1", String.class);
         assertEquals("Lupahistoria kieli should match!", "sv", kieli);
+
+        // Change muutospyynto tila to "KORJAUKSESSA"
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/korjauksessa/" + uuid,
+                null, OK);
+        final ResponseEntity<String> muutospyyntoJson = makeRequest("/api/muutospyynnot/id/" + uuid, OK);
+        doc = jsonPath.parse(muutospyyntoJson.getBody());
+        // Change asianumero
+        final String changedAsianumero = "VN/1/2021";
+        doc.set("$.asianumero", changedAsianumero);
+        ResponseEntity<String> fixResponse = requestSave(prepareMultipartEntity(
+                doc.jsonString(),
+                "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/esittelija/tallenna");
+        assertEquals("Response status should match", OK, fixResponse.getStatusCode());
+        doc = jsonPath.parse(fixResponse.getBody());
+        assertEquals("Fixed asianumero should match!", changedAsianumero, doc.read("$.asianumero", String.class));
+
+        // Change muutospyynto tila to "PAATETTY" after fixing.
+        final String fixedUuid = makeRequest(POST,
+                "/api/muutospyynnot/tila/paatetty/" + uuid,
+                null, OK).getBody();
+        assertEquals("\"" + uuid + "\"", fixedUuid);
+
+        // Fetch the latest lupa for jarjestaja
+        final ResponseEntity<String> fixedLupaJson = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?with=all", OK);
+        doc = jsonPath.parse(fixedLupaJson.getBody());
+        assertEquals("Fixed asianumero in lupa should match!", changedAsianumero, doc.read("$.asianumero", String.class));
+
+        // Check that old lupa is deleted
+        final Boolean oldLupaExists = jdbcTemplate.queryForObject("select exists(select id from lupa where uuid = ?)",
+                new Object[] {UUID.fromString(oldLupaUuid)}, Boolean.class);
+        assertFalse("Old lupa should not exists!", oldLupaExists);
     }
 
     @Test

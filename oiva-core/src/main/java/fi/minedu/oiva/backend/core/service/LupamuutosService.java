@@ -64,7 +64,8 @@ public class LupamuutosService {
         muutospyynto.setAlkupera(MuutospyyntoService.Tyyppi.ESITTELIJA.name());
         assertValidEsittelijanMuutospyynto(muutospyynto);
         Muutospyynto existing = muutospyyntoService.getByUuid(muutospyynto.getUuid().toString()).orElseThrow(() -> new ResourceNotFoundException("Muutospyynto is not found with uuid " + muutospyynto.getUuid()));
-        if (!Muutospyyntotila.VALMISTELUSSA.name().equals(existing.getTila())) {
+        if (!Muutospyyntotila.VALMISTELUSSA.name().equals(existing.getTila()) &&
+                !Muutospyyntotila.KORJAUKSESSA.name().equals(existing.getTila())) {
             throw new ForbiddenException("Action is not allowed");
         }
         if (!authService.hasAnyRole(OivaAccess.Role_Esittelija)) {

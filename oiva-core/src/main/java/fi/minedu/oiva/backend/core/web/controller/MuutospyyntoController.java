@@ -196,6 +196,12 @@ public class MuutospyyntoController {
         return getOr404(muutospyyntoService.executeAction(uuid, Action.PAATA).map(Muutospyynto::getUuid));
     }
 
+    @ApiOperation(notes = "Merkitse muutospyyntö korjattavaksi", value = "")
+    @RequestMapping(method = POST, value = "/tila/korjauksessa/{uuid}")
+    public HttpEntity<UUID> korjaa(final @PathVariable String uuid) {
+        return getOr404(muutospyyntoService.executeAction(uuid, Action.KORJAA).map(Muutospyynto::getUuid));
+    }
+
     @ApiOperation(notes = "Poista muutospyyntö.", value = "")
     @RequestMapping(method = DELETE, value = "/{uuid}")
     public HttpEntity<UUID> delete(final @PathVariable String uuid) {
