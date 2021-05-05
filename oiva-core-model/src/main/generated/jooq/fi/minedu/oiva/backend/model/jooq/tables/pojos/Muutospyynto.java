@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = -1983405550;
+    private static final long serialVersionUID = -632243206;
 
     private Long      id;
     private Long      lupaId;
@@ -52,6 +52,7 @@ public class Muutospyynto implements Serializable {
     private String    jarjestajaOid;
     private String    koulutustyyppi;
     private String    kieli;
+    private Long      luotuLupaId;
 
     public Muutospyynto() {}
 
@@ -77,6 +78,7 @@ public class Muutospyynto implements Serializable {
         this.jarjestajaOid = value.jarjestajaOid;
         this.koulutustyyppi = value.koulutustyyppi;
         this.kieli = value.kieli;
+        this.luotuLupaId = value.luotuLupaId;
     }
 
     public Muutospyynto(
@@ -100,7 +102,8 @@ public class Muutospyynto implements Serializable {
         String    diaarinumero,
         String    jarjestajaOid,
         String    koulutustyyppi,
-        String    kieli
+        String    kieli,
+        Long      luotuLupaId
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -123,6 +126,7 @@ public class Muutospyynto implements Serializable {
         this.jarjestajaOid = jarjestajaOid;
         this.koulutustyyppi = koulutustyyppi;
         this.kieli = kieli;
+        this.luotuLupaId = luotuLupaId;
     }
 
     public Long getId() {
@@ -301,6 +305,14 @@ public class Muutospyynto implements Serializable {
         this.kieli = kieli;
     }
 
+    public Long getLuotuLupaId() {
+        return this.luotuLupaId;
+    }
+
+    public void setLuotuLupaId(Long luotuLupaId) {
+        this.luotuLupaId = luotuLupaId;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -326,6 +338,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(jarjestajaOid);
         sb.append(", ").append(koulutustyyppi);
         sb.append(", ").append(kieli);
+        sb.append(", ").append(luotuLupaId);
 
         sb.append(")");
         return sb.toString();

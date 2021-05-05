@@ -1,0 +1,1 @@
+ALTER TABLE muutospyynto ADD COLUMN luotu_lupa_id BIGINT DEFAULT NULL;
