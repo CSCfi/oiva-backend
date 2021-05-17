@@ -520,8 +520,8 @@ public class MuutospyyntoService {
             return;
         }
         final LupaRecord oldLupaRecord = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getId()));
-        final LocalDate loppupvm = lupa.getAlkupvm().toLocalDate().minusDays(1);
-        oldLupaRecord.setLoppupvm(Date.valueOf(loppupvm));
+        final Date loppupvm = Date.valueOf(lupa.getAlkupvm().toLocalDate().minusDays(1));
+        oldLupaRecord.setLoppupvm(loppupvm);
         oldLupaRecord.store();
         final Lupa lupaCopy = new Lupa();
         BeanUtils.copyNonNullProperties(lupaCopy, oldLupa);
@@ -547,6 +547,15 @@ public class MuutospyyntoService {
         if (lupa.getAlkupvm().equals(oldLupa.getAlkupvm()) || lupa.getAlkupvm().before(oldLupa.getAlkupvm())) {
             // Old lupa was never affective
             historiaRecord.setKumottupvm(Date.valueOf(LocalDate.now()));
+            // Check if we need to fix previous old lupa ending date because it is still in future.
+            final LupaRecord prevOldLupa = dsl.fetchOne(LUPA, LUPA.ID.eq(oldLupa.getEdellinenLupaId()));
+            if (prevOldLupa != null && loppupvm.before(prevOldLupa.getLoppupvm())) {
+                final LupahistoriaRecord prevHistoria = dsl.fetchOne(LUPAHISTORIA, LUPAHISTORIA.LUPA_ID.eq(prevOldLupa.getId()));
+                prevHistoria.setVoimassaololoppupvm(loppupvm);
+                prevHistoria.store();
+                prevOldLupa.setLoppupvm(loppupvm);
+                prevOldLupa.store();
+            }
         }
         historiaRecord.store();
     }
