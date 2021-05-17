@@ -176,6 +176,7 @@ public class LupaService extends BaseService {
         baseLupaFilter().ifPresent(query::where);
         query.where(LUPA.JARJESTAJA_OID.eq(oid)
                 .and(LUPA.ALKUPVM.gt(DSL.currentDate()))
+                .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
                 .and(oppilaitostyyppi == null ? LUPA.OPPILAITOSTYYPPI.isNull() : LUPA.OPPILAITOSTYYPPI.eq(oppilaitostyyppi)));
         return fetch(query, options);

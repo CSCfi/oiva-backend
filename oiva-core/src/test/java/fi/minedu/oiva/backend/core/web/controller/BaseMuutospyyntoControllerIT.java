@@ -22,13 +22,16 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
+import static java.time.temporal.ChronoUnit.MONTHS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -220,11 +223,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final String json = readFileToString("json/muutospyynto.json");
         DocumentContext doc = jsonPath.parse(json);
         doc.set("$.jarjestajaYtunnus", null);
-        ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
-                doc.jsonString(),
-                "file0", "file1", "file2", "file3", "file4", "file5"), "/api/muutospyynnot/tallenna");
-        assertEquals("Response status should match", OK, createResponse.getStatusCode());
-        doc = jsonPath.parse(createResponse.getBody());
+        doc = luoMuutospyynto(doc, "/api/muutospyynnot/tallenna");
         final String uuid = doc.read("$.uuid", String.class);
         logout();
         // Change muutospyynto tila to "KASITTELYSSA"
@@ -240,27 +239,10 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 null, OK);
 
         // Change tila to "ESITTELYSSA"
-        makeRequest(POST,
-                "/api/muutospyynnot/tila/esittelyssa/" + uuid,
-                null, OK);
+        changeTilaEsittelyssa(uuid);
 
-        // Add paatoskirje
-        Map<String, String> paatosKirje = new HashMap<>();
-        paatosKirje.put("nimi", "paatoskirje");
-        paatosKirje.put("tiedostoId", "paatoskirje");
-        paatosKirje.put("tyyppi", "paatosKirje");
-        paatosKirje.put("kieli", "fi");
-        doc.add("$.liitteet", paatosKirje);
-        final ResponseEntity<String> paatoskirjeResponse = requestSave(prepareMultipartEntity(doc.jsonString(), "paatoskirje"),
-                "api/muutospyynnot/" + uuid + "/liitteet/paatoskirje");
-
-        assertEquals("Paatoskirje save should have been success!", OK, paatoskirjeResponse.getStatusCode());
-
-        // Change muutospyynto tila to "PAATETTY"
-        final String response = makeRequest(POST,
-                "/api/muutospyynnot/tila/paatetty/" + uuid,
-                null, OK).getBody();
-        assertEquals("\"" + uuid + "\"", response);
+        // Add paatoskirje and paata
+        paata(doc, uuid);
 
         // Fetch the latest lupa for jarjestaja
         final TypeRef<List<String>> stringRef = new TypeRef<List<String>>() {
@@ -293,6 +275,53 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
                 JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lupahistoria", "lupa_id = 1"));
         final String kieli = jdbcTemplate.queryForObject("SELECT kieli FROM lupahistoria WHERE lupa_id = 1", String.class);
         assertEquals("Lupahistoria kieli should match!", "sv", kieli);
+    }
+
+    @Test // CSCOIVA-2028
+    public void paataWhenPreviousLupaInFuture() throws IOException {
+        loginAs("testEsittelija", okmOid, OivaAccess.Context_Esittelija);
+        jdbcTemplate.update("update lupa set koulutustyyppi = null, oppilaitostyyppi = null where id = 1");
+
+        // Create lupa in future
+        DocumentContext doc = jsonPath.parse(readFileToString("json/muutospyynto.json"));
+        doc.set("$.voimassaalkupvm", LocalDate.now().plus(1, MONTHS).toString());
+        doc = luoMuutospyynto(doc, "/api/muutospyynnot/esittelija/tallenna");
+        final String prevUuid = doc.read("$.uuid", String.class);
+        final String prevAsianumero = doc.read("$.asianumero", String.class);
+
+        // Change tila ESITTELYSSA
+        changeTilaEsittelyssa(prevUuid);
+
+        // Add paatoskirje and paata
+        paata(doc, prevUuid);
+
+        // Fetch lupa in future
+        String prevLupaUuid = jdbcTemplate.queryForObject("select uuid from lupa where asianumero = ?",
+                new Object[] {prevAsianumero}, String.class);
+
+        // Create lupa starting now
+        doc = jsonPath.parse(readFileToString("json/muutospyynto.json"));
+        final String asianumero = "VN/1/1234";
+        doc.set("$.lupaUuid", prevLupaUuid);
+        doc.set("$.asianumero", asianumero);
+        doc.set("$.voimassaalkupvm", LocalDate.now().toString());
+        doc = luoMuutospyynto(doc, "/api/muutospyynnot/esittelija/tallenna");
+        final String uuid = doc.read("$.uuid", String.class);
+
+        changeTilaEsittelyssa(uuid);
+        paata(doc, uuid);
+
+        // Check that there is only one affective lupa
+        final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?with=all", OK);
+        doc = jsonPath.parse(lupaJson.getBody());
+        assertEquals("Asianumero should match!", asianumero, doc.read("$.asianumero", String.class));
+
+        // Check history
+        final ResponseEntity<String> history = makeRequest("/api/luvat/historia/1.1.111.111.11.11111111111", OK);
+        final DocumentContext historyDoc = jsonPath.parse(history.getBody());
+        assertEquals("History size should match!", 2, historyDoc.read("$.length()", Integer.class).intValue());
+        IntStream.of(0, 1).forEach(i ->
+                assertEquals(LocalDate.now().minusDays(1).toString(), historyDoc.read("$["+ i +"].voimassaololoppupvm")));
     }
 
     @Test
@@ -476,7 +505,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         assertEquals(asianumero, doc.read("$.asianumero"));
 
         // ----- ESITTELE -----
-        makeRequest(POST, "/api/muutospyynnot/tila/esittelyssa/" + uuid, null, OK);
+        changeTilaEsittelyssa(uuid);
 
         // ----- REVERSE TO VALMISTELU -----
         makeRequest(POST, "/api/muutospyynnot/tila/valmistelussa/" + uuid, null, OK);
@@ -501,27 +530,10 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final String uuid = doc.read("$.uuid", String.class);
 
         // Change tila to "ESITTELYSSA"
-        makeRequest(POST,
-                "/api/muutospyynnot/tila/esittelyssa/" + uuid,
-                null, OK).getBody();
+        changeTilaEsittelyssa(uuid);
 
-        // Add paatoskirje
-        Map<String, String> paatosKirje = new HashMap<>();
-        paatosKirje.put("nimi", "paatoskirje");
-        paatosKirje.put("tiedostoId", "paatoskirje");
-        paatosKirje.put("tyyppi", "paatosKirje");
-        paatosKirje.put("kieli", "fi");
-        doc.add("$.liitteet", paatosKirje);
-        final ResponseEntity<String> paatoskirjeResponse = requestSave(prepareMultipartEntity(doc.jsonString(), "paatoskirje"),
-                "api/muutospyynnot/" + uuid + "/liitteet/paatoskirje");
-
-        assertEquals("Paatoskirje save should have been success!", OK, paatoskirjeResponse.getStatusCode());
-
-        // Change muutospyynto tila to "PAATETTY"
-        final String response = makeRequest(POST,
-                "/api/muutospyynnot/tila/paatetty/" + uuid,
-                null, OK).getBody();
-        assertEquals("\"" + uuid + "\"", response);
+        // Add paatoskirje and paata
+        paata(doc, uuid);
 
         // Fetch the latest lupa for jarjestaja
         final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.2.3.4.111111?with=all", OK);
@@ -601,6 +613,40 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Asianumero does not exist -> not duplicate
         resp = requestDuplikaattiasianumero(prepareMultipartForDuplikaattiAsianumero(null, "VN/1/123456"));
         assertEquals("false", resp);
+    }
+
+    private void paata(DocumentContext doc, String uuid) {
+        Map<String, String> paatosKirje = new HashMap<>();
+        paatosKirje.put("nimi", "paatoskirje");
+        paatosKirje.put("tiedostoId", "paatoskirje");
+        paatosKirje.put("tyyppi", "paatosKirje");
+        paatosKirje.put("kieli", "fi");
+        doc.add("$.liitteet", paatosKirje);
+        final ResponseEntity<String> paatoskirjeResponse = requestSave(prepareMultipartEntity(doc.jsonString(), "paatoskirje"),
+                "api/muutospyynnot/" + uuid + "/liitteet/paatoskirje");
+
+        assertEquals("Paatoskirje save should have been success!", OK, paatoskirjeResponse.getStatusCode());
+
+        // Change muutospyynto tila to "PAATETTY"
+        final String response = makeRequest(POST,
+                "/api/muutospyynnot/tila/paatetty/" + uuid,
+                null, OK).getBody();
+        assertEquals("\"" + uuid + "\"", response);
+    }
+
+    private void changeTilaEsittelyssa(String prevUuid) {
+        makeRequest(POST,
+                "/api/muutospyynnot/tila/esittelyssa/" + prevUuid,
+                null, OK);
+    }
+
+    private DocumentContext luoMuutospyynto(DocumentContext doc, String uri) {
+        ResponseEntity<String> createResponse = requestSave(prepareMultipartEntity(
+                doc.jsonString(),
+                "file0", "file1", "file2", "file3", "file4", "file5"), uri);
+        assertEquals("Response status should match", OK, createResponse.getStatusCode());
+        doc = jsonPath.parse(createResponse.getBody());
+        return doc;
     }
 
     private ResponseEntity<String> requestSave(HttpEntity<MultiValueMap<String, Object>> requestEntity, String uri) {

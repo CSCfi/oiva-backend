@@ -10,6 +10,7 @@
   "paivityspvm": null,
   "voimassaalkupvm": "2020-01-01",
   "voimassaloppupvm": null,
+  "paatospvm": "2020-01-02",
   "kieli": "sv",
   "paatoskierros": {
     "uuid": "cc6aaeb8-43b6-11e8-b2ef-005056aa0e66"
