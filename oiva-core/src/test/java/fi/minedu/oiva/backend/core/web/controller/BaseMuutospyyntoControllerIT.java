@@ -213,6 +213,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
 
     @Test
     public void testHappyPath() throws IOException {
+        jdbcTemplate.update("UPDATE lupa SET kieli = 'sv' WHERE id = 1");
         loginAs("testuser", lupaJarjestajaOid,
                 OivaAccess.Context_Kayttaja, OivaAccess.Context_Kayttaja);
         // Create new muutospyynto without ytunnus
@@ -267,6 +268,7 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         final ResponseEntity<String> lupaJson = makeRequest("/api/luvat/jarjestaja/1.1.111.111.11.11111111111?with=all", OK);
         doc = jsonPath.parse(lupaJson.getBody());
         final String asianumero = doc.read("$.asianumero", String.class);
+        assertEquals("Lupa kieli should match!", "sv", doc.read("$.kieli", String.class));
         assertEquals("Lupa diaarinumero and asianumero should be equal!", doc.read("$.diaarinumero", String.class), asianumero);
         assertEquals("Lupa asianumero should match!", "VN/123456/1234", asianumero);
 
@@ -289,6 +291,8 @@ public abstract class BaseMuutospyyntoControllerIT extends BaseIT {
         // Check history
         assertEquals("There should be history row for old lupa", 1,
                 JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "lupahistoria", "lupa_id = 1"));
+        final String kieli = jdbcTemplate.queryForObject("SELECT kieli FROM lupahistoria WHERE lupa_id = 1", String.class);
+        assertEquals("Lupahistoria kieli should match!", "sv", kieli);
     }
 
     @Test

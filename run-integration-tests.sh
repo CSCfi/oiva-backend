@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-tests=*IT
+tests="*IT"
 usage() {
     echo "Usage: $0 [[-d][-t regex] | [-h]]"
     echo -e "-d | --debug      Run integration tests with remote debug in port 5005"
@@ -25,4 +25,4 @@ while [[ "$1" != "" ]]; do
 done
 
 echo "Tests: $tests"
-mvn clean docker:build -Dintegration-test && export MACHINE_IP=$(docker-machine ip test-db-machine) && mvn verify ${debug} -Dit.test=${tests} -Dintegration-test
+mvn clean docker:build -Dintegration-test && export MACHINE_IP=$(docker-machine ip test-db-machine) && mvn verify ${debug} -Dit.test="${tests}" -Dintegration-test

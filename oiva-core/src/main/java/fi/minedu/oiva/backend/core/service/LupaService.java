@@ -148,12 +148,9 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Collection<Lupa> getAllJarjestamisluvat(final String... withOptions) {
-        return getAllJarjestamisluvat(null, withOptions);
-    }
-
     public Collection<Lupa> getAllJarjestamisluvat(final Condition filter, final String... withOptions) {
-        final SelectJoinStep<Record> query = baseLupaSelect();
+        final SelectJoinStep<Record> query = baseLupaSelect()
+                .leftJoin(ASIATYYPPI).on(LUPA.ASIATYYPPI_ID.eq(ASIATYYPPI.ID));
         baseLupaFilter().ifPresent(query::where);
         Optional.ofNullable(filter).ifPresent(query::where);
         // filteröidään pois lisäkouluttajat
@@ -163,9 +160,11 @@ public class LupaService extends BaseService {
         return fetch(query, withOptions);
     }
 
-    public Optional<Lupa> getLatestByOid(String oid, boolean useKoodistoVersions, String koulutustyyppi, String[] withOptions) {
+    public Optional<Lupa> getLatestByOid(String oid, boolean useKoodistoVersions, String koulutustyyppi, String kieli,
+                                         String[] withOptions) {
         final SelectConditionStep<Record> query = baseLupaSelect().where(LUPA.JARJESTAJA_OID.eq(oid))
                 .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                .and(kieli == null ? LUPA.KIELI.isNull() : LUPA.KIELI.eq(kieli))
                 .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
         baseLupaFilter().ifPresent(query::and);
         query.orderBy(LUPA.LUONTIPVM.desc()).limit(1);
@@ -428,9 +427,8 @@ public class LupaService extends BaseService {
     public List<Organisaatio> getLupaorganisaatiot(String koulutustyyppi) {
         SelectConditionStep<Record1<String>> query = dsl.selectDistinct(LUPA.JARJESTAJA_OID)
                 .from(LUPA)
-                .where(LUPA.ALKUPVM.le(DSL.currentDate())
-                        .and(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
-                        .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate()))));
+                .where(koulutustyyppi == null ? LUPA.KOULUTUSTYYPPI.isNull() : LUPA.KOULUTUSTYYPPI.eq(koulutustyyppi))
+                        .and(LUPA.LOPPUPVM.isNull().or(LUPA.LOPPUPVM.ge(DSL.currentDate())));
 
         return dsl.fetch(query).stream()
                 .map(result -> result.get(LUPA.JARJESTAJA_OID))

@@ -29,7 +29,7 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Muutospyynto implements Serializable {
 
-    private static final long serialVersionUID = 683914854;
+    private static final long serialVersionUID = -1983405550;
 
     private Long      id;
     private Long      lupaId;
@@ -51,6 +51,7 @@ public class Muutospyynto implements Serializable {
     private String    diaarinumero;
     private String    jarjestajaOid;
     private String    koulutustyyppi;
+    private String    kieli;
 
     public Muutospyynto() {}
 
@@ -75,6 +76,7 @@ public class Muutospyynto implements Serializable {
         this.diaarinumero = value.diaarinumero;
         this.jarjestajaOid = value.jarjestajaOid;
         this.koulutustyyppi = value.koulutustyyppi;
+        this.kieli = value.kieli;
     }
 
     public Muutospyynto(
@@ -97,7 +99,8 @@ public class Muutospyynto implements Serializable {
         Date      paatospvm,
         String    diaarinumero,
         String    jarjestajaOid,
-        String    koulutustyyppi
+        String    koulutustyyppi,
+        String    kieli
     ) {
         this.id = id;
         this.lupaId = lupaId;
@@ -119,6 +122,7 @@ public class Muutospyynto implements Serializable {
         this.diaarinumero = diaarinumero;
         this.jarjestajaOid = jarjestajaOid;
         this.koulutustyyppi = koulutustyyppi;
+        this.kieli = kieli;
     }
 
     public Long getId() {
@@ -289,6 +293,14 @@ public class Muutospyynto implements Serializable {
         this.koulutustyyppi = koulutustyyppi;
     }
 
+    public String getKieli() {
+        return this.kieli;
+    }
+
+    public void setKieli(String kieli) {
+        this.kieli = kieli;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Muutospyynto (");
@@ -313,6 +325,7 @@ public class Muutospyynto implements Serializable {
         sb.append(", ").append(diaarinumero);
         sb.append(", ").append(jarjestajaOid);
         sb.append(", ").append(koulutustyyppi);
+        sb.append(", ").append(kieli);
 
         sb.append(")");
         return sb.toString();

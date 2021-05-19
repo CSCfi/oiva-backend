@@ -91,8 +91,9 @@ public class LupaController {
     public CompletableFuture<HttpEntity<Lupa>> getLatestByOid(final @PathVariable String oid,
                                                               final @RequestParam(value = "with", required = false) String with,
                                                               final @RequestParam(value = "useKoodistoVersions", defaultValue = "true") boolean useKoodistoVersions,
-                                                              final @RequestParam(required = false) String koulutustyyppi) {
-        return getOr404(async(() -> service.getLatestByOid(oid, useKoodistoVersions, koulutustyyppi, options(with))));
+                                                              final @RequestParam(required = false) String koulutustyyppi,
+                                                              final @RequestParam(required = false) String kieli) {
+        return getOr404(async(() -> service.getLatestByOid(oid, useKoodistoVersions, koulutustyyppi, kieli, options(with))));
     }
 
     @OivaAccess_Public
@@ -121,7 +122,7 @@ public class LupaController {
 
     @OivaAccess_Public
     @RequestMapping(method = GET, value = "/organisaatiot")
-    @ApiOperation(notes = "Palauttaa kaikki organisaatiot, joille löytyy voimassa oleva lupa järjestelmästä", value = "")
+    @ApiOperation(notes = "Palauttaa kaikki organisaatiot, joille löytyy voimassa oleva tai tulevaisuudessa voimaan tuleva lupa järjestelmästä", value = "")
     public CompletableFuture<Collection<Organisaatio>> getLupaorganisaatiot(@RequestParam(value = "koulutustyyppi", required = false) String koulutustyyppi) {
         return async(() -> service.getLupaorganisaatiot(koulutustyyppi));
     }

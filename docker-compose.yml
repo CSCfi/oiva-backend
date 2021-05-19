@@ -13,19 +13,6 @@ services:
             - "amos-redis"
         networks:
             - vpnsafe
-    yva-backend:
-        build:
-            context: .
-            dockerfile: ./Dockerfile-yva-backend
-        ports:
-            - "9100:8100"
-        volumes:
-            - ../oiva-template:/opt/oiva/template
-        depends_on:
-            - "yva-postgres"
-            - "yva-redis"
-        networks:
-            - vpnsafe
     amos-postgres:
         build:
             context: .
@@ -38,28 +25,10 @@ services:
             POSTGRES_DB: oiva
         networks:
             - vpnsafe
-    yva-postgres:
-        build:
-            context: .
-            dockerfile: ./Dockerfile-postgres
-        ports:
-            - "7432:5432"
-        environment:
-            POSTGRES_USER: kuja
-            POSTGRES_PASSWORD: kuja
-            POSTGRES_DB: kuja
-        networks:
-            - vpnsafe
     amos-redis:
         image: redis
         ports:
             - "7379:6379"
-        networks:
-            - vpnsafe
-    yva-redis:
-        image: redis
-        ports:
-            - "8379:6379"
         networks:
             - vpnsafe
     nginx:
@@ -70,20 +39,6 @@ services:
             - "80:80"
         volumes:
             - ./nginx/nginx.conf:/opt/openresty/nginx/conf/nginx.conf
-            - ./nginx/ssl/nginx.crt:/opt/openresty/nginx/conf/ssl/nginx.crt
-            - ./nginx/ssl/nginx.key:/opt/openresty/nginx/conf/ssl/nginx.key
-        extra_hosts:
-            hostmachine: HOSTIP
-        networks:
-            - vpnsafe
-    yva-nginx:
-        hostname: localhost
-        image: ficusio/openresty:latest
-        ports:
-            - "4433:4433"
-            - "8888:8888"
-        volumes:
-            - ./nginx/yva-nginx.conf:/opt/openresty/nginx/conf/nginx.conf
             - ./nginx/ssl/nginx.crt:/opt/openresty/nginx/conf/ssl/nginx.crt
             - ./nginx/ssl/nginx.key:/opt/openresty/nginx/conf/ssl/nginx.key
         extra_hosts:
