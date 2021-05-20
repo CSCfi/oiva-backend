@@ -153,10 +153,10 @@ public class LupaService extends BaseService {
                 .leftJoin(ASIATYYPPI).on(LUPA.ASIATYYPPI_ID.eq(ASIATYYPPI.ID));
         baseLupaFilter().ifPresent(query::where);
         Optional.ofNullable(filter).ifPresent(query::where);
-        // filteröidään pois lisäkouluttajat
-        query.where(LUPA.JARJESTAJA_YTUNNUS.notIn("0763403-0", "0986820-1", "0108023-3", "0188756-3", "0950895-1",
+        // filteröidään pois lisäkouluttajien ammatillisen puolen luvat
+        query.where(LUPA.JARJESTAJA_YTUNNUS.in("0763403-0", "0986820-1", "0108023-3", "0188756-3", "0950895-1",
                 "0206976-5", "0151534-8", "0112038-9", "0201789-3", "0210311-8", "1524361-1", "1099221-8", "0215382-8",
-                "1041090-0", "0195032-3", "0773744-3"));
+                "1041090-0", "0195032-3", "0773744-3").and(LUPA.KOULUTUSTYYPPI.isNull()).not());
         return fetch(query, withOptions);
     }
 

@@ -73,6 +73,19 @@ public abstract class BaseExportControllerIT extends BaseIT {
                 id);
     }
 
+    @Test
+    public void getJarjestysluvat() {
+        setUpDb("sql/lupa_data_lisakouluttajat.sql");
+        final String uri = UriComponentsBuilder.fromPath("/api/export/jarjestysluvat").build().toUriString();
+        final ResponseEntity<String> response =
+                makeRequest(GET, uri, getBasicAuthHeaders("oiva", "oiva"), null, HttpStatus.OK);
+        final DocumentContext doc = jsonPath.parse(response.getBody() == null ? "{}" : response.getBody());
+        log.info(doc.jsonString());
+        assertIds("All except 5 (Asiatyyppi Peruutus) and 9, 11, 13 (Lisäkouluttajat ammatillinen lupa) should return",
+                doc, 1, 2, 3, 4, 6, 7, 8, 10, 12, 14, 15);
+
+    }
+
     private DocumentContext requestKustannustiedot(String startDate, String endDate, HttpStatus status) {
         return requestKustannustiedot(null, startDate, endDate, status);
     }
