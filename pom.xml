@@ -26,7 +26,7 @@
 
         <org.jooq.version>3.9.1</org.jooq.version>
         <model.mapper.version>0.7.7</model.mapper.version>
-        <postgres.driver.version>42.1.4</postgres.driver.version>
+        <postgres.driver.version>42.2.25</postgres.driver.version>
         <postgres.driver.name>org.postgresql.Driver</postgres.driver.name>
 
         <commons-lang3.version>3.9</commons-lang3.version>
